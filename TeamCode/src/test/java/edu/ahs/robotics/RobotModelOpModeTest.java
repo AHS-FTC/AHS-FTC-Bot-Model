@@ -7,7 +7,7 @@ public class RobotModelOpModeTest {
 
     @Test
     public void testThis() {
-        // Set up mock motors and
+        // Set up mock motors and device names
         FTCUtilities.startTestMode();
         DcMotorMock frontLeft = new DcMotorMock(driveMotorType);
         DcMotorMock frontRight = new DcMotorMock(driveMotorType);
