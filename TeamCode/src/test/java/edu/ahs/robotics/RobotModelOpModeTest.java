@@ -7,7 +7,7 @@ public class RobotModelOpModeTest {
 
     @Test
     public void testThis() {
-        // That was a completely awful comment
+        // That was a completely and totally awful comment
         // Set up mock motors
         FTCUtilities.startTestMode();
         DcMotorMock frontLeft = new DcMotorMock(driveMotorType);
