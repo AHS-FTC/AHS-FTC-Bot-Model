@@ -6,10 +6,10 @@ import java.util.HashMap;
 
 public class MecanumChassis extends Chassis {
 
-    private DriveUnit frontLeft;
-    private DriveUnit frontRight;
-    private DriveUnit backLeft;
-    private DriveUnit backRight;
+    private SingleDriveUnit frontLeft;
+    private SingleDriveUnit frontRight;
+    private SingleDriveUnit backLeft;
+    private SingleDriveUnit backRight;
 
     public void execute(PlanElement planElement){
         if (planElement instanceof ForwardMotion) {
@@ -29,10 +29,10 @@ public class MecanumChassis extends Chassis {
         HashMap<MotorLocations, String> deviceNames = botConfig.getDriveMotorDeviceNames();
         //HashMap<MotorLocations, Boolean> deviceFlips = botConfig.getFlippedMotors();
 
-        frontLeft = new DriveUnit(deviceNames.get(MotorLocations.FRONTLEFT), botConfig, botConfig.isFlipped(MotorLocations.FRONTLEFT));
-        frontRight = new DriveUnit(deviceNames.get(MotorLocations.FRONTRIGHT), botConfig, botConfig.isFlipped(MotorLocations.FRONTRIGHT));
-        backLeft = new DriveUnit(deviceNames.get(MotorLocations.BACKLEFT), botConfig, botConfig.isFlipped(MotorLocations.BACKLEFT));
-        backRight = new DriveUnit(deviceNames.get(MotorLocations.BACKRIGHT), botConfig, botConfig.isFlipped(MotorLocations.BACKRIGHT));
+        frontLeft = new SingleDriveUnit(deviceNames.get(MotorLocations.FRONTLEFT), botConfig, botConfig.isFlipped(MotorLocations.FRONTLEFT));
+        frontRight = new SingleDriveUnit(deviceNames.get(MotorLocations.FRONTRIGHT), botConfig, botConfig.isFlipped(MotorLocations.FRONTRIGHT));
+        backLeft = new SingleDriveUnit(deviceNames.get(MotorLocations.BACKLEFT), botConfig, botConfig.isFlipped(MotorLocations.BACKLEFT));
+        backRight = new SingleDriveUnit(deviceNames.get(MotorLocations.BACKRIGHT), botConfig, botConfig.isFlipped(MotorLocations.BACKRIGHT));
     }
     public void turnOnMotor(){
         frontLeft.setPower(1);
