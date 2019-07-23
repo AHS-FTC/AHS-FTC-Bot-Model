@@ -10,7 +10,7 @@ public class DcMotorMock implements DcMotor {
     private long startTime = System.currentTimeMillis();
     private double motorPower;
     private RunMode runMode;
-    private final double EFFICIENCY = .2;
+    private final double EFFICIENCY = .8;
     private MotorHashService.MotorTypes motorType;
     private Direction direction = Direction.FORWARD;
 
@@ -72,7 +72,7 @@ public class DcMotorMock implements DcMotor {
     @Override
     public int getCurrentPosition() {
         long elapsedTime = System.currentTimeMillis() - startTime;
-        double ticksPerTime = MotorHashService.getTicks(motorType) * MotorHashService.getRPMs(motorType) * motorPower * (elapsedTime/1000.0) * EFFICIENCY;
+        double ticksPerTime = MotorHashService.getTicks(motorType) * MotorHashService.getRPMs(motorType)/60 * motorPower * (elapsedTime/1000.0) * EFFICIENCY;
         return (int) (ticksPerTime);
     }
 

@@ -1,6 +1,8 @@
 package edu.ahs.robotics;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.Range;
 
 public class SingleDriveUnit extends DriveUnit{
     private GearRatio gearRatio;
@@ -25,7 +27,9 @@ public class SingleDriveUnit extends DriveUnit{
 
         FTCUtilities.OpLogger("flop",flip);
         if (isFlipped){
-            flip = -1;
+            motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+        else{motor.setDirection(DcMotorSimple.Direction.FORWARD);
         }
 
 //        if(isFlipped){
@@ -39,10 +43,12 @@ public class SingleDriveUnit extends DriveUnit{
 
 
     public void setPower(double motorPower){
-        if (Math.abs(motorPower) > 1) {
-            throw new Error("DriveUnit motorPower is not between 1 and -1");
-        }
-        motor.setPower(flip*motorPower);
+        FTCUtilities.OpLogger("Motor Power", motorPower);
+        motor.setPower(Range.clip(motorPower,-1,1));
+    }
+
+    public void adjustPower(double powerAdjustment){
+        setPower(motor.getPower()+powerAdjustment);
     }
 
     public void zeroDistance(){
@@ -55,6 +61,6 @@ public class SingleDriveUnit extends DriveUnit{
         double rotations = motor.getCurrentPosition()/ticksPerRotation;
         double rotationsAfterGears = rotations*gearRatio.getRatioAsDouble();
         double inchesTraveled = wheelCircumference * rotationsAfterGears;
-        return flip*inchesTraveled;
+        return inchesTraveled;
     }
 }
