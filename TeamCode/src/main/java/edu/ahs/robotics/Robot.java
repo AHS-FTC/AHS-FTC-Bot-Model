@@ -8,13 +8,13 @@ public class Robot {
     private Plan plan;
     private Chassis chassis;
 
-    public Robot(BotConfig botConfig){
+    public Robot(BotFactory botFactory){
 
-        if(!botConfig.isFullyConfigured()) {
+        if(!botFactory.isFullyConfigured()) {
             throw new Error("You haven't fully configured your robot");
         }
-        if (botConfig.getChassisType() == MecanumChassis.class){
-            chassis = new MecanumChassis(botConfig);
+        if (botFactory.getChassisType() == MecanumChassis.class){
+            chassis = new MecanumChassis(botFactory);
         }
     }
 

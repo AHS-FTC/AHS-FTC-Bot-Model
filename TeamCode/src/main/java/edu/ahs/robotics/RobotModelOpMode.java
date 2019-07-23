@@ -31,7 +31,6 @@ package edu.ahs.robotics;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.HashMap;
@@ -50,48 +49,23 @@ public class RobotModelOpMode extends LinearOpMode {
         FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
 
-        Robot jankBot = initRobot();
+        Robot summerBot = initRobot();
         waitForStart();
         runtime.reset();
-        jankBot.execute();
-        // MecanumChassis chassis = (MecanumChassis)jankBot.getChassis();
+        summerBot.execute();
+        // MecanumChassis chassis = (MecanumChassis)summerBot.getChassis();
         //chassis.turnOnMotor();
+
 
     }
 
     Robot initRobot() { //accessible from JUnit tests
-        HashMap<MotorLocations, String> deviceNames = new HashMap<>();
-        HashMap<MotorLocations, Boolean> motorFlips = new HashMap<>();
-        BotConfig jankBotConfig = new BotConfig();
-        //set BotConfig Parameters prior to creation of main Robot object
-        jankBotConfig.setChassisType(MecanumChassis.class);
         MotorHashService.init();
-        jankBotConfig.setDriveMotors(MotorHashService.MotorTypes.YJ_435);
-        jankBotConfig.setWheelDiameter(3.94);// in inches
-        jankBotConfig.setDriveGears(1,2);
-
-        deviceNames.put(MotorLocations.FRONTLEFT, "FL");
-        deviceNames.put(MotorLocations.FRONTRIGHT, "FR");
-        deviceNames.put(MotorLocations.BACKLEFT, "BL");
-        deviceNames.put(MotorLocations.BACKRIGHT, "BR");
-
-        motorFlips.put(MotorLocations.FRONTLEFT, false);
-        motorFlips.put(MotorLocations.FRONTRIGHT, true);
-        motorFlips.put(MotorLocations.BACKLEFT, false);
-        motorFlips.put(MotorLocations.BACKRIGHT, true);
-
-        jankBotConfig.setDriveMotorDeviceNames(deviceNames);
-        jankBotConfig.setFlippedMotors(motorFlips);
-
-
-        //Create main Robot Object
-        Robot jankBot = new Robot(jankBotConfig);
-        Plan gamePlan = new Plan();
         //start constructing PlanElements below
-        gamePlan.addToPlan(new ForwardMotion(60, 1, 10000, jankBot.getChassis()));
-        jankBot.givePlan(gamePlan);
-        //End of Init
-        return jankBot;
+        Plan gamePlan = new Plan();
+        gamePlan.addToPlan(new ForwardMotion(60, 1, 10000, ));
+        summerBot.givePlan(gamePlan);
+        return summerBot;
 
     }
 }

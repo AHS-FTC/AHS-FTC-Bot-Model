@@ -12,12 +12,12 @@ public class DoubleDriveUnit extends DriveUnit{
     MotorHashService.MotorTypes motorType;
     int flip = 1;
 
-    public DoubleDriveUnit(String deviceName, BotConfig botConfig, boolean isFlipped) {
-        this.gearRatio = botConfig.getDriveGearRatio();  // input over output gear ratio
-        this.wheelDiameter = botConfig.getWheelDiameter();
+    public DoubleDriveUnit(String deviceName, BotFactory botFactory, boolean isFlipped) {
+        this.gearRatio = botFactory.getDriveGearRatio();  // input over output gear ratio
+        this.wheelDiameter = botFactory.getWheelDiameter();
         wheelCircumference = wheelDiameter * Math.PI;
         this.deviceName = deviceName;
-        this.motorType = botConfig.getDriveMotorType();
+        this.motorType = botFactory.getDriveMotorType();
 
         motor1 = FTCUtilities.getMotor(deviceName);
         motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -12,12 +12,12 @@ public class SingleDriveUnit extends DriveUnit{
     int flip = 1;
 
 
-    public SingleDriveUnit(String deviceName, BotConfig botConfig, boolean isFlipped) {
-        this.gearRatio = botConfig.getDriveGearRatio();  // input over output gear ratio
-        this.wheelDiameter = botConfig.getWheelDiameter();
+    public SingleDriveUnit(String deviceName, BotFactory botFactory, boolean isFlipped) {
+        this.gearRatio = botFactory.getDriveGearRatio();  // input over output gear ratio
+        this.wheelDiameter = botFactory.getWheelDiameter();
         wheelCircumference = wheelDiameter * Math.PI;
         this.deviceName = deviceName;
-        this.motorType = botConfig.getDriveMotorType();
+        this.motorType = botFactory.getDriveMotorType();
 
         motor = FTCUtilities.getMotor(deviceName);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
