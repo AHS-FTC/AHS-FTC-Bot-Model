@@ -57,7 +57,7 @@ public class MecanumChassis extends Chassis {
         RampFunction forceFunction = new RampFunction(forwardMotion.travelDistance);
 
         //create PID object with specifed P,I,D coefficients
-        PIDController myBasicPIDController = new PIDController(.1,0,0);
+        PIDController myBasicPIDController = new PIDController(.005,0,0);
 
         while(actualInchesTravelled<forwardMotion.travelDistance){
             //get the current time
@@ -84,7 +84,7 @@ public class MecanumChassis extends Chassis {
             //FTCUtilities.OpSleep(1000);
 
             //Log Stuff!
-/*
+
             FTCUtilities.OpLogger("Motor Power", power);
             FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
             FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
@@ -92,7 +92,7 @@ public class MecanumChassis extends Chassis {
             FTCUtilities.OpLogger("Error", error);
             FTCUtilities.OpLogger("Elapsed Time", currentTime);
             FTCUtilities.OpLogger("-------------", ":-----------");
-*/
+
 
             myBasicPIDController.getMeanAndSD();
 
