@@ -8,14 +8,8 @@ public class Robot {
     private Plan plan;
     private Chassis chassis;
 
-    public Robot(BotFactory botFactory){
-
-        if(!botFactory.isFullyConfigured()) {
-            throw new Error("You haven't fully configured your robot");
-        }
-        if (botFactory.getChassisType() == MecanumChassis.class){
-            chassis = new MecanumChassis(botFactory);
-        }
+    public Robot(Chassis chassis) {
+        this.chassis = chassis;
     }
 
     public void givePlan (Plan plan) {

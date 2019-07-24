@@ -2,41 +2,25 @@ package edu.ahs.robotics;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+
 public class SingleDriveUnit extends DriveUnit{
-    private GearRatio gearRatio;
-    private double wheelDiameter; // in inches
-    private double wheelCircumference;
-    DcMotor motor;
-    String deviceName;
-    MotorHashService.MotorTypes motorType;
     int flip = 1;
 
 
-    public SingleDriveUnit(String deviceName, BotFactory botFactory, boolean isFlipped) {
-        this.gearRatio = botFactory.getDriveGearRatio();  // input over output gear ratio
-        this.wheelDiameter = botFactory.getWheelDiameter();
-        wheelCircumference = wheelDiameter * Math.PI;
+    public SingleDriveUnit(String deviceName,Config config, boolean flipped) {
+        super(deviceName, config, flipped);
         this.deviceName = deviceName;
-        this.motorType = botFactory.getDriveMotorType();
+        this.config = config;
 
-        motor = FTCUtilities.getMotor(deviceName);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         FTCUtilities.OpLogger("flop",flip);
-        if (isFlipped){
+        if (flipped){
             flip = -1;
         }
 
-//        if(isFlipped){
-//            motor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        } else{
-//            motor.setDirection(DcMotorSimple.Direction.FORWARD);
-//        }
-
-
     }
-
 
     public void setPower(double motorPower){
         if (Math.abs(motorPower) > 1) {
@@ -51,9 +35,9 @@ public class SingleDriveUnit extends DriveUnit{
     }
 
     public double getDistance (){
-        double ticksPerRotation = MotorHashService.getTicks(motorType);
+        double ticksPerRotation = MotorHashService.getTicks(config.getMotorType());
         double rotations = motor.getCurrentPosition()/ticksPerRotation;
-        double rotationsAfterGears = rotations*gearRatio.getRatioAsDouble();
+        double rotationsAfterGears = rotations*config.getGearRatio().getRatioAsDouble();
         double inchesTraveled = wheelCircumference * rotationsAfterGears;
         return flip*inchesTraveled;
     }

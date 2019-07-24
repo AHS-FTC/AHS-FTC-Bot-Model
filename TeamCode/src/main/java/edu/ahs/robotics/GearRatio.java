@@ -9,11 +9,6 @@ public class GearRatio {
         this.outputTeeth = outputTeeth;
     }
 
-    public GearRatio () {
-        inputTeeth = 1;
-        outputTeeth = 1;
-    }
-
     public double getRatioAsDouble(){
         double ratio = (double)inputTeeth/(double)outputTeeth;
         return ratio;

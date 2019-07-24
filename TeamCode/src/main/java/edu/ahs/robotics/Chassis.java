@@ -5,7 +5,7 @@ package edu.ahs.robotics;
  */
 public abstract class Chassis implements Executor{
 
-    public Chassis(BotFactory botFactory){
+    public Chassis(){
     }
     public abstract void execute(PlanElement planElement);
 

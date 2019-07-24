@@ -35,13 +35,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.HashMap;
 
-@TeleOp(name="Robot Model Test Opmode", group="Linear Opmode")
+@TeleOp(name = "Robot Model Test Opmode", group = "Linear Opmode")
 //@Disabled
 public class RobotModelOpMode extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-
 
 
     @Override
@@ -53,17 +52,20 @@ public class RobotModelOpMode extends LinearOpMode {
         waitForStart();
         runtime.reset();
         summerBot.execute();
-        // MecanumChassis chassis = (MecanumChassis)summerBot.getChassis();
-        //chassis.turnOnMotor();
-
 
     }
 
     Robot initRobot() { //accessible from JUnit tests
         MotorHashService.init();
+
+        // Instantiate the BotFactory subclass for our robot
+        SummerBotFactory summerBotFactory = new SummerBotFactory();
+
+        Robot summerBot = summerBotFactory.createRobot();
+
         //start constructing PlanElements below
         Plan gamePlan = new Plan();
-        gamePlan.addToPlan(new ForwardMotion(60, 1, 10000, ));
+        gamePlan.addToPlan(new ForwardMotion(60, 1, 10000, summerBot.getChassis()));
         summerBot.givePlan(gamePlan);
         return summerBot;
 
