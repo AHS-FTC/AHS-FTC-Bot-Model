@@ -53,7 +53,7 @@ public class MecanumChassis extends Chassis {
         LinearFunction forceFunction = new LinearFunction(forwardMotion.travelDistance,12);
 
         //create PID object with specifed P,I,D coefficients
-        PIDController myBasicPIDController = new PIDController(.1,0,0);
+        PIDController myBasicPIDController = new PIDController(.00187,0,0);
 
         while(actualInchesTravelled<forwardMotion.travelDistance){
             //get the current time
@@ -62,7 +62,7 @@ public class MecanumChassis extends Chassis {
             //calculate the error and total error...desired distance - actual distance
             desiredInchesTravelled = forceFunction.getDesiredDistance(currentTime);
             actualInchesTravelled = (frontRight.getDistance() + frontLeft.getDistance() + backRight.getDistance()+ backLeft.getDistance())/4; //This should be re-implemented for seperate feedback on every motor
-            error = desiredInchesTravelled-actualInchesTravelled;
+            error = desiredInchesTravelled-1*actualInchesTravelled;
 
             //calculate the powerAdjustment based on the error
 
@@ -73,26 +73,31 @@ public class MecanumChassis extends Chassis {
             //adjustPowerAll(powerAdjustment);
             //pause for specified amount of time
             try {
-                Thread.sleep(1);
+                Thread.sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             //FTCUtilities.OpSleep(1000);
 
             //Log Stuff!
+/*
             FTCUtilities.OpLogger("Motor Power", power);
+            FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
             FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
             FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
             FTCUtilities.OpLogger("Error", error);
             FTCUtilities.OpLogger("Elapsed Time", currentTime);
             FTCUtilities.OpLogger("-------------", ":-----------");
-            
+  */
+            myBasicPIDController.getMeanAndSD();
+
         }
 
         setPowerAll(0);
     }
 
     private void motionInterpreter(ArcMotion arcMotion){
+
 
     }
 
