@@ -13,7 +13,11 @@ public class MecanumChassis extends Chassis {
 
     public void execute(PlanElement planElement){
         if (planElement instanceof ForwardMotion) {
-            motionInterpreter((ForwardMotion)planElement);
+            if(planElement instanceof ForwardMotionBasic){
+                motionInterpreter((ForwardMotionBasic)planElement);
+            } else {
+                motionInterpreter((ForwardMotion) planElement);
+            }
         }
         else if (planElement instanceof ArcMotion){
             motionInterpreter((ArcMotion)planElement);
@@ -87,6 +91,22 @@ public class MecanumChassis extends Chassis {
             FTCUtilities.OpLogger("Elapsed Time", currentTime);
             FTCUtilities.OpLogger("-------------", ":-----------");
             
+        }
+
+        setPowerAll(0);
+    }
+
+    private void motionInterpreter(ForwardMotionBasic forwardMotionBasic){
+        double distance = forwardMotionBasic.travelDistance;
+        double power = forwardMotionBasic.motorPower;
+        double averageDistance = 0;
+
+        //reset all encoders?
+
+        setPowerAll(power);
+
+        while (averageDistance < distance) {
+            averageDistance = (backLeft.getDistance() + backRight.getDistance() + frontRight.getDistance() + frontLeft.getDistance())/4;
         }
 
         setPowerAll(0);
