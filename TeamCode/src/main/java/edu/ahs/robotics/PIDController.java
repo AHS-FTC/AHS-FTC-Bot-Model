@@ -2,27 +2,28 @@ package edu.ahs.robotics;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class PIDController {
 
         private double KP;
         private double KI;
         private double KD;
-        private double currentError;
-        private double totalError;
-        private double changeInError;
+        private double currentError=0;
+        private double totalError=0;
+        private double changeInError=0;
+        private List errorList;
 
 
         public PIDController(double KP, double KI, double KD){
             this.KP=KP;
             this.KI=KI;
             this.KD=KD;
-            this.currentError=0;
-            totalError=0;
-            changeInError=0;
+            this.errorList = new ArrayList<Double>();
         }
 
         public double getPowerAdjustment(double error){
+            errorList.add(error);
             setChangeInError(error);
             updateTotalError(error);
             double pAdjustment = error*KP;
@@ -34,6 +35,38 @@ public class PIDController {
             return totalAdjustment;
 
         }
+
+        public void getMeanAndSD(){
+            double meanError = totalError/errorList.size();
+            double sd = sd((ArrayList<Double>) errorList);
+            FTCUtilities.OpLogger("Mean/SD",Double.toString(meanError)+", "+Double.toString(sd));
+
+        }
+
+    public double sd (ArrayList<Double> errors)
+    {
+        // Step 1:
+        double mean = totalError/errors.size();
+        double temp = 0;
+
+        for (int i = 0; i < errors.size(); i++)
+        {
+            double val = errors.get(i);
+
+            // Step 2:
+            double squreDiffToMean = Math.pow(val - mean, 2);
+
+            // Step 3:
+            temp += squreDiffToMean;
+        }
+
+        // Step 4:
+        double meanOfDiffs =  temp / (double) (errors.size());
+
+        // Step 5:
+        return Math.sqrt(meanOfDiffs);
+    }
+
 
         private void setChangeInError(double error){
             changeInError=error-currentError;

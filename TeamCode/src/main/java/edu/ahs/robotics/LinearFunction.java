@@ -13,8 +13,8 @@ public class LinearFunction implements Function {
      */
     public LinearFunction(double distance, double maxSpeed){
         this.distance = distance;
-        this.executionTime = distance/maxSpeed;
         this.maxSpeed = maxSpeed/1000;
+        this.executionTime = distance/this.maxSpeed;
 
     }
 
