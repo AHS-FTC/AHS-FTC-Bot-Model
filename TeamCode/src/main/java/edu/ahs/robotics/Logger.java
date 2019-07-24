@@ -31,7 +31,9 @@ public class Logger {
 
     You can change names in logger class, default is "Data.csv"
 
-    Directory will by standard be
+    Directory will ,by standard, be working file (if running mock tests)
+    Directory will ,by standard, be __________ (if actually running on robot and have phone plugged in)
+
     Make sure to save file or change name in between runs so that your file is not overwritten
     IF THIS IS NOT DONE DATA WILL BE LOST
      */
