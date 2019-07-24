@@ -47,36 +47,45 @@ public class MecanumChassis extends Chassis {
         double startTime = System.currentTimeMillis();
         double currentTime=0;
         double powerAdjustment = 0;
+        double power = 0;
 
         //create Linear Function Object which specifies distance and speed.
         LinearFunction forceFunction = new LinearFunction(forwardMotion.travelDistance,12);
 
         //create PID object with specifed P,I,D coefficients
-        PIDController myBasicPIDController = new PIDController(.01,0,0);
+        PIDController myBasicPIDController = new PIDController(.1,0,0);
 
         while(actualInchesTravelled<forwardMotion.travelDistance){
-
             //get the current time
             currentTime = System.currentTimeMillis()-startTime;
 
             //calculate the error and total error...desired distance - actual distance
             desiredInchesTravelled = forceFunction.getDesiredDistance(currentTime);
-            actualInchesTravelled = (frontRight.getDistance() + frontLeft.getDistance() + backRight.getDistance()+ backLeft.getDistance())/4;
+            actualInchesTravelled = (frontRight.getDistance() + frontLeft.getDistance() + backRight.getDistance()+ backLeft.getDistance())/4; //This should be re-implemented for seperate feedback on every motor
             error = desiredInchesTravelled-actualInchesTravelled;
 
             //calculate the powerAdjustment based on the error
-            powerAdjustment = myBasicPIDController.getPowerAdjustment(error);
 
+            powerAdjustment = myBasicPIDController.getPowerAdjustment(error);
+            power += powerAdjustment;
+            setPowerAll(power);
             //adjust the motor speed appropriately
-            adjustPowerAll(powerAdjustment);
+            //adjustPowerAll(powerAdjustment);
             //pause for specified amount of time
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             //FTCUtilities.OpSleep(1000);
 
             //Log Stuff!
+            FTCUtilities.OpLogger("Motor Power", power);
             FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
             FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
             FTCUtilities.OpLogger("Error", error);
             FTCUtilities.OpLogger("Elapsed Time", currentTime);
+            FTCUtilities.OpLogger("-------------", ":-----------");
             
         }
 

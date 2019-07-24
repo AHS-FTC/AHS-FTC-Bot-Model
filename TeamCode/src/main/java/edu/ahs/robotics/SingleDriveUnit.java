@@ -25,7 +25,6 @@ public class SingleDriveUnit extends DriveUnit{
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        FTCUtilities.OpLogger("flop",flip);
         if (isFlipped){
             motor.setDirection(DcMotorSimple.Direction.REVERSE);
         }
@@ -43,7 +42,6 @@ public class SingleDriveUnit extends DriveUnit{
 
 
     public void setPower(double motorPower){
-        FTCUtilities.OpLogger("Motor Power", motorPower);
         motor.setPower(Range.clip(motorPower,-1,1));
     }
 
