@@ -107,8 +107,8 @@ public class MecanumChassis extends Chassis {
 
         while (averageDistance < distance) {
             averageDistance = (backLeft.getDistance() + backRight.getDistance() + frontRight.getDistance() + frontLeft.getDistance())/4;
+            //FTCUtilities.OpLogger("Average Distance", averageDistance);
         }
-
         setPowerAll(0);
     }
 
