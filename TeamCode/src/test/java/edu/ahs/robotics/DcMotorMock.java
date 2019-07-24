@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 public class DcMotorMock implements DcMotor {
 
     private long startTime = System.currentTimeMillis();
-    double distance = 0;
+    private double distance;
     private double motorPower;
     private RunMode runMode;
     private final double EFFICIENCY = .8;
@@ -72,6 +72,7 @@ public class DcMotorMock implements DcMotor {
 
     @Override
     public int getCurrentPosition() {
+        encoderUpdate();
         return (int)distance;
     }
 
@@ -152,7 +153,7 @@ public class DcMotorMock implements DcMotor {
 
     }
 
-    private void encoderUpdate(){//encoderUpdate allows for a more realistic modeling of motors, by keeping a running tally of encoder value change rather than a static rate estimate
+    private void encoderUpdate(){//encoderUpdate allows for a more realistic modeling of motors by keeping a running tally of encoder value change rather than a static rate estimate
         double elapsedTime = System.currentTimeMillis() - startTime;
         zeroTime();
         double ticksPerTime = MotorHashService.getTicks(motorType) * MotorHashService.getRPMs(motorType)/60000 * motorPower * elapsedTime * EFFICIENCY;

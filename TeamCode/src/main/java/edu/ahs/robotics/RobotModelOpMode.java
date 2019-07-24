@@ -88,7 +88,7 @@ public class RobotModelOpMode extends LinearOpMode {
         Robot jankBot = new Robot(jankBotConfig);
         Plan gamePlan = new Plan();
         //start constructing PlanElements below
-        gamePlan.addToPlan(new ForwardMotion(60, 1, 10000, jankBot.getChassis()));
+        gamePlan.addToPlan(new ForwardMotionBasic(60, 1, 10000, jankBot.getChassis()));
         jankBot.givePlan(gamePlan);
         //End of Init
         return jankBot;
