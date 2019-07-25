@@ -13,6 +13,7 @@ public class PIDController {
         private double totalError=0;
         private double changeInError=0;
         private List errorList;
+        private double lastTime;
 
 
         public PIDController(double KP, double KI, double KD){
@@ -22,7 +23,7 @@ public class PIDController {
             this.errorList = new ArrayList<Double>();
         }
 
-        public double getPowerAdjustment(double error){
+        public double getPowerAdjustment(double error, double deltaTime){
             errorList.add(error);
             setChangeInError(error);
             updateTotalError(error);
