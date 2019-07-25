@@ -13,7 +13,7 @@ public class PIDController {
         private double totalError=0;
         private double changeInError=0;
         private List errorList;
-        private double lastTime;
+        private double deltaTime;
 
 
         public PIDController(double KP, double KI, double KD){
@@ -25,8 +25,9 @@ public class PIDController {
 
         public double getPowerAdjustment(double error, double deltaTime){
             errorList.add(error);
-            setChangeInError(error);
-            updateTotalError(error);
+            changeInError=(error-currentError)/deltaTime;
+            currentError=error;
+            totalError+=currentError*deltaTime;
             double pAdjustment = error*KP;
             double iAdjustment = totalError*KI;
             double dAdjustment = changeInError*KD;
@@ -69,18 +70,6 @@ public class PIDController {
     }
 
 
-        private void setChangeInError(double error){
-            changeInError=error-currentError;
-            setCurrentError(error);
-        }
-
-        private void setCurrentError(double error){
-            currentError=error;
-        }
-
-        private void updateTotalError(double currentError){
-            totalError+=currentError;
-        }
 
 }
 

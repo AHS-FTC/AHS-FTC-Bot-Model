@@ -1,5 +1,7 @@
 package edu.ahs.robotics;
 
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.util.HashMap;
@@ -38,56 +40,62 @@ public class MecanumChassis extends Chassis {
     private void motionInterpreter(ForwardMotion forwardMotion) {
 
         double actualInchesTravelled = 0;
-        double desiredInchesTravelled = 0;
-        double error = 0;
+
         double startTime = System.currentTimeMillis();
         double currentTime=0;
-        double powerAdjustment = 0;
         double power = 0;
+        int loopCounter=0;
+        int loopInterval = 50;
 
         //create Linear Function Object which specifies distance and speed.
         RampFunction forceFunction = new RampFunction(forwardMotion.travelDistance);
 
         //create PID object with specifed P,I,D coefficients
-        PIDController myBasicPIDController = new PIDController(.1,0,0);
+        PIDController myBasicPIDController = new PIDController(.1,0.1,.1);
 
         while(actualInchesTravelled<forwardMotion.travelDistance){
             //get the current time
             double lastTime = currentTime;
             currentTime = System.currentTimeMillis()-startTime;
             double deltaTime = currentTime-lastTime;
+            //ensure a regular Sample Interval
+            double sleepTime = Range.clip(loopInterval*loopCounter-currentTime,0,loopInterval);
+            loopCounter+=1;
+
+            try {
+                Thread.sleep((int)sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             //calculate the error and total error...desired distance - actual distance
-            desiredInchesTravelled = forceFunction.getDesiredDistance(currentTime);
+            double desiredInchesTravelled = forceFunction.getDesiredDistance(currentTime);
             actualInchesTravelled = (frontRight.getDistance() + frontLeft.getDistance() + backRight.getDistance()+ backLeft.getDistance())/4; //This should be re-implemented for seperate feedback on every motor
-            error = desiredInchesTravelled-1*actualInchesTravelled;
+            double error = desiredInchesTravelled-actualInchesTravelled;
 
             //calculate the powerAdjustment based on the error
 
-            powerAdjustment = myBasicPIDController.getPowerAdjustment(error,deltaTime);
+            double powerAdjustment = myBasicPIDController.getPowerAdjustment(error,deltaTime);
             power += powerAdjustment;
             setPowerAll(power);
             //adjust the motor speed appropriately
             //adjustPowerAll(powerAdjustment);
             //pause for specified amount of time
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             //FTCUtilities.OpSleep(1000);
 
             //Log Stuff!
-/*
+
             FTCUtilities.OpLogger("Motor Power", power);
             FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
             FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
             FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
             FTCUtilities.OpLogger("Error", error);
             FTCUtilities.OpLogger("Elapsed Time", currentTime);
-            FTCUtilities.OpLogger("-------------", ":-----------");
-*/
-
+            FTCUtilities.OpLogger("Interval Time", deltaTime);
             myBasicPIDController.getMeanAndSD();
+            FTCUtilities.OpLogger("-------------", ":-----------");
+
 
         }
 
