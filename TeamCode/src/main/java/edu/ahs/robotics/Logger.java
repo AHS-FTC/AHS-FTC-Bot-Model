@@ -1,7 +1,5 @@
 package edu.ahs.robotics;
 
-import android.os.Environment;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,11 +14,10 @@ public class Logger {
     INSTRUCTIONS FOR USING THE LOGGER:
 
     SETUP:
-    In opmode, Logger.getInstance().createCats("Field1","Field2");
-    Can add as many fields as needed
+    None needed
 
     ADD DATA:
-    In any file, use Logger.append("Field1",Data);
+    In any file, use Logger.append(Logger.cats.(NAME),Data);
     Will add data to given field, not much more than that
 
     IMPORTANT: make sure that your data is converted to a string before appending
@@ -42,7 +39,17 @@ public class Logger {
      */
 
     private static Logger instance;
-    private Map<String, ArrayList<String>> entriesByCategory;
+    private Map<Cats, ArrayList<String>> entriesByCategory;
+
+    public static enum Cats {
+        MOTORPOW("Motor Power"), ENCODERDIST("Encoder Distance");
+
+        private String name;
+
+        private String getName(){return name;}
+
+        private Cats(String s) { this.name = s;}
+    }
 
     private String fileName = "Data.csv";
 
@@ -58,13 +65,11 @@ public class Logger {
 
     private Logger() {
         entriesByCategory = new HashMap<>();
-    }
-    public void creatCats(String... categories){
-        for (int i = 0; i < categories.length; i++) {
-            entriesByCategory.put(categories[i], new ArrayList<String>());
+        for (int i = 0; i < Cats.values().length; i++) {
+            entriesByCategory.put(Cats.values()[i], new ArrayList<String>());
+
         }
     }
-
 
     public void writeToFile() {
         try {
@@ -74,8 +79,8 @@ public class Logger {
             }
             file.createNewFile();
             csvWriter = new FileWriter(file);
-            for (Map.Entry<String, ArrayList<String>> s : entriesByCategory.entrySet()) {
-                csvWriter.append(s.getKey());
+            for (Map.Entry<Cats, ArrayList<String>> s : entriesByCategory.entrySet()) {
+                csvWriter.append(s.getKey().getName());
                 csvWriter.append(", ");
                 ArrayList<String> list = s.getValue();
                 Iterator<String> iterator = list.iterator();
@@ -96,7 +101,7 @@ public class Logger {
         }
     }
 
-    public static void append(String title, String data) {
+    public static void append(Cats title, String data) {
         getInstance().entriesByCategory.get(title).add(data);
     }
 }
