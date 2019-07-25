@@ -17,7 +17,7 @@ public class MecanumChassis extends Chassis {
     private ChassisMotors.Mecanum BACK_LEFT = ChassisMotors.Mecanum.BACKLEFT;
     private ChassisMotors.Mecanum BACK_RIGHT = ChassisMotors.Mecanum.BACKRIGHT;
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map<ChassisMotors, Boolean> flips) {
+    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map<ChassisMotors.Mecanum, Boolean> flips) {
         super();
         frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(), driveUnitConfig, flips.get(FRONT_LEFT));
         frontRight = new SingleDriveUnit(FRONT_RIGHT.getDeviceName(), driveUnitConfig, flips.get(FRONT_RIGHT));
@@ -37,10 +37,10 @@ public class MecanumChassis extends Chassis {
 
     private void motionInterpreter(ForwardMotion forwardMotion) {
 
-        //frontLeft.zeroDistance();
-        //frontRight.zeroDistance();
-        //backLeft.zeroDistance();
-        //backRight.zeroDistance();
+        frontLeft.zeroDistance();
+        frontRight.zeroDistance();
+        backLeft.zeroDistance();
+        backRight.zeroDistance();
 
         double encoderAverage = 0;
 
