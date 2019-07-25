@@ -1,5 +1,7 @@
 package edu.ahs.robotics;
 
+import android.os.Environment;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,6 +19,14 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
 
     public static void setHardwareMap(HardwareMap hardwareMap) {
         FTCUtilities.hardwareMap = hardwareMap;
+    }
+
+    public static String getLogDirectory(){
+        if (testMode){
+            return (System.getProperty("user.dir"));
+        } else{
+            return (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+        }
     }
 
     public static HardwareMap getHardwareMap() {
