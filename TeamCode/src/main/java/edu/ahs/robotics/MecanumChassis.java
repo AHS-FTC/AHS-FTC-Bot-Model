@@ -2,7 +2,7 @@ package edu.ahs.robotics;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class MecanumChassis extends Chassis {
 
@@ -11,18 +11,18 @@ public class MecanumChassis extends Chassis {
     private SingleDriveUnit backLeft;
     private SingleDriveUnit backRight;
 
-    // Device names for drive units; corresponds to
-    private static String FRONT_LEFT = "FL";
-    private static String FRONT_RIGHT = "FR";
-    private static String BACK_LEFT = "BL";
-    private static String BACK_RIGHT = "BR";
+    // Motor shortcuts
+    private ChassisMotors.Mecanum FRONT_LEFT = ChassisMotors.Mecanum.FRONTLEFT;
+    private ChassisMotors.Mecanum FRONT_RIGHT = ChassisMotors.Mecanum.FRONTRIGHT;
+    private ChassisMotors.Mecanum BACK_LEFT = ChassisMotors.Mecanum.BACKLEFT;
+    private ChassisMotors.Mecanum BACK_RIGHT = ChassisMotors.Mecanum.BACKRIGHT;
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig) {
+    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map<ChassisMotors.Mecanum, Boolean> flips) {
         super();
-        frontLeft = new SingleDriveUnit(FRONT_LEFT, driveUnitConfig, false);
-        frontRight = new SingleDriveUnit(FRONT_RIGHT, driveUnitConfig, true);
-        backLeft = new SingleDriveUnit(BACK_LEFT, driveUnitConfig, false);
-        backRight = new SingleDriveUnit(BACK_RIGHT, driveUnitConfig, true);
+        frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(), driveUnitConfig, flips.get(FRONT_LEFT));
+        frontRight = new SingleDriveUnit(FRONT_RIGHT.getDeviceName(), driveUnitConfig, flips.get(FRONT_RIGHT));
+        backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, flips.get(BACK_LEFT));
+        backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, flips.get(BACK_RIGHT));
     }
 
     public void execute(PlanElement planElement) {
@@ -31,16 +31,16 @@ public class MecanumChassis extends Chassis {
         } else if (planElement instanceof ArcMotion) {
             motionInterpreter((ArcMotion) planElement);
         } else {
-            throw new Warning("Couldn't find a way to execute Planelement " + planElement.toString());
+            throw new Warning("Couldn't find a way to execute planElement " + planElement.toString());
         }
     }
 
     private void motionInterpreter(ForwardMotion forwardMotion) {
 
-        //frontLeft.zeroDistance();
-        //frontRight.zeroDistance();
-        //backLeft.zeroDistance();
-        //backRight.zeroDistance();
+        frontLeft.zeroDistance();
+        frontRight.zeroDistance();
+        backLeft.zeroDistance();
+        backRight.zeroDistance();
 
         double encoderAverage = 0;
 
