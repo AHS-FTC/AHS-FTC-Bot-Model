@@ -8,7 +8,7 @@ import java.util.List;
 
 public class PIDController {
 
-        private double MAXADJUSTMENT = .1;
+        private double MAXADJUSTMENT = .02;
         private double KP;
         private double KI;
         private double KD;
@@ -29,7 +29,9 @@ public class PIDController {
 
         public double getPowerAdjustment(double error, double deltaTime, double secondDerivative){
             errorList.add(error);
-            if(deltaTime==0){deltaTime=1;}
+            if (deltaTime==0){
+                deltaTime=1;}
+
             changeInError=(error-currentError)/deltaTime;
             currentError=error;
             totalError+=currentError*deltaTime;
@@ -38,7 +40,12 @@ public class PIDController {
             double dAdjustment = changeInError*KD;
             double ddAdjustment = secondDerivative*KDD;
 
-            double totalAdjustment = ddAdjustment;//pAdjustment+iAdjustment+dAdjustment+;
+            Logger.append(Logger.Cats.PADJUSTMENT,Double.toString(pAdjustment));
+            Logger.append(Logger.Cats.IADJUSTMENT,Double.toString(iAdjustment));
+            Logger.append(Logger.Cats.DADJUSTMENT,Double.toString(dAdjustment));
+            Logger.append(Logger.Cats.DDADJUSTMENT,Double.toString(ddAdjustment));
+
+            double totalAdjustment = ddAdjustment+pAdjustment+iAdjustment+dAdjustment;
 
             return totalAdjustment;
 

@@ -4,7 +4,7 @@ public class RampFunction implements Function {
     private double distance;
     private double executionTime;
     private double H_DILATION=0.005;
-    private double V_DILATION=10;
+    private double V_DILATION=20;
     private double OFFSET = 750;
 
     /**

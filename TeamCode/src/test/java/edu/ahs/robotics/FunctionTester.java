@@ -3,7 +3,7 @@ package edu.ahs.robotics;
 import org.junit.Test;
 
 public class FunctionTester {
-    private final double DISTANCE = 12; // in inches
+    private final double DISTANCE = 60; // in inches
 
     private Function function = new RampFunction(DISTANCE);
 
