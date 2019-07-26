@@ -53,7 +53,7 @@ public class MecanumChassis extends Chassis {
         RampFunction forceFunction = new RampFunction(forwardMotion.travelDistance);
 
         //create PID object with specifed P,I,D,DD coefficients
-        PIDController myBasicPIDController = new PIDController(0.05,0,0,.556);
+        PIDController myBasicPIDController = new PIDController(0,0,0,0.255);
 
         while(actualInchesTravelled<forwardMotion.travelDistance){
             //get the current time
@@ -89,18 +89,21 @@ public class MecanumChassis extends Chassis {
             //FTCUtilities.OpSleep(1000);
 
             //Log Stuff!
+            Logger.append(Logger.Cats.ENCODERDIST,Double.toString(actualInchesTravelled));
+            Logger.append(Logger.Cats.DESIDIST,Double.toString(desiredInchesTravelled));
+            Logger.append(Logger.Cats.ERROR,Double.toString(error));
             Logger.append(Logger.Cats.MOTORPOW,Double.toString(power));
+            Logger.append(Logger.Cats.POWADJ,Double.toString(powerAdjustment));
+            Logger.append(Logger.Cats.TIME,Double.toString(currentTime));
             //FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
             //FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
-            FTCUtilities.OpLogger("Error", error);
-            FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
-            FTCUtilities.OpLogger("Motor Power", power);
+           // FTCUtilities.OpLogger("Error", error);
+            //FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
+            //FTCUtilities.OpLogger("Motor Power", power);
             //FTCUtilities.OpLogger("Elapsed Time", currentTime);
             //FTCUtilities.OpLogger("Second Derivative", secondDerivative);
             //myBasicPIDController.getMeanAndSD();
-            FTCUtilities.OpLogger("-------------", ":-----------");
-
-
+            //FTCUtilities.OpLogger("-------------", ":-----------");
         }
         myBasicPIDController.getMeanAndSD();
 

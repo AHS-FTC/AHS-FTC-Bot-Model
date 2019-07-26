@@ -42,7 +42,8 @@ public class Logger {
     private Map<Cats, ArrayList<String>> entriesByCategory;
 
     public static enum Cats {
-        MOTORPOW("Motor Power"), ENCODERDIST("Encoder Distance");
+        MOTORPOW("Motor Power"), ENCODERDIST("Encoder Distance"),DESIDIST("Desired Distance"),ERROR("Error"),
+        POWADJ("Power Adjustment"),TIME("Time");
 
         private String name;
 

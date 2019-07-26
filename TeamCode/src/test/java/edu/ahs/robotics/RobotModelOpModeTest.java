@@ -22,6 +22,7 @@ public class RobotModelOpModeTest {
         RobotModelOpMode opMode = new RobotModelOpMode();
         Robot robot = opMode.initRobot();
         robot.execute();
+        Logger.getInstance().writeToFile();
 
     }
 
