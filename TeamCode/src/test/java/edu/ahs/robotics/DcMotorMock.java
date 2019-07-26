@@ -11,7 +11,7 @@ public class DcMotorMock implements DcMotor {
     private double distance;
     private double motorPower;
     private RunMode runMode;
-    private final double EFFICIENCY = .8;
+    private final double EFFICIENCY = .99;
     private MotorHashService.MotorTypes motorType;
     private Direction direction = Direction.FORWARD;
 

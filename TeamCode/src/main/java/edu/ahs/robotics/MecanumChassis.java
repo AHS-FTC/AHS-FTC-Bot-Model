@@ -53,7 +53,7 @@ public class MecanumChassis extends Chassis {
         RampFunction forceFunction = new RampFunction(forwardMotion.travelDistance);
 
         //create PID object with specifed P,I,D,DD coefficients
-        PIDController myBasicPIDController = new PIDController(0.05,0,0,.556);
+        PIDController myBasicPIDController = new PIDController(0.0,0,0,.45);
 
         while(actualInchesTravelled<forwardMotion.travelDistance){
             //get the current time
