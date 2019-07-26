@@ -1,14 +1,18 @@
 package edu.ahs.robotics;
 
+import com.qualcomm.robotcore.util.Range;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class PIDController {
 
+        private double MAXADJUSTMENT = .1;
         private double KP;
         private double KI;
         private double KD;
+        private double KDD;
         private double currentError=0;
         private double totalError=0;
         private double changeInError=0;
@@ -16,23 +20,25 @@ public class PIDController {
         private double deltaTime;
 
 
-        public PIDController(double KP, double KI, double KD){
+        public PIDController(double KP, double KI, double KD, double KDD){
             this.KP=KP;
             this.KI=KI;
             this.KD=KD;
+            this.KDD = KDD;
             this.errorList = new ArrayList<Double>();
         }
 
-        public double getPowerAdjustment(double error, double deltaTime){
+        public double getPowerAdjustment(double error, double deltaTime, double secondDerivative){
             errorList.add(error);
             changeInError=(error-currentError)/deltaTime;
             currentError=error;
             totalError+=currentError*deltaTime;
             double pAdjustment = error*KP;
-            double iAdjustment = totalError*KI;
+            double iAdjustment = Range.clip(totalError*KI,-MAXADJUSTMENT,MAXADJUSTMENT);
             double dAdjustment = changeInError*KD;
+            double ddAdjustment = secondDerivative*KDD;
 
-            double totalAdjustment = pAdjustment+iAdjustment+dAdjustment;
+            double totalAdjustment = pAdjustment+iAdjustment+dAdjustment+ddAdjustment;
 
             return totalAdjustment;
 

@@ -44,14 +44,16 @@ public class MecanumChassis extends Chassis {
         double startTime = System.currentTimeMillis();
         double currentTime=0;
         double power = 0;
+        double lastROC =0;
         int loopCounter=0;
         int loopInterval = 50;
+
 
         //create Linear Function Object which specifies distance and speed.
         RampFunction forceFunction = new RampFunction(forwardMotion.travelDistance);
 
-        //create PID object with specifed P,I,D coefficients
-        PIDController myBasicPIDController = new PIDController(.1,0.1,.1);
+        //create PID object with specifed P,I,D,DD coefficients
+        PIDController myBasicPIDController = new PIDController(0.05,0,0,.556);
 
         while(actualInchesTravelled<forwardMotion.travelDistance){
             //get the current time
@@ -72,10 +74,12 @@ public class MecanumChassis extends Chassis {
             double desiredInchesTravelled = forceFunction.getDesiredDistance(currentTime);
             actualInchesTravelled = (frontRight.getDistance() + frontLeft.getDistance() + backRight.getDistance()+ backLeft.getDistance())/4; //This should be re-implemented for seperate feedback on every motor
             double error = desiredInchesTravelled-actualInchesTravelled;
-
+            double currentROC = (forceFunction.getDesiredDistance(currentTime+loopInterval)-forceFunction.getDesiredDistance(currentTime));
             //calculate the powerAdjustment based on the error
+            double secondDerivative=(currentROC-lastROC);
+            lastROC = currentROC;
 
-            double powerAdjustment = myBasicPIDController.getPowerAdjustment(error,deltaTime);
+            double powerAdjustment = myBasicPIDController.getPowerAdjustment(error,deltaTime,secondDerivative);
             power += powerAdjustment;
             setPowerAll(power);
             //adjust the motor speed appropriately
@@ -85,19 +89,20 @@ public class MecanumChassis extends Chassis {
             //FTCUtilities.OpSleep(1000);
 
             //Log Stuff!
-
-            FTCUtilities.OpLogger("Motor Power", power);
-            FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
-            FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
-            FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
+            Logger.append(Logger.Cats.MOTORPOW,Double.toString(power));
+            //FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
+            //FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
             FTCUtilities.OpLogger("Error", error);
-            FTCUtilities.OpLogger("Elapsed Time", currentTime);
-            FTCUtilities.OpLogger("Interval Time", deltaTime);
-            myBasicPIDController.getMeanAndSD();
+            FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
+            FTCUtilities.OpLogger("Motor Power", power);
+            //FTCUtilities.OpLogger("Elapsed Time", currentTime);
+            //FTCUtilities.OpLogger("Second Derivative", secondDerivative);
+            //myBasicPIDController.getMeanAndSD();
             FTCUtilities.OpLogger("-------------", ":-----------");
 
 
         }
+        myBasicPIDController.getMeanAndSD();
 
         setPowerAll(0);
     }
