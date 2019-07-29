@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MecanumChassis extends Chassis {
 
@@ -13,18 +14,18 @@ public class MecanumChassis extends Chassis {
     private SingleDriveUnit backLeft;
     private SingleDriveUnit backRight;
 
-    // Device names for drive units; corresponds to
-    private static String FRONT_LEFT = "FL";
-    private static String FRONT_RIGHT = "FR";
-    private static String BACK_LEFT = "BL";
-    private static String BACK_RIGHT = "BR";
+    // Motor shortcuts
+    private ChassisMotors.Mecanum FRONT_LEFT = ChassisMotors.Mecanum.FRONTLEFT;
+    private ChassisMotors.Mecanum FRONT_RIGHT = ChassisMotors.Mecanum.FRONTRIGHT;
+    private ChassisMotors.Mecanum BACK_LEFT = ChassisMotors.Mecanum.BACKLEFT;
+    private ChassisMotors.Mecanum BACK_RIGHT = ChassisMotors.Mecanum.BACKRIGHT;
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig) {
+    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map driveFlips) {
         super();
-        frontLeft = new SingleDriveUnit(FRONT_LEFT, driveUnitConfig, false);
-        frontRight = new SingleDriveUnit(FRONT_RIGHT, driveUnitConfig, true);
-        backLeft = new SingleDriveUnit(BACK_LEFT, driveUnitConfig, false);
-        backRight = new SingleDriveUnit(BACK_RIGHT, driveUnitConfig, true);
+        frontLeft = new SingleDriveUnit(FRONT_LEFT,driveUnitConfig,driveFlips.get(FRONT_LEFT));
+        frontRight = new SingleDriveUnit(FRONT_RIGHT, driveUnitConfig, driveFlips.get(FRONT_RIGHT));
+        backLeft = new SingleDriveUnit(BACK_LEFT, driveUnitConfig, driveFlips.get(BACK_LEFT));
+        backRight = new SingleDriveUnit(BACK_RIGHT, driveUnitConfig, driveFlips.get(BACK_RIGHT));
     }
 
     public void execute(PlanElement planElement) {

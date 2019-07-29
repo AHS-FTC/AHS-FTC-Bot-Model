@@ -2,21 +2,17 @@ package edu.ahs.robotics;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.Range;
 
 
 public class SingleDriveUnit extends DriveUnit{
-    int flip = 1;
 
-
-    public SingleDriveUnit(String deviceName,Config config, boolean flipped) {
+    public SingleDriveUnit(String deviceName ,Config config, boolean flipped) {
         super(deviceName, config, flipped);
         this.deviceName = deviceName;
         this.config = config;
 
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
 
         if (flipped){
             motor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -27,11 +23,10 @@ public class SingleDriveUnit extends DriveUnit{
     }
 
     public void setPower(double motorPower){
-        motor.setPower(Range.clip(motorPower,-1,1));
-    }
-
-    public void adjustPower(double powerAdjustment){
-        setPower(motor.getPower()+powerAdjustment);
+        if (Math.abs(motorPower) > 1) {
+            throw new Error("DriveUnit motorPower is not between 1 and -1");
+        }
+        motor.setPower(motorPower);
     }
 
     public void zeroDistance(){
