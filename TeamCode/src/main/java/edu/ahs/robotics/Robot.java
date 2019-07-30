@@ -17,6 +17,7 @@ public class Robot {
     }
 
     public void execute() {
+        FTCUtilities.OpLogger("Executing","In Robot");
         Iterator<PlanElement> iterator = plan.getIterator();
         while(iterator.hasNext()){
             PlanElement element = iterator.next();

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class SingleDriveUnit extends DriveUnit{
 
-    public SingleDriveUnit(String deviceName,Config config, boolean flipped) {
+    public SingleDriveUnit(String deviceName ,Config config, boolean flipped) {
         super(deviceName, config, flipped);
         this.deviceName = deviceName;
         this.config = config;

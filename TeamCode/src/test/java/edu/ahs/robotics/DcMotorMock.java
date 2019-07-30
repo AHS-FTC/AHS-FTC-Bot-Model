@@ -8,9 +8,11 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 public class DcMotorMock implements DcMotor {
 
     private long startTime = System.currentTimeMillis();
+    private double distance;
     private double motorPower;
     private RunMode runMode;
-    private final double EFFICIENCY = .2;
+    private final double EFFICIENCY = 1.70
+            ;
     private MotorHashService.MotorTypes motorType;
     private Direction direction = Direction.FORWARD;
 
@@ -71,15 +73,15 @@ public class DcMotorMock implements DcMotor {
 
     @Override
     public int getCurrentPosition() {
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        double ticksPerTime = MotorHashService.getTicks(motorType) * MotorHashService.getRPMs(motorType) * motorPower * (elapsedTime/1000.0) * EFFICIENCY;
-        return (int) (ticksPerTime);
+        encoderUpdate();
+        return (int)distance;
     }
 
     @Override
     public void setMode(RunMode mode) {
         if(mode == DcMotor.RunMode.STOP_AND_RESET_ENCODER){
-            startTime = System.currentTimeMillis();
+            zeroTime();
+            distance = 0;
             runMode = mode;
         } if (mode == DcMotor.RunMode.RUN_WITHOUT_ENCODER){
             runMode = mode;
@@ -110,7 +112,7 @@ public class DcMotorMock implements DcMotor {
     @Override
     public void setPower(double power) {
         motorPower = power;
-
+        encoderUpdate();
     }
 
     @Override
@@ -150,5 +152,17 @@ public class DcMotorMock implements DcMotor {
     @Override
     public void close() {
 
+    }
+
+    private void encoderUpdate(){//encoderUpdate allows for a more realistic modeling of motors by keeping a running tally of encoder value change rather than a static rate estimate
+        double elapsedTime = System.currentTimeMillis() - startTime;
+        zeroTime();
+        double ticksPerTime = MotorHashService.getTicks(motorType) * MotorHashService.getRPMs(motorType)/60000 * motorPower * elapsedTime * EFFICIENCY;
+        //ticks per rotation * rotations per millisecond * motorPower scalar * milliseconds * efficiency scalar
+        distance += ticksPerTime;
+    }
+
+    private void zeroTime(){
+        startTime = System.currentTimeMillis();
     }
 }

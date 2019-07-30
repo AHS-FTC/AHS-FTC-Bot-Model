@@ -33,9 +33,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.util.HashMap;
 
-@TeleOp(name = "Robot Model Test Opmode", group = "Linear Opmode")
+@TeleOp(name="PID Test Opmode", group="Linear Opmode")
+
 //@Disabled
 public class RobotModelOpMode extends LinearOpMode {
 
@@ -49,9 +52,12 @@ public class RobotModelOpMode extends LinearOpMode {
         FTCUtilities.setOpMode(this);
 
         Robot summerBot = initRobot();
+        telemetry.addData("Init Succsess","!");
+        telemetry.update();
         waitForStart();
         runtime.reset();
         summerBot.execute();
+        Logger.getInstance().writeToFile();
 
     }
 
@@ -65,7 +71,7 @@ public class RobotModelOpMode extends LinearOpMode {
 
         //start constructing PlanElements below
         Plan gamePlan = new Plan();
-        gamePlan.addToPlan(new ForwardMotion(60, 1, 10000, summerBot.getChassis()));
+        gamePlan.addToPlan(new ForwardMotion(60, 1, 5000, summerBot.getChassis()));
         summerBot.givePlan(gamePlan);
         return summerBot;
 
