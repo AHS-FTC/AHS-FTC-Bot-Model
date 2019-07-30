@@ -37,6 +37,7 @@ public class PIDController {
             totalError+=currentError*deltaTime;
             double pAdjustment = error*KP;
             double iAdjustment = Range.clip(totalError*KI,-MAXADJUSTMENT,MAXADJUSTMENT);
+            totalError=Range.clip(totalError,-MAXADJUSTMENT/KI,MAXADJUSTMENT/KI);
             double dAdjustment = changeInError*KD;
             double ddAdjustment = secondDerivative*KDD;
 

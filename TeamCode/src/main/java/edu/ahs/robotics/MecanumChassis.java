@@ -20,12 +20,12 @@ public class MecanumChassis extends Chassis {
     private ChassisMotors.Mecanum BACK_LEFT = ChassisMotors.Mecanum.BACKLEFT;
     private ChassisMotors.Mecanum BACK_RIGHT = ChassisMotors.Mecanum.BACKRIGHT;
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map driveFlips) {
+    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map<ChassisMotors.Mecanum, Boolean> driveFlips) {
         super();
-        frontLeft = new SingleDriveUnit(FRONT_LEFT,driveUnitConfig,driveFlips.get(FRONT_LEFT));
-        frontRight = new SingleDriveUnit(FRONT_RIGHT, driveUnitConfig, driveFlips.get(FRONT_RIGHT));
-        backLeft = new SingleDriveUnit(BACK_LEFT, driveUnitConfig, driveFlips.get(BACK_LEFT));
-        backRight = new SingleDriveUnit(BACK_RIGHT, driveUnitConfig, driveFlips.get(BACK_RIGHT));
+        frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(),driveUnitConfig,driveFlips.get(FRONT_LEFT));
+        frontRight = new SingleDriveUnit(FRONT_RIGHT.getDeviceName(), driveUnitConfig, driveFlips.get(FRONT_RIGHT));
+        backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_LEFT));
+        backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_RIGHT));
     }
 
     public void execute(PlanElement planElement) {
@@ -54,7 +54,7 @@ public class MecanumChassis extends Chassis {
         RampFunction forceFunction = new RampFunction(forwardMotion.travelDistance);
 
         //create PID object with specifed P,I,D,DD coefficients
-        PIDController myBasicPIDController = new PIDController(0.003,.0001,.05,0.26);
+        PIDController myBasicPIDController = new PIDController(0.01,.001,.00,0.26);
 
         while(actualInchesTravelled<forwardMotion.travelDistance && forwardMotion.timeOut>currentTime){
             //get the current time
@@ -82,6 +82,7 @@ public class MecanumChassis extends Chassis {
 
             double powerAdjustment = myBasicPIDController.getPowerAdjustment(error,deltaTime,secondDerivative);
             power += powerAdjustment;
+            power = Range.clip(power,-1,1);
             setPowerAll(power);
             //adjust the motor speed appropriately
             //adjustPowerAll(powerAdjustment);
@@ -97,7 +98,7 @@ public class MecanumChassis extends Chassis {
             //Logger.append(Logger.Cats.POWADJ,Double.toString(powerAdjustment));
             //Logger.append(Logger.Cats.TIME,Double.toString(currentTime));
             //FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
-            //FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
+            FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
            // FTCUtilities.OpLogger("Error", error);
             //FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
             FTCUtilities.OpLogger("Motor Power", power);
