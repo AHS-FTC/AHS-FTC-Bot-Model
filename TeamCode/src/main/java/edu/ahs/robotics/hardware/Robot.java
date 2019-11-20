@@ -1,7 +1,11 @@
 
-package edu.ahs.robotics;
+package edu.ahs.robotics.hardware;
 
 import java.util.Iterator;
+
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.autopaths.Plan;
+import edu.ahs.robotics.autopaths.PlanElement;
 
 public class Robot {
 

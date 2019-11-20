@@ -1,6 +1,9 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.MotorHashService;
 
 public abstract class DriveUnit {
 

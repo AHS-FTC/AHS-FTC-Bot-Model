@@ -1,4 +1,4 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.autopaths.functions;
 
 public class LinearFunction implements Function {
 

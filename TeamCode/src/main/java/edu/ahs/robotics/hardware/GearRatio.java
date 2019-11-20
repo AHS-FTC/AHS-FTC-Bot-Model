@@ -1,4 +1,4 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.hardware;
 
 public class GearRatio {
     private int inputTeeth;

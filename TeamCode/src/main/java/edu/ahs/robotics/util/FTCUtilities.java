@@ -1,7 +1,9 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.util;
 
 import android.os.Environment;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -50,6 +52,19 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         }
     }
 
+    public static void addData(String caption, Object object){
+        if(!testMode) {
+            opMode.telemetry.addData(caption, object);
+        } else {
+            System.out.println(caption + ": " + object);
+        }
+    }
+    public static void updateOpLogger(){
+        if(!testMode){
+            opMode.telemetry.update();
+        }
+    }
+
     public static void OpSleep(long ms) {
         if(testMode){
             try {
@@ -70,7 +85,23 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         return hardwareMap.get(DcMotor.class, deviceName);
     }
 
-    static void addTestMotor(DcMotor motor, String deviceName){
+    public static BNO055IMU getIMU (String imuName){
+        if(testMode){
+            return null;//literally die in a hole // todo mock imu
+        }
+        return hardwareMap.get(BNO055IMU.class, imuName);
+    }
+
+    public static Rev2mDistanceSensor getDistanceSensor(String sensorName){
+        if(!testMode) {
+            Rev2mDistanceSensor distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, sensorName);
+            return distanceSensor;
+        } else {
+            throw new UnsupportedOperationException("TestMode doesn't support distance sensors yet. mock it");
+        }
+    }
+
+    public static void addTestMotor(DcMotor motor, String deviceName){
         if(!testMode){
             throw new UnsupportedOperationException("Not in testMode! Make sure to call startTestMode first");
         }

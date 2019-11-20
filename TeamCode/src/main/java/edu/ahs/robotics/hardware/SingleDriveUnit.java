@@ -1,7 +1,9 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import edu.ahs.robotics.util.MotorHashService;
 
 
 public class SingleDriveUnit extends DriveUnit{

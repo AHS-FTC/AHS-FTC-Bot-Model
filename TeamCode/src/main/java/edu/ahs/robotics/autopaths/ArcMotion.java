@@ -1,4 +1,6 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.autopaths;
+
+import edu.ahs.robotics.hardware.Executor;
 
 public class ArcMotion extends Motion {
 

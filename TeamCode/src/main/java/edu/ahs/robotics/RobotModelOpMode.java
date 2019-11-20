@@ -29,20 +29,24 @@
 
 package edu.ahs.robotics;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import java.util.HashMap;
+import edu.ahs.robotics.autopaths.ForwardMotion;
+import edu.ahs.robotics.autopaths.Plan;
+import edu.ahs.robotics.botfactories.SummerBotFactory;
+import edu.ahs.robotics.hardware.Robot;
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.MotorHashService;
 
 @TeleOp(name="PID Test Opmode", group="Linear Opmode")
 
-//@Disabled
+@Disabled
 public class RobotModelOpMode extends LinearOpMode {
 
-    // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
 

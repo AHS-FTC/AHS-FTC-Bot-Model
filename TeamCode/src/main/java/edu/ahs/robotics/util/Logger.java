@@ -1,9 +1,14 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.util;
+
+import android.graphics.Bitmap;
+import android.os.Environment;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -100,6 +105,26 @@ public class Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void saveImage(Bitmap bitmap){
+        Calendar now = Calendar.getInstance();
+        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+        String fileName = "BotImg_"+ now.get(Calendar.DAY_OF_MONTH) + "_" + now.get(Calendar.HOUR_OF_DAY) + "_" + now.get(Calendar.MINUTE) + "_" + now.get(Calendar.SECOND) + now.get(Calendar.MILLISECOND) +".jpg";
+        File img = new File(filePath, fileName);
+        if (img.exists())
+            img.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(img);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void append(Cats title, String data) {

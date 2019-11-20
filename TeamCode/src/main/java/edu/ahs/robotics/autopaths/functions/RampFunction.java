@@ -1,4 +1,4 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.autopaths.functions;
 
 public class RampFunction implements Function {
     private double distance;
