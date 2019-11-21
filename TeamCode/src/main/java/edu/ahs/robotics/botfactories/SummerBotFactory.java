@@ -1,7 +1,14 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.botfactories;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.ahs.robotics.hardware.ChassisMotors;
+import edu.ahs.robotics.hardware.DriveUnit;
+import edu.ahs.robotics.hardware.GearRatio;
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.Robot;
+import edu.ahs.robotics.util.MotorHashService;
 
 public class SummerBotFactory extends BotFactory {
 

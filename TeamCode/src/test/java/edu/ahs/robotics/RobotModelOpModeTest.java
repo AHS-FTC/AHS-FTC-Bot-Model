@@ -2,6 +2,11 @@ package edu.ahs.robotics;
 
 import org.junit.Test;
 
+import edu.ahs.robotics.hardware.Robot;
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.MotorHashService;
+
 public class RobotModelOpModeTest {
     private MotorHashService.MotorTypes driveMotorType = MotorHashService.MotorTypes.YJ_223;
 

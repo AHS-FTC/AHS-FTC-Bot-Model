@@ -1,9 +1,11 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.hardware;
+
+import edu.ahs.robotics.autopaths.PlanElement;
 
 /**
  * The Chassis class is the superclass for all chassis types
  */
-public abstract class Chassis implements Executor{
+public abstract class Chassis implements Executor {
 
     public Chassis(){
     }
