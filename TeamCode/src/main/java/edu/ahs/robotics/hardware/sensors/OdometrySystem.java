@@ -2,8 +2,7 @@ package edu.ahs.robotics.hardware.sensors;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.autopaths.functions.Position;
+import edu.ahs.robotics.autocommands.autopaths.functions.Position;
 
 public class OdometrySystem {
     private IMU imu;

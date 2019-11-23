@@ -1,6 +1,6 @@
 package edu.ahs.robotics.hardware;
 
-import edu.ahs.robotics.autopaths.PlanElement;
+import edu.ahs.robotics.autocommands.PlanElement;
 
 /**
  * The Chassis class is the superclass for all chassis types

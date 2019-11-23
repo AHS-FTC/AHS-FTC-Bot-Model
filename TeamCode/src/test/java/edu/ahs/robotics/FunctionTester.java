@@ -2,8 +2,8 @@ package edu.ahs.robotics;
 
 import org.junit.Test;
 
-import edu.ahs.robotics.autopaths.functions.Function;
-import edu.ahs.robotics.autopaths.functions.RampFunction;
+import edu.ahs.robotics.autocommands.autopaths.functions.Function;
+import edu.ahs.robotics.autocommands.autopaths.functions.RampFunction;
 
 public class FunctionTester {
     private final double DISTANCE = 60; // in inches

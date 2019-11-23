@@ -3,14 +3,18 @@ package edu.ahs.robotics.hardware;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
-import edu.ahs.robotics.autopaths.Sleep;
+import edu.ahs.robotics.autocommands.autopaths.Sleep;
+import edu.ahs.robotics.botfactories.BotFactory;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.autopaths.Plan;
-import edu.ahs.robotics.autopaths.PlanElement;
+import edu.ahs.robotics.autocommands.Plan;
+import edu.ahs.robotics.autocommands.PlanElement;
 
 public class Robot implements Executor{
+
 
     @Override
     public void execute(PlanElement planElement) {

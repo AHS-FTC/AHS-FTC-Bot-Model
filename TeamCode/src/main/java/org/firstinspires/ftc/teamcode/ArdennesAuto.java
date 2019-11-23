@@ -27,25 +27,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics;
+package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import edu.ahs.robotics.autocommands.autopaths.ForwardMotion;
+import edu.ahs.robotics.autocommands.autopaths.OdometryPointTurn;
 import edu.ahs.robotics.autocommands.Plan;
-import edu.ahs.robotics.botfactories.SummerBotFactory;
+import edu.ahs.robotics.botfactories.ArdennesFactory;
 import edu.ahs.robotics.hardware.Robot;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 
-@TeleOp(name="PID Test Opmode", group="Linear Opmode")
 
-@Disabled
-public class RobotModelOpMode extends LinearOpMode {
+//@TeleOp(name="Ardennes Auto", group="Linear Opmode")
+@Autonomous(name = "Ardennes Auto", group = "Linear Opmode")
+//@Disabled
+public class ArdennesAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -55,13 +54,13 @@ public class RobotModelOpMode extends LinearOpMode {
         FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
 
-        Robot summerBot = initRobot();
-        telemetry.addData("Init Succsess","!");
-        telemetry.update();
+        Robot ardennes = initRobot();
+        //telemetry.addData("Init Success","!");
+        //telemetry.update();
         waitForStart();
         runtime.reset();
-        summerBot.execute();
-        Logger.getInstance().writeToFile();
+        ardennes.execute();
+        //Logger.getInstance().writeToFile();
 
     }
 
@@ -69,15 +68,16 @@ public class RobotModelOpMode extends LinearOpMode {
         MotorHashService.init();
 
         // Instantiate the BotFactory subclass for our robot
-        SummerBotFactory summerBotFactory = new SummerBotFactory();
+        ArdennesFactory ardennesFactory = new ArdennesFactory();
 
-        Robot summerBot = summerBotFactory.createRobot();
+        Robot ardennes = ardennesFactory.createRobot();
 
         //start constructing PlanElements below
         Plan gamePlan = new Plan();
-        gamePlan.addToPlan(new ForwardMotion(60, 1, 5000, summerBot.getChassis()));
-        summerBot.givePlan(gamePlan);
-        return summerBot;
+        gamePlan.addToPlan(new OdometryPointTurn(ardennes.getChassis(), 90, .6));
+        sleep(1000);
+        ardennes.givePlan(gamePlan);
+        return ardennes;
 
     }
 }
