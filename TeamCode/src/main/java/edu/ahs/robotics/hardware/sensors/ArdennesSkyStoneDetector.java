@@ -3,7 +3,6 @@ package edu.ahs.robotics.hardware.sensors;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import com.disnodeteam.dogecv.filters.LeviColorFilter;
 
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
