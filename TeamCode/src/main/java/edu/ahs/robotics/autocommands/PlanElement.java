@@ -1,4 +1,4 @@
-package edu.ahs.robotics.autopaths;
+package edu.ahs.robotics.autocommands;
 
 import edu.ahs.robotics.hardware.Executor;
 

@@ -6,18 +6,18 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.util.Map;
 
-import edu.ahs.robotics.autopaths.OdometryForwardMotion;
-import edu.ahs.robotics.autopaths.OdometryPointTurn;
-import edu.ahs.robotics.autopaths.PointTurn;
+import edu.ahs.robotics.autocommands.autopaths.OdometryForwardMotion;
+import edu.ahs.robotics.autocommands.autopaths.OdometryPointTurn;
+import edu.ahs.robotics.autocommands.autopaths.PointTurn;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.autopaths.PIDDController;
-import edu.ahs.robotics.autopaths.PlanElement;
-import edu.ahs.robotics.autopaths.functions.RampFunction;
-import edu.ahs.robotics.autopaths.ArcMotion;
-import edu.ahs.robotics.autopaths.ForwardMotion;
+import edu.ahs.robotics.autocommands.autopaths.PIDDController;
+import edu.ahs.robotics.autocommands.PlanElement;
+import edu.ahs.robotics.autocommands.autopaths.functions.RampFunction;
+import edu.ahs.robotics.autocommands.autopaths.ArcMotion;
+import edu.ahs.robotics.autocommands.autopaths.ForwardMotion;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 
 public class MecanumChassis extends Chassis {

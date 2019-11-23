@@ -2,7 +2,6 @@ package edu.ahs.robotics.hardware.sensors;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import edu.ahs.robotics.autopaths.StraightMotion;
 import edu.ahs.robotics.util.FTCUtilities;
 
 public class Odometer {

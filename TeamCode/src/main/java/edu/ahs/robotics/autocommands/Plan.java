@@ -1,4 +1,4 @@
-package edu.ahs.robotics.autopaths;
+package edu.ahs.robotics.autocommands;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
