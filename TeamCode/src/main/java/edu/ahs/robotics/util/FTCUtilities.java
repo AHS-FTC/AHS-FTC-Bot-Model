@@ -97,7 +97,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
             Rev2mDistanceSensor distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, sensorName);
             return distanceSensor;
         } else {
-            throw new UnsupportedOperationException("TestMode doesn't support distance sensors yet. mock it");
+            throw new UnsupportedOperationException("TestMode doesn't support targetDistance sensors yet. mock it");
         }
     }
 

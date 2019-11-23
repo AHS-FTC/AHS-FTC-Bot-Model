@@ -51,7 +51,7 @@ public class ArdennesSkyStoneDetector {
 
 
     public ArdennesSkyStoneDetector(boolean isImageSavingEnabled) {
-        vuforia = new Vuforia(FTCUtilities.getOpMode());
+        vuforia = new Vuforia();
         this.isImageSavingEnabled = isImageSavingEnabled;
     }
 

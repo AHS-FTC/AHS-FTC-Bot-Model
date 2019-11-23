@@ -20,7 +20,7 @@ public class LinearFunction implements Function {
 
 
     @Override
-    //This method returns the desired distance in inches
+    //This method returns the desired targetDistance in inches
     public double getDesiredDistance(double time) {
         if(time<executionTime) {
             return maxSpeed * time;

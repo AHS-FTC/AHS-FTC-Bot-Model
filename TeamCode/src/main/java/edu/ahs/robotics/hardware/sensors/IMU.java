@@ -13,8 +13,9 @@ public class IMU {
     private BNO055IMU imu;
     double correction;
     private Orientation lastAngles = new Orientation();
-    double globalAngle;
     private BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+    double lastAngle;
+    double offset = 0;
 
     public IMU(BNO055IMU imu) {
         this.imu = imu;
@@ -28,8 +29,18 @@ public class IMU {
     }
 
     public double getHeading(){
-        update();
-        return lastAngles.firstAngle;
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC,AxesOrder.ZYX,AngleUnit.DEGREES);
+
+        double deltaAngle = angles.firstAngle-lastAngle;
+        lastAngle = angles.firstAngle;
+
+        if (deltaAngle < -180){
+            offset+=360;
+        } else if (deltaAngle>180){
+            offset -=360;
+        }
+
+        return angles.firstAngle + offset;
     }
 
     public boolean isCalibrated (){
@@ -41,40 +52,5 @@ public class IMU {
         return lastAngles.firstAngle;
     }
     */
-    public double getCorrection(){
-        update();
-        return correction;
-    }
-    private void update(){
-        correction = checkDirection();
-    }
 
-    private double checkDirection(){
-        double correction, angle, gain = 0.15;
-        angle = getAngle();
-        if (angle == 0){
-            correction = 0;
-        } else{
-            correction = -angle;
-        }
-        correction = correction*gain;
-
-        return correction;
-    }
-    private double getAngle(){
-        FTCUtilities.OpLogger("imu", imu);
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC,AxesOrder.XYZ,AngleUnit.DEGREES);
-        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
-
-        if (deltaAngle < -180){
-            deltaAngle+=360;
-        } else if (deltaAngle>180){
-            deltaAngle -=360;
-        }
-        globalAngle += deltaAngle;
-
-        lastAngles = angles;
-
-        return globalAngle;
-    }
 }

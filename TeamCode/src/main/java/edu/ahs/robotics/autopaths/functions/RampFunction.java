@@ -18,7 +18,7 @@ public class RampFunction implements Function {
 
 
     @Override
-    //This method takes a time in miliseconds and returns the desired distance in inches
+    //This method takes a time in miliseconds and returns the desired targetDistance in inches
     public double getDesiredDistance(double time) {
         if(time<executionTime/2) {
             return fx(time);

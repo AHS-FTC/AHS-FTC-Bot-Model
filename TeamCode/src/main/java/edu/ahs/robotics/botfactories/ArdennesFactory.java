@@ -43,11 +43,11 @@ public class ArdennesFactory extends BotFactory {
         driveFlips.put(ChassisMotors.Mecanum.BACKLEFT, false);
         driveFlips.put(ChassisMotors.Mecanum.BACKRIGHT, true);
 
-        return new MecanumChassis(config, driveFlips);
+        return new MecanumChassis(config, driveFlips, imu);
     }
 
     private  OdometrySystem makeOdometrySystem(IMU imu){
 
-        return new OdometrySystem(FTCUtilities.getMotor("IntakeRight"), FTCUtilities.getMotor("IntakeLeft"), imu, 2.3622);
+        return new OdometrySystem(FTCUtilities.getMotor("intakeR"), FTCUtilities.getMotor("intakeL"), imu, 2.3622);
     }
 }
