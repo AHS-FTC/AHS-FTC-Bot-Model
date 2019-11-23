@@ -8,11 +8,14 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import edu.ahs.robotics.util.FTCUtilities;
+
 public class Vuforia {
     private VuforiaLocalizer vuforiaLocalizer;
 
 
-    public Vuforia(OpMode opMode) {
+    public Vuforia() {
+        OpMode opMode = FTCUtilities.getOpMode();
         int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId"," id", opMode.hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;

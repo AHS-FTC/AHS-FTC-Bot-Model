@@ -26,28 +26,6 @@ public class OdometrySystem {
         position = new Position(0,0,0); //Todo set this for starting position of field
     }
 
-    public void start (){
-        isRunning = true;
-        double xRotations, yRotations;
-        double xDistance, yDistance;
-
-        while(isRunning){
-
-            xTicks = xMotor.getCurrentPosition();
-            yTicks = yMotor.getCurrentPosition();
-
-            FTCUtilities.OpLogger("xTicks", xTicks);
-            FTCUtilities.OpLogger("yTicks", yTicks);
-
-            xRotations = xTicks/TICKS_PER_ROTATION;
-            yRotations = yTicks/TICKS_PER_ROTATION;
-
-
-            //xDistance = xRotations;
-
-
-        }
-    }
 
     public void stop(){
         isRunning = false;
