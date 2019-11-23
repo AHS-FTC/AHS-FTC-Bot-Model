@@ -252,6 +252,9 @@ public class MecanumChassis extends Chassis {
         double leftTarget = 300, rightTarget = -300;
         double leftRemaining, rightRemaining;
         double averageRemaining = (Math.abs(leftTarget) + Math.abs(rightTarget))/2;
+        double correctionError;
+        double correctionScale = .05;
+        double correctionPower;
 
         double u = 0.07, d = 0.02; // reciprocal of millimeters after which you will be at maxPower 1
 
@@ -280,11 +283,14 @@ public class MecanumChassis extends Chassis {
             FTCUtilities.addData("average remaining", averageRemaining);
             FTCUtilities.updateOpLogger();
 
-            frontLeft.setPower(Math.signum(leftTarget)*power);
-            backLeft.setPower(Math.signum(leftTarget)*power);
+            correctionError = Math.abs(leftDistance)-Math.abs(rightDistance); //is this right?
+            correctionPower = correctionError * correctionScale;
 
-            frontRight.setPower(Math.signum(rightTarget)*power);
-            backRight.setPower(Math.signum(rightTarget)*power);
+            frontLeft.setPower(Math.signum(leftTarget)*power+(Math.signum(correctionError)*correctionPower));
+            backLeft.setPower(Math.signum(leftTarget)*power+(Math.signum(correctionError)*correctionPower));
+
+            frontRight.setPower(Math.signum(rightTarget)*power+(Math.signum(correctionError)*correctionPower));
+            backRight.setPower(Math.signum(rightTarget)*power+(Math.signum(correctionError)*correctionPower));
         }
         setPowerAll(0);
     }
