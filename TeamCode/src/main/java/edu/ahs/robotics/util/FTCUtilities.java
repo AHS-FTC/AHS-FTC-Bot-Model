@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +20,6 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     private static boolean testMode = false;
     private static Map <String, DcMotor>testMotors = new HashMap();
 
-    public static void setHardwareMap(HardwareMap hardwareMap) {
-        FTCUtilities.hardwareMap = hardwareMap;
-    }
 
     public static String getLogDirectory(){
         if (testMode){
@@ -37,6 +35,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
 
     public static void setOpMode(OpMode opMode){
         FTCUtilities.opMode = opMode;
+        FTCUtilities.hardwareMap = opMode.hardwareMap;
     }
 
     public static OpMode getOpMode(){
@@ -106,6 +105,14 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
             throw new UnsupportedOperationException("Not in testMode! Make sure to call startTestMode first");
         }
         testMotors.put(deviceName, motor);
+    }
+
+    public static Servo getServo(String deviceName){
+        if(!testMode){
+            return hardwareMap.get(Servo.class, deviceName);
+        } else {
+            throw new Error("TestMode doesn't support servos yet. mock it");
+        }
     }
 
     public static void startTestMode(){

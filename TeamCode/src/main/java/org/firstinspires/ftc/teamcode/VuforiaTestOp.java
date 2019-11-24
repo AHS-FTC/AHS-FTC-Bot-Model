@@ -70,7 +70,6 @@ public class VuforiaTestOp extends OpMode
 
     @Override
     public void init() {
-        FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
         //vuforia = new Vuforia(this);
         detector = new ArdennesSkyStoneDetector(true);

@@ -63,8 +63,6 @@ public class ArdennesSensorLogger extends OpMode
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
-        FTCUtilities.setHardwareMap(hardwareMap);
-
         bnoIMU = FTCUtilities.getIMU("imu");
         imu = new IMU(bnoIMU);
     }

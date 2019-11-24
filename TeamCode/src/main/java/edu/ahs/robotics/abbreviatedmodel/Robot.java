@@ -36,4 +36,8 @@ public abstract class Robot implements Executor{
             element.execute();
         }
     }
+    public void executePlan(Plan plan){
+        givePlan(plan);
+        executePlan();
+    }
 }

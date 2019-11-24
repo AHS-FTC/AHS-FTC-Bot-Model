@@ -17,6 +17,7 @@ import edu.ahs.robotics.hardware.Executor;
 import edu.ahs.robotics.hardware.GearRatio;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
@@ -26,6 +27,7 @@ import edu.ahs.robotics.util.MotorHashService;
 public class Ardennes extends Robot {
     private MecanumChassis mecanumChassis;
     private Intake intake;
+    private SerialServo gripper;//todo add other serbos
     private TriggerDistanceSensor intakeTrigger, gripperTrigger;
     private ArdennesSkyStoneDetector detector;
 
@@ -36,6 +38,7 @@ public class Ardennes extends Robot {
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40);
 
         intake = new Intake(1);
+        gripper = new SerialServo("gripper", true);
         mecanumChassis = makeChassis();
 
         detector = new ArdennesSkyStoneDetector();
@@ -57,6 +60,10 @@ public class Ardennes extends Robot {
 
     public TriggerDistanceSensor getGripperTrigger() {
         return gripperTrigger;
+    }
+
+    public SerialServo getGripper(){
+        return gripper;
     }
 
     private MecanumChassis makeChassis() {
