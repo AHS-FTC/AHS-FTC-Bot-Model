@@ -47,8 +47,8 @@ public class MecanumChassis extends Chassis {
         backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_LEFT));
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_RIGHT));
 
-        leftOdometer = new Odometer("intakeL", 60 , false);
-        rightOdometer = new Odometer("intakeR", 60, true);
+        leftOdometer = new Odometer("intakeL", 60.2967 , false);
+        rightOdometer = new Odometer("intakeR", 60.79, true);
     }
 
 
@@ -249,11 +249,13 @@ public class MecanumChassis extends Chassis {
         double power, scaledPower;
         double minRampUp = .2;
         double minRampDown = .2;
-        double leftTarget = 300, rightTarget = -300;
+        double leftTarget = 243, rightTarget = -243; //250,-250 for almost perfect 90 deg
         double leftRemaining, rightRemaining;
         double averageRemaining = (Math.abs(leftTarget) + Math.abs(rightTarget))/2;
+        double errorLeft, errorRight;
+        double correctionScale = 0.01;
 
-        double u = 0.07, d = 0.02; // reciprocal of millimeters after which you will be at maxPower 1
+        double u = 0.07, d = 0.01; // reciprocal of millimeters after which you will be at maxPower 1
 
         leftOdometer.reset();
         rightOdometer.reset();
@@ -280,13 +282,28 @@ public class MecanumChassis extends Chassis {
             FTCUtilities.addData("average remaining", averageRemaining);
             FTCUtilities.updateOpLogger();
 
-            frontLeft.setPower(Math.signum(leftTarget)*power);
-            backLeft.setPower(Math.signum(leftTarget)*power);
+            errorLeft = averageDistance - Math.abs(leftDistance);
+            errorRight = averageDistance - Math.abs(rightDistance);
 
-            frontRight.setPower(Math.signum(rightTarget)*power);
-            backRight.setPower(Math.signum(rightTarget)*power);
+
+            double powerLeft = Math.signum(leftTarget) * (power + correctionScale * errorLeft);
+            frontLeft.setPower(powerLeft);
+            backLeft.setPower(powerLeft);
+
+            double powerRight = Math.signum(rightTarget) * (power + correctionScale * errorRight);
+            frontRight.setPower(powerRight);
+            backRight.setPower(powerRight);
+
+            Logger.append(Logger.Cats.DADJUSTMENT, String.valueOf(errorLeft));
+            Logger.append(Logger.Cats.DDADJUSTMENT, String.valueOf(errorRight));
+            Logger.append(Logger.Cats.ERROR, String.valueOf(powerLeft));
+            Logger.append(Logger.Cats.ENCODERDIST, String.valueOf(powerRight));
+            Logger.append(Logger.Cats.IADJUSTMENT, String.valueOf(leftDistance));
+            Logger.append(Logger.Cats.DESIDIST, String.valueOf(rightDistance));
+
         }
         setPowerAll(0);
+        Logger.getInstance().writeToFile();
     }
 
     private void setPowerAll(double motorPower) {

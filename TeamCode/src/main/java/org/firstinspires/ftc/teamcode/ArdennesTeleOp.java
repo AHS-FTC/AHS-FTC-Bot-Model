@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSenor;
 import edu.ahs.robotics.util.FTCUtilities;
 
 //Written by Alex Appleby of team 16896
@@ -66,8 +66,8 @@ public class ArdennesTeleOp extends OpMode
     Servo gripperServo, wristServo;
 
     //Servo capstoneServo;
-    TriggerDistanceSensor intakeTrigger;
-    TriggerDistanceSensor gripperTrigger;
+    TriggerDistanceSenor intakeTrigger;
+    TriggerDistanceSenor gripperTrigger;
 
     private double frontLeftPower = 0, frontRightPower = 0, backLeftPower = 0, backRightPower = 0;
     private final int SLIDES_MAX = 4150;
@@ -127,8 +127,8 @@ public class ArdennesTeleOp extends OpMode
         gripperServo = hardwareMap.get(Servo.class,"gripper");
         wristServo = hardwareMap.get(Servo.class,"wrist");
 
-        gripperTrigger = new TriggerDistanceSensor("gripperTrigger",70);
-        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",40);
+        gripperTrigger = new TriggerDistanceSenor("gripperTrigger",40);
+        intakeTrigger = new TriggerDistanceSenor("intakeTrigger",70);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -146,7 +146,7 @@ public class ArdennesTeleOp extends OpMode
         foundationServoL.setDirection(Servo.Direction.FORWARD);
         foundationServoR.setDirection(Servo.Direction.FORWARD);
 
-        gripperServo.setDirection(Servo.Direction.FORWARD);
+        gripperServo.setDirection(Servo.Direction.REVERSE);
         wristServo.setDirection(Servo.Direction.REVERSE);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -154,8 +154,8 @@ public class ArdennesTeleOp extends OpMode
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        intakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        intakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         slideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -241,14 +241,6 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        //press driver r bumper to toggle grippers
-        if(gamepad1.right_bumper) {
-            if(time.milliseconds() - lastGripperPress > BUTTON_THRESHOLD) {
-                gripperEnabled = !gripperEnabled;
-                lastGripperPress = time.milliseconds();
-            }
-        }
-
         //both controllers press dpad up to enable delivery style intake
         if(gamepad1.dpad_up && gamepad2.dpad_up) {
             if(time.milliseconds() - lastDeliveryIntakeStyle > BUTTON_THRESHOLD) {
@@ -258,17 +250,17 @@ public class ArdennesTeleOp extends OpMode
         }
 
         //negatives are important here
-        frontLeftPower = gamepad1.left_stick_y+gamepad1.left_stick_x-gamepad1.right_stick_x;
-        frontRightPower = gamepad1.left_stick_y-gamepad1.left_stick_x+gamepad1.right_stick_x;
-        backLeftPower = gamepad1.left_stick_y-gamepad1.left_stick_x-gamepad1.right_stick_x;
-        backRightPower = gamepad1.left_stick_y+gamepad1.left_stick_x+gamepad1.right_stick_x;
+        frontLeftPower = gamepad1.left_stick_y-gamepad1.left_stick_x-gamepad1.right_stick_x;
+        frontRightPower = gamepad1.left_stick_y+gamepad1.left_stick_x+gamepad1.right_stick_x;
+        backLeftPower = gamepad1.left_stick_y+gamepad1.left_stick_x-gamepad1.right_stick_x;
+        backRightPower = gamepad1.left_stick_y-gamepad1.left_stick_x+gamepad1.right_stick_x;
 
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
-        slideLPower = gamepad1.left_trigger-(gamepad1.right_trigger*SLIDE_DOWN_POWER_SCALE);
+        slideLPower = gamepad2.right_trigger-(gamepad2.left_trigger*SLIDE_DOWN_POWER_SCALE);
 
         if(slideL.getCurrentPosition() >= SLIDES_MAX){
             slideLPower = Range.clip(slideLPower, -1, 0);
@@ -319,9 +311,12 @@ public class ArdennesTeleOp extends OpMode
             //telemetry.addData("Right Slide Encoder", slideR.getCurrentPosition());
 
             //telemetry.addData("intake Distance", intakeTrigger.getDist());
-            telemetry.addData("intake triggered?", intakeTrigger.isTriggered());
+            //telemetry.addData("intake triggered?", intakeTrigger.isTriggered());
             //telemetry.addData("gripper targetDistance", gripperTrigger.getDist());
-            telemetry.addData("gripper triggered?", gripperTrigger.isTriggered());
+            //telemetry.addData("gripper triggered?", gripperTrigger.isTriggered());
+            //telemetry.addData("gripper enabled?", gripperEnabled);
+            //telemetry.addData("slide in position?", slideL.getCurrentPosition()<= SLIDES_GRIP_THRESHOLD);
+            telemetry.addData("y servo position", yServoPosition);
 
 
             telemetry.update();

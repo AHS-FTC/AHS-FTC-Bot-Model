@@ -75,7 +75,6 @@ public class ArdennesAuto extends LinearOpMode {
         //start constructing PlanElements below
         Plan gamePlan = new Plan();
         gamePlan.addToPlan(new OdometryPointTurn(ardennes.getChassis(), 90, .6));
-        sleep(1000);
         ardennes.givePlan(gamePlan);
         return ardennes;
 
