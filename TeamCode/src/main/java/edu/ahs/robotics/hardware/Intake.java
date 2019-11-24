@@ -6,10 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.autocommands.PlanElement;
-import edu.ahs.robotics.autocommands.autopaths.IntakeMonitor;
+import edu.ahs.robotics.autocommands.obmcommands.IntakeMonitor;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeCommand;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
 public class Intake implements Executor{ //todo make a one or two motor alternate to intake class
@@ -44,8 +43,7 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
         } else if(planElement instanceof IntakeCommandWithTrigger){
             execute((IntakeCommandWithTrigger)planElement);
         } else{
-            throw new Warning("Could not executePlan Planelement " + planElement.toString() + " in intake class");
-
+            throw new Warning("Could not execute PlanElement " + planElement.toString() + " in intake class");
         }
     }
 

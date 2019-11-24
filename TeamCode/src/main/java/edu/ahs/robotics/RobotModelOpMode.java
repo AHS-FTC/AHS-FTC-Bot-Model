@@ -42,17 +42,16 @@ import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 
-@TeleOp(name="PID Test Opmode", group="Linear Opmode")
+@TeleOp(name="Model OpMode", group="Linear Opmode")
 
 @Disabled
-public class RobotModelOpMode extends LinearOpMode {
+public class RobotModelOpMode extends LinearOpMode { //todo make a model opmode with the abbreviated botmodel
 
     private ElapsedTime runtime = new ElapsedTime();
 
 
     @Override
     public void runOpMode() {
-        FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
 
         Robot summerBot = initRobot();

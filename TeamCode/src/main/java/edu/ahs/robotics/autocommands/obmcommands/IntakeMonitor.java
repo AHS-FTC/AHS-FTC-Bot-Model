@@ -1,4 +1,4 @@
-package edu.ahs.robotics.autocommands.autopaths;
+package edu.ahs.robotics.autocommands.obmcommands;
 
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;

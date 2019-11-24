@@ -108,8 +108,6 @@ public class ArdennesTeleOp extends OpMode
 
     @Override
     public void init() {
-
-        FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
 
         frontLeft = hardwareMap.get(DcMotor.class,"FL");

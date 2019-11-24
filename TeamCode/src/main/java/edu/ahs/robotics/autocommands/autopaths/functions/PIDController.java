@@ -1,4 +1,4 @@
-package edu.ahs.robotics.autocommands.autopaths;
+package edu.ahs.robotics.autocommands.autopaths.functions;
 
 import com.qualcomm.robotcore.util.Range;
 
@@ -6,30 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
 
-public class PIDDController {
+public class PIDController {
 
         private double MAXADJUSTMENT = .02;
         private double KP;
         private double KI;
         private double KD;
-        private double KDD;
         private double currentError=0;
         private double totalError=0;
         private double changeInError=0;
         private List errorList;
 
 
-        public PIDDController(double KP, double KI, double KD, double KDD){
+        public PIDController(double KP, double KI, double KD){
             this.KP = KP;
             this.KI = KI;
             this.KD = KD;
-            this.KDD = KDD;
             this.errorList = new ArrayList<Double>();
         }
 
-        public double getPowerAdjustment(double error, double deltaTime, double secondDerivative){
+        public double getPowerAdjustment(double error, double deltaTime){
             errorList.add(error);
             if (deltaTime==0){
                 deltaTime=1;}
@@ -41,14 +38,12 @@ public class PIDDController {
             double iAdjustment = Range.clip(totalError*KI,-MAXADJUSTMENT,MAXADJUSTMENT);
             totalError=Range.clip(totalError,-MAXADJUSTMENT/KI,MAXADJUSTMENT/KI);
             double dAdjustment = changeInError*KD;
-            double ddAdjustment = secondDerivative*KDD;
 
             //Logger.append(Logger.Cats.PADJUSTMENT,Double.toString(pAdjustment));
             //Logger.append(Logger.Cats.IADJUSTMENT,Double.toString(iAdjustment));
             //Logger.append(Logger.Cats.DADJUSTMENT,Double.toString(dAdjustment));
-            //Logger.append(Logger.Cats.DDADJUSTMENT,Double.toString(ddAdjustment));
 
-            double totalAdjustment = ddAdjustment+pAdjustment+iAdjustment+dAdjustment;
+            double totalAdjustment = pAdjustment+iAdjustment+dAdjustment;
 
             return totalAdjustment;
 

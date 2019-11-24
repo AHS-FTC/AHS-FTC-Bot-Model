@@ -13,7 +13,7 @@ import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.autocommands.autopaths.PIDDController;
+import edu.ahs.robotics.autocommands.autopaths.functions.PIDDController;
 import edu.ahs.robotics.autocommands.PlanElement;
 import edu.ahs.robotics.autocommands.autopaths.functions.RampFunction;
 import edu.ahs.robotics.autocommands.autopaths.ArcMotion;

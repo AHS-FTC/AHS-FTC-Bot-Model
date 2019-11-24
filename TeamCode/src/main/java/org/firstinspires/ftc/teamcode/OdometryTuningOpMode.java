@@ -22,7 +22,6 @@ public class OdometryTuningOpMode extends OpMode {
 
     @Override
     public void init() {
-        FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
 
         FL = hardwareMap.get(DcMotor.class, "FL");

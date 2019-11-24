@@ -37,7 +37,9 @@ import edu.ahs.robotics.abbreviatedmodel.Ardennes;
 import edu.ahs.robotics.autocommands.Plan;
 import edu.ahs.robotics.autocommands.autopaths.OdometryForwardMotion;
 import edu.ahs.robotics.autocommands.autopaths.OdometryMotion;
+import edu.ahs.robotics.autocommands.autopaths.Sleep;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
+import edu.ahs.robotics.autocommands.obmcommands.ServoCommand;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
@@ -55,14 +57,19 @@ public class ArdennesAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-        FTCUtilities.setHardwareMap(hardwareMap);
         MotorHashService.init();
 
         plan = new Plan();
 
         ardennes = new Ardennes();
-        plan.addToPlan(new OdometryMotion(ardennes.getChassis(), .4,250, -250));
-        plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
+
+        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 1));
+        plan.addToPlan(new Sleep(ardennes,2000));
+        //plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
+        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 0));
+        plan.addToPlan(new Sleep(ardennes,2000));
+        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 1));
+        plan.addToPlan(new Sleep(ardennes,2000));
         ardennes.givePlan(plan);
 
         waitForStart();
