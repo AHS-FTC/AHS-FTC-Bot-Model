@@ -60,7 +60,7 @@ public class RobotModelOpMode extends LinearOpMode {
         telemetry.update();
         waitForStart();
         runtime.reset();
-        summerBot.execute();
+        summerBot.executePlan();
         Logger.getInstance().writeToFile();
 
     }

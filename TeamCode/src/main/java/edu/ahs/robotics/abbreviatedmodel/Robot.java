@@ -1,22 +1,21 @@
-
-package edu.ahs.robotics.hardware;
+package edu.ahs.robotics.abbreviatedmodel;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
-import edu.ahs.robotics.autocommands.autopaths.Sleep;
-import edu.ahs.robotics.botfactories.BotFactory;
-import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.autocommands.Plan;
 import edu.ahs.robotics.autocommands.PlanElement;
+import edu.ahs.robotics.autocommands.autopaths.Sleep;
+import edu.ahs.robotics.hardware.Executor;
+import edu.ahs.robotics.util.FTCUtilities;
 
-public class Robot implements Executor{
+public abstract class Robot implements Executor{
+    private Plan plan;
 
-
-    @Override
+    public void givePlan (Plan plan) {
+        this.plan = plan;
+    }
     public void execute(PlanElement planElement) {
         if(planElement instanceof Sleep){
             Sleep sleep = (Sleep)planElement;
@@ -28,18 +27,6 @@ public class Robot implements Executor{
             throw new Warning("Could not executePlan planElement " + planElement.toString() + " in Robot class");
         }
     }
-
-    private Plan plan;
-    private Chassis chassis;
-
-    public Robot(Chassis chassis) {
-        this.chassis = chassis;
-    }
-
-    public void givePlan (Plan plan) {
-        this.plan = plan;
-    }
-
     public void executePlan() {
         FTCUtilities.OpLogger("Executing","In Robot");
         Iterator<PlanElement> iterator = plan.getIterator();
@@ -48,12 +35,4 @@ public class Robot implements Executor{
             element.execute();
         }
     }
-
-    public Chassis getChassis(){
-        return chassis;
-    }
-
 }
-
-
-

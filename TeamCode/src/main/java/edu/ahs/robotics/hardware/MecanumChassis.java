@@ -76,7 +76,7 @@ public class MecanumChassis extends Chassis {
         } else if (planElement instanceof OdometryPointTurn){
             motionInterpreter((OdometryPointTurn) planElement);
         } else {
-            throw new Warning("Couldn't find a way to execute PlanElement " + planElement.toString());
+            throw new Warning("Couldn't find a way to executePlan PlanElement " + planElement.toString());
         }
     }
 

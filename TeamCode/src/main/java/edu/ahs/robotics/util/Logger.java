@@ -30,7 +30,7 @@ public class Logger {
 
     FINALIZE AND WRITE FILE:
     Use function logger.getinstance().writeToFile();
-    Make sure to write this after your robot.execute();
+    Make sure to write this after your robot.executePlan();
     Otherwise, file will never be written and data is lost
 
     You can change names in logger class, default is "Data.csv"

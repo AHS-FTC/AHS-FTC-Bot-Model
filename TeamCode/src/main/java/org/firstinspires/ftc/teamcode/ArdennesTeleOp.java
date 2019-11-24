@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSenor;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
 //Written by Alex Appleby of team 16896
@@ -66,8 +66,8 @@ public class ArdennesTeleOp extends OpMode
     Servo gripperServo, wristServo;
 
     //Servo capstoneServo;
-    TriggerDistanceSenor intakeTrigger;
-    TriggerDistanceSenor gripperTrigger;
+    TriggerDistanceSensor intakeTrigger;
+    TriggerDistanceSensor gripperTrigger;
 
     private double frontLeftPower = 0, frontRightPower = 0, backLeftPower = 0, backRightPower = 0;
     private final int SLIDES_MAX = 4150;
@@ -127,8 +127,8 @@ public class ArdennesTeleOp extends OpMode
         gripperServo = hardwareMap.get(Servo.class,"gripper");
         wristServo = hardwareMap.get(Servo.class,"wrist");
 
-        gripperTrigger = new TriggerDistanceSenor("gripperTrigger",70);
-        intakeTrigger = new TriggerDistanceSenor("intakeTrigger",40);
+        gripperTrigger = new TriggerDistanceSensor("gripperTrigger",70);
+        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",40);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);

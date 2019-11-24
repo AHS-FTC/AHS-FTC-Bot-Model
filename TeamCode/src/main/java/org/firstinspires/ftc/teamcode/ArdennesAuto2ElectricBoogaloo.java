@@ -33,51 +33,46 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import edu.ahs.robotics.autocommands.autopaths.OdometryPointTurn;
+import edu.ahs.robotics.abbreviatedmodel.Ardennes;
 import edu.ahs.robotics.autocommands.Plan;
+import edu.ahs.robotics.autocommands.autopaths.ForwardMotion;
+import edu.ahs.robotics.autocommands.autopaths.OdometryForwardMotion;
+import edu.ahs.robotics.autocommands.autopaths.OdometryPointTurn;
+import edu.ahs.robotics.autocommands.autopaths.Sleep;
+import edu.ahs.robotics.autocommands.obmcommands.IntakeCommand;
+import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
 import edu.ahs.robotics.botfactories.ArdennesFactory;
+import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.Robot;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
 
 //@TeleOp(name="Ardennes Auto", group="Linear Opmode")
-@Autonomous(name = "Ardennes Auto", group = "Linear Opmode")
+@Autonomous(name = "Ardennes Auto 2 Electric Boogaloo", group = "Linear Opmode")
 //@Disabled
-public class ArdennesAuto extends LinearOpMode {
+public class ArdennesAuto2ElectricBoogaloo extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
+    private Ardennes ardennes;
+    private Plan plan;
 
 
     @Override
     public void runOpMode() {
-        FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
-
-        Robot ardennes = initRobot();
-        //telemetry.addData("Init Success","!");
-        //telemetry.update();
-        waitForStart();
-        runtime.reset();
-        ardennes.executePlan();
-        //Logger.getInstance().writeToFile();
-
-    }
-
-    Robot initRobot() { //accessible from JUnit tests
+        FTCUtilities.setHardwareMap(hardwareMap);
         MotorHashService.init();
 
-        // Instantiate the BotFactory subclass for our robot
-        ArdennesFactory ardennesFactory = new ArdennesFactory();
+        plan = new Plan();
 
-        Robot ardennes = ardennesFactory.createRobot();
+        ardennes = new Ardennes();
+        plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
+        ardennes.givePlan(plan);
 
-        //start constructing PlanElements below
-        Plan gamePlan = new Plan();
-        gamePlan.addToPlan(new OdometryPointTurn(ardennes.getChassis(), 90, .6));
-        sleep(1000);
-        ardennes.givePlan(gamePlan);
-        return ardennes;
+        waitForStart();
 
+        ardennes.executePlan();
     }
+
 }
