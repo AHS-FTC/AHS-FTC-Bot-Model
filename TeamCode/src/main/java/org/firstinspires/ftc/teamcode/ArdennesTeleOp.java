@@ -89,6 +89,7 @@ public class ArdennesTeleOp extends OpMode
     private boolean isDeliveryIntakeStyle = false;
     private boolean wristEnabled = false;
     private boolean gripperEnabled = false;
+    private boolean foundationEnabled = false;
 
     private ElapsedTime time;
 
@@ -99,6 +100,7 @@ public class ArdennesTeleOp extends OpMode
     private double lastIntakeOutPress = -BUTTON_THRESHOLD;
     private double lastWristPress = -BUTTON_THRESHOLD;
     private double lastGripperPress = -BUTTON_THRESHOLD;
+    private double lastFoundationPress = -BUTTON_THRESHOLD;
 
     //todo add serbos
 
@@ -240,6 +242,13 @@ public class ArdennesTeleOp extends OpMode
                 lastGripperPress = time.milliseconds();
             }
         }
+        //press a to grip foundation
+        if(gamepad1.a) {
+            if(time.milliseconds() - lastFoundationPress > BUTTON_THRESHOLD) {
+                foundationEnabled = !foundationEnabled;
+                lastFoundationPress = time.milliseconds();
+            }
+        }
 
         //both controllers press dpad up to enable delivery style intake
         if(gamepad1.dpad_up && gamepad2.dpad_up) {
@@ -304,6 +313,14 @@ public class ArdennesTeleOp extends OpMode
             gripperServo.setPosition(1);
         } else {
             gripperServo.setPosition(0);
+        }
+
+        if(foundationEnabled){
+            foundationServoL.setPosition(1);
+            foundationServoR.setPosition(1);
+        } else {
+            foundationServoL.setPosition(0);
+            foundationServoR.setPosition(0);
         }
 
         if(debuggingEnabled){

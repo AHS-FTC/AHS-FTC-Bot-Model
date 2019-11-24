@@ -16,6 +16,7 @@ public abstract class Robot implements Executor{
     public void givePlan (Plan plan) {
         this.plan = plan;
     }
+
     public void execute(PlanElement planElement) {
         if(planElement instanceof Sleep){
             Sleep sleep = (Sleep)planElement;
