@@ -102,6 +102,8 @@ public class ArdennesTeleOp extends OpMode
     private double lastGripperPress = -BUTTON_THRESHOLD;
     private double lastFoundationPress = -BUTTON_THRESHOLD;
 
+    private double lastTime;
+
     //todo add serbos
 
     @Override
@@ -182,6 +184,7 @@ public class ArdennesTeleOp extends OpMode
     @Override
     public void start() {
         time.startTime();
+        lastTime = time.milliseconds();
 
         resetEncoder(slideL);
         resetEncoder(slideR);
@@ -324,6 +327,8 @@ public class ArdennesTeleOp extends OpMode
         }
 
         if(debuggingEnabled){
+            telemetry.addData("deltaTime",lastTime-time.milliseconds());
+            lastTime = time.milliseconds();
             telemetry.addData("Left Slide Encoder", slideL.getCurrentPosition());
             //telemetry.addData("Right Slide Encoder", slideR.getCurrentPosition());
 
