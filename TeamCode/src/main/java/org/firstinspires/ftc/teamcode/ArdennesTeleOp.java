@@ -76,7 +76,7 @@ public class ArdennesTeleOp extends OpMode
 
     //from zero to one
     private double yServoPosition = 0;
-    private final double Y_SERVO_SPEED = .02;//unitless multiplier - only effects speed attached to stick.
+    private final double Y_SERVO_SPEED = 1;//unitless multiplier - only effects speed attached to stick.
 
     //private double intakeLPower = 0, intakeRPower = 0;
     private final double INTAKE_POWER = 1;

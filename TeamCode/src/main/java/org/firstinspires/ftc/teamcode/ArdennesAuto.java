@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import edu.ahs.robotics.abbreviatedmodel.Ardennes;
 import edu.ahs.robotics.autocommands.Plan;
+import edu.ahs.robotics.autocommands.autopaths.OdometryForwardMotion;
 import edu.ahs.robotics.autocommands.autopaths.OdometryMotion;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -60,7 +61,7 @@ public class ArdennesAuto extends LinearOpMode {
         plan = new Plan();
 
         ardennes = new Ardennes();
-        plan.addToPlan(new OdometryMotion(ardennes.getChassis(), .3,250, -250));
+        plan.addToPlan(new OdometryMotion(ardennes.getChassis(), .4,250, -250));
         plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
         ardennes.givePlan(plan);
 
