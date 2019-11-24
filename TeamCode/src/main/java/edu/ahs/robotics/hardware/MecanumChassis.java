@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 import java.util.Map;
 
 import edu.ahs.robotics.autocommands.autopaths.OdometryForwardMotion;
-import edu.ahs.robotics.autocommands.autopaths.OdometryPointTurn;
+import edu.ahs.robotics.autocommands.autopaths.OdometryMotion;
 import edu.ahs.robotics.autocommands.autopaths.PointTurn;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -73,8 +73,8 @@ public class MecanumChassis extends Chassis {
             motionInterpreter((PointTurn) planElement);
         } else if (planElement instanceof OdometryForwardMotion){
             motionInterpreter((OdometryForwardMotion) planElement);
-        } else if (planElement instanceof OdometryPointTurn){
-            motionInterpreter((OdometryPointTurn) planElement);
+        } else if (planElement instanceof OdometryMotion){
+            motionInterpreter((OdometryMotion) planElement);
         } else {
             throw new Warning("Couldn't find a way to executePlan PlanElement " + planElement.toString());
         }
@@ -243,13 +243,13 @@ public class MecanumChassis extends Chassis {
         setPowerAll(0);
     }
 
-    private void motionInterpreter(OdometryPointTurn turn){
-        double leftDistance, rightDistance, averageDistance = 0;
+    private void motionInterpreter(OdometryMotion turn){
+        double leftDistance, rightDistance, averageDistance;
         double rampUp, rampDown;
         double power, scaledPower;
         double minRampUp = .2;
         double minRampDown = .2;
-        double leftTarget = 243, rightTarget = -243; //250,-250 for almost perfect 90 deg
+        double leftTarget = turn.leftTarget, rightTarget = turn.rightTarget; //250,-250 for almost perfect 90 deg
         double leftRemaining, rightRemaining;
         double averageRemaining = (Math.abs(leftTarget) + Math.abs(rightTarget))/2;
         double errorLeft, errorRight;
@@ -294,12 +294,6 @@ public class MecanumChassis extends Chassis {
             frontRight.setPower(powerRight);
             backRight.setPower(powerRight);
 
-            Logger.append(Logger.Cats.DADJUSTMENT, String.valueOf(errorLeft));
-            Logger.append(Logger.Cats.DDADJUSTMENT, String.valueOf(errorRight));
-            Logger.append(Logger.Cats.ERROR, String.valueOf(powerLeft));
-            Logger.append(Logger.Cats.ENCODERDIST, String.valueOf(powerRight));
-            Logger.append(Logger.Cats.IADJUSTMENT, String.valueOf(leftDistance));
-            Logger.append(Logger.Cats.DESIDIST, String.valueOf(rightDistance));
 
         }
         setPowerAll(0);

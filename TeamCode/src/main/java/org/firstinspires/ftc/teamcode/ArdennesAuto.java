@@ -33,10 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import edu.ahs.robotics.autocommands.autopaths.OdometryPointTurn;
+import edu.ahs.robotics.abbreviatedmodel.Ardennes;
 import edu.ahs.robotics.autocommands.Plan;
-import edu.ahs.robotics.botfactories.ArdennesFactory;
-import edu.ahs.robotics.hardware.Robot;
+import edu.ahs.robotics.autocommands.autopaths.OdometryMotion;
+import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
@@ -47,36 +47,26 @@ import edu.ahs.robotics.util.MotorHashService;
 public class ArdennesAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
+    private Ardennes ardennes;
+    private Plan plan;
 
 
     @Override
     public void runOpMode() {
-        FTCUtilities.setHardwareMap(hardwareMap);
         FTCUtilities.setOpMode(this);
-
-        Robot ardennes = initRobot();
-        //telemetry.addData("Init Success","!");
-        //telemetry.update();
-        waitForStart();
-        runtime.reset();
-        ardennes.executePlan();
-        //Logger.getInstance().writeToFile();
-
-    }
-
-    Robot initRobot() { //accessible from JUnit tests
+        FTCUtilities.setHardwareMap(hardwareMap);
         MotorHashService.init();
 
-        // Instantiate the BotFactory subclass for our robot
-        ArdennesFactory ardennesFactory = new ArdennesFactory();
+        plan = new Plan();
 
-        Robot ardennes = ardennesFactory.createRobot();
+        ardennes = new Ardennes();
+        plan.addToPlan(new OdometryMotion(ardennes.getChassis(), .3,250, -250));
+        plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
+        ardennes.givePlan(plan);
 
-        //start constructing PlanElements below
-        Plan gamePlan = new Plan();
-        gamePlan.addToPlan(new OdometryPointTurn(ardennes.getChassis(), 90, .6));
-        ardennes.givePlan(gamePlan);
-        return ardennes;
+        waitForStart();
 
+        ardennes.executePlan();
     }
+
 }

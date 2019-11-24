@@ -17,6 +17,7 @@ import edu.ahs.robotics.hardware.Executor;
 import edu.ahs.robotics.hardware.GearRatio;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -26,6 +27,7 @@ public class Ardennes extends Robot {
     private MecanumChassis mecanumChassis;
     private Intake intake;
     private TriggerDistanceSensor intakeTrigger, gripperTrigger;
+    private ArdennesSkyStoneDetector detector;
 
 
 
@@ -35,7 +37,11 @@ public class Ardennes extends Robot {
 
         intake = new Intake(1);
         mecanumChassis = makeChassis();
+
+        detector = new ArdennesSkyStoneDetector();
     }
+
+    public ArdennesSkyStoneDetector.SkyStoneConfigurations runDetector() {return detector.look();}
 
     public Intake getIntake(){
         return intake;
