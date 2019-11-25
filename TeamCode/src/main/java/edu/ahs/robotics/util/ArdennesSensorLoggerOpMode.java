@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -55,16 +56,18 @@ import edu.ahs.robotics.hardware.sensors.IMU;
 
 @TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
 @Disabled
-public class ArdennesSensorLogger extends OpMode
+public class ArdennesSensorLoggerOpMode extends OpMode
 {
     BNO055IMU bnoIMU;
     IMU imu;
+    TouchSensor limitSwitch;
 
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
         bnoIMU = FTCUtilities.getIMU("imu");
         imu = new IMU(bnoIMU);
+        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
     }
 
     @Override
@@ -78,8 +81,8 @@ public class ArdennesSensorLogger extends OpMode
     @Override
     public void loop() {
         FTCUtilities.addData("IMU",imu.getHeading());
+        FTCUtilities.addData("pressed?", limitSwitch.isPressed());
         FTCUtilities.updateOpLogger();
-
     }
     @Override
     public void stop() {

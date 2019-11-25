@@ -1,6 +1,6 @@
 package edu.ahs.robotics.hardware.sensors;
 
-public class TriggerDistanceSensor extends DistanceSensor {
+public class TriggerDistanceSensor extends DistanceSensor implements Trigger {
     private double threshold;
 
     public TriggerDistanceSensor(String sensorName, double threshold) {
