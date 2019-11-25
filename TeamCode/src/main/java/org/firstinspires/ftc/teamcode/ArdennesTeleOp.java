@@ -191,6 +191,7 @@ public class ArdennesTeleOp extends OpMode
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
+
     @Override
     public void loop() {
 
@@ -259,17 +260,10 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        //negatives are important here
-        //frontLeftPower = gamepad1.left_stick_y-gamepad1.left_stick_x-gamepad1.right_stick_x;
-        //frontRightPower = gamepad1.left_stick_y+gamepad1.left_stick_x+gamepad1.right_stick_x;
-        //backLeftPower = gamepad1.left_stick_y+gamepad1.left_stick_x-gamepad1.right_stick_x;
-        //backRightPower = gamepad1.left_stick_y-gamepad1.left_stick_x+gamepad1.right_stick_x;
-
         frontLeftPower = calculateMotorPower(1,-1,-1);
         frontRightPower = calculateMotorPower(1,1,1);
         backLeftPower = calculateMotorPower(1,1,-1);
         backRightPower = calculateMotorPower(1,-1,1);
-
 
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
