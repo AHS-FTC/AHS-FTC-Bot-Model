@@ -6,8 +6,6 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.util.Map;
 
-import edu.ahs.robotics.autocommands.autopaths.OdometryForwardMotion;
-import edu.ahs.robotics.autocommands.autopaths.OdometryMotion;
 import edu.ahs.robotics.autocommands.autopaths.PointTurn;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -212,7 +210,7 @@ public class MecanumChassis extends Chassis {
         double minRampUp = .2;
         double minRampDown = .12;
 
-        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .2, .015);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .15, .015);
     }
 
     public void pivot(double angle, double maxPower) {
@@ -233,62 +231,66 @@ public class MecanumChassis extends Chassis {
     }
 
     private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale){
-        double leftDistance, rightDistance, averageDistance;
-        double power, scaledPower;
-        //double leftTarget = turn.leftTarget, rightTarget = turn.rightTarget; //250,-250 for almost perfect 90 deg
-        double leftRemaining, rightRemaining;
-        double averageRemaining = (Math.abs(leftTarget) + Math.abs(rightTarget))/2;
-        double errorLeft, errorRight;
-        double correctionScale = 0.005;
+
+        if(maxPower < 0 || maxPower > 1.0) {
+            throw new Warning("maxPower " + maxPower + " must be between 0 and 1");
+        }
+
+        final double correctionScale = 0.005;
 
         leftOdometer.reset();
         rightOdometer.reset();
 
-        while(averageRemaining > 0){
-            leftDistance = leftOdometer.getDistance();
-            rightDistance = rightOdometer.getDistance();
+        try {
+           while (true) {
+                double leftDistance = leftOdometer.getDistance();
+                double rightDistance = rightOdometer.getDistance();
 
-            averageDistance = (Math.abs(leftDistance) + Math.abs(rightDistance))/2;
+                double averageDistance = (Math.abs(leftDistance) + Math.abs(rightDistance)) / 2;
 
-            leftRemaining = Math.signum(leftTarget)*(leftTarget - leftDistance);
-            rightRemaining = Math.signum(rightTarget)*(rightTarget - rightDistance);
+                double leftRemaining = Math.signum(leftTarget) * (leftTarget - leftDistance);
+                double rightRemaining = Math.signum(rightTarget) * (rightTarget - rightDistance);
 
-            averageRemaining = (leftRemaining + rightRemaining)/2;
+                double averageRemaining = (leftRemaining + rightRemaining) / 2;
+                if (averageRemaining <= 0) {
+                    break;
+                }
 
-            power = getRampedPower(maxPower, averageDistance, minRampUp, minRampDown, averageRemaining, upScale, downScale);
+                double rampUp, rampDown;
+                double power;
+                rampUp = Math.max(upScale * Math.sqrt(averageDistance), minRampUp);
+                rampDown = Math.max(downScale * Math.sqrt(averageRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
 
-            FTCUtilities.addData("power", power);
-            FTCUtilities.addData("left r", leftRemaining);
-            FTCUtilities.addData("right r", rightRemaining);
-            FTCUtilities.addData("average remaining", averageRemaining);
-            FTCUtilities.updateOpLogger();
+                power = Math.min(rampUp, Math.min(rampDown, maxPower));
 
-            errorLeft = averageDistance - Math.abs(leftDistance);
-            errorRight = averageDistance - Math.abs(rightDistance);
+                double adjustLeft = correctionScale * (averageDistance - Math.abs(leftDistance));
+                double adjustRight = correctionScale * (averageDistance - Math.abs(rightDistance));
 
+                power -= Math.max(adjustLeft, adjustRight);
 
-            double powerLeft = Math.signum(leftTarget) * (power + correctionScale * errorLeft);
-            frontLeft.setPower(powerLeft);
-            backLeft.setPower(powerLeft);
-
-            double powerRight = Math.signum(rightTarget) * (power + correctionScale * errorRight);
-            frontRight.setPower(powerRight);
-            backRight.setPower(powerRight);
+                double powerLeft = Math.signum(leftTarget) * (power + adjustLeft);
+                double powerRight = Math.signum(rightTarget) * (power + adjustRight);
 
 
+
+                frontLeft.setPower(powerLeft);
+                backLeft.setPower(powerLeft);
+                frontRight.setPower(powerRight);
+                backRight.setPower(powerRight);
+
+               FTCUtilities.addData("power", power);
+               FTCUtilities.addData("left r", leftRemaining);
+               FTCUtilities.addData("right r", rightRemaining);
+               FTCUtilities.addData("average remaining", averageRemaining);
+               FTCUtilities.addData("leftDistance", leftDistance);
+               FTCUtilities.addData("rightDistance", rightDistance);
+               FTCUtilities.updateOpLogger();
+
+           }
+        } finally {
+            setPowerAll(0);
         }
-        setPowerAll(0);
         Logger.getInstance().writeToFile();
-    }
-
-    private double getRampedPower(double maxPower, double averageDistance, double minRampUp, double minRampDown, double averageRemaining, double upScale, double downScale) {
-        double rampUp, rampDown;
-        double power;
-        rampUp = Math.max(upScale * Math.sqrt(averageDistance), minRampUp);
-        rampDown = Math.max(downScale * Math.sqrt(averageRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
-
-        power = Math.min(rampUp, Math.min(rampDown, maxPower));
-        return power;
     }
 
 }

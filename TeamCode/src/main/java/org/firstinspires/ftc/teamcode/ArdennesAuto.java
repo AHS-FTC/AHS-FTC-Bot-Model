@@ -60,11 +60,11 @@ public class ArdennesAuto extends LinearOpMode {
         ardennes = new Ardennes();
         Intake intake = ardennes.getIntake();
         MecanumChassis chassis = ardennes.getChassis();
-        chassis.driveStraight(1000, 1);
-//        chassis.pivot(360, 0.4);
-//        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-//        chassis.driveStraight(600, .5);
-//        chassis.driveStraight(-1500, 1);
+        chassis.driveStraight(500, .8);
+        chassis.pivot(360, 0.4);
+        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
+        chassis.driveStraight(600, .5);
+        chassis.driveStraight(-1000, 1);
 
 
     }
