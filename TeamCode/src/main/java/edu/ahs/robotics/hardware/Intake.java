@@ -6,9 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.autocommands.PlanElement;
-import edu.ahs.robotics.autocommands.obmcommands.IntakeMonitor;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeCommand;
-import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
+import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
@@ -54,8 +53,8 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
     public void startIntakeWaitForBlock(TriggerDistanceSensor trigger){
         intakeMode = IntakeMode.IN;
         runMotorsByMode();
-        IntakeMonitor intakeMonitor = new IntakeMonitor(trigger,this);
-        Thread thread = new Thread(intakeMonitor);
+        BlockMonitor blockMonitor = new BlockMonitor(trigger);
+        Thread thread = new Thread(blockMonitor);
         thread.start();
     }
 
@@ -77,5 +76,27 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
     public void stopMotors(){
         leftMotor.setPower(0);
         rightMotor.setPower(0);
+    }
+
+    private class BlockMonitor implements Runnable {
+        private Trigger stopTrigger;
+
+
+        public BlockMonitor(Trigger stopTrigger) {
+            this.stopTrigger = stopTrigger;
+        }
+
+        @Override
+        public void run() {
+            while (!stopTrigger.isTriggered()){
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+
+                }
+            }
+            stopMotors();
+        }
+
     }
 }
