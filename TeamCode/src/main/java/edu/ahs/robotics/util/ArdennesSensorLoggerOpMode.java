@@ -27,57 +27,65 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics;
+package edu.ahs.robotics.util;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-import edu.ahs.robotics.autopaths.ForwardMotion;
-import edu.ahs.robotics.autopaths.Plan;
-import edu.ahs.robotics.botfactories.SummerBotFactory;
-import edu.ahs.robotics.hardware.Robot;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.MotorHashService;
+import edu.ahs.robotics.hardware.sensors.IMU;
 
-@TeleOp(name="PID Test Opmode", group="Linear Opmode")
+/**
+ * This file contains an example of an iterative (Non-Linear) "OpMode".
+ * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
+ * The names of OpModes appear on the menu of the FTC Driver Station.
+ * When an selection is made from the menu, the corresponding OpMode
+ * class is instantiated on the Robot Controller and executed.
+ *
+ * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
+ * It includes all the skeletal structure that all iterative OpModes contain.
+ *
+ * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+ */
 
+@TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
 @Disabled
-public class RobotModelOpMode extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-
+public class ArdennesSensorLoggerOpMode extends OpMode
+{
+    BNO055IMU bnoIMU;
+    IMU imu;
+    TouchSensor limitSwitch;
 
     @Override
-    public void runOpMode() {
-        FTCUtilities.setHardwareMap(hardwareMap);
+    public void init() {
         FTCUtilities.setOpMode(this);
-
-        Robot summerBot = initRobot();
-        telemetry.addData("Init Succsess","!");
-        telemetry.update();
-        waitForStart();
-        runtime.reset();
-        summerBot.execute();
-        Logger.getInstance().writeToFile();
-
+        bnoIMU = FTCUtilities.getIMU("imu");
+        imu = new IMU(bnoIMU);
+        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
     }
 
-    Robot initRobot() { //accessible from JUnit tests
-        MotorHashService.init();
-
-        // Instantiate the BotFactory subclass for our robot
-        SummerBotFactory summerBotFactory = new SummerBotFactory();
-
-        Robot summerBot = summerBotFactory.createRobot();
-
-        //start constructing PlanElements below
-        Plan gamePlan = new Plan();
-        gamePlan.addToPlan(new ForwardMotion(60, 1, 5000, summerBot.getChassis()));
-        summerBot.givePlan(gamePlan);
-        return summerBot;
-
+    @Override
+    public void init_loop() {
     }
+
+    @Override
+    public void start() {
+    }
+
+    @Override
+    public void loop() {
+        FTCUtilities.addData("IMU",imu.getHeading());
+        FTCUtilities.addData("pressed?", limitSwitch.isPressed());
+        FTCUtilities.updateOpLogger();
+    }
+    @Override
+    public void stop() {
+    }
+
 }

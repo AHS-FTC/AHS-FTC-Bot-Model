@@ -27,17 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics.util;
+package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
-
-import edu.ahs.robotics.hardware.sensors.IMU;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -53,36 +50,78 @@ import edu.ahs.robotics.hardware.sensors.IMU;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
+@TeleOp(name="Basic: Iterative OpMode", group="Iterative Opmode")
 @Disabled
-public class ArdennesSensorLogger extends OpMode
+public class OdometryTestOpMode extends OpMode
 {
-    BNO055IMU bnoIMU;
-    IMU imu;
+    // Declare OpMode members.
+    private DcMotor x = null;
+    private DcMotor y = null;
 
+    private DcMotor left, right;
+
+    /*
+     * Code to run ONCE when the driver hits INIT
+     */
     @Override
     public void init() {
-        FTCUtilities.setOpMode(this);
-        FTCUtilities.setHardwareMap(hardwareMap);
 
-        bnoIMU = FTCUtilities.getIMU("imu");
-        imu = new IMU(bnoIMU);
+        x = hardwareMap.get(DcMotor.class, "x");
+        y = hardwareMap.get(DcMotor.class, "y");
+
+        left = hardwareMap.get(DcMotor.class, "L");
+        right = hardwareMap.get(DcMotor.class, "R");
+
+        x.setDirection(DcMotor.Direction.FORWARD);
+        y.setDirection(DcMotor.Direction.FORWARD);
+
+        // Tell the driver that initialization is complete.
+        telemetry.addData("Status", "Initialized");
     }
 
+    /*
+     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+     */
     @Override
     public void init_loop() {
     }
 
+    /*
+     * Code to run ONCE when the driver hits PLAY
+     */
     @Override
     public void start() {
+
     }
 
+    /*
+     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
+     */
     @Override
     public void loop() {
-        FTCUtilities.addData("IMU",imu.getHeading());
-        FTCUtilities.updateOpLogger();
 
+        telemetry.addData("x",x.getCurrentPosition());
+        telemetry.addData("y",y.getCurrentPosition());
+
+        // Show the elapsed game time and wheel maxPower.
+
+        if (gamepad1.right_trigger != 0) {
+            x.setPower(-gamepad1.right_trigger);
+            y.setPower(gamepad1.right_trigger);
+        } else {
+            x.setPower(gamepad1.left_trigger);
+            y.setPower(-gamepad1.left_trigger);
+        }
+
+        left.setPower(-gamepad1.left_stick_y);
+        right.setPower(gamepad1.right_stick_y);
+
+        telemetry.update();
     }
+
+    /*
+     * Code to run ONCE after the driver hits STOP
+     */
     @Override
     public void stop() {
     }

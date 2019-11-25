@@ -1,4 +1,4 @@
-package edu.ahs.robotics.autopaths.functions;
+package edu.ahs.robotics.autocommands.autopaths.functions;
 
 public class Position {
     public double x;

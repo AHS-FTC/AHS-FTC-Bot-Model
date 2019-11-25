@@ -2,7 +2,6 @@ package edu.ahs.robotics.hardware.sensors;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import edu.ahs.robotics.autopaths.StraightMotion;
 import edu.ahs.robotics.util.FTCUtilities;
 
 public class Odometer {
@@ -29,5 +28,10 @@ public class Odometer {
     public void reset(){
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public double getRotations(){
+        int ticks = motor.getCurrentPosition();
+        double rotations = ticks/TICKS_PER_ROTATION;
+        return direction*rotations;
     }
 }

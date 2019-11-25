@@ -3,6 +3,8 @@ package edu.ahs.robotics.hardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
+
 import edu.ahs.robotics.util.MotorHashService;
 
 
@@ -26,7 +28,7 @@ public class SingleDriveUnit extends DriveUnit{
 
     public void setPower(double motorPower){
         if (Math.abs(motorPower) > 1) {
-            throw new Error("DriveUnit motorPower is not between 1 and -1");
+            throw new Warning("DriveUnit motorPower is not between 1 and -1");
         }
         motor.setPower(motorPower);
     }

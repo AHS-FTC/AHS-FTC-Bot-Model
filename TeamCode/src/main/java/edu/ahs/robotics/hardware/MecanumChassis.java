@@ -6,18 +6,10 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.util.Map;
 
-import edu.ahs.robotics.autopaths.OdometryForwardMotion;
-import edu.ahs.robotics.autopaths.OdometryPointTurn;
-import edu.ahs.robotics.autopaths.PointTurn;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.autopaths.PIDDController;
-import edu.ahs.robotics.autopaths.PlanElement;
-import edu.ahs.robotics.autopaths.functions.RampFunction;
-import edu.ahs.robotics.autopaths.ArcMotion;
-import edu.ahs.robotics.autopaths.ForwardMotion;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 
 public class MecanumChassis extends Chassis {
@@ -47,8 +39,8 @@ public class MecanumChassis extends Chassis {
         backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_LEFT));
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_RIGHT));
 
-        leftOdometer = new Odometer("intakeL", 60 , false);
-        rightOdometer = new Odometer("intakeR", 60, true);
+        leftOdometer = new Odometer("intakeL", 60.2967 , false);
+        rightOdometer = new Odometer("intakeR", 60.79, true);
     }
 
 
@@ -64,101 +56,7 @@ public class MecanumChassis extends Chassis {
     }
 
 
-    public void execute(PlanElement planElement) {
-        if (planElement instanceof ForwardMotion) {
-            motionInterpreter((ForwardMotion) planElement);
-        } else if (planElement instanceof ArcMotion) {
-            motionInterpreter((ArcMotion) planElement);
-        } else if(planElement instanceof PointTurn) {
-            motionInterpreter((PointTurn) planElement);
-        } else if (planElement instanceof OdometryForwardMotion){
-            motionInterpreter((OdometryForwardMotion) planElement);
-        } else if (planElement instanceof OdometryPointTurn){
-            motionInterpreter((OdometryPointTurn) planElement);
-        } else {
-            throw new Warning("Couldn't find a way to execute PlanElement " + planElement.toString());
-        }
-    }
-
-    private void motionInterpreter(ForwardMotion forwardMotion) {
-
-        double actualInchesTravelled = 0;
-
-        double startTime = System.currentTimeMillis();
-        double currentTime=0;
-        double power = 0;
-        double lastROC =0;
-        int loopCounter=0;
-        int loopInterval = 50;
-
-
-        //create Linear Function Object which specifies targetDistance and speed.
-        RampFunction forceFunction = new RampFunction(forwardMotion.travelDistance);
-
-        //create PID object with specifed P,I,D,DD coefficients
-        PIDDController myBasicPIDDController = new PIDDController(0.01,.001,.00,0.26);
-
-        while(actualInchesTravelled<forwardMotion.travelDistance && forwardMotion.timeOut>currentTime){
-            //get the current time
-            double lastTime = currentTime;
-            currentTime = System.currentTimeMillis()-startTime;
-            double deltaTime = currentTime-lastTime;
-            //ensure a regular Sample Interval
-            double sleepTime = Range.clip(loopInterval*loopCounter-currentTime,0,loopInterval);
-            loopCounter+=1;
-
-            try {
-                Thread.sleep((int)sleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            //calculate the error and total error...desired targetDistance - actual targetDistance
-            double desiredInchesTravelled = forceFunction.getDesiredDistance(currentTime);
-            actualInchesTravelled = (frontRight.getDistance() + frontLeft.getDistance() + backRight.getDistance()+ backLeft.getDistance())/4; //This should be re-implemented for seperate feedback on every motor
-            double error = desiredInchesTravelled-actualInchesTravelled;
-            double currentROC = (forceFunction.getDesiredDistance(currentTime+loopInterval)-forceFunction.getDesiredDistance(currentTime));
-            //calculate the powerAdjustment based on the error
-            double secondDerivative=(currentROC-lastROC);
-            lastROC = currentROC;
-
-            double powerAdjustment = myBasicPIDDController.getPowerAdjustment(error,deltaTime,secondDerivative);
-            power += powerAdjustment;
-            power = Range.clip(power,-1,1);
-            setPowerAll(power);
-            //adjust the motor speed appropriately
-            //adjustPowerAll(powerAdjustment);
-            //pause for specified amount of time
-
-            //FTCUtilities.OpSleep(1000);
-
-            //Log Stuff!
-            Logger.append(Logger.Cats.ENCODERDIST,Double.toString(actualInchesTravelled));
-            Logger.append(Logger.Cats.DESIDIST,Double.toString(desiredInchesTravelled));
-            Logger.append(Logger.Cats.ERROR,Double.toString(error));
-            //Logger.append(Logger.Cats.MOTORPOW,Double.toString(maxPower));
-            //Logger.append(Logger.Cats.POWADJ,Double.toString(powerAdjustment));
-            //Logger.append(Logger.Cats.TIME,Double.toString(currentTime));
-            //FTCUtilities.OpLogger("Target Inches Travelled", desiredInchesTravelled);
-            FTCUtilities.OpLogger("Inches Travelled", actualInchesTravelled);
-           // FTCUtilities.OpLogger("Error", error);
-            //FTCUtilities.OpLogger("Power Adjustment", powerAdjustment);
-            FTCUtilities.OpLogger("Motor Power", power);
-            //FTCUtilities.OpLogger("Elapsed Time", currentTime);
-            //FTCUtilities.OpLogger("Second Derivative", secondDerivative);
-            //myBasicPIDDController.getMeanAndSD();
-            //FTCUtilities.OpLogger("-------------", ":-----------");
-        }
-        myBasicPIDDController.getMeanAndSD();
-
-        setPowerAll(0);
-    }
-
-    private void motionInterpreter(ArcMotion arcMotion) {
-
-    }
-
-    private void motionInterpreter(PointTurn pointTurn){
+    /*private void motionInterpreter(PointTurn pointTurn){
         if(pointTurn.type == PointTurn.Type.RELATIVE){
             double startHeading = imu.getHeading();
             double deltaHeading = 0;
@@ -209,84 +107,24 @@ public class MecanumChassis extends Chassis {
             }
             setPowerAll(0);
         }
-    }
+    }*/
 
-    private void motionInterpreter(OdometryForwardMotion motion){
-        double distance = 0;
-        double rampUp, rampDown;
-        double distanceTo;
-        double power, scaledPower;
+
+    public void driveStraight(double distance, double maxPower) {
         double minRampUp = .2;
         double minRampDown = .12;
 
-        double u = 0.05, d = 0.013; // reciprocal of millimeters after which you will be at maxPower 1
-
-        leftOdometer.reset();
-        rightOdometer.reset();
-
-        while(Math.abs(distance) < Math.abs(motion.targetDistance)){
-            distance = Math.abs(leftOdometer.getDistance() + rightOdometer.getDistance())/2;
-            distanceTo = Math.abs(motion.targetDistance) - Math.abs(distance);
-
-            rampUp = Math.max(u*Math.sqrt(distance),minRampUp);
-            rampDown = Math.max(d*Math.sqrt(distanceTo),minRampDown); //distanceTo accounts for flip across y axis and x offset
-
-            power = Math.min(rampUp, Math.min(rampDown, motion.maxPower));
-
-            FTCUtilities.addData("maxPower", power);
-            FTCUtilities.addData("left", leftOdometer.getDistance());
-            FTCUtilities.addData("right", rightOdometer.getDistance());
-            FTCUtilities.updateOpLogger();
-
-            setPowerAll(power);
-        }
-        setPowerAll(0);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .15, .015);
     }
 
-    private void motionInterpreter(OdometryPointTurn turn){
-        double leftDistance, rightDistance, averageDistance = 0;
-        double rampUp, rampDown;
-        double power, scaledPower;
+    public void pivot(double angle, double maxPower) {
         double minRampUp = .2;
         double minRampDown = .2;
-        double leftTarget = 300, rightTarget = -300;
-        double leftRemaining, rightRemaining;
-        double averageRemaining = (Math.abs(leftTarget) + Math.abs(rightTarget))/2;
 
-        double u = 0.07, d = 0.02; // reciprocal of millimeters after which you will be at maxPower 1
-
-        leftOdometer.reset();
-        rightOdometer.reset();
-
-        while(averageRemaining > 0){
-            leftDistance = leftOdometer.getDistance();
-            rightDistance = rightOdometer.getDistance();
-
-            averageDistance = (Math.abs(leftDistance) + Math.abs(rightDistance))/2;
-
-            leftRemaining = Math.signum(leftTarget)*(leftTarget - leftDistance);
-            rightRemaining = Math.signum(rightTarget)*(rightTarget - rightDistance);
-
-            averageRemaining = (leftRemaining + rightRemaining)/2;
-
-            rampUp = Math.max(u*Math.sqrt(averageDistance),minRampUp);
-            rampDown = Math.max(d*Math.sqrt(averageRemaining),minRampDown); //distanceTo accounts for flip across y axis and x offset
-
-            power = Math.min(rampUp, Math.min(rampDown, turn.maxPower));
-
-            FTCUtilities.addData("power", power);
-            FTCUtilities.addData("left r", leftRemaining);
-            FTCUtilities.addData("right r", rightRemaining);
-            FTCUtilities.addData("average remaining", averageRemaining);
-            FTCUtilities.updateOpLogger();
-
-            frontLeft.setPower(Math.signum(leftTarget)*power);
-            backLeft.setPower(Math.signum(leftTarget)*power);
-
-            frontRight.setPower(Math.signum(rightTarget)*power);
-            backRight.setPower(Math.signum(rightTarget)*power);
-        }
-        setPowerAll(0);
+        final double distancePer360 = 1001;
+        double leftTarget = (angle * distancePer360)/360.0;
+        double rightTarget = -1 * leftTarget;
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .07, .04);
     }
 
     private void setPowerAll(double motorPower) {
@@ -295,4 +133,68 @@ public class MecanumChassis extends Chassis {
         backRight.setPower(motorPower);
         backLeft.setPower(motorPower);
     }
+
+    private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale){
+
+        if(maxPower < 0 || maxPower > 1.0) {
+            throw new Warning("maxPower " + maxPower + " must be between 0 and 1");
+        }
+
+        final double correctionScale = 0.005;
+
+        leftOdometer.reset();
+        rightOdometer.reset();
+
+        try {
+           while (true) {
+                double leftDistance = leftOdometer.getDistance();
+                double rightDistance = rightOdometer.getDistance();
+
+                double averageDistance = (Math.abs(leftDistance) + Math.abs(rightDistance)) / 2;
+
+                double leftRemaining = Math.signum(leftTarget) * (leftTarget - leftDistance);
+                double rightRemaining = Math.signum(rightTarget) * (rightTarget - rightDistance);
+
+                double averageRemaining = (leftRemaining + rightRemaining) / 2;
+                if (averageRemaining <= 0) {
+                    break;
+                }
+
+                double rampUp, rampDown;
+                double power;
+                rampUp = Math.max(upScale * Math.sqrt(averageDistance), minRampUp);
+                rampDown = Math.max(downScale * Math.sqrt(averageRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
+
+                power = Math.min(rampUp, Math.min(rampDown, maxPower));
+
+                double adjustLeft = correctionScale * (averageDistance - Math.abs(leftDistance));
+                double adjustRight = correctionScale * (averageDistance - Math.abs(rightDistance));
+
+                power -= Math.max(adjustLeft, adjustRight);
+
+                double powerLeft = Math.signum(leftTarget) * (power + adjustLeft);
+                double powerRight = Math.signum(rightTarget) * (power + adjustRight);
+
+
+
+                frontLeft.setPower(powerLeft);
+                backLeft.setPower(powerLeft);
+                frontRight.setPower(powerRight);
+                backRight.setPower(powerRight);
+
+               FTCUtilities.addData("power", power);
+               FTCUtilities.addData("left r", leftRemaining);
+               FTCUtilities.addData("right r", rightRemaining);
+               FTCUtilities.addData("average remaining", averageRemaining);
+               FTCUtilities.addData("leftDistance", leftDistance);
+               FTCUtilities.addData("rightDistance", rightDistance);
+               FTCUtilities.updateOpLogger();
+
+           }
+        } finally {
+            setPowerAll(0);
+        }
+        Logger.getInstance().writeToFile();
+    }
+
 }

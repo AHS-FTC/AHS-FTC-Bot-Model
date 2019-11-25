@@ -1,4 +1,4 @@
-package edu.ahs.robotics.autopaths;
+package edu.ahs.robotics.autocommands.autopaths.functions;
 
 import com.qualcomm.robotcore.util.Range;
 
