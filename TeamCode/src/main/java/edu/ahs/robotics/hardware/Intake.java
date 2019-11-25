@@ -7,19 +7,13 @@ import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
-public class Intake{ //todo make a one or two motor alternate to intake class
+public class Intake { //todo make a one or two motor alternate to intake class
     private DcMotor leftMotor;
     private DcMotor rightMotor;
     private IntakeMode intakeMode;
     private double motorPower;
 
-    public enum IntakeMode {
-        OFF,
-        IN,
-        OUT
-    }
-
-    public Intake (double motorPower) {
+    public Intake(double motorPower) {
         leftMotor = FTCUtilities.getMotor("intakeL");
         rightMotor = FTCUtilities.getMotor("intakeR");
 
@@ -33,8 +27,7 @@ public class Intake{ //todo make a one or two motor alternate to intake class
         intakeMode = IntakeMode.OFF;
     }
 
-
-    public void startIntakeWaitForBlock(TriggerDistanceSensor trigger){
+    public void startIntakeWaitForBlock(TriggerDistanceSensor trigger) {
         intakeMode = IntakeMode.IN;
         runMotorsByMode();
         BlockMonitor blockMonitor = new BlockMonitor(trigger);
@@ -42,29 +35,34 @@ public class Intake{ //todo make a one or two motor alternate to intake class
         thread.start();
     }
 
-
-    private void runMotorsByMode(){
-        if(intakeMode == IntakeMode.IN){
+    private void runMotorsByMode() {
+        if (intakeMode == IntakeMode.IN) {
             runMotors(motorPower);
-        } else if(intakeMode == IntakeMode.OUT){
+        } else if (intakeMode == IntakeMode.OUT) {
             runMotors(-motorPower);
-        } else if (intakeMode == IntakeMode.OFF){
+        } else if (intakeMode == IntakeMode.OFF) {
             stopMotors();
         }
     }
 
-    public void runMotors(double motorPower){
+    public void runMotors(double motorPower) {
         leftMotor.setPower(-motorPower);
         rightMotor.setPower(motorPower);
     }
-    public void stopMotors(){
+
+    public void stopMotors() {
         leftMotor.setPower(0);
         rightMotor.setPower(0);
     }
 
+    public enum IntakeMode {
+        OFF,
+        IN,
+        OUT
+    }
+
     private class BlockMonitor implements Runnable {
         private Trigger stopTrigger;
-
 
         public BlockMonitor(Trigger stopTrigger) {
             this.stopTrigger = stopTrigger;
@@ -72,7 +70,7 @@ public class Intake{ //todo make a one or two motor alternate to intake class
 
         @Override
         public void run() {
-            while (!stopTrigger.isTriggered()){
+            while (!stopTrigger.isTriggered()) {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {

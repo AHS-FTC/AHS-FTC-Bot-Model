@@ -330,11 +330,13 @@ public class ArdennesTeleOp extends OpMode
             foundationServoR.setPosition(0);
         }
 
+        telemetry.addData("Collection Mode?", isDeliveryIntakeStyle);
+        telemetry.update();
+
         if(debuggingEnabled){
             telemetry.addData("deltaTime",lastTime-time.milliseconds());
             lastTime = time.milliseconds();
             telemetry.addData("Left Slide Encoder", slideL.getCurrentPosition());
-            telemetry.addData("Collection Mode?", isDeliveryIntakeStyle);
             //telemetry.addData("Right Slide Encoder", slideR.getCurrentPosition());
 
             //telemetry.addData("intake Distance", intakeTrigger.getDist());
