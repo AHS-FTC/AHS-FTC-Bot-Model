@@ -63,18 +63,14 @@ public class ArdennesAuto extends LinearOpMode {
 
         ardennes = new Ardennes();
 
-        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 1));
-        plan.addToPlan(new Sleep(ardennes,2000));
-        //plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
-        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 0));
-        plan.addToPlan(new Sleep(ardennes,2000));
-        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 1));
-        plan.addToPlan(new Sleep(ardennes,2000));
+        plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
+        plan.addToPlan(new OdometryMotion(ardennes.getChassis(), .3, 3000, 3000));
+        plan.addToPlan(new Sleep(ardennes,1000));
+
         ardennes.givePlan(plan);
 
         waitForStart();
 
         ardennes.executePlan();
     }
-
 }

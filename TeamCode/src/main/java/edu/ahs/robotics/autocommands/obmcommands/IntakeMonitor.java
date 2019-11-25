@@ -1,14 +1,15 @@
 package edu.ahs.robotics.autocommands.obmcommands;
 
 import edu.ahs.robotics.hardware.Intake;
+import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
 public class IntakeMonitor implements Runnable {
-    TriggerDistanceSensor stopTrigger;
+    Trigger stopTrigger;
     Intake intake;
 
-    public IntakeMonitor(TriggerDistanceSensor stopTrigger, Intake intake) {
+    public IntakeMonitor(Trigger stopTrigger, Intake intake) {
         this.stopTrigger = stopTrigger;
         this.intake = intake;
     }

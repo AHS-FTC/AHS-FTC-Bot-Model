@@ -260,10 +260,16 @@ public class ArdennesTeleOp extends OpMode
         }
 
         //negatives are important here
-        frontLeftPower = gamepad1.left_stick_y-gamepad1.left_stick_x-gamepad1.right_stick_x;
-        frontRightPower = gamepad1.left_stick_y+gamepad1.left_stick_x+gamepad1.right_stick_x;
-        backLeftPower = gamepad1.left_stick_y+gamepad1.left_stick_x-gamepad1.right_stick_x;
-        backRightPower = gamepad1.left_stick_y-gamepad1.left_stick_x+gamepad1.right_stick_x;
+        //frontLeftPower = gamepad1.left_stick_y-gamepad1.left_stick_x-gamepad1.right_stick_x;
+        //frontRightPower = gamepad1.left_stick_y+gamepad1.left_stick_x+gamepad1.right_stick_x;
+        //backLeftPower = gamepad1.left_stick_y+gamepad1.left_stick_x-gamepad1.right_stick_x;
+        //backRightPower = gamepad1.left_stick_y-gamepad1.left_stick_x+gamepad1.right_stick_x;
+
+        frontLeftPower = calculateMotorPower(1,-1,-1);
+        frontRightPower = calculateMotorPower(1,1,1);
+        backLeftPower = calculateMotorPower(1,1,-1);
+        backRightPower = calculateMotorPower(1,-1,1);
+
 
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
@@ -363,9 +369,32 @@ public class ArdennesTeleOp extends OpMode
         slideR.setPower(0);
     }
 
-    public void resetEncoder(DcMotor motor){
+    private void resetEncoder(DcMotor motor){
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    private double calculateMotorPower(int forwardFlip, int strafeFlip, int turnFlip){
+
+        double forward, strafe, turn;
+
+        forward = getClippedPower(gamepad1.left_stick_y);
+        strafe = Range.clip(getClippedPower(gamepad1.left_stick_x), -.4, .4);
+        turn = getClippedPower(gamepad1.right_stick_x);
+
+
+        return forwardFlip*forward + strafeFlip*strafe + turnFlip*turn;
+    }
+
+    private double getClippedPower(double input){
+        final double ZERO_RANGE = 0.01; //inputs beneath this range are ignored
+        final double MIN_POWER = 0.2; // lowest(ish) power in which robot still moves
+
+        if(Math.abs(input) <= ZERO_RANGE){
+            return 0;
+        } else {
+            return Math.signum(input)*Math.max(MIN_POWER,Math.abs(input));//abs to legitimize max, signum to retain directionality
+        }
     }
 
 }

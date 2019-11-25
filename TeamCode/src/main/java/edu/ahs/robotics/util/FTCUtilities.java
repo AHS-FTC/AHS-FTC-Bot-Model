@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,6 +90,14 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
             return null;//literally die in a hole // todo mock imu
         }
         return hardwareMap.get(BNO055IMU.class, imuName);
+    }
+
+    public static TouchSensor getTouchSensor (String sensorName){
+        if(testMode){
+            throw new UnsupportedOperationException("TestMode doesn't support touch sensors yet. mock it");
+        } else {
+            return hardwareMap.get(TouchSensor.class, sensorName);
+        }
     }
 
     public static Rev2mDistanceSensor getDistanceSensor(String sensorName){
