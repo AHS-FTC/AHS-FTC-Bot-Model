@@ -323,10 +323,10 @@ public class ArdennesTeleOp extends OpMode
         }
 
         if(foundationEnabled){
-            foundationServoL.setPosition(1);
+            foundationServoL.setPosition(0);
             foundationServoR.setPosition(1);
         } else {
-            foundationServoL.setPosition(0);
+            foundationServoL.setPosition(1);
             foundationServoR.setPosition(0);
         }
 
