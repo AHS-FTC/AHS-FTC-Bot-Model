@@ -35,8 +35,11 @@ public class ArdennesSkyStoneDetector {
         PURE_YELLOW(255,255,0),
         PURE_BLACK(0,0,0),
 
-        BASEMENT_YELLOW(0,0,0),
-        BASEMENT_BLACK(0,0,0);
+        BASEMENT_YELLOW(188,112,0),
+        BASEMENT_BLACK(5,4,3),
+
+        SEYBOLDS_YELLOW(0,0,0),
+        SEYBOLDS_BLACK(0,0,0);
 
         int r,g,b;
 

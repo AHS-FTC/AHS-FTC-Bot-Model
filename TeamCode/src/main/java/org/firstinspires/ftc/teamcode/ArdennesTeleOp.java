@@ -342,8 +342,8 @@ public class ArdennesTeleOp extends OpMode
             //telemetry.addData("gripper triggered?", gripperTrigger.isTriggered());
             //telemetry.addData("gripper enabled?", gripperEnabled);
             //telemetry.addData("slide in position?", slideL.getCurrentPosition()<= SLIDES_GRIP_THRESHOLD);
+            telemetry.addData("turnness", gamepad1.right_stick_x);
             telemetry.addData("y servo position", yServoPosition);
-
 
             telemetry.update();
         } else {
@@ -378,22 +378,22 @@ public class ArdennesTeleOp extends OpMode
 
         double forward, strafe, turn;
 
-        forward = getClippedPower(gamepad1.left_stick_y);
-        strafe = Range.clip(getClippedPower(gamepad1.left_stick_x), -.4, .4);
-        turn = getClippedPower(gamepad1.right_stick_x);
+        forward = getClippedPower(gamepad1.left_stick_y, .2);
+        strafe = Range.clip(getClippedPower(gamepad1.left_stick_x, .2), -.4, .4);
+        turn = getClippedPower(Math.pow(gamepad1.right_stick_x,3), .25);
 
 
         return forwardFlip*forward + strafeFlip*strafe + turnFlip*turn;
     }
 
-    private double getClippedPower(double input){
+    private double getClippedPower(double input, double minPower){
         final double ZERO_RANGE = 0.01; //inputs beneath this range are ignored
-        final double MIN_POWER = 0.2; // lowest(ish) power in which robot still moves
+        //final double MIN_POWER = 0.2; // lowest(ish) power in which robot still moves
 
         if(Math.abs(input) <= ZERO_RANGE){
             return 0;
         } else {
-            return Math.signum(input)*Math.max(MIN_POWER,Math.abs(input));//abs to legitimize max, signum to retain directionality
+            return Math.signum(input)*Math.max(minPower,Math.abs(input));//abs to legitimize max, signum to retain directionality
         }
     }
 
