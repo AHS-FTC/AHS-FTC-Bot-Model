@@ -231,7 +231,7 @@ public class ArdennesTeleOp extends OpMode
         //press b to rotate stone 90 degrees
         if(gamepad2.b) {
             if(time.milliseconds() - lastWristPress > BUTTON_THRESHOLD) {
-                wristEnabled = !wristEnabled;
+                //wristEnabled = !wristEnabled; //todo
                 lastWristPress = time.milliseconds();
             }
         }
@@ -307,7 +307,7 @@ public class ArdennesTeleOp extends OpMode
         }
 
         if(wristEnabled){
-            wristServo.setPosition(1);
+            wristServo.setPosition(0); //todo reestablish wrist
         } else {
             wristServo.setPosition(0);
         }
