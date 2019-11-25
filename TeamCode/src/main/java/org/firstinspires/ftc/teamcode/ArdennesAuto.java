@@ -33,8 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import edu.ahs.robotics.abbreviatedmodel.Ardennes;
-import edu.ahs.robotics.autocommands.Plan;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -48,7 +47,6 @@ public class ArdennesAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
-    private Plan plan;
 
 
     @Override
@@ -60,11 +58,11 @@ public class ArdennesAuto extends LinearOpMode {
         ardennes = new Ardennes();
         Intake intake = ardennes.getIntake();
         MecanumChassis chassis = ardennes.getChassis();
-        chassis.driveStraight(500, .8);
+//        chassis.driveStraight(500, 1);
         chassis.pivot(360, 0.4);
-        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-        chassis.driveStraight(600, .5);
-        chassis.driveStraight(-1000, 1);
+//        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
+//        chassis.driveStraight(800, .5);
+//        chassis.driveStraight(-1200, 1);
 
 
     }

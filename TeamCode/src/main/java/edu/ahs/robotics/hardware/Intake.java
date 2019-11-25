@@ -3,15 +3,11 @@ package edu.ahs.robotics.hardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
-
-import edu.ahs.robotics.autocommands.PlanElement;
-import edu.ahs.robotics.autocommands.obmcommands.IntakeCommand;
 import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
-public class Intake implements Executor{ //todo make a one or two motor alternate to intake class
+public class Intake{ //todo make a one or two motor alternate to intake class
     private DcMotor leftMotor;
     private DcMotor rightMotor;
     private IntakeMode intakeMode;
@@ -37,18 +33,6 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
         intakeMode = IntakeMode.OFF;
     }
 
-    public void execute(PlanElement planElement){
-        if(planElement instanceof IntakeCommand){
-            execute((IntakeCommand)planElement);
-        } else{
-            throw new Warning("Could not execute PlanElement " + planElement.toString() + " in intake class");
-        }
-    }
-
-    private void execute(IntakeCommand command){
-        intakeMode = command.intakeMode;
-        runMotorsByMode();
-    }
 
     public void startIntakeWaitForBlock(TriggerDistanceSensor trigger){
         intakeMode = IntakeMode.IN;
