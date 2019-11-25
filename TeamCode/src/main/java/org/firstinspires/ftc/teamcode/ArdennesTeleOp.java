@@ -334,6 +334,7 @@ public class ArdennesTeleOp extends OpMode
             telemetry.addData("deltaTime",lastTime-time.milliseconds());
             lastTime = time.milliseconds();
             telemetry.addData("Left Slide Encoder", slideL.getCurrentPosition());
+            telemetry.addData("Collection Mode?", isDeliveryIntakeStyle);
             //telemetry.addData("Right Slide Encoder", slideR.getCurrentPosition());
 
             //telemetry.addData("intake Distance", intakeTrigger.getDist());

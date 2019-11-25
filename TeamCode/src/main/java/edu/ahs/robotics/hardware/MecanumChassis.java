@@ -121,7 +121,7 @@ public class MecanumChassis extends Chassis {
         double minRampUp = .2;
         double minRampDown = .2;
 
-        final double distancePer360 = 998;
+        final double distancePer360 = 1001;
         double leftTarget = (angle * distancePer360)/360.0;
         double rightTarget = -1 * leftTarget;
         rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .07, .04);
