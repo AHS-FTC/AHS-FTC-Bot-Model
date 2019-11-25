@@ -35,11 +35,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import edu.ahs.robotics.abbreviatedmodel.Ardennes;
 import edu.ahs.robotics.autocommands.Plan;
-import edu.ahs.robotics.autocommands.autopaths.OdometryForwardMotion;
-import edu.ahs.robotics.autocommands.autopaths.OdometryMotion;
-import edu.ahs.robotics.autocommands.autopaths.Sleep;
-import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
-import edu.ahs.robotics.autocommands.obmcommands.ServoCommand;
+import edu.ahs.robotics.hardware.Intake;
+import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
@@ -59,22 +56,19 @@ public class ArdennesAuto extends LinearOpMode {
         FTCUtilities.setOpMode(this);
         MotorHashService.init();
 
-        plan = new Plan();
-
-        ardennes = new Ardennes();
-
-        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 1));
-        plan.addToPlan(new Sleep(ardennes,2000));
-        //plan.addToPlan(new IntakeCommandWithTrigger(ardennes.getIntake(), ardennes.getIntakeTrigger()));
-        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 0));
-        plan.addToPlan(new Sleep(ardennes,2000));
-        plan.addToPlan(new ServoCommand(ardennes.getGripper(), 1));
-        plan.addToPlan(new Sleep(ardennes,2000));
-        ardennes.givePlan(plan);
-
         waitForStart();
+        ardennes = new Ardennes();
+        Intake intake = ardennes.getIntake();
+        MecanumChassis chassis = ardennes.getChassis();
+        chassis.driveStraight(1000, 1);
+//        chassis.pivot(360, 0.4);
+//        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
+//        chassis.driveStraight(600, .5);
+//        chassis.driveStraight(-1500, 1);
 
-        ardennes.executePlan();
+
     }
+
+
 
 }

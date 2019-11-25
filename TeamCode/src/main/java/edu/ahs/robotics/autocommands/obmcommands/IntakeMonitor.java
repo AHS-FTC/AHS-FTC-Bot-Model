@@ -13,10 +13,6 @@ public class IntakeMonitor implements Runnable {
         this.intake = intake;
     }
 
-    public void start(){
-
-    }
-
     @Override
     public void run() {
         while (!stopTrigger.isTriggered()){

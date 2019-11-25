@@ -9,6 +9,7 @@ import edu.ahs.robotics.autocommands.PlanElement;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeMonitor;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeCommand;
 import edu.ahs.robotics.autocommands.obmcommands.IntakeCommandWithTrigger;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
 public class Intake implements Executor{ //todo make a one or two motor alternate to intake class
@@ -27,7 +28,7 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
         leftMotor = FTCUtilities.getMotor("intakeL");
         rightMotor = FTCUtilities.getMotor("intakeR");
 
-        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -40,8 +41,6 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
     public void execute(PlanElement planElement){
         if(planElement instanceof IntakeCommand){
             execute((IntakeCommand)planElement);
-        } else if(planElement instanceof IntakeCommandWithTrigger){
-            execute((IntakeCommandWithTrigger)planElement);
         } else{
             throw new Warning("Could not execute PlanElement " + planElement.toString() + " in intake class");
         }
@@ -49,18 +48,19 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
 
     private void execute(IntakeCommand command){
         intakeMode = command.intakeMode;
-        checkIntakeMode();
+        runMotorsByMode();
     }
 
-    private void execute(IntakeCommandWithTrigger command){
+    public void startIntakeWaitForBlock(TriggerDistanceSensor trigger){
         intakeMode = IntakeMode.IN;
-        checkIntakeMode();
-        IntakeMonitor intakeMonitor = new IntakeMonitor(command.trigger,this);
+        runMotorsByMode();
+        IntakeMonitor intakeMonitor = new IntakeMonitor(trigger,this);
         Thread thread = new Thread(intakeMonitor);
-        thread.run();
+        thread.start();
     }
 
-    private void checkIntakeMode(){
+
+    private void runMotorsByMode(){
         if(intakeMode == IntakeMode.IN){
             runMotors(motorPower);
         } else if(intakeMode == IntakeMode.OUT){
@@ -71,7 +71,7 @@ public class Intake implements Executor{ //todo make a one or two motor alternat
     }
 
     public void runMotors(double motorPower){
-        leftMotor.setPower(motorPower);
+        leftMotor.setPower(-motorPower);
         rightMotor.setPower(motorPower);
     }
     public void stopMotors(){

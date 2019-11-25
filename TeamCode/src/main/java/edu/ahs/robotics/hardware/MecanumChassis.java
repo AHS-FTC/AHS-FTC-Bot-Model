@@ -71,10 +71,6 @@ public class MecanumChassis extends Chassis {
             motionInterpreter((ArcMotion) planElement);
         } else if(planElement instanceof PointTurn) {
             motionInterpreter((PointTurn) planElement);
-        } else if (planElement instanceof OdometryForwardMotion){
-            motionInterpreter((OdometryForwardMotion) planElement);
-        } else if (planElement instanceof OdometryMotion){
-            motionInterpreter((OdometryMotion) planElement);
         } else {
             throw new Warning("Couldn't find a way to executePlan PlanElement " + planElement.toString());
         }
@@ -211,51 +207,39 @@ public class MecanumChassis extends Chassis {
         }
     }
 
-    private void motionInterpreter(OdometryForwardMotion motion){
-        double distance = 0;
-        double rampUp, rampDown;
-        double distanceTo;
-        double power, scaledPower;
+
+    public void driveStraight(double distance, double maxPower) {
         double minRampUp = .2;
         double minRampDown = .12;
 
-        double u = 0.05, d = 0.013; // reciprocal of millimeters after which you will be at maxPower 1
-
-        leftOdometer.reset();
-        rightOdometer.reset();
-
-        while(Math.abs(distance) < Math.abs(motion.targetDistance)){
-            distance = Math.abs(leftOdometer.getDistance() + rightOdometer.getDistance())/2;
-            distanceTo = Math.abs(motion.targetDistance) - Math.abs(distance);
-
-            rampUp = Math.max(u*Math.sqrt(distance),minRampUp);
-            rampDown = Math.max(d*Math.sqrt(distanceTo),minRampDown); //distanceTo accounts for flip across y axis and x offset
-
-            power = Math.min(rampUp, Math.min(rampDown, motion.maxPower));
-
-            FTCUtilities.addData("maxPower", power);
-            FTCUtilities.addData("left", leftOdometer.getDistance());
-            FTCUtilities.addData("right", rightOdometer.getDistance());
-            FTCUtilities.updateOpLogger();
-
-            setPowerAll(power);
-        }
-        setPowerAll(0);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .2, .015);
     }
 
-    private void motionInterpreter(OdometryMotion turn){
-        double leftDistance, rightDistance, averageDistance;
-        double rampUp, rampDown;
-        double power, scaledPower;
+    public void pivot(double angle, double maxPower) {
         double minRampUp = .2;
         double minRampDown = .2;
-        double leftTarget = turn.leftTarget, rightTarget = turn.rightTarget; //250,-250 for almost perfect 90 deg
+
+        final double distancePer360 = 1000;
+        double leftTarget = (angle * distancePer360)/360.0;
+        double rightTarget = -1 * leftTarget;
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .07, .04);
+    }
+
+    private void setPowerAll(double motorPower) {
+        frontRight.setPower(motorPower);
+        frontLeft.setPower(motorPower);
+        backRight.setPower(motorPower);
+        backLeft.setPower(motorPower);
+    }
+
+    private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale){
+        double leftDistance, rightDistance, averageDistance;
+        double power, scaledPower;
+        //double leftTarget = turn.leftTarget, rightTarget = turn.rightTarget; //250,-250 for almost perfect 90 deg
         double leftRemaining, rightRemaining;
         double averageRemaining = (Math.abs(leftTarget) + Math.abs(rightTarget))/2;
         double errorLeft, errorRight;
-        double correctionScale = 0.01;
-
-        double u = 0.07, d = 0.01; // reciprocal of millimeters after which you will be at maxPower 1
+        double correctionScale = 0.005;
 
         leftOdometer.reset();
         rightOdometer.reset();
@@ -271,10 +255,7 @@ public class MecanumChassis extends Chassis {
 
             averageRemaining = (leftRemaining + rightRemaining)/2;
 
-            rampUp = Math.max(u*Math.sqrt(averageDistance),minRampUp);
-            rampDown = Math.max(d*Math.sqrt(averageRemaining),minRampDown); //distanceTo accounts for flip across y axis and x offset
-
-            power = Math.min(rampUp, Math.min(rampDown, turn.maxPower));
+            power = getRampedPower(maxPower, averageDistance, minRampUp, minRampDown, averageRemaining, upScale, downScale);
 
             FTCUtilities.addData("power", power);
             FTCUtilities.addData("left r", leftRemaining);
@@ -300,10 +281,14 @@ public class MecanumChassis extends Chassis {
         Logger.getInstance().writeToFile();
     }
 
-    private void setPowerAll(double motorPower) {
-        frontRight.setPower(motorPower);
-        frontLeft.setPower(motorPower);
-        backRight.setPower(motorPower);
-        backLeft.setPower(motorPower);
+    private double getRampedPower(double maxPower, double averageDistance, double minRampUp, double minRampDown, double averageRemaining, double upScale, double downScale) {
+        double rampUp, rampDown;
+        double power;
+        rampUp = Math.max(upScale * Math.sqrt(averageDistance), minRampUp);
+        rampDown = Math.max(downScale * Math.sqrt(averageRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
+
+        power = Math.min(rampUp, Math.min(rampDown, maxPower));
+        return power;
     }
+
 }
