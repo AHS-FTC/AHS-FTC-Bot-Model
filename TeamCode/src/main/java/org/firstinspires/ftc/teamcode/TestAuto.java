@@ -33,21 +33,21 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import edu.ahs.robotics.hardware.Intake;
+import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.hardware.Intake;
-import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
 
-@Autonomous(name = "Ardennes Auto", group = "Linear Opmode")
+@Autonomous(name = "Test Auto", group = "Linear Opmode")
 //@Disabled
-public class ArdennesAuto extends LinearOpMode {
+public class TestAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
@@ -74,57 +74,19 @@ public class ArdennesAuto extends LinearOpMode {
 
         waitForStart();
 
-        ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = ardennes.runDetector();
-        if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration){
-            leftPlan(intake, chassis, foundationServoLeft, foundationServoRight, slides);
-        } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration){
-            middlePlan(intake, chassis, foundationServoLeft, foundationServoRight, slides);
-        } else rightPlan(intake, chassis, foundationServoLeft, foundationServoRight, slides);
-
-    }
-
-    private void leftPlan(Intake intake, MecanumChassis chassis, SerialServo foundationServoLeft, SerialServo foundationServoRight, Slides slides) {
-        chassis.driveStraight(500, 1);
-        chassis.pivot(-30,.4);
-        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-        chassis.driveStraight(450,.3);
-
-    }
-
-    private void middlePlan(Intake intake, MecanumChassis chassis, SerialServo foundationServoLeft, SerialServo foundationServoRight, Slides slides) {
-        chassis.pivot(10, .4);
-        chassis.driveStraight(600,1);
-        chassis.pivot(-40, .4);
-        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-        chassis.driveStraight(450, .3);
-        chassis.driveStraight(-450, 1);
-        chassis.pivot(-57,.4);
-        chassis.driveStraight(-1700,.8);
-        chassis.pivot(-87,.5);
-        chassis.driveStraight(-200, .4);
-        foundationServoLeft.setPosition(0);
-        foundationServoRight.setPosition(1);
-        sleep(1500);
-        chassis.driveStraight(700, 1);
-        chassis.pivot(93,.5);
-        foundationServoLeft.setPosition(1);
-        foundationServoRight.setPosition(0);
-        sleep(700);
+        gripper.setPosition(1);
+        slides.runSlidesToLevel(2);
+        sleep(5000);
+        /*
         slides.runSlidesToEncoder(600);
+        yslide.setPosition(1);
+        sleep(2000);
+        gripper.setPosition(0);
         sleep(1000);
-
-
-
-    }
-
-    private void rightPlan(Intake intake, MecanumChassis chassis, SerialServo foundationServoLeft, SerialServo foundationServoRight, Slides slides) {
-        chassis.pivot(-10, .4);
-        chassis.driveStraight(550,1);
-        chassis.pivot(30,.5);
-        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-        chassis.driveStraight(300,.3);
+        yslide.setPosition(0);
+        sleep(2000);
+        slides.resetSlidesToOriginalPosition();
+        */
 
     }
-
-
 }

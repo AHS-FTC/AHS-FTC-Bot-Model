@@ -39,7 +39,9 @@ import com.qualcomm.robotcore.util.Range;
 
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.hardware.Intake;
 
 //Written by Alex Appleby of team 16896
 //It really do be like that
@@ -58,15 +60,16 @@ public class ArdennesTeleOp extends OpMode
         OUT
     }
 
+    private Intake intake;
+    private LimitSwitch limitSwitch;
+
     DcMotor frontLeft, frontRight, backLeft, backRight;
-    DcMotor intakeL, intakeR;
+    //DcMotor intakeL, intakeR;
     DcMotor slideL, slideR;
 
     Servo ySlideServo;
     Servo foundationServoL, foundationServoR;
     Servo gripperServo, wristServo;
-
-    LimitSwitch limitSwitch;
 
     //Servo capstoneServo;
     TriggerDistanceSensor intakeTrigger;
@@ -112,13 +115,17 @@ public class ArdennesTeleOp extends OpMode
     public void init() {
         FTCUtilities.setOpMode(this);
 
+        Ardennes ardennes = new Ardennes();
+
         frontLeft = hardwareMap.get(DcMotor.class,"FL");
         frontRight = hardwareMap.get(DcMotor.class, "FR");
         backLeft = hardwareMap.get(DcMotor.class, "BL");
         backRight = hardwareMap.get(DcMotor.class, "BR");
 
-        intakeL = hardwareMap.get(DcMotor.class,"intakeL");
-        intakeR = hardwareMap.get(DcMotor.class,"intakeR");
+        //intakeL = hardwareMap.get(DcMotor.class,"intakeL");
+        //intakeR = hardwareMap.get(DcMotor.class,"intakeR");
+        this.intake = ardennes.getIntake();
+        this.limitSwitch = ardennes.getLimitSwitch();
 
         slideL = hardwareMap.get(DcMotor.class,"slideL");
         slideR = hardwareMap.get(DcMotor.class,"slideR");
@@ -141,8 +148,8 @@ public class ArdennesTeleOp extends OpMode
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        intakeL.setDirection(DcMotorSimple.Direction.REVERSE);
-        intakeR.setDirection(DcMotorSimple.Direction.FORWARD);
+        //intakeL.setDirection(DcMotorSimple.Direction.FORWARD);
+        //intakeR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         slideL.setDirection(DcMotorSimple.Direction.FORWARD);
         slideR.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -160,8 +167,8 @@ public class ArdennesTeleOp extends OpMode
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        intakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //intakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //intakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         slideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -274,18 +281,18 @@ public class ArdennesTeleOp extends OpMode
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
+
         if(limitSwitch.isTriggered()){
             resetEncoder(slideL);
             resetEncoder(slideR);
         }
 
-
         slideLPower = gamepad2.right_trigger-(gamepad2.left_trigger*SLIDE_DOWN_POWER_SCALE);
 
         if(slideL.getCurrentPosition() >= SLIDES_MAX){
             slideLPower = Range.clip(slideLPower, -1, 0);
-//        } else if(slideL.getCurrentPosition()<= SLIDES_MIN){
-//            slideLPower = Range.clip(slideLPower, 0, 1);
+        } else if(limitSwitch.isTriggered()){
+            slideLPower = Range.clip(slideLPower, 0, 1);
         }
         slideRPower = slideLPower;
 
@@ -300,14 +307,11 @@ public class ArdennesTeleOp extends OpMode
         }
 
         if(intakeMode == IntakeMode.IN){
-            intakeL.setPower(INTAKE_POWER);
-            intakeR.setPower(INTAKE_POWER);
+            intake.runMotors(INTAKE_POWER);
         } else if (intakeMode == IntakeMode.OFF) {
-            intakeL.setPower(0);
-            intakeR.setPower(0);
-        } else if(intakeMode == intakeMode.OUT){
-            intakeL.setPower(-INTAKE_POWER);
-            intakeR.setPower(-INTAKE_POWER);
+            intake.stopMotors();
+        } else if(intakeMode == IntakeMode.OUT){
+            intake.runMotors(-INTAKE_POWER);
         }
 
         if(wristEnabled){
@@ -341,7 +345,7 @@ public class ArdennesTeleOp extends OpMode
             telemetry.addData("deltaTime",lastTime-time.milliseconds());
             lastTime = time.milliseconds();
             telemetry.addData("Left Slide Encoder", slideL.getCurrentPosition());
-            //telemetry.addData("Right Slide Encoder", slideR.getCurrentPosition());
+            telemetry.addData("Right Slide Encoder", slideR.getCurrentPosition());
 
             //telemetry.addData("intake Distance", intakeTrigger.getDist());
             //telemetry.addData("intake triggered?", intakeTrigger.isTriggered());
@@ -369,8 +373,7 @@ public class ArdennesTeleOp extends OpMode
 
         backRight.setPower(0);
 
-        intakeL.setPower(0);
-        intakeR.setPower(0);
+        intake.stopMotors();
 
         slideL.setPower(0);
         slideR.setPower(0);

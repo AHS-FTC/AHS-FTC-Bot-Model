@@ -42,7 +42,7 @@ public class Ardennes extends Robot {
         intake = new Intake(1);
         gripper = new SerialServo("gripper", true);
         mecanumChassis = makeChassis();
-        slides = new Slides(.8, limitSwitch);
+        slides = new Slides(.5, limitSwitch);
         detector = new ArdennesSkyStoneDetector();
         ySlide = new SerialServo("slideServo", false);
     }
