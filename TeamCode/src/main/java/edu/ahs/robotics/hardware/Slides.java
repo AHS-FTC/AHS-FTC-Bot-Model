@@ -81,4 +81,14 @@ public class Slides {
         resetEncoder(rightMotor);
     }
 
+    public void setPower(double power) {
+        leftMotor.setPower(power);
+        rightMotor.setPower(power);
+    }
+
+    public double getCurrentPosition() {
+        double slidesPosition = (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition())/2;
+        return slidesPosition;
+    }
+
 }

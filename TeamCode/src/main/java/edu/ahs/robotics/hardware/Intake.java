@@ -17,7 +17,7 @@ public class Intake { //todo make a one or two motor alternate to intake class
         leftMotor = FTCUtilities.getMotor("intakeL");
         rightMotor = FTCUtilities.getMotor("intakeR");
 
-        leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -46,7 +46,7 @@ public class Intake { //todo make a one or two motor alternate to intake class
     }
 
     public void runMotors(double motorPower) {
-        leftMotor.setPower(-motorPower);
+        leftMotor.setPower(motorPower);
         rightMotor.setPower(motorPower);
     }
 

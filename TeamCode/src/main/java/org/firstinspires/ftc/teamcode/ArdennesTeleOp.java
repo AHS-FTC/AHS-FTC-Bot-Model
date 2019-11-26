@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
@@ -49,6 +50,8 @@ import edu.ahs.robotics.hardware.Intake;
 //first at 340
 //min at 100
 
+//Then edited by Andrew Seybold
+//It really really do be like dat
 
 @TeleOp(name="Ardennes TeleOp", group="Iterative Opmode")
 //@Disabled
@@ -62,10 +65,9 @@ public class ArdennesTeleOp extends OpMode
 
     private Intake intake;
     private LimitSwitch limitSwitch;
+    private Slides slides;
 
     DcMotor frontLeft, frontRight, backLeft, backRight;
-    //DcMotor intakeL, intakeR;
-    DcMotor slideL, slideR;
 
     Servo ySlideServo;
     Servo foundationServoL, foundationServoR;
@@ -87,7 +89,7 @@ public class ArdennesTeleOp extends OpMode
     private final double INTAKE_POWER = 1;
     private IntakeMode intakeMode = IntakeMode.OFF;
 
-    private double slideLPower = 0, slideRPower = 0;
+    private double slidesPower = 0, slideRPower = 0;
     private final double SLIDE_DOWN_POWER_SCALE = 0.3; //unitless multiplier to weaken slide motors when pulling down
 
     private boolean debuggingEnabled = false;
@@ -122,15 +124,9 @@ public class ArdennesTeleOp extends OpMode
         backLeft = hardwareMap.get(DcMotor.class, "BL");
         backRight = hardwareMap.get(DcMotor.class, "BR");
 
-        //intakeL = hardwareMap.get(DcMotor.class,"intakeL");
-        //intakeR = hardwareMap.get(DcMotor.class,"intakeR");
-        this.intake = ardennes.getIntake();
-        this.limitSwitch = ardennes.getLimitSwitch();
-
-        slideL = hardwareMap.get(DcMotor.class,"slideL");
-        slideR = hardwareMap.get(DcMotor.class,"slideR");
-
-
+        intake = ardennes.getIntake();
+        limitSwitch = ardennes.getLimitSwitch();
+        slides = ardennes.getSlides();
 
         ySlideServo = hardwareMap.get(Servo.class,"slideServo");
 
@@ -148,12 +144,6 @@ public class ArdennesTeleOp extends OpMode
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        //intakeL.setDirection(DcMotorSimple.Direction.FORWARD);
-        //intakeR.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        slideL.setDirection(DcMotorSimple.Direction.FORWARD);
-        slideR.setDirection(DcMotorSimple.Direction.REVERSE);
-
         ySlideServo.setDirection(Servo.Direction.FORWARD);
 
         foundationServoL.setDirection(Servo.Direction.FORWARD);
@@ -166,12 +156,6 @@ public class ArdennesTeleOp extends OpMode
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        //intakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //intakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        slideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         time = new ElapsedTime();
 
@@ -195,8 +179,7 @@ public class ArdennesTeleOp extends OpMode
         time.startTime();
         lastTime = time.milliseconds();
 
-        resetEncoder(slideL);
-        resetEncoder(slideR);
+        slides.resetEncoders();
     }
 
     /*
@@ -211,8 +194,7 @@ public class ArdennesTeleOp extends OpMode
             if(time.milliseconds() - lastDebugPress > BUTTON_THRESHOLD) {
                 debuggingEnabled = !debuggingEnabled;
                 lastDebugPress = time.milliseconds();
-                resetEncoder(slideL);
-                resetEncoder(slideR);
+                slides.resetEncoders();
             }
         }
 
@@ -283,21 +265,18 @@ public class ArdennesTeleOp extends OpMode
 
 
         if(limitSwitch.isTriggered()){
-            resetEncoder(slideL);
-            resetEncoder(slideR);
+            slides.resetEncoders();
         }
 
-        slideLPower = gamepad2.right_trigger-(gamepad2.left_trigger*SLIDE_DOWN_POWER_SCALE);
+        slidesPower = gamepad2.right_trigger-(gamepad2.left_trigger*SLIDE_DOWN_POWER_SCALE);
 
-        if(slideL.getCurrentPosition() >= SLIDES_MAX){
-            slideLPower = Range.clip(slideLPower, -1, 0);
+        if(slides.getCurrentPosition() >= SLIDES_MAX){
+            slidesPower = Range.clip(slidesPower, -1, 0);
         } else if(limitSwitch.isTriggered()){
-            slideLPower = Range.clip(slideLPower, 0, 1);
+            slidesPower = Range.clip(slidesPower, 0, 1);
         }
-        slideRPower = slideLPower;
 
-        slideL.setPower(slideLPower);
-        slideR.setPower(slideRPower);
+        slides.setPower(slidesPower);
 
         yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y*Y_SERVO_SPEED, 0,1);
         ySlideServo.setPosition(yServoPosition);
@@ -320,7 +299,7 @@ public class ArdennesTeleOp extends OpMode
             wristServo.setPosition(0);
         }
         //if the gripperTrigger is flipped while the gripper is disabled and in position to grip.
-        if(!gripperEnabled && gripperTrigger.isTriggered() && slideL.getCurrentPosition()<= SLIDES_GRIP_THRESHOLD){
+        if(!gripperEnabled && gripperTrigger.isTriggered() && slides.getCurrentPosition()<= SLIDES_GRIP_THRESHOLD){
             gripperEnabled = true;
         }
 
@@ -344,8 +323,7 @@ public class ArdennesTeleOp extends OpMode
         if(debuggingEnabled){
             telemetry.addData("deltaTime",lastTime-time.milliseconds());
             lastTime = time.milliseconds();
-            telemetry.addData("Left Slide Encoder", slideL.getCurrentPosition());
-            telemetry.addData("Right Slide Encoder", slideR.getCurrentPosition());
+            telemetry.addData("Slides Average Encoder Value", slides.getCurrentPosition());
 
             //telemetry.addData("intake Distance", intakeTrigger.getDist());
             //telemetry.addData("intake triggered?", intakeTrigger.isTriggered());
@@ -370,13 +348,10 @@ public class ArdennesTeleOp extends OpMode
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
-
         backRight.setPower(0);
 
         intake.stopMotors();
-
-        slideL.setPower(0);
-        slideR.setPower(0);
+        slides.setPower(0);
     }
 
     private void resetEncoder(DcMotor motor){
