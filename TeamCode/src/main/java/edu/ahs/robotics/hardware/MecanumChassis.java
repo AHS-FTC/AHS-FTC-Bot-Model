@@ -112,9 +112,9 @@ public class MecanumChassis extends Chassis {
 
     public void driveStraight(double distance, double maxPower) {
         double minRampUp = .2;
-        double minRampDown = .12;
+        double minRampDown = .2;
 
-        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .15, .015);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .05, .00005);
     }
 
     public void pivot(double angle, double maxPower) {
@@ -124,7 +124,7 @@ public class MecanumChassis extends Chassis {
         final double distancePer360 = 1001;
         double leftTarget = (angle * distancePer360)/360.0;
         double rightTarget = -1 * leftTarget;
-        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .07, .04);
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .2, .05);
     }
 
     private void setPowerAll(double motorPower) {
@@ -162,8 +162,8 @@ public class MecanumChassis extends Chassis {
 
                 double rampUp, rampDown;
                 double power;
-                rampUp = Math.max(upScale * Math.sqrt(averageDistance), minRampUp);
-                rampDown = Math.max(downScale * Math.sqrt(averageRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
+                rampUp = Math.max(upScale * (averageDistance * Math.exp(2)), minRampUp);
+                rampDown = Math.max(downScale * (averageRemaining * Math.exp(3)), minRampDown); //distanceTo accounts for flip across y axis and x offset
 
                 power = Math.min(rampUp, Math.min(rampDown, maxPower));
 

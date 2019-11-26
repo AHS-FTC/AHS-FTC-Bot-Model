@@ -17,8 +17,8 @@ public class ArdennesSkyStoneDetector {
     //private final int IMAGE_HEIGHT = 200;
 
     private final int LEFT_X = 90 , LEFT_Y = 580;// LEFT_HEIGHT = 0, LEFT_WIDTH = 0;
-    private final int MIDDLE_X = 400 , MIDDLE_Y = 580;// MIDDLE_HEIGHT = 0, MIDDLE_WIDTH = 0;
-    private final int RIGHT_X = 700 , RIGHT_Y = 580;// RIGHT_HEIGHT = 0, RIGHT_WIDTH = 0;
+    private final int MIDDLE_X = 500 , MIDDLE_Y = 580;// MIDDLE_HEIGHT = 0, MIDDLE_WIDTH = 0;
+    private final int RIGHT_X = 800 , RIGHT_Y = 580;// RIGHT_HEIGHT = 0, RIGHT_WIDTH = 0;
 
     private final int STONE_WIDTH = 100, STONE_HEIGHT = 25;
 

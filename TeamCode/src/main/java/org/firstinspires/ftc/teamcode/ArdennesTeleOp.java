@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 
@@ -65,13 +66,14 @@ public class ArdennesTeleOp extends OpMode
     Servo foundationServoL, foundationServoR;
     Servo gripperServo, wristServo;
 
+    LimitSwitch limitSwitch;
+
     //Servo capstoneServo;
     TriggerDistanceSensor intakeTrigger;
     TriggerDistanceSensor gripperTrigger;
 
     private double frontLeftPower = 0, frontRightPower = 0, backLeftPower = 0, backRightPower = 0;
     private final int SLIDES_MAX = 4150;
-    private final int SLIDES_MIN = 100;
     private final int SLIDES_GRIP_THRESHOLD = 120;
 
     //from zero to one
@@ -120,6 +122,8 @@ public class ArdennesTeleOp extends OpMode
 
         slideL = hardwareMap.get(DcMotor.class,"slideL");
         slideR = hardwareMap.get(DcMotor.class,"slideR");
+
+
 
         ySlideServo = hardwareMap.get(Servo.class,"slideServo");
 
@@ -270,12 +274,18 @@ public class ArdennesTeleOp extends OpMode
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
 
+        if(limitSwitch.isTriggered()){
+            resetEncoder(slideL);
+            resetEncoder(slideR);
+        }
+
+
         slideLPower = gamepad2.right_trigger-(gamepad2.left_trigger*SLIDE_DOWN_POWER_SCALE);
 
         if(slideL.getCurrentPosition() >= SLIDES_MAX){
             slideLPower = Range.clip(slideLPower, -1, 0);
-        } else if(slideL.getCurrentPosition()<= SLIDES_MIN){
-            slideLPower = Range.clip(slideLPower, 0, 1);
+//        } else if(slideL.getCurrentPosition()<= SLIDES_MIN){
+//            slideLPower = Range.clip(slideLPower, 0, 1);
         }
         slideRPower = slideLPower;
 
