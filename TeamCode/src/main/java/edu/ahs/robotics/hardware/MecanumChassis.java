@@ -1,5 +1,6 @@
 package edu.ahs.robotics.hardware;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
@@ -32,28 +33,28 @@ public class MecanumChassis extends Chassis {
     private Odometer rightOdometer;
 
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map<ChassisMotors.Mecanum, Boolean> driveFlips) {
+    public MecanumChassis(DriveUnit.Config driveUnitConfig) {
         super();
-        frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(),driveUnitConfig,driveFlips.get(FRONT_LEFT));
-        frontRight = new SingleDriveUnit(FRONT_RIGHT.getDeviceName(), driveUnitConfig, driveFlips.get(FRONT_RIGHT));
-        backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_LEFT));
-        backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, driveFlips.get(BACK_RIGHT));
+        frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(),driveUnitConfig,false);
+        frontRight = new SingleDriveUnit(FRONT_RIGHT.getDeviceName(), driveUnitConfig, true);
+        backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, false);
+        backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
         leftOdometer = new Odometer("intakeL", 60.2967 , false);
         rightOdometer = new Odometer("intakeR", 60.79, true);
     }
 
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map<ChassisMotors.Mecanum, Boolean> driveFlips, IMU imu) {
-        this(driveUnitConfig, driveFlips);
+    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu) {
+        this(driveUnitConfig);
         this.imu = imu;
     }
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig, Map<ChassisMotors.Mecanum, Boolean> driveFlips, IMU imu, OdometrySystem odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
-        this(driveUnitConfig, driveFlips, imu);
-
-        odometrySystem = new OdometrySystem(FTCUtilities.getMotor(xMotorName), FTCUtilities.getMotor(yMotorName), imu, odometryWheelDiameter);
-    }
+//    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystem odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
+//        this(driveUnitConfig, imu);
+//
+//        odometrySystem = new OdometrySystem(FTCUtilities.getMotor(xMotorName), FTCUtilities.getMotor(yMotorName), imu, odometryWheelDiameter);
+//    }
 
 
     /*private void motionInterpreter(PointTurn pointTurn){
@@ -109,6 +110,31 @@ public class MecanumChassis extends Chassis {
         }
     }*/
 
+    private void setPowerAll(double motorPower) {
+        frontRight.setPower(motorPower);
+        frontLeft.setPower(motorPower);
+        backRight.setPower(motorPower);
+        backLeft.setPower(motorPower);
+    }
+
+    public void stopMotors() {
+        setPowerAll(0);
+    }
+
+    public void drive3Axis(double forward, double strafe, double turn) {
+
+        double frontLeftPower = forward - strafe - turn;
+        double frontRightPower = forward + strafe + turn;
+        double backLeftPower = forward + strafe - turn;
+        double backRightPower = forward - strafe + turn;
+
+
+
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backLeft.setPower(backLeftPower);
+        backRight.setPower(backRightPower);
+    }
 
     public void driveStraight(double distance, double maxPower) {
         double minRampUp = .2;
@@ -125,13 +151,6 @@ public class MecanumChassis extends Chassis {
         double leftTarget = (angle * distancePer360)/360.0;
         double rightTarget = -1 * leftTarget;
         rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .2, .05);
-    }
-
-    private void setPowerAll(double motorPower) {
-        frontRight.setPower(motorPower);
-        frontLeft.setPower(motorPower);
-        backRight.setPower(motorPower);
-        backLeft.setPower(motorPower);
     }
 
     private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale){

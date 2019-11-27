@@ -93,12 +93,7 @@ public class Ardennes extends Robot {
         IMU imu = new IMU(bnoImu);
         //OdometrySystem odometrySystem = makeOdometrySystem(imu);
 
-        driveFlips.put(ChassisMotors.Mecanum.FRONTLEFT, false); //todo check directions
-        driveFlips.put(ChassisMotors.Mecanum.FRONTRIGHT, true);
-        driveFlips.put(ChassisMotors.Mecanum.BACKLEFT, false);
-        driveFlips.put(ChassisMotors.Mecanum.BACKRIGHT, true);
-
-        return new MecanumChassis(config, driveFlips, imu);
+        return new MecanumChassis(config, imu);
     }
 
 

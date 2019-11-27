@@ -86,6 +86,10 @@ public class Slides {
         rightMotor.setPower(power);
     }
 
+    public void stopMotors() {
+        setPower(0);
+    }
+
     public double getCurrentPosition() {
         double slidesPosition = (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition())/2;
         return slidesPosition;

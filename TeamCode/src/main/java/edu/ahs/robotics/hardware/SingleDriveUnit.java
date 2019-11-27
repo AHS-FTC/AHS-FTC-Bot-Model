@@ -2,6 +2,7 @@ package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
@@ -27,10 +28,7 @@ public class SingleDriveUnit extends DriveUnit{
     }
 
     public void setPower(double motorPower){
-        if (Math.abs(motorPower) > 1) {
-            throw new Warning("DriveUnit motorPower is not between 1 and -1");
-        }
-        motor.setPower(motorPower);
+        motor.setPower(Range.clip(motorPower, -1.0, 1.0));
     }
 
     public void zeroDistance(){

@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
@@ -66,8 +67,10 @@ public class ArdennesTeleOp extends OpMode
     private Intake intake;
     private LimitSwitch limitSwitch;
     private Slides slides;
+    private MecanumChassis chassis;
 
-    DcMotor frontLeft, frontRight, backLeft, backRight;
+
+    //DcMotor frontLeft, frontRight, backLeft, backRight;
 
     Servo ySlideServo;
     Servo foundationServoL, foundationServoR;
@@ -119,11 +122,12 @@ public class ArdennesTeleOp extends OpMode
 
         Ardennes ardennes = new Ardennes();
 
-        frontLeft = hardwareMap.get(DcMotor.class,"FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backLeft = hardwareMap.get(DcMotor.class, "BL");
-        backRight = hardwareMap.get(DcMotor.class, "BR");
+//        frontLeft = hardwareMap.get(DcMotor.class,"FL");
+//        frontRight = hardwareMap.get(DcMotor.class, "FR");
+//        backLeft = hardwareMap.get(DcMotor.class, "BL");
+//        backRight = hardwareMap.get(DcMotor.class, "BR");
 
+        chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
         limitSwitch = ardennes.getLimitSwitch();
         slides = ardennes.getSlides();
@@ -139,11 +143,6 @@ public class ArdennesTeleOp extends OpMode
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger",40);
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
 
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
         ySlideServo.setDirection(Servo.Direction.FORWARD);
 
         foundationServoL.setDirection(Servo.Direction.FORWARD);
@@ -152,10 +151,15 @@ public class ArdennesTeleOp extends OpMode
         gripperServo.setDirection(Servo.Direction.REVERSE);
         wristServo.setDirection(Servo.Direction.REVERSE);
 
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+//        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+//        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+//        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+//        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
         time = new ElapsedTime();
 
@@ -253,16 +257,11 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        frontLeftPower = calculateMotorPower(1,-1,-1);
-        frontRightPower = calculateMotorPower(1,1,1);
-        backLeftPower = calculateMotorPower(1,1,-1);
-        backRightPower = calculateMotorPower(1,-1,1);
-
-        frontLeft.setPower(frontLeftPower);
-        frontRight.setPower(frontRightPower);
-        backLeft.setPower(backLeftPower);
-        backRight.setPower(backRightPower);
-
+        //Calculate motion components
+        double forward = getClippedPower(-gamepad1.left_stick_y, .2);
+        double strafe = Range.clip(getClippedPower(-gamepad1.left_stick_x, .2), -.4, .4);
+        double turn = getClippedPower(Math.pow(-gamepad1.right_stick_x,3), .25);
+        chassis.drive3Axis(forward, strafe, turn);
 
         if(limitSwitch.isTriggered()){
             slides.resetEncoders();
@@ -340,37 +339,6 @@ public class ArdennesTeleOp extends OpMode
         }
     }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
-
-        intake.stopMotors();
-        slides.setPower(0);
-    }
-
-    private void resetEncoder(DcMotor motor){
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    private double calculateMotorPower(int forwardFlip, int strafeFlip, int turnFlip){
-
-        double forward, strafe, turn;
-
-        forward = getClippedPower(gamepad1.left_stick_y, .2);
-        strafe = Range.clip(getClippedPower(gamepad1.left_stick_x, .2), -.4, .4);
-        turn = getClippedPower(Math.pow(gamepad1.right_stick_x,3), .25);
-
-
-        return forwardFlip*forward + strafeFlip*strafe + turnFlip*turn;
-    }
-
     private double getClippedPower(double input, double minPower){
         final double ZERO_RANGE = 0.01; //inputs beneath this range are ignored
         //final double MIN_POWER = 0.2; // lowest(ish) power in which robot still moves
@@ -380,6 +348,21 @@ public class ArdennesTeleOp extends OpMode
         } else {
             return Math.signum(input)*Math.max(minPower,Math.abs(input));//abs to legitimize max, signum to retain directionality
         }
+    }
+
+    /*
+     * Code to run ONCE after the driver hits STOP
+     */
+    @Override
+    public void stop() {
+        chassis.stopMotors();
+        intake.stopMotors();
+        slides.stopMotors();
+    }
+
+    private void resetEncoder(DcMotor motor){
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
 }
