@@ -2,6 +2,7 @@ package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
@@ -14,9 +15,10 @@ public class Slides {
     private DcMotor rightMotor;
     private LimitSwitch limitSwitch;
     private double motorPower;
-    private int encoderTicksPerLevel = 420;
+    private static final int ENCODER_TICKS_PER_LEVEL = 420;
+    private static final int SLIDES_MAX = 4150;
 
-    public Slides (double motorPower, LimitSwitch limitSwitch){
+    public Slides (double motorPower){
         leftMotor = FTCUtilities.getMotor("slideL");
         rightMotor = FTCUtilities.getMotor("slideR");
 
@@ -26,8 +28,25 @@ public class Slides {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        limitSwitch = new LimitSwitch("limitSwitch");
+
         this.motorPower = motorPower;
-        this.limitSwitch = limitSwitch;
+    }
+
+    public void runSlides(double slidesPower) {
+        if (getCurrentPosition() >= SLIDES_MAX) {
+            slidesPower = Range.clip(slidesPower, -1, 0);
+        } else if (limitSwitch.isTriggered()) {
+            slidesPower = Range.clip(slidesPower, 0, 1);
+            resetEncoders();
+        }
+
+        setPower(slidesPower);
+
+    }
+
+    public boolean atBottom(){
+        return limitSwitch.isTriggered();
     }
 
     private void resetEncoder(DcMotor motor){
@@ -56,7 +75,7 @@ public class Slides {
         }
         int level1 = 200;
         int ticksAtLevel;
-        ticksAtLevel = (level-1) * encoderTicksPerLevel + level1;
+        ticksAtLevel = (level-1) * ENCODER_TICKS_PER_LEVEL + level1;
         leftMotor.setTargetPosition(ticksAtLevel);
         rightMotor.setTargetPosition(ticksAtLevel);
         setEncoderModeRunToPostion(leftMotor);

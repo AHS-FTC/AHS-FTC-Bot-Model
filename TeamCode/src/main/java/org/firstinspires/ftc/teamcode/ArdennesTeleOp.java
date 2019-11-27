@@ -64,7 +64,6 @@ public class ArdennesTeleOp extends OpMode
     }
 
     private Intake intake;
-    private LimitSwitch limitSwitch;
     private Slides slides;
     private MecanumChassis chassis;
 
@@ -73,18 +72,12 @@ public class ArdennesTeleOp extends OpMode
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
 
-    private final int SLIDES_MAX = 4150;
-    private final int SLIDES_GRIP_THRESHOLD = 120;
-
     //from zero to one
     private double yServoPosition = 0;
-    private final double Y_SERVO_SPEED = 1;//unitless multiplier - only effects speed attached to stick.
 
-    //private double intakeLPower = 0, intakeRPower = 0;
     private final double INTAKE_POWER = 1;
     private IntakeMode intakeMode = IntakeMode.OFF;
 
-    private double slidesPower = 0;
     private final double SLIDE_DOWN_POWER_SCALE = 0.3; //unitless multiplier to weaken slide motors when pulling down
 
     private Toggle foundationToggle;
@@ -111,7 +104,6 @@ public class ArdennesTeleOp extends OpMode
 
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
-        limitSwitch = ardennes.getLimitSwitch();
         slides = ardennes.getSlides();
 
         gripper = ardennes.getGripper();
@@ -161,7 +153,43 @@ public class ArdennesTeleOp extends OpMode
 
     @Override
     public void loop() {
+        buttonActions();
+        driveActions();
+        slideActions();
+        triggers();
+    }
 
+    private void slideActions() {
+        double slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
+
+        slides.runSlides(slidesPower);
+
+        yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y, 0, 1);
+        ySlide.setPosition(yServoPosition);
+    }
+
+    private void triggers() {
+        // If the gripperTrigger is flipped while the gripper is disabled and in position to grip.
+        if (gripperTrigger.isTriggered()) {
+            intakeMode = IntakeMode.OFF;
+            updateIntake();
+            // Is the gripper open and in position?
+            if (!gripperToggle.isEnabled() && slides.atBottom()) {
+                gripperToggle.flip();
+                activateGripper();
+            }
+        }
+    }
+
+    private void driveActions() {
+        //Calculate motion components
+        double forward = getClippedPower(-gamepad1.left_stick_y, .2);
+        double strafe = Range.clip(getClippedPower(-gamepad1.left_stick_x, .2), -.4, .4);
+        double turn = getClippedPower(Math.pow(-gamepad1.right_stick_x, 3), .25);
+        chassis.drive3Axis(forward, strafe, turn);
+    }
+
+    private void buttonActions() {
         //press dpad down to enable debug logs
         if (gamepad1.dpad_down) {
             debugToggle.flip();
@@ -209,7 +237,6 @@ public class ArdennesTeleOp extends OpMode
             } else {
                 wrist.setPosition(0);
             }
-
         }
 
         //press a to grip block
@@ -240,38 +267,6 @@ public class ArdennesTeleOp extends OpMode
             telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
             telemetry.update();
         }
-
-        //Calculate motion components
-        double forward = getClippedPower(-gamepad1.left_stick_y, .2);
-        double strafe = Range.clip(getClippedPower(-gamepad1.left_stick_x, .2), -.4, .4);
-        double turn = getClippedPower(Math.pow(-gamepad1.right_stick_x, 3), .25);
-        chassis.drive3Axis(forward, strafe, turn);
-
-        slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
-
-        if (slides.getCurrentPosition() >= SLIDES_MAX) {
-            slidesPower = Range.clip(slidesPower, -1, 0);
-        } else if (limitSwitch.isTriggered()) {
-            slidesPower = Range.clip(slidesPower, 0, 1);
-            slides.resetEncoders();
-        }
-
-        slides.setPower(slidesPower);
-
-        yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y * Y_SERVO_SPEED, 0, 1);
-        ySlide.setPosition(yServoPosition);
-
-        // If the gripperTrigger is flipped while the gripper is disabled and in position to grip.
-        if (gripperTrigger.isTriggered()) {
-            intakeMode = IntakeMode.OFF;
-            updateIntake();
-            // Is the gripper open and in position?
-            if (!gripperToggle.isEnabled() && slides.getCurrentPosition() <= SLIDES_GRIP_THRESHOLD) {
-                gripperToggle.flip();
-                activateGripper();
-            }
-        }
-
     }
 
     private void updateIntake() {
@@ -313,11 +308,6 @@ public class ArdennesTeleOp extends OpMode
         slides.stopMotors();
     }
 
-    private void resetEncoder(DcMotor motor){
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
     private class Switch {
         private final static double BUTTON_THRESHOLD = 300; //in millis - time between presses
         protected double lastPress;
@@ -333,7 +323,6 @@ public class ArdennesTeleOp extends OpMode
             }
             return false;
         }
-
     }
 
     private class Toggle extends Switch {

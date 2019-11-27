@@ -26,7 +26,6 @@ public class Ardennes extends Robot {
     private Intake intake;
     private SerialServo gripper;//todo add other serbos
     private TriggerDistanceSensor intakeTrigger, gripperTrigger;
-    private LimitSwitch limitSwitch;
     private ArdennesSkyStoneDetector detector;
     private Slides slides;
     private SerialServo leftFoundation, rightFoundation;
@@ -37,13 +36,12 @@ public class Ardennes extends Robot {
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40);
-        limitSwitch = new LimitSwitch("limitSwitch");
         leftFoundation = new SerialServo("FSL", true);
         rightFoundation = new SerialServo("FSR", false);
         intake = new Intake(1);
         gripper = new SerialServo("gripper", true);
         mecanumChassis = makeChassis();
-        slides = new Slides(.5, limitSwitch);
+        slides = new Slides(.5);
         detector = new ArdennesSkyStoneDetector();
         ySlide = new SerialServo("slideServo", false);
         wrist = new SerialServo("wrist", true);
@@ -65,10 +63,6 @@ public class Ardennes extends Robot {
 
     public TriggerDistanceSensor getGripperTrigger() {
         return gripperTrigger;
-    }
-
-    public LimitSwitch getLimitSwitch(){
-        return limitSwitch;
     }
 
     public SerialServo getGripper(){
