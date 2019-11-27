@@ -31,13 +31,14 @@ public class Ardennes extends Robot {
     private Slides slides;
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo ySlide;
+    private SerialServo wrist;
 
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40);
         limitSwitch = new LimitSwitch("limitSwitch");
-        leftFoundation = new SerialServo("FSL", false);
+        leftFoundation = new SerialServo("FSL", true);
         rightFoundation = new SerialServo("FSR", false);
         intake = new Intake(1);
         gripper = new SerialServo("gripper", true);
@@ -45,6 +46,7 @@ public class Ardennes extends Robot {
         slides = new Slides(.5, limitSwitch);
         detector = new ArdennesSkyStoneDetector();
         ySlide = new SerialServo("slideServo", false);
+        wrist = new SerialServo("wrist", true);
     }
 
     public ArdennesSkyStoneDetector.SkyStoneConfigurations runDetector() {return detector.look();}
@@ -79,6 +81,8 @@ public class Ardennes extends Robot {
     public SerialServo getySlide() {return ySlide;}
 
     public Slides getSlides() {return slides;}
+
+    public SerialServo getWrist() {return wrist;}
 
     private MecanumChassis makeChassis() {
         //Set Gear Ratio

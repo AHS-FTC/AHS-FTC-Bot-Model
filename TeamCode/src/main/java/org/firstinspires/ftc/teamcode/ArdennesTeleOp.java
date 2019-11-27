@@ -32,12 +32,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
@@ -69,18 +68,11 @@ public class ArdennesTeleOp extends OpMode
     private Slides slides;
     private MecanumChassis chassis;
 
+    private SerialServo gripper, wrist, ySlide, leftFoundation, rightFoundation;
+    //todo add Servo capstoneServo;
 
-    //DcMotor frontLeft, frontRight, backLeft, backRight;
+    private TriggerDistanceSensor gripperTrigger, intakeTrigger;
 
-    Servo ySlideServo;
-    Servo foundationServoL, foundationServoR;
-    Servo gripperServo, wristServo;
-
-    //Servo capstoneServo;
-    TriggerDistanceSensor intakeTrigger;
-    TriggerDistanceSensor gripperTrigger;
-
-    private double frontLeftPower = 0, frontRightPower = 0, backLeftPower = 0, backRightPower = 0;
     private final int SLIDES_MAX = 4150;
     private final int SLIDES_GRIP_THRESHOLD = 120;
 
@@ -92,25 +84,19 @@ public class ArdennesTeleOp extends OpMode
     private final double INTAKE_POWER = 1;
     private IntakeMode intakeMode = IntakeMode.OFF;
 
-    private double slidesPower = 0, slideRPower = 0;
+    private double slidesPower = 0;
     private final double SLIDE_DOWN_POWER_SCALE = 0.3; //unitless multiplier to weaken slide motors when pulling down
 
-    private boolean debuggingEnabled = false;
-    private boolean isDeliveryIntakeStyle = false;
-    private boolean wristEnabled = false;
-    private boolean gripperEnabled = false;
-    private boolean foundationEnabled = false;
+    private Toggle foundationToggle;
+    private Toggle gripperToggle;
+    private Toggle wristToggle;
+    private Toggle collectionModeToggle;
+    private Toggle debugToggle;
+
+    private Switch intakeOutSwitch;
+    private Switch intakeInSwitch;
 
     private ElapsedTime time;
-
-    private final double BUTTON_THRESHOLD = 300; //in millis - time between presses
-    private double lastDebugPress = -BUTTON_THRESHOLD;//should be pressable at start
-    private double lastDeliveryIntakeStyle = -BUTTON_THRESHOLD;
-    private double lastIntakeInPress = -BUTTON_THRESHOLD;
-    private double lastIntakeOutPress = -BUTTON_THRESHOLD;
-    private double lastWristPress = -BUTTON_THRESHOLD;
-    private double lastGripperPress = -BUTTON_THRESHOLD;
-    private double lastFoundationPress = -BUTTON_THRESHOLD;
 
     private double lastTime;
 
@@ -119,49 +105,32 @@ public class ArdennesTeleOp extends OpMode
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
+        time = new ElapsedTime();
 
         Ardennes ardennes = new Ardennes();
-
-//        frontLeft = hardwareMap.get(DcMotor.class,"FL");
-//        frontRight = hardwareMap.get(DcMotor.class, "FR");
-//        backLeft = hardwareMap.get(DcMotor.class, "BL");
-//        backRight = hardwareMap.get(DcMotor.class, "BR");
 
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
         limitSwitch = ardennes.getLimitSwitch();
         slides = ardennes.getSlides();
 
-        ySlideServo = hardwareMap.get(Servo.class,"slideServo");
+        gripper = ardennes.getGripper();
+        wrist = ardennes.getWrist();
+        ySlide = ardennes.getySlide();
+        leftFoundation = ardennes.getLeftFoundation();
+        rightFoundation = ardennes.getRightFoundation();
 
-        foundationServoL = hardwareMap.get(Servo.class,"FSL");
-        foundationServoR = hardwareMap.get(Servo.class,"FSR");
+        foundationToggle = new Toggle();
+        gripperToggle = new Toggle();
+        wristToggle = new Toggle();
+        collectionModeToggle = new Toggle();
+        debugToggle = new Toggle();
 
-        gripperServo = hardwareMap.get(Servo.class,"gripper");
-        wristServo = hardwareMap.get(Servo.class,"wrist");
+        intakeOutSwitch = new Switch();
+        intakeInSwitch = new Switch();
 
-        gripperTrigger = new TriggerDistanceSensor("gripperTrigger",40);
-        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
-
-        ySlideServo.setDirection(Servo.Direction.FORWARD);
-
-        foundationServoL.setDirection(Servo.Direction.FORWARD);
-        foundationServoR.setDirection(Servo.Direction.FORWARD);
-
-        gripperServo.setDirection(Servo.Direction.REVERSE);
-        wristServo.setDirection(Servo.Direction.REVERSE);
-
-//        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-//        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-//        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-//        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-//        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        time = new ElapsedTime();
+        gripperTrigger = ardennes.getGripperTrigger();
+        intakeTrigger = ardennes.getIntakeTrigger();
 
         telemetry.addLine("initialized");
         telemetry.update();
@@ -194,96 +163,118 @@ public class ArdennesTeleOp extends OpMode
     public void loop() {
 
         //press dpad down to enable debug logs
-        if(gamepad1.dpad_down) {
-            if(time.milliseconds() - lastDebugPress > BUTTON_THRESHOLD) {
-                debuggingEnabled = !debuggingEnabled;
-                lastDebugPress = time.milliseconds();
-                slides.resetEncoders();
+        if (gamepad1.dpad_down) {
+            debugToggle.flip();
+            if (debugToggle.isEnabled()) {
+                telemetry.addData("deltaTime",lastTime-time.milliseconds());
+                lastTime = time.milliseconds();
+                telemetry.addData("Slides Average Encoder Value", slides.getCurrentPosition());
+                telemetry.addData("y servo position", yServoPosition);
+
+                telemetry.update();
+            } else {
+                telemetry.clear();
             }
         }
 
         //press l bumper to reverse intake
-        if(gamepad1.left_bumper) {
-            if(time.milliseconds() - lastIntakeOutPress > BUTTON_THRESHOLD) {
-                if(intakeMode == IntakeMode.OUT) {
+        if (gamepad1.left_bumper) {
+            if(intakeOutSwitch.flip()) {
+                if (intakeMode == IntakeMode.OUT) {
                     intakeMode = IntakeMode.OFF;
                 } else {
                     intakeMode = IntakeMode.OUT;
                 }
-                lastIntakeOutPress = time.milliseconds();
+                updateIntake();
             }
         }
 
         //press r bumper to enable intake
-        if(gamepad1.right_bumper) {
-            if(time.milliseconds() - lastIntakeInPress > BUTTON_THRESHOLD) {
-                if(intakeMode == IntakeMode.IN) {
+        if (gamepad1.right_bumper) {
+            if (intakeInSwitch.flip()) {
+                if (intakeMode == IntakeMode.IN) {
                     intakeMode = IntakeMode.OFF;
                 } else {
                     intakeMode = IntakeMode.IN;
                 }
-                lastIntakeInPress = time.milliseconds();
+                updateIntake();
             }
         }
 
         //press b to rotate stone 90 degrees
-        if(gamepad2.b) {
-            if(time.milliseconds() - lastWristPress > BUTTON_THRESHOLD) {
-                //wristEnabled = !wristEnabled; //todo
-                lastWristPress = time.milliseconds();
+        if (gamepad2.b) {
+            wristToggle.flip();
+            if (wristToggle.isEnabled()) {
+                wrist.setPosition(0); //todo reestablish wrist
+            } else {
+                wrist.setPosition(0);
             }
+
         }
 
         //press a to grip block
-        if(gamepad2.a) {
-            if(time.milliseconds() - lastGripperPress > BUTTON_THRESHOLD) {
-                gripperEnabled = !gripperEnabled;
-                lastGripperPress = time.milliseconds();
-            }
+        if (gamepad2.a) {
+            gripperToggle.flip();
+            activateGripper();
         }
+
         //press a to grip foundation
-        if(gamepad1.a) {
-            if(time.milliseconds() - lastFoundationPress > BUTTON_THRESHOLD) {
-                foundationEnabled = !foundationEnabled;
-                lastFoundationPress = time.milliseconds();
+        if (gamepad1.a) {
+            foundationToggle.flip();
+            if (foundationToggle.isEnabled()) {
+                leftFoundation.setPosition(1);
+                rightFoundation.setPosition(1);
+            } else {
+                leftFoundation.setPosition(0);
+                rightFoundation.setPosition(0);
             }
         }
 
-        //both controllers press dpad up to enable delivery style intake
-        if(gamepad1.dpad_up && gamepad2.dpad_up) {
-            if(time.milliseconds() - lastDeliveryIntakeStyle > BUTTON_THRESHOLD) {
-                isDeliveryIntakeStyle = !isDeliveryIntakeStyle;
-                lastDeliveryIntakeStyle = time.milliseconds();
+        //gamepad 1 press dpad up to enable collection mode
+        if (gamepad1.dpad_up) {
+            collectionModeToggle.flip();
+            if (collectionModeToggle.isEnabled() && intakeMode == IntakeMode.IN && intakeTrigger.isTriggered()) {//if playing delivery, stop intake at trigger.
+                intakeMode = IntakeMode.OFF;
+                updateIntake();
             }
+            telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
+            telemetry.update();
         }
 
         //Calculate motion components
         double forward = getClippedPower(-gamepad1.left_stick_y, .2);
         double strafe = Range.clip(getClippedPower(-gamepad1.left_stick_x, .2), -.4, .4);
-        double turn = getClippedPower(Math.pow(-gamepad1.right_stick_x,3), .25);
+        double turn = getClippedPower(Math.pow(-gamepad1.right_stick_x, 3), .25);
         chassis.drive3Axis(forward, strafe, turn);
 
-        if(limitSwitch.isTriggered()){
-            slides.resetEncoders();
-        }
+        slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
 
-        slidesPower = gamepad2.right_trigger-(gamepad2.left_trigger*SLIDE_DOWN_POWER_SCALE);
-
-        if(slides.getCurrentPosition() >= SLIDES_MAX){
+        if (slides.getCurrentPosition() >= SLIDES_MAX) {
             slidesPower = Range.clip(slidesPower, -1, 0);
-        } else if(limitSwitch.isTriggered()){
+        } else if (limitSwitch.isTriggered()) {
             slidesPower = Range.clip(slidesPower, 0, 1);
+            slides.resetEncoders();
         }
 
         slides.setPower(slidesPower);
 
-        yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y*Y_SERVO_SPEED, 0,1);
-        ySlideServo.setPosition(yServoPosition);
+        yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y * Y_SERVO_SPEED, 0, 1);
+        ySlide.setPosition(yServoPosition);
 
-        if(isDeliveryIntakeStyle && intakeMode == IntakeMode.IN && intakeTrigger.isTriggered()){//if playing delivery, stop intake at trigger.
+        // If the gripperTrigger is flipped while the gripper is disabled and in position to grip.
+        if (gripperTrigger.isTriggered()) {
             intakeMode = IntakeMode.OFF;
+            updateIntake();
+            // Is the gripper open and in position?
+            if (!gripperToggle.isEnabled() && slides.getCurrentPosition() <= SLIDES_GRIP_THRESHOLD) {
+                gripperToggle.flip();
+                activateGripper();
+            }
         }
 
+    }
+
+    private void updateIntake() {
         if(intakeMode == IntakeMode.IN){
             intake.runMotors(INTAKE_POWER);
         } else if (intakeMode == IntakeMode.OFF) {
@@ -291,51 +282,13 @@ public class ArdennesTeleOp extends OpMode
         } else if(intakeMode == IntakeMode.OUT){
             intake.runMotors(-INTAKE_POWER);
         }
+    }
 
-        if(wristEnabled){
-            wristServo.setPosition(0); //todo reestablish wrist
+    private void activateGripper() {
+        if(gripperToggle.isEnabled()){
+            gripper.setPosition(1);
         } else {
-            wristServo.setPosition(0);
-        }
-        //if the gripperTrigger is flipped while the gripper is disabled and in position to grip.
-        if(!gripperEnabled && gripperTrigger.isTriggered() && slides.getCurrentPosition()<= SLIDES_GRIP_THRESHOLD){
-            gripperEnabled = true;
-        }
-
-        if(gripperEnabled){
-            gripperServo.setPosition(1);
-        } else {
-            gripperServo.setPosition(0);
-        }
-
-        if(foundationEnabled){
-            foundationServoL.setPosition(0);
-            foundationServoR.setPosition(1);
-        } else {
-            foundationServoL.setPosition(1);
-            foundationServoR.setPosition(0);
-        }
-
-        telemetry.addData("Collection Mode?", isDeliveryIntakeStyle);
-        telemetry.update();
-
-        if(debuggingEnabled){
-            telemetry.addData("deltaTime",lastTime-time.milliseconds());
-            lastTime = time.milliseconds();
-            telemetry.addData("Slides Average Encoder Value", slides.getCurrentPosition());
-
-            //telemetry.addData("intake Distance", intakeTrigger.getDist());
-            //telemetry.addData("intake triggered?", intakeTrigger.isTriggered());
-            //telemetry.addData("gripper targetDistance", gripperTrigger.getDist());
-            //telemetry.addData("gripper triggered?", gripperTrigger.isTriggered());
-            //telemetry.addData("gripper enabled?", gripperEnabled);
-            //telemetry.addData("slide in position?", slideL.getCurrentPosition()<= SLIDES_GRIP_THRESHOLD);
-            telemetry.addData("turnness", gamepad1.right_stick_x);
-            telemetry.addData("y servo position", yServoPosition);
-
-            telemetry.update();
-        } else {
-            telemetry.clear();
+            gripper.setPosition(0);
         }
     }
 
@@ -365,4 +318,41 @@ public class ArdennesTeleOp extends OpMode
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    private class Switch {
+        private final static double BUTTON_THRESHOLD = 300; //in millis - time between presses
+        protected double lastPress;
+
+        public Switch() {
+            lastPress = time.milliseconds();
+        }
+
+        public boolean flip() {
+            if(time.milliseconds() - lastPress > BUTTON_THRESHOLD) {
+                lastPress = time.milliseconds();
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    private class Toggle extends Switch {
+        private boolean enabled = false;
+
+        public Toggle() {
+            super();
+        }
+
+        public boolean flip() {
+            if (super.flip()) {
+                enabled = !enabled;
+                return true;
+            }
+            return false;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+    }
 }

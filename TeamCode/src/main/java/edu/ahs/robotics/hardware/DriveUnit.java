@@ -14,11 +14,14 @@ public abstract class DriveUnit {
     protected DcMotor motor;
 
 
+
     public DriveUnit(String deviceName, Config config, boolean flipped) {
         motor = FTCUtilities.getMotor(deviceName);
         wheelCircumference = config.wheelDiameter * Math.PI;
         this.config = config;
         this.flipped = flipped;
+
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public abstract void setPower(double power);

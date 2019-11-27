@@ -70,7 +70,8 @@ public class ArdennesAuto extends LinearOpMode {
         TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
         slides.resetEncoders();
         gripper.setPosition(0);
-
+        telemetry.addLine("Init Finished");
+        telemetry.update();
 
         waitForStart();
 
