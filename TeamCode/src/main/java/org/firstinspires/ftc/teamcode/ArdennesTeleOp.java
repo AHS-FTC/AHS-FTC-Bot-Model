@@ -31,14 +31,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
-import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -57,6 +55,7 @@ import edu.ahs.robotics.hardware.Intake;
 //@Disabled
 public class ArdennesTeleOp extends OpMode
 {
+
     private enum IntakeMode{
         OFF,
         IN,
@@ -75,18 +74,21 @@ public class ArdennesTeleOp extends OpMode
     //from zero to one
     private double yServoPosition = 0;
 
-    private final double INTAKE_POWER = 1;
+    private static final double TRIGGER_THRESHOLD = 0.1;
+    private static final double INTAKE_POWER = 1;
     private IntakeMode intakeMode = IntakeMode.OFF;
-
-    private final double SLIDE_DOWN_POWER_SCALE = 0.3; //unitless multiplier to weaken slide motors when pulling down
+    private static final double SLIDE_DOWN_POWER_SCALE = 0.3; //unitless multiplier to weaken slide motors when pulling down
 
     private Toggle foundationToggle;
     private Toggle gripperToggle;
     private Toggle wristToggle;
     private Toggle collectionModeToggle;
     private Toggle debugToggle;
+    private boolean slidesMoving = false;
+    private boolean xPressed = false;
+    private boolean runToLevelMode = false;
 
-    private Switch intakeOutSwitch;
+     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
 
     private ElapsedTime time;
@@ -153,19 +155,70 @@ public class ArdennesTeleOp extends OpMode
 
     @Override
     public void loop() {
-        buttonActions();
-        driveActions();
+        //buttonActions();
+        //driveActions();
         slideActions();
-        triggers();
+        //triggers();
     }
 
     private void slideActions() {
-        double slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
 
-        slides.runSlides(slidesPower);
+        //if either trigger is pressed then run the slides
+        if(gamepad2.left_trigger >= TRIGGER_THRESHOLD || gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
+            slidesMoving = true;
+            //if the slides are running to a level, cancel and run with manual control
+            if(runToLevelMode){
+                runToLevelMode = false;
+                slides.setManualControlMode();
+            }
+            //run slides at power
+            double slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
+            slides.runAtPower(slidesPower);
+        }
+
+        //if slides are mot in run to level mode and are not receiving inputs from triggers, stop motors
+        if (gamepad2.left_trigger < TRIGGER_THRESHOLD && gamepad2.right_trigger < TRIGGER_THRESHOLD){
+            if (!runToLevelMode && slidesMoving) {
+                slides.stopMotors();
+                slidesMoving = false;
+            }
+        }
 
         yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y, 0, 1);
         ySlide.setPosition(yServoPosition);
+
+        //press x to increase levels for stacking
+        if (gamepad2.x) {
+            if (!xPressed) {
+                xPressed = true;
+                slides.incrementTargetLevel();
+            }
+        } else {
+            xPressed = false;
+        }
+
+        if (gamepad2.y) {
+            runToLevelMode = true;
+            slides.runSlidesToTargetLevel();
+        }
+
+        //press right bumper to reset slides to original position
+        if (gamepad2.right_bumper) {
+            if(gripperToggle.isEnabled()) {
+                gripperToggle.flip();
+                activateGripper();
+            }
+            if (wristToggle.isEnabled()) {
+                wristToggle.flip();
+                activateWrist();
+            }
+            yServoPosition = 0;
+            slides.setManualControlMode();
+            runToLevelMode = false;
+            ySlide.setPosition(yServoPosition);
+            FTCUtilities.OpSleep(500);
+            slides.resetSlidesToOriginalPosition();
+        }
     }
 
     private void triggers() {
@@ -196,9 +249,8 @@ public class ArdennesTeleOp extends OpMode
             if (debugToggle.isEnabled()) {
                 telemetry.addData("deltaTime",lastTime-time.milliseconds());
                 lastTime = time.milliseconds();
-                telemetry.addData("Slides Average Encoder Value", slides.getCurrentPosition());
                 telemetry.addData("y servo position", yServoPosition);
-
+                telemetry.addData("limit switch triggered?", slides.atBottom());
                 telemetry.update();
             } else {
                 telemetry.clear();
@@ -232,11 +284,7 @@ public class ArdennesTeleOp extends OpMode
         //press b to rotate stone 90 degrees
         if (gamepad2.b) {
             wristToggle.flip();
-            if (wristToggle.isEnabled()) {
-                wrist.setPosition(0); //todo reestablish wrist
-            } else {
-                wrist.setPosition(0);
-            }
+            activateWrist();
         }
 
         //press a to grip block
@@ -266,6 +314,14 @@ public class ArdennesTeleOp extends OpMode
             }
             telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
             telemetry.update();
+        }
+    }
+
+    private void activateWrist() {
+        if (wristToggle.isEnabled()) {
+            wrist.setPosition(1);
+        } else {
+            wrist.setPosition(0);
         }
     }
 
@@ -342,6 +398,10 @@ public class ArdennesTeleOp extends OpMode
 
         public boolean isEnabled() {
             return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
     }
 }

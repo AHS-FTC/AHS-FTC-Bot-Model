@@ -65,7 +65,6 @@ public class ArdennesAuto extends LinearOpMode {
         SerialServo foundationServoLeft = ardennes.getLeftFoundation();
         SerialServo foundationServoRight = ardennes.getRightFoundation();
         SerialServo gripper = ardennes.getGripper();
-        LimitSwitch limitSwitch = ardennes.getLimitSwitch();
         SerialServo yslide = ardennes.getySlide();
         TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
         slides.resetEncoders();
@@ -111,7 +110,6 @@ public class ArdennesAuto extends LinearOpMode {
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(0);
         sleep(700);
-        slides.runSlidesToEncoder(600);
         sleep(1000);
 
 

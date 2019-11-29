@@ -14,7 +14,6 @@ import edu.ahs.robotics.hardware.Robot;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
@@ -47,7 +46,7 @@ public class Ardennes extends Robot {
         wrist = new SerialServo("wrist", true);
     }
 
-    public ArdennesSkyStoneDetector.SkyStoneConfigurations runDetector() {return detector.look();}
+    public ArdennesSkyStoneDetector.SkyStoneConfigurations runDetector() {return detector.lookRed();}
 
     public Intake getIntake(){
         return intake;

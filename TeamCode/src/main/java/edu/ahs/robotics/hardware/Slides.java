@@ -17,6 +17,8 @@ public class Slides {
     private double motorPower;
     private static final int ENCODER_TICKS_PER_LEVEL = 420;
     private static final int SLIDES_MAX = 4150;
+    public static final int MAX_LEVEL = 10;
+    private int targetLevel = 0;
 
     public Slides (double motorPower){
         leftMotor = FTCUtilities.getMotor("slideL");
@@ -28,79 +30,89 @@ public class Slides {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        setManualControlMode();
+
         limitSwitch = new LimitSwitch("limitSwitch");
 
         this.motorPower = motorPower;
     }
 
-    public void runSlides(double slidesPower) {
+    public void runAtPower(double slidesPower) {
         if (getCurrentPosition() >= SLIDES_MAX) {
             slidesPower = Range.clip(slidesPower, -1, 0);
-        } else if (limitSwitch.isTriggered()) {
+        } else if (atBottom()) {
             slidesPower = Range.clip(slidesPower, 0, 1);
             resetEncoders();
+            targetLevel = 0;
         }
 
         setPower(slidesPower);
-
     }
 
     public boolean atBottom(){
         return limitSwitch.isTriggered();
     }
 
-    private void resetEncoder(DcMotor motor){
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public void resetEncoders(){
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private void setEncoderModeRunToPostion(DcMotor motor){
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    private void setEncoderModeRunToPostion(){
+        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void runSlidesToEncoder(double encoderHeight) {
-        while(leftMotor.getCurrentPosition() < encoderHeight) {
-            leftMotor.setPower(motorPower);
-            rightMotor.setPower(-motorPower);
+    public void setManualControlMode() {
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void setTargetLevel (int level) {
+        targetLevel = level;
+        if(targetLevel > Slides.MAX_LEVEL) {
+            targetLevel = Slides.MAX_LEVEL;
         }
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-
     }
 
-    public void runSlidesToLevel(int level) {
-        if(level < 1 || level > 10) {
-            throw new Warning("level "+ level +" must be between 1 and 10");
-        }
+    public void incrementTargetLevel () {
+        setTargetLevel(targetLevel+1);
+    }
+
+    public void runSlidesToTargetLevel() {
         int level1 = 200;
         int ticksAtLevel;
-        ticksAtLevel = (level-1) * ENCODER_TICKS_PER_LEVEL + level1;
+        ticksAtLevel = (targetLevel-1) * ENCODER_TICKS_PER_LEVEL + level1;
         leftMotor.setTargetPosition(ticksAtLevel);
         rightMotor.setTargetPosition(ticksAtLevel);
-        setEncoderModeRunToPostion(leftMotor);
-        setEncoderModeRunToPostion(rightMotor);
-        leftMotor.setPower(motorPower); //These are powers for going up
-        rightMotor.setPower(motorPower);
-
+        setEncoderModeRunToPostion();
+        setPower(motorPower);
     }
 
     public void resetSlidesToOriginalPosition() {
-        leftMotor.setPower(-motorPower); //These are powers for going down
-        rightMotor.setPower(motorPower);
-        while(!limitSwitch.isTriggered()) {}
+        setPower(-motorPower);
+        targetLevel = 0;
+        while(!limitSwitch.isTriggered()) {
+            if (getCurrentPosition() < 150) {
+                setPower(.75 * -motorPower);
+            }
+            if (getCurrentPosition() < 100) {
+                setPower(.5 * -motorPower);
+            }
+            if (getCurrentPosition() < 50) {
+                setPower(.25 * -motorPower);
+            }
+        }
         leftMotor.setPower(0);
         rightMotor.setPower(0);
         resetEncoders();
 
     }
 
-    public void resetEncoders() {
-        resetEncoder(leftMotor);
-        resetEncoder(rightMotor);
-    }
 
-    public void setPower(double power) {
+    private void setPower(double power) {
         leftMotor.setPower(power);
         rightMotor.setPower(power);
     }
@@ -110,8 +122,7 @@ public class Slides {
     }
 
     public double getCurrentPosition() {
-        double slidesPosition = (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition())/2;
-        return slidesPosition;
+        return (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition())/2.0;
     }
 
 }

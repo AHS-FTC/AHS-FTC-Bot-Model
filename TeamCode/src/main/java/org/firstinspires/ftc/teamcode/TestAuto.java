@@ -37,8 +37,6 @@ import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -65,7 +63,6 @@ public class TestAuto extends LinearOpMode {
         SerialServo foundationServoLeft = ardennes.getLeftFoundation();
         SerialServo foundationServoRight = ardennes.getRightFoundation();
         SerialServo gripper = ardennes.getGripper();
-        LimitSwitch limitSwitch = ardennes.getLimitSwitch();
         SerialServo yslide = ardennes.getySlide();
         TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
         slides.resetEncoders();
@@ -75,7 +72,8 @@ public class TestAuto extends LinearOpMode {
         waitForStart();
 
         gripper.setPosition(1);
-        slides.runSlidesToLevel(2);
+        slides.setTargetLevel(3);
+        slides.runSlidesToTargetLevel();
         sleep(5000);
         /*
         slides.runSlidesToEncoder(600);
