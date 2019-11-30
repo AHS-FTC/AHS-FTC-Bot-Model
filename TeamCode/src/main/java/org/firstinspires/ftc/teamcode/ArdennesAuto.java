@@ -49,80 +49,15 @@ import edu.ahs.robotics.util.MotorHashService;
 //@Disabled
 public class ArdennesAuto extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-
-
     @Override
     public void runOpMode() {
-
         FTCUtilities.setOpMode(this);
-        MotorHashService.init();
-        ardennes = new Ardennes();
-        Intake intake = ardennes.getIntake();
-        MecanumChassis chassis = ardennes.getChassis();
-        Slides slides = ardennes.getSlides();
-        SerialServo foundationServoLeft = ardennes.getLeftFoundation();
-        SerialServo foundationServoRight = ardennes.getRightFoundation();
-        SerialServo gripper = ardennes.getGripper();
-        SerialServo yslide = ardennes.getySlide();
-        TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
-        slides.resetEncoders();
-        gripper.setPosition(0);
+        FullAuto fullAuto = new FullAuto(false);
+        fullAuto.init();
         telemetry.addLine("Init Finished");
         telemetry.update();
-
         waitForStart();
-
-        ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = ardennes.runDetector();
-        if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration){
-            leftPlan(intake, chassis, foundationServoLeft, foundationServoRight, slides);
-        } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration){
-            middlePlan(intake, chassis, foundationServoLeft, foundationServoRight, slides);
-        } else rightPlan(intake, chassis, foundationServoLeft, foundationServoRight, slides);
-
-    }
-
-    private void leftPlan(Intake intake, MecanumChassis chassis, SerialServo foundationServoLeft, SerialServo foundationServoRight, Slides slides) {
-        chassis.driveStraight(500, 1);
-        chassis.pivot(-30,.4);
-        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-        chassis.driveStraight(450,.3);
-
-    }
-
-    private void middlePlan(Intake intake, MecanumChassis chassis, SerialServo foundationServoLeft, SerialServo foundationServoRight, Slides slides) {
-        chassis.pivot(10, .4);
-        chassis.driveStraight(600,1);
-        chassis.pivot(-40, .4);
-        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-        chassis.driveStraight(450, .3);
-        chassis.driveStraight(-450, 1);
-        chassis.pivot(-57,.4);
-        chassis.driveStraight(-1700,.8);
-        chassis.pivot(-87,.5);
-        chassis.driveStraight(-200, .4);
-        foundationServoLeft.setPosition(0);
-        foundationServoRight.setPosition(1);
-        sleep(1500);
-        chassis.driveStraight(700, 1);
-        chassis.pivot(93,.5);
-        foundationServoLeft.setPosition(1);
-        foundationServoRight.setPosition(0);
-        sleep(700);
-        sleep(1000);
-
-
-
-    }
-
-    private void rightPlan(Intake intake, MecanumChassis chassis, SerialServo foundationServoLeft, SerialServo foundationServoRight, Slides slides) {
-        chassis.pivot(-10, .4);
-        chassis.driveStraight(550,1);
-        chassis.pivot(30,.5);
-        intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
-        chassis.driveStraight(300,.3);
-
+        fullAuto.afterStart();
     }
 
 

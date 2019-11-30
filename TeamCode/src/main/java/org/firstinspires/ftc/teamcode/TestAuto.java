@@ -71,18 +71,19 @@ public class TestAuto extends LinearOpMode {
 
         waitForStart();
 
+        chassis.pivot(10, .4);
+
+        /*
         gripper.setPosition(1);
+        sleep(2000);
         slides.setTargetLevel(3);
         slides.runSlidesToTargetLevel();
-        sleep(5000);
-        /*
-        slides.runSlidesToEncoder(600);
+        sleep(2000);
         yslide.setPosition(1);
         sleep(2000);
         gripper.setPosition(0);
         sleep(1000);
         yslide.setPosition(0);
-        sleep(2000);
         slides.resetSlidesToOriginalPosition();
         */
 

@@ -77,7 +77,7 @@ public class VuforiaTestOp extends OpMode
 
     @Override
     public void start() {
-        detector.lookRed();
+        detector.look(false);
         //vuBitmap = vuforia.getBitmap();
         //croppedBitmap = Bitmap.createBitmap(vuBitmap, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
 

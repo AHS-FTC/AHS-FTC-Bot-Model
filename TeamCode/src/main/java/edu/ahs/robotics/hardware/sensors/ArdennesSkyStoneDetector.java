@@ -61,31 +61,22 @@ public class ArdennesSkyStoneDetector {
         this(false);
     }
 
-    public SkyStoneConfigurations lookRed(){
+    public SkyStoneConfigurations look(boolean mirrored){
         Bitmap vuBitmap = vuforia.getBitmap();
+        Bitmap stoneLeft;
+        Bitmap stoneRight;
         //Bitmap croppedBitmap = Bitmap.createBitmap(vuBitmap, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
 
-        Bitmap stoneLeft = Bitmap.createBitmap(vuBitmap, LEFT_X, LEFT_Y, STONE_WIDTH, STONE_HEIGHT);
+        stoneLeft = Bitmap.createBitmap(vuBitmap, LEFT_X, LEFT_Y, STONE_WIDTH, STONE_HEIGHT);
         Bitmap stoneMiddle = Bitmap.createBitmap(vuBitmap, MIDDLE_X, MIDDLE_Y, STONE_WIDTH, STONE_HEIGHT);
-        Bitmap stoneRight = Bitmap.createBitmap(vuBitmap, RIGHT_X, RIGHT_Y, STONE_WIDTH, STONE_HEIGHT);
+        stoneRight = Bitmap.createBitmap(vuBitmap, RIGHT_X, RIGHT_Y, STONE_WIDTH, STONE_HEIGHT);
 
-        return getSkyStoneConfigurations(vuBitmap, stoneLeft, stoneMiddle, stoneRight);
+        if (mirrored) {
+            Bitmap temporary = stoneLeft;
+            stoneLeft = stoneRight;
+            stoneRight = temporary;
+        }
 
-    }
-
-    public SkyStoneConfigurations lookBlue(){
-        Bitmap vuBitmap = vuforia.getBitmap();
-        //Bitmap croppedBitmap = Bitmap.createBitmap(vuBitmap, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
-
-        Bitmap stoneRight = Bitmap.createBitmap(vuBitmap, LEFT_X, LEFT_Y, STONE_WIDTH, STONE_HEIGHT);
-        Bitmap stoneMiddle = Bitmap.createBitmap(vuBitmap, MIDDLE_X, MIDDLE_Y, STONE_WIDTH, STONE_HEIGHT);
-        Bitmap stoneLeft = Bitmap.createBitmap(vuBitmap, RIGHT_X, RIGHT_Y, STONE_WIDTH, STONE_HEIGHT);
-
-        return getSkyStoneConfigurations(vuBitmap, stoneLeft, stoneMiddle, stoneRight);
-
-    }
-
-    private SkyStoneConfigurations getSkyStoneConfigurations(Bitmap vuBitmap, Bitmap stoneLeft, Bitmap stoneMiddle, Bitmap stoneRight) {
         if (isImageSavingEnabled) {
             Logger.saveImage(vuBitmap);
             Logger.saveImage(stoneLeft);
@@ -101,6 +92,8 @@ public class ArdennesSkyStoneDetector {
         FTCUtilities.addData("Left Skystone Ratio", leftRatio);
         FTCUtilities.addData("Middle Skystone Ratio", middleRatio);
         FTCUtilities.addData("Right Skystone Ratio", rightRatio);
+        FTCUtilities.updateOpLogger();
+        FTCUtilities.sleep(5000);
 
         if (leftRatio > middleRatio && leftRatio > rightRatio) {
             return SkyStoneConfigurations.ONE_FOUR;
@@ -109,8 +102,8 @@ public class ArdennesSkyStoneDetector {
         } else {
             return SkyStoneConfigurations.THREE_SIX;
         }
-    }
 
+    }
 
 
     private double getColorness(Bitmap bitmap, ColorPreset colorPreset){//finds the closeness of a region to a color

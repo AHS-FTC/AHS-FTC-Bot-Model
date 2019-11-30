@@ -40,13 +40,10 @@ public class Ardennes extends Robot {
         intake = new Intake(1);
         gripper = new SerialServo("gripper", true);
         mecanumChassis = makeChassis();
-        slides = new Slides(.5);
-        detector = new ArdennesSkyStoneDetector();
+        slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
         wrist = new SerialServo("wrist", true);
     }
-
-    public ArdennesSkyStoneDetector.SkyStoneConfigurations runDetector() {return detector.lookRed();}
 
     public Intake getIntake(){
         return intake;

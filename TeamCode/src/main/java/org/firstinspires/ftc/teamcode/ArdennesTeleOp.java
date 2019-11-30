@@ -155,10 +155,10 @@ public class ArdennesTeleOp extends OpMode
 
     @Override
     public void loop() {
-        //buttonActions();
-        //driveActions();
+        buttonActions();
+        driveActions();
         slideActions();
-        //triggers();
+        triggers();
     }
 
     private void slideActions() {
@@ -216,7 +216,7 @@ public class ArdennesTeleOp extends OpMode
             slides.setManualControlMode();
             runToLevelMode = false;
             ySlide.setPosition(yServoPosition);
-            FTCUtilities.OpSleep(500);
+            FTCUtilities.sleep(500);
             slides.resetSlidesToOriginalPosition();
         }
     }

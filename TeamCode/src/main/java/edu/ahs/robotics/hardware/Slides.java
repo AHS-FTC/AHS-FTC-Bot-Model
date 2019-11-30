@@ -14,13 +14,14 @@ public class Slides {
     private DcMotor leftMotor;
     private DcMotor rightMotor;
     private LimitSwitch limitSwitch;
-    private double motorPower;
     private static final int ENCODER_TICKS_PER_LEVEL = 420;
-    private static final int SLIDES_MAX = 4150;
+    private static final int SLIDES_MAX = 4000;
     public static final int MAX_LEVEL = 10;
     private int targetLevel = 0;
+    private static final double UP_POWER = .8;
+    private static final double DOWN_POWER = -.1;
 
-    public Slides (double motorPower){
+    public Slides (){
         leftMotor = FTCUtilities.getMotor("slideL");
         rightMotor = FTCUtilities.getMotor("slideR");
 
@@ -33,8 +34,6 @@ public class Slides {
         setManualControlMode();
 
         limitSwitch = new LimitSwitch("limitSwitch");
-
-        this.motorPower = motorPower;
     }
 
     public void runAtPower(double slidesPower) {
@@ -88,25 +87,15 @@ public class Slides {
         leftMotor.setTargetPosition(ticksAtLevel);
         rightMotor.setTargetPosition(ticksAtLevel);
         setEncoderModeRunToPostion();
-        setPower(motorPower);
+        setPower(UP_POWER);
     }
 
     public void resetSlidesToOriginalPosition() {
-        setPower(-motorPower);
         targetLevel = 0;
         while(!limitSwitch.isTriggered()) {
-            if (getCurrentPosition() < 150) {
-                setPower(.75 * -motorPower);
-            }
-            if (getCurrentPosition() < 100) {
-                setPower(.5 * -motorPower);
-            }
-            if (getCurrentPosition() < 50) {
-                setPower(.25 * -motorPower);
-            }
+            setPower(DOWN_POWER);
         }
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
+        stopMotors();
         resetEncoders();
 
     }

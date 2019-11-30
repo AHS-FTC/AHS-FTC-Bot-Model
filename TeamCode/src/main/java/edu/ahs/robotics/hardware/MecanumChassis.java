@@ -166,7 +166,7 @@ public class MecanumChassis extends Chassis {
 
         try {
            while (true) {
-                double leftDistance = leftOdometer.getDistance();
+                double leftDistance = -leftOdometer.getDistance();
                 double rightDistance = rightOdometer.getDistance();
 
                 double averageDistance = (Math.abs(leftDistance) + Math.abs(rightDistance)) / 2;
