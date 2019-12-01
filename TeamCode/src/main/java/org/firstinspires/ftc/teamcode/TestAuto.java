@@ -68,10 +68,9 @@ public class TestAuto extends LinearOpMode {
         slides.resetEncoders();
         gripper.setPosition(0);
 
-
         waitForStart();
 
-        chassis.pivot(10, .4);
+        chassis.arc(90, 1000, .8);
 
         /*
         gripper.setPosition(1);

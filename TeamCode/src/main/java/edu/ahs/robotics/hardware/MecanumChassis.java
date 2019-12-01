@@ -1,20 +1,18 @@
 package edu.ahs.robotics.hardware;
 
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.Range;
-
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
-import java.util.Map;
-
-import edu.ahs.robotics.hardware.sensors.Odometer;
-import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
 
 public class MecanumChassis extends Chassis {
 
+    private static final double ROBOT_WIDTH = 370;
+    public static final int MIN_TARGET_DISTANCE = 5;
+    public static final double DISTANCE_PER_360 = 1001;
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
     private SingleDriveUnit backLeft;
@@ -33,14 +31,15 @@ public class MecanumChassis extends Chassis {
     private Odometer rightOdometer;
 
 
+
     public MecanumChassis(DriveUnit.Config driveUnitConfig) {
         super();
-        frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(),driveUnitConfig,false);
+        frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(), driveUnitConfig, false);
         frontRight = new SingleDriveUnit(FRONT_RIGHT.getDeviceName(), driveUnitConfig, true);
         backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, false);
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
-        leftOdometer = new Odometer("intakeL", 60.2967 , false);
+        leftOdometer = new Odometer("intakeL", 60.2967, false);
         rightOdometer = new Odometer("intakeR", 60.79, true);
     }
 
@@ -129,71 +128,88 @@ public class MecanumChassis extends Chassis {
         double backRightPower = forward - strafe + turn;
 
 
-
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
     }
 
+    public void arc(double angle, double radius ,double maxPower) {
+        double minRampUp = .2;
+        double minRampDown = .15;
+        double leftTarget;
+        double rightTarget;
+        if (radius > 0) {
+            rightTarget = angle * 2 * Math.PI * radius / 360;
+            leftTarget = angle * 2 * Math.PI * (radius + ROBOT_WIDTH) / 360;
+        } else {
+            leftTarget = angle * 2 * Math.PI * radius / 360;
+            rightTarget = angle * 2 * Math.PI * (radius + ROBOT_WIDTH) / 360;
+        }
+
+
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .005);
+    }
+
     public void driveStraight(double distance, double maxPower) {
         double minRampUp = .2;
-        double minRampDown = .2;
+        double minRampDown = .1;
 
-        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .05, .00005);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .03, .00004);
     }
 
     public void pivot(double angle, double maxPower) {
         double minRampUp = .2;
         double minRampDown = .2;
 
-        final double distancePer360 = 1001;
-        double leftTarget = (angle * distancePer360)/360.0;
+        double leftTarget = (angle * DISTANCE_PER_360) / 360.0;
         double rightTarget = -1 * leftTarget;
         rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .2, .05);
     }
 
-    private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale){
+    private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale) {
 
-        if(maxPower < 0 || maxPower > 1.0) {
+        if (maxPower < 0 || maxPower > 1.0) {
             throw new Warning("maxPower " + maxPower + " must be between 0 and 1");
         }
+        if (Math.abs(leftTarget) < MIN_TARGET_DISTANCE || Math.abs(rightTarget) < MIN_TARGET_DISTANCE) {
+            throw new Warning("Abs(targets) must be > MIN_TARGET_DISTANCE, " + MIN_TARGET_DISTANCE + " left target " + leftTarget + " right target " + rightTarget);
+        }
 
-        final double correctionScale = 0.005;
+        double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
+
+        final double correctionScale = 0;
 
         leftOdometer.reset();
         rightOdometer.reset();
 
         try {
-           while (true) {
+            while (true) {
                 double leftDistance = -leftOdometer.getDistance();
                 double rightDistance = rightOdometer.getDistance();
 
-                double averageDistance = (Math.abs(leftDistance) + Math.abs(rightDistance)) / 2;
+                double leftDistanceRatio = leftDistance / leftTarget;
+                double rightDistanceRatio = rightDistance / rightTarget;
+                double averageDistanceRatio = (leftDistanceRatio + rightDistanceRatio) / 2;
 
-                double leftRemaining = Math.signum(leftTarget) * (leftTarget - leftDistance);
-                double rightRemaining = Math.signum(rightTarget) * (rightTarget - rightDistance);
-
-                double averageRemaining = (leftRemaining + rightRemaining) / 2;
-                if (averageRemaining <= 0) {
+                if (leftDistanceRatio >=1.0 || rightDistanceRatio >=1.0) {
                     break;
                 }
 
-                double rampUp, rampDown;
-                double power;
-                rampUp = Math.max(upScale * (averageDistance * Math.exp(2)), minRampUp);
-                rampDown = Math.max(downScale * (averageRemaining * Math.exp(3)), minRampDown); //distanceTo accounts for flip across y axis and x offset
+                double maxDistance = Math.abs(leftDistance) > Math.abs(rightDistance) ? Math.abs(leftDistance) : Math.abs(rightDistance);
+                double maxRemaining = maxTarget - maxDistance;
+                double rampUp = Math.max(upScale * (maxDistance * Math.exp(2)), minRampUp);
+                double rampDown = Math.max(downScale * (maxRemaining * Math.exp(3)), minRampDown); //distanceTo accounts for flip across y axis and x offset
 
-                power = Math.min(rampUp, Math.min(rampDown, maxPower));
+                double power = Math.min(rampUp, Math.min(rampDown, maxPower));
 
-                double adjustLeft = correctionScale * (averageDistance - Math.abs(leftDistance));
-                double adjustRight = correctionScale * (averageDistance - Math.abs(rightDistance));
+                double adjustLeft = correctionScale * (averageDistanceRatio - leftDistanceRatio);
+                double adjustRight = correctionScale * (averageDistanceRatio - rightDistanceRatio);
 
                 power -= Math.max(adjustLeft, adjustRight);
 
-                double powerLeft = Math.signum(leftTarget) * (power + adjustLeft);
-                double powerRight = Math.signum(rightTarget) * (power + adjustRight);
-
+                double powerLeft = (leftTarget / maxTarget) * (power + adjustLeft);
+                double powerRight = (rightTarget / maxTarget) * (power + adjustRight);
 
 
                 frontLeft.setPower(powerLeft);
@@ -201,15 +217,15 @@ public class MecanumChassis extends Chassis {
                 frontRight.setPower(powerRight);
                 backRight.setPower(powerRight);
 
-               FTCUtilities.addData("power", power);
-               FTCUtilities.addData("left r", leftRemaining);
-               FTCUtilities.addData("right r", rightRemaining);
-               FTCUtilities.addData("average remaining", averageRemaining);
-               FTCUtilities.addData("leftDistance", leftDistance);
-               FTCUtilities.addData("rightDistance", rightDistance);
-               FTCUtilities.updateOpLogger();
+                FTCUtilities.addData("power", power);
+                FTCUtilities.addData("left ratio", leftDistanceRatio);
+                FTCUtilities.addData("right ratio", rightDistanceRatio);
+                FTCUtilities.addData("max remaining", maxRemaining);
+                FTCUtilities.addData("leftDistance", leftDistance);
+                FTCUtilities.addData("rightDistance", rightDistance);
+                FTCUtilities.updateOpLogger();
 
-           }
+            }
         } finally {
             setPowerAll(0);
         }

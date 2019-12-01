@@ -176,7 +176,7 @@ public class ArdennesTeleOp extends OpMode
             slides.runAtPower(slidesPower);
         }
 
-        //if slides are mot in run to level mode and are not receiving inputs from triggers, stop motors
+        //if slides are not in run to level mode and are not receiving inputs from triggers, stop motors
         if (gamepad2.left_trigger < TRIGGER_THRESHOLD && gamepad2.right_trigger < TRIGGER_THRESHOLD){
             if (!runToLevelMode && slidesMoving) {
                 slides.stopMotors();
@@ -251,6 +251,8 @@ public class ArdennesTeleOp extends OpMode
                 lastTime = time.milliseconds();
                 telemetry.addData("y servo position", yServoPosition);
                 telemetry.addData("limit switch triggered?", slides.atBottom());
+                telemetry.addData("intake trigger", intakeTrigger.isTriggered());
+                telemetry.addData("intake trigger distance", intakeTrigger.getDist());
                 telemetry.update();
             } else {
                 telemetry.clear();
