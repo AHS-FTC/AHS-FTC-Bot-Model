@@ -63,15 +63,26 @@ public class FullAuto {
     }
 
     private void leftPlan() {
-        chassis.driveStraight(500, 1);
+        pivot(-20, .4);
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.driveStraight(700, .93);
+        chassis.driveStraight(200, .7);
+
+        /*chassis.driveStraight(500, 1);
         chassis.pivot(-30, .4);
         intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
         chassis.driveStraight(450, .3);
+        */
 
     }
 
     private void middlePlan() {
-        pivot(10, .4);
+        pivot(-10, .4);
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.driveStraight(600, .93);
+        chassis.driveStraight(200, .7);
+
+        /*pivot(10, .4);
         chassis.driveStraight(600, 1);
         pivot(-40, .4);
         intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
@@ -89,18 +100,25 @@ public class FullAuto {
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(700);
-
+        */
 
     }
 
     private void rightPlan() {
-        chassis.pivot(-10, .4);
+        pivot(5, .4);
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.driveStraight(650, .93);
+        chassis.driveStraight(200, .7);
+
+        /*chassis.pivot(-10, .4);
         chassis.driveStraight(550, 1);
         chassis.pivot(30, .5);
         intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
         chassis.driveStraight(300, .3);
+        */
 
     }
+
     private void pivot(double angle, double maxPower) {
         if (mirrored) {
             chassis.pivot(-angle, maxPower);
@@ -108,6 +126,14 @@ public class FullAuto {
             chassis.pivot(angle, maxPower);
         }
 
+    }
+
+    private void arc(double angle, double radius, double maxPower, boolean rightTurn) {
+        if (mirrored) {
+            chassis.arc(angle, radius, maxPower, !rightTurn);
+        } else {
+            chassis.arc(angle, radius, maxPower, rightTurn);
+        }
     }
 }
 

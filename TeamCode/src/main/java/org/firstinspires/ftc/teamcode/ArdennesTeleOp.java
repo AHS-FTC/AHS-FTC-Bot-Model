@@ -224,6 +224,7 @@ public class ArdennesTeleOp extends OpMode
     private void triggers() {
         // If the gripperTrigger is flipped while the gripper is disabled and in position to grip.
         if (gripperTrigger.isTriggered()) {
+            collectionModeToggle.flip();
             intakeMode = IntakeMode.OFF;
             updateIntake();
             // Is the gripper open and in position?

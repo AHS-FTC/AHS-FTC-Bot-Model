@@ -37,6 +37,7 @@ import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
+import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -49,6 +50,7 @@ public class TestAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
+    private ArdennesSkyStoneDetector detector;
 
 
     @Override
@@ -57,6 +59,7 @@ public class TestAuto extends LinearOpMode {
         FTCUtilities.setOpMode(this);
         MotorHashService.init();
         ardennes = new Ardennes();
+        detector = new ArdennesSkyStoneDetector();
         Intake intake = ardennes.getIntake();
         MecanumChassis chassis = ardennes.getChassis();
         Slides slides = ardennes.getSlides();
@@ -65,12 +68,16 @@ public class TestAuto extends LinearOpMode {
         SerialServo gripper = ardennes.getGripper();
         SerialServo yslide = ardennes.getySlide();
         TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
+        TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
         gripper.setPosition(0);
 
         waitForStart();
-
-        chassis.arc(90, 1000, .8);
+        //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
+        //sleep(10000);
+        //chassis.arc(90, 1000, .93, true);
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        sleep(5000);
 
         /*
         gripper.setPosition(1);
