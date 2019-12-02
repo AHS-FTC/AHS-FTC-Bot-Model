@@ -206,7 +206,7 @@ public class ArdennesTeleOp extends OpMode
         if (gamepad2.right_bumper) {
             if(gripperToggle.isEnabled()) {
                 gripperToggle.flip();
-                activateGripper();
+                updateGripper();
             }
             if (wristToggle.isEnabled()) {
                 wristToggle.flip();
@@ -222,15 +222,24 @@ public class ArdennesTeleOp extends OpMode
     }
 
     private void triggers() {
-        // If the gripperTrigger is flipped while the gripper is disabled and in position to grip.
+        // If the gripperTrigger sees a block, stop the intake.  But allow it to run outwards
         if (gripperTrigger.isTriggered()) {
-            collectionModeToggle.flip();
-            intakeMode = IntakeMode.OFF;
-            updateIntake();
-            // Is the gripper open and in position?
+            if (intakeMode == IntakeMode.IN) {
+                intakeMode = IntakeMode.OFF;
+                updateIntake();
+            }
+            // Is the gripper open and in position? Then grip the block.
             if (!gripperToggle.isEnabled() && slides.atBottom()) {
                 gripperToggle.flip();
-                activateGripper();
+                updateGripper();
+            }
+        }
+
+        // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
+        if (intakeTrigger.isTriggered() && collectionModeToggle.isEnabled()) {
+            if (intakeMode == IntakeMode.IN) {
+                intakeMode = IntakeMode.OFF;
+                updateIntake();
             }
         }
     }
@@ -293,7 +302,7 @@ public class ArdennesTeleOp extends OpMode
         //press a to grip block
         if (gamepad2.a) {
             gripperToggle.flip();
-            activateGripper();
+            updateGripper();
         }
 
         //press a to grip foundation
@@ -311,10 +320,6 @@ public class ArdennesTeleOp extends OpMode
         //gamepad 1 press dpad up to enable collection mode
         if (gamepad1.dpad_up) {
             collectionModeToggle.flip();
-            if (collectionModeToggle.isEnabled() && intakeMode == IntakeMode.IN && intakeTrigger.isTriggered()) {//if playing delivery, stop intake at trigger.
-                intakeMode = IntakeMode.OFF;
-                updateIntake();
-            }
             telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
             telemetry.update();
         }
@@ -338,7 +343,7 @@ public class ArdennesTeleOp extends OpMode
         }
     }
 
-    private void activateGripper() {
+    private void updateGripper() {
         if(gripperToggle.isEnabled()){
             gripper.setPosition(1);
         } else {
