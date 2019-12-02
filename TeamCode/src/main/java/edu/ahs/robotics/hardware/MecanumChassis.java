@@ -148,7 +148,7 @@ public class MecanumChassis extends Chassis {
             leftTarget = innerTarget;
             rightTarget = outerTarget;
         }
-
+        FTCUtilities.sleep(1000);
         rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .002);
     }
 
@@ -160,12 +160,12 @@ public class MecanumChassis extends Chassis {
     }
 
     public void pivot(double angle, double maxPower) {
-        double minRampUp = .2;
-        double minRampDown = .2;
+        double minRampUp = .6;
+        double minRampDown = .55;
 
         double leftTarget = (angle * DISTANCE_PER_360) / 360.0;
         double rightTarget = -1 * leftTarget;
-        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .005);
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .06);
     }
 
     private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale) {
@@ -179,7 +179,7 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = 20;
+        final double correctionScale = 1;
 
         leftOdometer.reset();
         rightOdometer.reset();
@@ -193,7 +193,7 @@ public class MecanumChassis extends Chassis {
                 double rightDistanceRatio = rightDistance / rightTarget;
                 double averageDistanceRatio = (leftDistanceRatio + rightDistanceRatio) / 2;
 
-                if (leftDistanceRatio >=1.0 || rightDistanceRatio >=1.0) {
+                if (Math.abs(leftDistanceRatio) >=1.0 || Math.abs(rightDistanceRatio) >=1.0) {
                     break;
                 }
 

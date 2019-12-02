@@ -54,8 +54,6 @@ public class ArdennesAuto extends LinearOpMode {
         FTCUtilities.setOpMode(this);
         FullAuto fullAuto = new FullAuto(false);
         fullAuto.init();
-        telemetry.addLine("Init Finished");
-        telemetry.update();
         waitForStart();
         fullAuto.afterStart();
     }

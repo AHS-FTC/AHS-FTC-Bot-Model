@@ -76,8 +76,9 @@ public class TestAuto extends LinearOpMode {
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
         //sleep(10000);
         //chassis.arc(90, 1000, .93, true);
-        intake.startIntakeWaitForBlock(gripperTrigger);
-        sleep(5000);
+        //intake.startIntakeWaitForBlock(gripperTrigger);
+        //sleep(5000);
+        chassis.pivot(10, .93);
 
         /*
         gripper.setPosition(1);

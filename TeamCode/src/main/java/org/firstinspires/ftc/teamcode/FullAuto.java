@@ -26,6 +26,7 @@ public class FullAuto {
     private TriggerDistanceSensor gripperTrigger;
     private ArdennesSkyStoneDetector detector;
     private boolean mirrored;
+    private ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration;
 
     public FullAuto(boolean mirrored) {
         this.mirrored = mirrored;
@@ -49,11 +50,11 @@ public class FullAuto {
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);
+        stoneConfiguration = detector.look(mirrored);
     }
 
     public void afterStart() {
 
-        ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(mirrored);
         if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
             leftPlan();
         } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
@@ -63,10 +64,9 @@ public class FullAuto {
     }
 
     private void leftPlan() {
-        pivot(-20, .4);
+        pivot(-15, .93);
         intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(700, .93);
-        chassis.driveStraight(200, .7);
+        chassis.driveStraight(1000, .7);
 
         /*chassis.driveStraight(500, 1);
         chassis.pivot(-30, .4);
@@ -77,10 +77,9 @@ public class FullAuto {
     }
 
     private void middlePlan() {
-        pivot(-10, .4);
+        pivot(-9, .93);
         intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(600, .93);
-        chassis.driveStraight(200, .7);
+        chassis.driveStraight(900, .7);
 
         /*pivot(10, .4);
         chassis.driveStraight(600, 1);
@@ -105,10 +104,9 @@ public class FullAuto {
     }
 
     private void rightPlan() {
-        pivot(5, .4);
+        pivot(5, .93);
         intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(650, .93);
-        chassis.driveStraight(200, .7);
+        chassis.driveStraight(950, .7);
 
         /*chassis.pivot(-10, .4);
         chassis.driveStraight(550, 1);
