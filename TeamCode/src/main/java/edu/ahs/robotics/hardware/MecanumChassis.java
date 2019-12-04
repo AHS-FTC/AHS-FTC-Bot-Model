@@ -136,7 +136,7 @@ public class MecanumChassis extends Chassis {
 
     public void arc(double angle, double radius ,double maxPower, boolean rightTurn) {
         double minRampUp = .6;
-        double minRampDown = .45;
+        double minRampDown = .5;
         double leftTarget;
         double rightTarget;
         double innerTarget = angle * 2 * Math.PI * Math.abs(radius) / 360;
@@ -153,10 +153,10 @@ public class MecanumChassis extends Chassis {
     }
 
     public void driveStraight(double distance, double maxPower) {
-        double minRampUp = .6;
+        double minRampUp = .55;
         double minRampDown = .45;
 
-        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .03, .002);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .02, .02);
     }
 
     public void pivot(double angle, double maxPower) {
@@ -179,7 +179,7 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = 1;
+        final double correctionScale = .1;
 
         leftOdometer.reset();
         rightOdometer.reset();

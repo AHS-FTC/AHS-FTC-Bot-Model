@@ -64,9 +64,22 @@ public class FullAuto {
     }
 
     private void leftPlan() {
-        pivot(-15, .93);
+        //pivot(-15, .93);
+        arc(15,1300, .93, false);
         intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(1000, .7);
+//        chassis.driveStraight(700, .93);
+//        chassis.driveStraight(400, .65);
+        chassis.driveStraight(-250, .93);
+        arc(-67,500,.93,true);
+        FTCUtilities.sleep(500);
+        chassis.driveStraight(-800, .85);
+        FTCUtilities.sleep(500);
+        pivot(-70, .93);
+        chassis.driveStraight(-200, .65);
+        foundationServoLeft.setPosition(1);
+        foundationServoRight.setPosition(1);
+        FTCUtilities.sleep(500);
+//        arc(90, 300, .93, true);
 
         /*chassis.driveStraight(500, 1);
         chassis.pivot(-30, .4);
