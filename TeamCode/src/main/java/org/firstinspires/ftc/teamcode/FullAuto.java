@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import edu.ahs.robotics.hardware.Intake;
@@ -50,10 +51,11 @@ public class FullAuto {
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);
-        stoneConfiguration = detector.look(mirrored);
+        FTCUtilities.addData("init", "finished");
     }
 
     public void afterStart() {
+        stoneConfiguration = detector.look(mirrored);
 
         if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
             leftPlan();
@@ -64,18 +66,19 @@ public class FullAuto {
     }
 
     private void leftPlan() {
-        //pivot(-15, .93);
-        arc(15,1300, .93, false);
+        chassis.driveStraight(100, .75);
+        pivot(-18, .93);
+        //arc(15,1300, .93, false);
         intake.startIntakeWaitForBlock(gripperTrigger);
-//        chassis.driveStraight(700, .93);
-//        chassis.driveStraight(400, .65);
+        chassis.driveStraight(400, .93);
+        chassis.driveStraight(600, .65);
         chassis.driveStraight(-250, .93);
         arc(-67,500,.93,true);
         FTCUtilities.sleep(500);
-        chassis.driveStraight(-800, .85);
+        chassis.driveStraight(-1300, .85);
         FTCUtilities.sleep(500);
         pivot(-70, .93);
-        chassis.driveStraight(-200, .65);
+        chassis.driveStraight(-300, .6);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
