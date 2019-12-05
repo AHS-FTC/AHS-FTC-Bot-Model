@@ -25,6 +25,7 @@ public class FullAuto {
     private SerialServo yslide;
     private SerialServo intakeServo;
     private TriggerDistanceSensor gripperTrigger;
+    private TriggerDistanceSensor intakeTrigger;
     private ArdennesSkyStoneDetector detector;
     private boolean mirrored;
     private ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration;
@@ -47,6 +48,7 @@ public class FullAuto {
         intakeServo = ardennes.getIntakeServo();
         yslide = ardennes.getySlide();
         gripperTrigger = ardennes.getGripperTrigger();
+        intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
         gripper.setPosition(0);
         foundationServoLeft.setPosition(0);
@@ -74,37 +76,23 @@ public class FullAuto {
         chassis.driveStraight(100, .75);
         pivot(-16, .93);
         //arc(15,1300, .93, false);
-        intake.startIntakeWaitForBlock(gripperTrigger);
+        intake.startIntakeWaitForBlock(intakeTrigger);
         //chassis.driveStraight(400, .93);
         chassis.driveStraight(1000, .65);
-        if(gripperTrigger.isTriggered()) {
-            gripper.setPosition(1);
-        }
         chassis.driveStraight(-120,.8);
         arc(-73,500,.93,true);
         FTCUtilities.sleep(500);
         chassis.driveStraight(-1100, .85);
         FTCUtilities.sleep(500);
-        pivot(-72, .93);
+        pivot(-70, .93);
         FTCUtilities.sleep(200);
         chassis.driveStraight(-250, .65);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
-        arc(90, 50,.93,true);
-        chassis.driveStraight(-300, 1);
-        gripper.setPosition(1);
-        FTCUtilities.sleep(500);
-        slides.setTargetLevel(2);
-        slides.runSlidesToTargetLevel();
-        FTCUtilities.sleep(300);
-        yslide.setPosition(1);
-        FTCUtilities.sleep(1500);
-        gripper.setPosition(0);
-        FTCUtilities.sleep(1000);
-        yslide.setPosition(0);
-        FTCUtilities.sleep(1000);
-        slides.resetSlidesToOriginalPosition();
+        //arc(130, 30,1,true);
+        pivot(90, .93);
+        chassis.driveStraight(-200, .93);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
         FTCUtilities.sleep(300);
