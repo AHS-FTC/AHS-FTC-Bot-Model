@@ -52,6 +52,7 @@ public class FullAuto {
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);
         FTCUtilities.addData("init", "finished");
+        FTCUtilities.updateOpLogger();
     }
 
     public void afterStart() {
@@ -75,13 +76,15 @@ public class FullAuto {
         chassis.driveStraight(-250, .93);
         arc(-67,500,.93,true);
         FTCUtilities.sleep(500);
-        chassis.driveStraight(-1300, .85);
+        chassis.driveStraight(-1100, .85);
         FTCUtilities.sleep(500);
         pivot(-70, .93);
-        chassis.driveStraight(-300, .6);
+        chassis.driveStraight(-300, .65);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
+        pivot(90,.8);
+        chassis.driveStraight(-500,.8);
 //        arc(90, 300, .93, true);
 
         /*chassis.driveStraight(500, 1);

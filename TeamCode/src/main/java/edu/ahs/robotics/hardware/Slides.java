@@ -9,6 +9,9 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.util.FTCUtilities;
 
+/**
+ * Vertical slides system for robot. Encapsulates motors and limit switches
+ */
 public class Slides {
 
     private DcMotor leftMotor;
@@ -36,6 +39,10 @@ public class Slides {
         limitSwitch = new LimitSwitch("limitSwitch");
     }
 
+    /**
+     * Direct control over slide motors at a specified power
+     * @param slidesPower Value between -1 and 1 to move slides
+     */
     public void runAtPower(double slidesPower) {
         if (getCurrentPosition() >= SLIDES_MAX) {
             slidesPower = Range.clip(slidesPower, -1, 0);
@@ -48,6 +55,9 @@ public class Slides {
         setPower(slidesPower);
     }
 
+    /**
+     * @return true if slides are at bottom
+     */
     public boolean atBottom(){
         return limitSwitch.isTriggered();
     }
@@ -69,6 +79,10 @@ public class Slides {
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    /**
+     * Sets the target level that you want the slides to achieve. Use runSlidesToTargetLevel() to execute
+     * @param level desired height of slides in mm
+     */
     public void setTargetLevel (int level) {
         targetLevel = level;
         if(targetLevel > Slides.MAX_LEVEL) {
@@ -80,6 +94,10 @@ public class Slides {
         setTargetLevel(targetLevel+1);
     }
 
+    /**
+     * Moves the slides to the level specified by incrementTargetLevel() or setTargetLevel.
+     * Nonblocking, returns immediately
+     */
     public void runSlidesToTargetLevel() {
         int level1 = 200;
         int ticksAtLevel;
@@ -90,6 +108,9 @@ public class Slides {
         setPower(UP_POWER);
     }
 
+    /**
+     * Retracts slides down to origin. Blocks until slides at origin
+     */
     public void resetSlidesToOriginalPosition() {
         targetLevel = 0;
         while(!limitSwitch.isTriggered()) {
@@ -100,7 +121,6 @@ public class Slides {
 
     }
 
-
     private void setPower(double power) {
         leftMotor.setPower(power);
         rightMotor.setPower(power);
@@ -109,7 +129,9 @@ public class Slides {
     public void stopMotors() {
         setPower(0);
     }
-
+    /**
+     * @return returns average slide height calculated by motor encoders.
+     */
     public double getCurrentPosition() {
         return (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition())/2.0;
     }
