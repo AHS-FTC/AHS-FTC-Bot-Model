@@ -27,6 +27,16 @@ public class Intake { //todo make a one or two motor alternate to intake class
         intakeMode = IntakeMode.OFF;
     }
 
+    public enum IntakeMode {
+        OFF,
+        IN,
+        OUT
+    }
+
+    /**
+     * Runs intake until triggered, monitors on a new thread. Nonblocking method
+     * @param trigger the trigger which stops the intake when triggered
+     */
     public void startIntakeWaitForBlock(TriggerDistanceSensor trigger) {
         intakeMode = IntakeMode.IN;
         runMotorsByMode();
@@ -53,12 +63,6 @@ public class Intake { //todo make a one or two motor alternate to intake class
     public void stopMotors() {
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-    }
-
-    public enum IntakeMode {
-        OFF,
-        IN,
-        OUT
     }
 
     private class BlockMonitor implements Runnable {
