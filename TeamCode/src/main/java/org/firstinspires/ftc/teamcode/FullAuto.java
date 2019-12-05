@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import edu.ahs.robotics.hardware.Intake;
@@ -24,6 +23,7 @@ public class FullAuto {
     private SerialServo foundationServoRight;
     private SerialServo gripper;
     private SerialServo yslide;
+    private SerialServo intakeServo;
     private TriggerDistanceSensor gripperTrigger;
     private ArdennesSkyStoneDetector detector;
     private boolean mirrored;
@@ -44,6 +44,7 @@ public class FullAuto {
         foundationServoLeft = ardennes.getLeftFoundation();
         foundationServoRight = ardennes.getRightFoundation();
         gripper = ardennes.getGripper();
+        intakeServo = ardennes.getIntakeServo();
         yslide = ardennes.getySlide();
         gripperTrigger = ardennes.getGripperTrigger();
         slides.resetEncoders();
@@ -51,10 +52,14 @@ public class FullAuto {
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);
+        intakeServo.setPosition(0);
         FTCUtilities.addData("init", "finished");
+        FTCUtilities.updateOpLogger();
     }
 
     public void afterStart() {
+        intakeServo.setPosition(1);
+
         stoneConfiguration = detector.look(mirrored);
 
         if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
@@ -67,21 +72,45 @@ public class FullAuto {
 
     private void leftPlan() {
         chassis.driveStraight(100, .75);
-        pivot(-18, .93);
+        pivot(-16, .93);
         //arc(15,1300, .93, false);
         intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(400, .93);
-        chassis.driveStraight(600, .65);
-        chassis.driveStraight(-250, .93);
-        arc(-67,500,.93,true);
+        //chassis.driveStraight(400, .93);
+        chassis.driveStraight(1000, .65);
+        if(gripperTrigger.isTriggered()) {
+            gripper.setPosition(1);
+        }
+        chassis.driveStraight(-120,.8);
+        arc(-73,500,.93,true);
         FTCUtilities.sleep(500);
-        chassis.driveStraight(-1300, .85);
+        chassis.driveStraight(-1100, .85);
         FTCUtilities.sleep(500);
-        pivot(-70, .93);
-        chassis.driveStraight(-300, .6);
+        pivot(-72, .93);
+        FTCUtilities.sleep(200);
+        chassis.driveStraight(-250, .65);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
+        arc(90, 50,.93,true);
+        chassis.driveStraight(-300, 1);
+        gripper.setPosition(1);
+        FTCUtilities.sleep(500);
+        slides.setTargetLevel(2);
+        slides.runSlidesToTargetLevel();
+        FTCUtilities.sleep(300);
+        yslide.setPosition(1);
+        FTCUtilities.sleep(1500);
+        gripper.setPosition(0);
+        FTCUtilities.sleep(1000);
+        yslide.setPosition(0);
+        FTCUtilities.sleep(1000);
+        slides.resetSlidesToOriginalPosition();
+        foundationServoLeft.setPosition(0);
+        foundationServoRight.setPosition(0);
+        FTCUtilities.sleep(300);
+        chassis.driveStraight(1500, .93);
+
+
 //        arc(90, 300, .93, true);
 
         /*chassis.driveStraight(500, 1);

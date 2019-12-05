@@ -71,6 +71,9 @@ public class TestAuto extends LinearOpMode {
         TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
         gripper.setPosition(0);
+        foundationServoLeft.setPosition(0);
+        foundationServoRight.setPosition(0);
+        yslide.setPosition(0);
 
         waitForStart();
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
@@ -78,21 +81,20 @@ public class TestAuto extends LinearOpMode {
         //chassis.arc(90, 1000, .93, true);
         //intake.startIntakeWaitForBlock(gripperTrigger);
         //sleep(5000);
-        chassis.pivot(10, .93);
+        //chassis.pivot(10, .93);
 
-        /*
-        gripper.setPosition(1);
-        sleep(2000);
-        slides.setTargetLevel(3);
+
+        slides.setTargetLevel(2);
         slides.runSlidesToTargetLevel();
-        sleep(2000);
+        sleep(300);
         yslide.setPosition(1);
-        sleep(2000);
+        sleep(1500);
         gripper.setPosition(0);
         sleep(1000);
         yslide.setPosition(0);
+        sleep(1000);
         slides.resetSlidesToOriginalPosition();
-        */
+
 
     }
 }

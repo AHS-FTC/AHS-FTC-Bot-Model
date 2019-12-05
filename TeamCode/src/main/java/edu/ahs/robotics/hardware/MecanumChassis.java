@@ -179,7 +179,7 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = .1;
+        final double correctionScale = 1;
 
         leftOdometer.reset();
         rightOdometer.reset();
@@ -193,7 +193,7 @@ public class MecanumChassis extends Chassis {
                 double rightDistanceRatio = rightDistance / rightTarget;
                 double averageDistanceRatio = (leftDistanceRatio + rightDistanceRatio) / 2;
 
-                if (Math.abs(leftDistanceRatio) >=1.0 || Math.abs(rightDistanceRatio) >=1.0) {
+                if (Math.abs(leftDistanceRatio) >=1.0 && Math.abs(rightDistanceRatio) >=1.0) { //was || before
                     break;
                 }
 
