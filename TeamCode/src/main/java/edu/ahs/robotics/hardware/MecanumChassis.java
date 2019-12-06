@@ -13,6 +13,8 @@ public class MecanumChassis extends Chassis {
     private static final double ROBOT_WIDTH = 333;
     public static final int MIN_TARGET_DISTANCE = 5;
     public static final double DISTANCE_PER_360 = 1001;
+    private static final double LEFT_INITIAL_SHIFT = 0;
+    private static final double LEFT_INITIAL_SCALE = 1.04;
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
     private SingleDriveUnit backLeft;
@@ -39,8 +41,8 @@ public class MecanumChassis extends Chassis {
         backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, false);
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
-        leftOdometer = new Odometer("intakeL", 60.2967, false);
-        rightOdometer = new Odometer("intakeR", 60.79, true);
+        leftOdometer = new Odometer("intakeL", 60, false);
+        rightOdometer = new Odometer("intakeR", 60.3, true);
     }
 
 
@@ -135,7 +137,7 @@ public class MecanumChassis extends Chassis {
     }
 
     public void arc(double angle, double radius ,double maxPower, boolean rightTurn) {
-        double minRampUp = .6;
+        double minRampUp = .65;
         double minRampDown = .5;
         double leftTarget;
         double rightTarget;
@@ -149,14 +151,14 @@ public class MecanumChassis extends Chassis {
             rightTarget = outerTarget;
         }
         FTCUtilities.sleep(1000);
-        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .002);
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .01);
     }
 
     public void driveStraight(double distance, double maxPower) {
         double minRampUp = .55;
         double minRampDown = .45;
 
-        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .02, .02);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .02, .005);
     }
 
     public void pivot(double angle, double maxPower) {
@@ -179,12 +181,16 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = 1;
+        final double correctionScale = 0.05;
 
         leftOdometer.reset();
         rightOdometer.reset();
 
         try {
+
+            double powerLeft = inversePower(((leftTarget / maxTarget) * (minRampUp) + LEFT_INITIAL_SHIFT)* LEFT_INITIAL_SCALE);
+            double powerRight = inversePower((rightTarget / maxTarget) * (minRampUp));
+
             while (true) {
                 double leftDistance = -leftOdometer.getDistance();
                 double rightDistance = rightOdometer.getDistance();
@@ -193,7 +199,7 @@ public class MecanumChassis extends Chassis {
                 double rightDistanceRatio = rightDistance / rightTarget;
                 double averageDistanceRatio = (leftDistanceRatio + rightDistanceRatio) / 2;
 
-                if (Math.abs(leftDistanceRatio) >=1.0 && Math.abs(rightDistanceRatio) >=1.0) { //was || before
+                if (Math.abs(leftDistanceRatio) >=1.0 || Math.abs(rightDistanceRatio) >=1.0) { //was || before
                     break;
                 }
 
@@ -202,16 +208,21 @@ public class MecanumChassis extends Chassis {
                 double rampUp = Math.max(upScale * (maxDistance), minRampUp);
                 double rampDown = Math.max(downScale * (maxRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
 
-                double targetPower = Math.min(rampUp, Math.min(rampDown, maxPower));
+                double targetPower = inversePower(Math.min(rampUp, Math.min(rampDown, maxPower)));
 
                 double adjustLeft = correctionScale * (averageDistanceRatio - leftDistanceRatio);
                 double adjustRight = correctionScale * (averageDistanceRatio - rightDistanceRatio);
 
                 targetPower -= Math.max(adjustLeft, adjustRight);
 
-                double powerLeft = inversePower((leftTarget / maxTarget) * (targetPower + adjustLeft));
-                double powerRight = inversePower((rightTarget / maxTarget) * (targetPower + adjustRight));
+                powerLeft += (adjustLeft * Math.signum(leftTarget));
+                powerRight += (adjustRight * Math.signum(rightTarget));
 
+                double higherPower = Math.max(Math.abs(powerLeft), Math.abs(powerRight));
+                double rampRatio = targetPower / higherPower;
+
+                powerLeft *= rampRatio;
+                powerRight *= rampRatio;
 
                 frontLeft.setPower(powerLeft);
                 backLeft.setPower(powerLeft);
@@ -225,6 +236,7 @@ public class MecanumChassis extends Chassis {
                 FTCUtilities.addData("max remaining", maxRemaining);
                 FTCUtilities.addData("leftDistance", leftDistance);
                 FTCUtilities.addData("rightDistance", rightDistance);
+                FTCUtilities.addData("ramp ratio", rampRatio);
                 FTCUtilities.updateOpLogger();
 
             }

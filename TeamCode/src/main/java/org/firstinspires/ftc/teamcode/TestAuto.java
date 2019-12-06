@@ -51,6 +51,7 @@ public class TestAuto extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
     private ArdennesSkyStoneDetector detector;
+    private TriggerDistanceSensor intakeTrigger;
 
 
     @Override
@@ -83,17 +84,32 @@ public class TestAuto extends LinearOpMode {
         //sleep(5000);
         //chassis.pivot(10, .93);
 
+        intake.startIntakeWaitForBlock(intakeTrigger);
+        chassis.arc(40,1450, .65, false);
+        chassis.arc(-47, 1500, .8, true);
+        chassis.driveStraight(-600,.8);
+        sleep(500);
+        chassis.pivot(-105, .7);
+        sleep(500);
+        chassis.driveStraight(-300,.7);
+        foundationServoLeft.setPosition(1);
+        foundationServoRight.setPosition(1);
+        sleep(500);
+        chassis.arc(90,80,1,true);
+        chassis.driveStraight(-400, 1);
 
-        slides.setTargetLevel(2);
-        slides.runSlidesToTargetLevel();
-        sleep(300);
-        yslide.setPosition(1);
-        sleep(1500);
-        gripper.setPosition(0);
-        sleep(1000);
-        yslide.setPosition(0);
-        sleep(1000);
-        slides.resetSlidesToOriginalPosition();
+
+
+//        slides.setTargetLevel(2);
+//        slides.runSlidesToTargetLevel();
+//        sleep(300);
+//        yslide.setPosition(1);
+//        sleep(1500);
+//        gripper.setPosition(0);
+//        sleep(1000);
+//        yslide.setPosition(0);
+//        sleep(1000);
+//        slides.resetSlidesToOriginalPosition();
 
 
     }

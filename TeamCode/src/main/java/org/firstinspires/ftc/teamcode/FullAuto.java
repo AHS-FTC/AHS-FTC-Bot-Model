@@ -74,8 +74,8 @@ public class FullAuto {
 
     private void leftPlan() {
         chassis.driveStraight(100, .75);
-        pivot(-16, .93);
-        //arc(15,1300, .93, false);
+        //pivot(-16, .93);
+        arc(15,1300, .65, false);
         intake.startIntakeWaitForBlock(intakeTrigger);
         //chassis.driveStraight(400, .93);
         chassis.driveStraight(1000, .65);
