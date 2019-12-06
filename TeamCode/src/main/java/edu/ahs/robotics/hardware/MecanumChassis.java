@@ -33,7 +33,6 @@ public class MecanumChassis extends Chassis {
     private Odometer rightOdometer;
 
 
-
     public MecanumChassis(DriveUnit.Config driveUnitConfig) {
         super();
         frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(), driveUnitConfig, false);
@@ -136,9 +135,16 @@ public class MecanumChassis extends Chassis {
         backRight.setPower(backRightPower);
     }
 
-    public void arc(double angle, double radius ,double maxPower, boolean rightTurn) {
+    public void arc(double angle, double radius, double maxPower, boolean rightTurn) {
         double minRampUp = .65;
         double minRampDown = .5;
+
+        arc(angle, radius, maxPower, rightTurn, minRampUp, minRampDown, 5000);
+    }
+
+
+    public void arc(double angle, double radius, double maxPower, boolean rightTurn, double minRampUp, double minRampDown, long timeOut) {
+
         double leftTarget;
         double rightTarget;
         double innerTarget = angle * 2 * Math.PI * Math.abs(radius) / 360;
@@ -151,27 +157,32 @@ public class MecanumChassis extends Chassis {
             rightTarget = outerTarget;
         }
         FTCUtilities.sleep(1000);
-        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .01);
-    }
-
-    public void driveStraight(double distance, double maxPower, double minRampUp, double minRampDown) {
-        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .02, .005);
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .01, timeOut);
     }
 
     public void driveStraight(double distance, double maxPower) {
-        driveStraight(distance, maxPower, .55, .45);
+        driveStraight(distance, maxPower, .55, .45, 5000);
+    }
+    
+    public void driveStraight(double distance, double maxPower, double minRampUp, double minRampDown, long timeOut) {
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .02, .005, timeOut);
     }
 
     public void pivot(double angle, double maxPower) {
         double minRampUp = .6;
         double minRampDown = .55;
 
-        double leftTarget = (angle * DISTANCE_PER_360) / 360.0;
-        double rightTarget = -1 * leftTarget;
-        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .06);
+        pivot(angle, maxPower, minRampUp, minRampDown, 3000);
     }
 
-    private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale) {
+    public void pivot(double angle, double maxPower, double minRampUp, double minRampDown, long timeOut) {
+        double leftTarget = (angle * DISTANCE_PER_360) / 360.0;
+        double rightTarget = -1 * leftTarget;
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .06, timeOut);
+    }
+
+
+    private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale, long timeout) {
 
         if (maxPower < 0 || maxPower > 1.0) {
             throw new Warning("maxPower " + maxPower + " must be between 0 and 1");
@@ -188,11 +199,10 @@ public class MecanumChassis extends Chassis {
         rightOdometer.reset();
 
         try {
-
-            double powerLeft = inversePower(((leftTarget / maxTarget) * (minRampUp) + LEFT_INITIAL_SHIFT)* LEFT_INITIAL_SCALE);
+            double powerLeft = inversePower(((leftTarget / maxTarget) * (minRampUp) + LEFT_INITIAL_SHIFT) * LEFT_INITIAL_SCALE);
             double powerRight = inversePower((rightTarget / maxTarget) * (minRampUp));
-
-            while (true) {
+            long startTime = System.currentTimeMillis();
+            while (System.currentTimeMillis() - startTime < timeout) {
                 double leftDistance = -leftOdometer.getDistance();
                 double rightDistance = rightOdometer.getDistance();
 
@@ -200,7 +210,7 @@ public class MecanumChassis extends Chassis {
                 double rightDistanceRatio = rightDistance / rightTarget;
                 double averageDistanceRatio = (leftDistanceRatio + rightDistanceRatio) / 2;
 
-                if (Math.abs(leftDistanceRatio) >=1.0 && Math.abs(rightDistanceRatio) >=1.0) { //was || before
+                if (Math.abs(leftDistanceRatio) >= 1.0 && Math.abs(rightDistanceRatio) >= 1.0) { //was || before
                     break;
                 }
 
@@ -247,8 +257,8 @@ public class MecanumChassis extends Chassis {
         Logger.getInstance().writeToFile();
     }
 
-    private double inversePower (double power) {
-     //   return power * Math.abs(power);
+    private double inversePower(double power) {
+        //   return power * Math.abs(power);
         return Math.pow(power, 3);
     }
 
