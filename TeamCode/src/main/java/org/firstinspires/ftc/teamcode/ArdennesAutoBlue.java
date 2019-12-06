@@ -52,7 +52,7 @@ public class ArdennesAutoBlue extends LinearOpMode {
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-        FullAuto fullAuto = new FullAuto(false);
+        FullAuto fullAuto = new FullAuto(true);
         fullAuto.init();
         waitForStart();
         fullAuto.afterStart();

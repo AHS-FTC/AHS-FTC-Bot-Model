@@ -68,7 +68,7 @@ public class VuforiaTestOp extends OpMode
     public void init() {
         FTCUtilities.setOpMode(this);
         //vuforia = new Vuforia(this);
-        detector = new ArdennesSkyStoneDetector(true);
+        detector = new ArdennesSkyStoneDetector(true, false);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class VuforiaTestOp extends OpMode
 
     @Override
     public void start() {
-        detector.look(false);
+        detector.look();
         //vuBitmap = vuforia.getBitmap();
         //croppedBitmap = Bitmap.createBitmap(vuBitmap, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
 
