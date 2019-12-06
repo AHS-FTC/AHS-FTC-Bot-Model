@@ -24,21 +24,22 @@ public class FullAuto {
     private SerialServo gripper;
     private SerialServo yslide;
     private SerialServo intakeServo;
+    private SerialServo wrist;
     private TriggerDistanceSensor gripperTrigger;
     private TriggerDistanceSensor intakeTrigger;
     private ArdennesSkyStoneDetector detector;
-    private boolean mirrored;
+    private boolean blueSide;
     private ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration;
 
-    public FullAuto(boolean mirrored) {
-        this.mirrored = mirrored;
+    public FullAuto(boolean blueSide) {
+        this.blueSide = blueSide;
     }
 
     public void init() {
 
         MotorHashService.init();
         ardennes = new Ardennes();
-        detector = new ArdennesSkyStoneDetector();
+        detector = new ArdennesSkyStoneDetector(false, blueSide);
         intake = ardennes.getIntake();
         chassis = ardennes.getChassis();
         slides = ardennes.getSlides();
@@ -47,9 +48,12 @@ public class FullAuto {
         gripper = ardennes.getGripper();
         intakeServo = ardennes.getIntakeServo();
         yslide = ardennes.getySlide();
+        wrist = ardennes.getWrist();
         gripperTrigger = ardennes.getGripperTrigger();
         intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
+
+        wrist.setPosition(-.5);
         gripper.setPosition(0);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
@@ -62,31 +66,16 @@ public class FullAuto {
     public void afterStart() {
         intakeServo.setPosition(1);
 
-//        stoneConfiguration = detector.look(mirrored);
-//
-//        if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
-//            leftPlan();
-//        } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
-//            middlePlan();
-//        } else rightPlan();
-        intake.startIntakeWaitForBlock(intakeTrigger);
-        arc(40,1450, .65, false);
-        arc(-46, 1500, .8, true);
-        chassis.driveStraight(-800,.8);
-        FTCUtilities.sleep(300);
-        pivot(-90, .7);
-        FTCUtilities.sleep(300);
-        chassis.driveStraight(-200,.8);
-        foundationServoLeft.setPosition(1);
-        foundationServoRight.setPosition(1);
-        FTCUtilities.sleep(500);
-        arc(90,80,1,true);
-        FTCUtilities.sleep(300);
-        chassis.driveStraight(-200, 1);
+        stoneConfiguration = detector.look();
 
+        if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
+            oneFourPlan();
+        } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
+            twoFivePlan();
+        } else threeSixPlan();
     }
 
-    private void leftPlan() {
+    private void oneFourPlan() {
 //        chassis.driveStraight(100, .75);
 //        //pivot(-16, .93);
 //        arc(15,1300, .65, false);
@@ -113,20 +102,21 @@ public class FullAuto {
 //        chassis.driveStraight(1500, .93);
 
         intake.startIntakeWaitForBlock(intakeTrigger);
-        arc(40,1450, .65, false);
-        arc(-46, 1500, .8, true);
-        chassis.driveStraight(-800,.8);
+        arc(25,2400, .7, false);
+        arc(-67, 1000, .8, true);
+        chassis.driveStraight(-850,.8);
         FTCUtilities.sleep(300);
-        pivot(-90, .7);
+        pivot(-85, .7);
         FTCUtilities.sleep(300);
-        chassis.driveStraight(-200,.8);
+        chassis.driveStraight(-200,1, .7, .7);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
         arc(90,80,1,true);
         FTCUtilities.sleep(300);
-        chassis.driveStraight(-200, 1);
-
+        chassis.driveStraight(-200, 1, .7, .7);
+        foundationServoLeft.setPosition(0);
+        foundationServoRight.setPosition(0);
 
 //        arc(90, 300, .93, true);
 
@@ -138,7 +128,7 @@ public class FullAuto {
 
     }
 
-    private void middlePlan() {
+    private void twoFivePlan() {
         pivot(-9, .93);
         intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.driveStraight(900, .7);
@@ -165,7 +155,7 @@ public class FullAuto {
 
     }
 
-    private void rightPlan() {
+    private void threeSixPlan() {
         pivot(5, .93);
         intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.driveStraight(950, .7);
@@ -180,7 +170,7 @@ public class FullAuto {
     }
 
     private void pivot(double angle, double maxPower) {
-        if (mirrored) {
+        if (!blueSide) {
             chassis.pivot(-angle, maxPower);
         } else {
             chassis.pivot(angle, maxPower);
@@ -189,7 +179,7 @@ public class FullAuto {
     }
 
     private void arc(double angle, double radius, double maxPower, boolean rightTurn) {
-        if (mirrored) {
+        if (!blueSide) {
             chassis.arc(angle, radius, maxPower, !rightTurn);
         } else {
             chassis.arc(angle, radius, maxPower, rightTurn);

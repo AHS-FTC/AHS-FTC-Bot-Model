@@ -34,7 +34,7 @@ public class Ardennes extends Robot {
 
 
     public Ardennes() {
-        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70, 100);
+        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70, 300);
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40, 0);
         leftFoundation = new SerialServo("FSL", true);
         rightFoundation = new SerialServo("FSR", false);
@@ -93,7 +93,5 @@ public class Ardennes extends Robot {
 
         return new MecanumChassis(config, imu);
     }
-
-
 
 }

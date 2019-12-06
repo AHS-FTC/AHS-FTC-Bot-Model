@@ -60,7 +60,7 @@ public class TestAuto extends LinearOpMode {
         FTCUtilities.setOpMode(this);
         MotorHashService.init();
         ardennes = new Ardennes();
-        detector = new ArdennesSkyStoneDetector();
+        detector = new ArdennesSkyStoneDetector(false, true);
         Intake intake = ardennes.getIntake();
         MecanumChassis chassis = ardennes.getChassis();
         Slides slides = ardennes.getSlides();

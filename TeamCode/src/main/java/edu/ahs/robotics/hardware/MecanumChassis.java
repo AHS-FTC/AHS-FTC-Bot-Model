@@ -14,7 +14,7 @@ public class MecanumChassis extends Chassis {
     public static final int MIN_TARGET_DISTANCE = 5;
     public static final double DISTANCE_PER_360 = 1001;
     private static final double LEFT_INITIAL_SHIFT = 0;
-    private static final double LEFT_INITIAL_SCALE = 1.04;
+    private static final double LEFT_INITIAL_SCALE = 1.02;
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
     private SingleDriveUnit backLeft;
@@ -154,11 +154,12 @@ public class MecanumChassis extends Chassis {
         rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .01);
     }
 
-    public void driveStraight(double distance, double maxPower) {
-        double minRampUp = .55;
-        double minRampDown = .45;
-
+    public void driveStraight(double distance, double maxPower, double minRampUp, double minRampDown) {
         rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .02, .005);
+    }
+
+    public void driveStraight(double distance, double maxPower) {
+        driveStraight(distance, maxPower, .55, .45);
     }
 
     public void pivot(double angle, double maxPower) {
