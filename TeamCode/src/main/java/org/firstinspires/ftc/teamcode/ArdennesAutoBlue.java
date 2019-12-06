@@ -45,9 +45,9 @@ import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
 
-@Autonomous(name = "Ardennes Auto", group = "Linear Opmode")
+@Autonomous(name = "Ardennes Auto Blue Side", group = "Linear Opmode")
 //@Disabled
-public class ArdennesAuto extends LinearOpMode {
+public class ArdennesAutoBlue extends LinearOpMode {
 
     @Override
     public void runOpMode() {

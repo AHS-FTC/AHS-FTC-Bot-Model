@@ -112,8 +112,9 @@ public class Slides {
      * Retracts slides down to origin. Blocks until slides at origin
      */
     public void resetSlidesToOriginalPosition() {
+        setManualControlMode();
         targetLevel = 0;
-        while(!limitSwitch.isTriggered()) {
+        while(!atBottom()) {
             setPower(DOWN_POWER);
         }
         stopMotors();

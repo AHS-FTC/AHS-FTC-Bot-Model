@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import edu.ahs.robotics.hardware.Intake;
@@ -24,7 +23,9 @@ public class FullAuto {
     private SerialServo foundationServoRight;
     private SerialServo gripper;
     private SerialServo yslide;
+    private SerialServo intakeServo;
     private TriggerDistanceSensor gripperTrigger;
+    private TriggerDistanceSensor intakeTrigger;
     private ArdennesSkyStoneDetector detector;
     private boolean mirrored;
     private ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration;
@@ -44,18 +45,23 @@ public class FullAuto {
         foundationServoLeft = ardennes.getLeftFoundation();
         foundationServoRight = ardennes.getRightFoundation();
         gripper = ardennes.getGripper();
+        intakeServo = ardennes.getIntakeServo();
         yslide = ardennes.getySlide();
         gripperTrigger = ardennes.getGripperTrigger();
+        intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
         gripper.setPosition(0);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);
+        intakeServo.setPosition(0);
         FTCUtilities.addData("init", "finished");
         FTCUtilities.updateOpLogger();
     }
 
     public void afterStart() {
+        intakeServo.setPosition(1);
+
         stoneConfiguration = detector.look(mirrored);
 
         if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
@@ -68,23 +74,31 @@ public class FullAuto {
 
     private void leftPlan() {
         chassis.driveStraight(100, .75);
-        pivot(-18, .93);
-        //arc(15,1300, .93, false);
-        intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(400, .93);
-        chassis.driveStraight(600, .65);
-        chassis.driveStraight(-250, .93);
-        arc(-67,500,.93,true);
+        //pivot(-16, .93);
+        arc(15,1300, .65, false);
+        intake.startIntakeWaitForBlock(intakeTrigger);
+        //chassis.driveStraight(400, .93);
+        chassis.driveStraight(1000, .65);
+        chassis.driveStraight(-120,.8);
+        arc(-73,500,.93,true);
         FTCUtilities.sleep(500);
         chassis.driveStraight(-1100, .85);
         FTCUtilities.sleep(500);
         pivot(-70, .93);
-        chassis.driveStraight(-300, .65);
+        FTCUtilities.sleep(200);
+        chassis.driveStraight(-250, .65);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
-        pivot(90,.8);
-        chassis.driveStraight(-500,.8);
+        //arc(130, 30,1,true);
+        pivot(90, .93);
+        chassis.driveStraight(-200, .93);
+        foundationServoLeft.setPosition(0);
+        foundationServoRight.setPosition(0);
+        FTCUtilities.sleep(300);
+        chassis.driveStraight(1500, .93);
+
+
 //        arc(90, 300, .93, true);
 
         /*chassis.driveStraight(500, 1);

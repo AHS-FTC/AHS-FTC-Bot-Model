@@ -51,6 +51,7 @@ public class TestAuto extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
     private ArdennesSkyStoneDetector detector;
+    private TriggerDistanceSensor intakeTrigger;
 
 
     @Override
@@ -71,6 +72,9 @@ public class TestAuto extends LinearOpMode {
         TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
         gripper.setPosition(0);
+        foundationServoLeft.setPosition(0);
+        foundationServoRight.setPosition(0);
+        yslide.setPosition(0);
 
         waitForStart();
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
@@ -78,21 +82,35 @@ public class TestAuto extends LinearOpMode {
         //chassis.arc(90, 1000, .93, true);
         //intake.startIntakeWaitForBlock(gripperTrigger);
         //sleep(5000);
-        chassis.pivot(10, .93);
+        //chassis.pivot(10, .93);
 
-        /*
-        gripper.setPosition(1);
-        sleep(2000);
-        slides.setTargetLevel(3);
-        slides.runSlidesToTargetLevel();
-        sleep(2000);
-        yslide.setPosition(1);
-        sleep(2000);
-        gripper.setPosition(0);
-        sleep(1000);
-        yslide.setPosition(0);
-        slides.resetSlidesToOriginalPosition();
-        */
+        intake.startIntakeWaitForBlock(intakeTrigger);
+        chassis.arc(40,1450, .65, false);
+        chassis.arc(-47, 1500, .8, true);
+        chassis.driveStraight(-600,.8);
+        sleep(500);
+        chassis.pivot(-105, .7);
+        sleep(500);
+        chassis.driveStraight(-300,.7);
+        foundationServoLeft.setPosition(1);
+        foundationServoRight.setPosition(1);
+        sleep(500);
+        chassis.arc(90,80,1,true);
+        chassis.driveStraight(-400, 1);
+
+
+
+//        slides.setTargetLevel(2);
+//        slides.runSlidesToTargetLevel();
+//        sleep(300);
+//        yslide.setPosition(1);
+//        sleep(1500);
+//        gripper.setPosition(0);
+//        sleep(1000);
+//        yslide.setPosition(0);
+//        sleep(1000);
+//        slides.resetSlidesToOriginalPosition();
+
 
     }
 }
