@@ -88,7 +88,7 @@ public class ArdennesTeleOp extends OpMode
     private boolean xPressed = false;
     private boolean runToLevelMode = false;
 
-     private Switch intakeOutSwitch;
+    private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
 
     private ElapsedTime time;
@@ -145,6 +145,7 @@ public class ArdennesTeleOp extends OpMode
     public void start() {
         time.startTime();
         lastTime = time.milliseconds();
+        wrist.setPosition(-.5);
 
         slides.resetEncoders();
     }
@@ -294,7 +295,7 @@ public class ArdennesTeleOp extends OpMode
         }
 
         //press b to rotate stone 90 degrees
-        if (gamepad2.b) {
+        if (gamepad2.b && gamepad2.dpad_right ) {
             wristToggle.flip();
             activateWrist();
         }
@@ -327,9 +328,9 @@ public class ArdennesTeleOp extends OpMode
 
     private void activateWrist() {
         if (wristToggle.isEnabled()) {
-            wrist.setPosition(1);
+            wrist.setPosition(-.5);
         } else {
-            wrist.setPosition(0);
+            wrist.setPosition(.5);
         }
     }
 

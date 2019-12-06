@@ -86,17 +86,18 @@ public class TestAuto extends LinearOpMode {
 
         intake.startIntakeWaitForBlock(intakeTrigger);
         chassis.arc(40,1450, .65, false);
-        chassis.arc(-47, 1500, .8, true);
-        chassis.driveStraight(-600,.8);
-        sleep(500);
-        chassis.pivot(-105, .7);
-        sleep(500);
-        chassis.driveStraight(-300,.7);
+        chassis.arc(-46, 1500, .8, true);
+        chassis.driveStraight(-800,.8);
+        sleep(300);
+        chassis.pivot(-90, .7);
+        sleep(300);
+        chassis.driveStraight(-200,.8);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         sleep(500);
         chassis.arc(90,80,1,true);
-        chassis.driveStraight(-400, 1);
+        sleep(300);
+        chassis.driveStraight(-200, 1);
 
 
 

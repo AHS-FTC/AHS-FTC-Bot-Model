@@ -62,41 +62,70 @@ public class FullAuto {
     public void afterStart() {
         intakeServo.setPosition(1);
 
-        stoneConfiguration = detector.look(mirrored);
-
-        if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
-            leftPlan();
-        } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
-            middlePlan();
-        } else rightPlan();
+//        stoneConfiguration = detector.look(mirrored);
+//
+//        if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
+//            leftPlan();
+//        } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
+//            middlePlan();
+//        } else rightPlan();
+        intake.startIntakeWaitForBlock(intakeTrigger);
+        arc(40,1450, .65, false);
+        arc(-46, 1500, .8, true);
+        chassis.driveStraight(-800,.8);
+        FTCUtilities.sleep(300);
+        pivot(-90, .7);
+        FTCUtilities.sleep(300);
+        chassis.driveStraight(-200,.8);
+        foundationServoLeft.setPosition(1);
+        foundationServoRight.setPosition(1);
+        FTCUtilities.sleep(500);
+        arc(90,80,1,true);
+        FTCUtilities.sleep(300);
+        chassis.driveStraight(-200, 1);
 
     }
 
     private void leftPlan() {
-        chassis.driveStraight(100, .75);
-        //pivot(-16, .93);
-        arc(15,1300, .65, false);
+//        chassis.driveStraight(100, .75);
+//        //pivot(-16, .93);
+//        arc(15,1300, .65, false);
+//        intake.startIntakeWaitForBlock(intakeTrigger);
+//        //chassis.driveStraight(400, .93);
+//        chassis.driveStraight(1000, .65);
+//        chassis.driveStraight(-120,.8);
+//        arc(-73,500,.93,true);
+//        FTCUtilities.sleep(500);
+//        chassis.driveStraight(-1100, .85);
+//        FTCUtilities.sleep(500);
+//        pivot(-70, .93);
+//        FTCUtilities.sleep(200);
+//        chassis.driveStraight(-250, .65);
+//        foundationServoLeft.setPosition(1);
+//        foundationServoRight.setPosition(1);
+//        FTCUtilities.sleep(500);
+//        //arc(130, 30,1,true);
+//        pivot(90, .93);
+//        chassis.driveStraight(-200, .93);
+//        foundationServoLeft.setPosition(0);
+//        foundationServoRight.setPosition(0);
+//        FTCUtilities.sleep(300);
+//        chassis.driveStraight(1500, .93);
+
         intake.startIntakeWaitForBlock(intakeTrigger);
-        //chassis.driveStraight(400, .93);
-        chassis.driveStraight(1000, .65);
-        chassis.driveStraight(-120,.8);
-        arc(-73,500,.93,true);
-        FTCUtilities.sleep(500);
-        chassis.driveStraight(-1100, .85);
-        FTCUtilities.sleep(500);
-        pivot(-70, .93);
-        FTCUtilities.sleep(200);
-        chassis.driveStraight(-250, .65);
+        arc(40,1450, .65, false);
+        arc(-46, 1500, .8, true);
+        chassis.driveStraight(-800,.8);
+        FTCUtilities.sleep(300);
+        pivot(-90, .7);
+        FTCUtilities.sleep(300);
+        chassis.driveStraight(-200,.8);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
-        //arc(130, 30,1,true);
-        pivot(90, .93);
-        chassis.driveStraight(-200, .93);
-        foundationServoLeft.setPosition(0);
-        foundationServoRight.setPosition(0);
+        arc(90,80,1,true);
         FTCUtilities.sleep(300);
-        chassis.driveStraight(1500, .93);
+        chassis.driveStraight(-200, 1);
 
 
 //        arc(90, 300, .93, true);

@@ -199,7 +199,7 @@ public class MecanumChassis extends Chassis {
                 double rightDistanceRatio = rightDistance / rightTarget;
                 double averageDistanceRatio = (leftDistanceRatio + rightDistanceRatio) / 2;
 
-                if (Math.abs(leftDistanceRatio) >=1.0 || Math.abs(rightDistanceRatio) >=1.0) { //was || before
+                if (Math.abs(leftDistanceRatio) >=1.0 && Math.abs(rightDistanceRatio) >=1.0) { //was || before
                     break;
                 }
 
