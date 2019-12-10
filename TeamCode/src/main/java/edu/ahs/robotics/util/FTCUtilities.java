@@ -65,7 +65,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         }
     }
 
-    public static void OpSleep(long ms) {
+    public static void sleep(long ms) {
         if(testMode){
             try {
                 Thread.sleep(5000);

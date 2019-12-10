@@ -29,15 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Bitmap;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.hardware.sensors.Vuforia;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -72,7 +68,7 @@ public class VuforiaTestOp extends OpMode
     public void init() {
         FTCUtilities.setOpMode(this);
         //vuforia = new Vuforia(this);
-        detector = new ArdennesSkyStoneDetector(true);
+        detector = new ArdennesSkyStoneDetector(true, false);
     }
 
     @Override

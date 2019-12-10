@@ -14,33 +14,38 @@ import edu.ahs.robotics.hardware.Robot;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
+import edu.ahs.robotics.hardware.Slides;
+
 
 public class Ardennes extends Robot {
     private MecanumChassis mecanumChassis;
     private Intake intake;
     private SerialServo gripper;//todo add other serbos
     private TriggerDistanceSensor intakeTrigger, gripperTrigger;
-    private LimitSwitch limitSwitch;
     private ArdennesSkyStoneDetector detector;
-
+    private Slides slides;
+    private SerialServo leftFoundation, rightFoundation;
+    private SerialServo ySlide;
+    private SerialServo wrist;
+    private SerialServo intakeServo;
 
 
     public Ardennes() {
-        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
-        gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40);
-        limitSwitch = new LimitSwitch("limitSwitch");
+        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70, 300);
+        gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40, 0);
+        leftFoundation = new SerialServo("FSL", true);
+        rightFoundation = new SerialServo("FSR", false);
         intake = new Intake(1);
         gripper = new SerialServo("gripper", true);
         mecanumChassis = makeChassis();
-
-        detector = new ArdennesSkyStoneDetector();
+        slides = new Slides();
+        ySlide = new SerialServo("slideServo", false);
+        wrist = new SerialServo("wrist", true);
+        intakeServo = new SerialServo("intakeLock", false);
     }
-
-    public ArdennesSkyStoneDetector.SkyStoneConfigurations runDetector() {return detector.look();}
 
     public Intake getIntake(){
         return intake;
@@ -58,13 +63,20 @@ public class Ardennes extends Robot {
         return gripperTrigger;
     }
 
-    public LimitSwitch getLimitSwitch(){
-        return limitSwitch;
-    }
-
     public SerialServo getGripper(){
         return gripper;
     }
+
+    public SerialServo getIntakeServo() {return intakeServo;}
+
+    public SerialServo getLeftFoundation() {return leftFoundation;}
+    public SerialServo getRightFoundation() {return rightFoundation;}
+
+    public SerialServo getySlide() {return ySlide;}
+
+    public Slides getSlides() {return slides;}
+
+    public SerialServo getWrist() {return wrist;}
 
     private MecanumChassis makeChassis() {
         //Set Gear Ratio
@@ -79,14 +91,7 @@ public class Ardennes extends Robot {
         IMU imu = new IMU(bnoImu);
         //OdometrySystem odometrySystem = makeOdometrySystem(imu);
 
-        driveFlips.put(ChassisMotors.Mecanum.FRONTLEFT, false); //todo check directions
-        driveFlips.put(ChassisMotors.Mecanum.FRONTRIGHT, true);
-        driveFlips.put(ChassisMotors.Mecanum.BACKLEFT, false);
-        driveFlips.put(ChassisMotors.Mecanum.BACKRIGHT, true);
-
-        return new MecanumChassis(config, driveFlips, imu);
+        return new MecanumChassis(config, imu);
     }
-
-
 
 }

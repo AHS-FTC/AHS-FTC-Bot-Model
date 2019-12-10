@@ -16,14 +16,14 @@ public class ArdennesSkyStoneDetector {
     //private final int IMAGE_WIDTH = 1000;
     //private final int IMAGE_HEIGHT = 200;
 
-    private final int LEFT_X = 90 , LEFT_Y = 580;// LEFT_HEIGHT = 0, LEFT_WIDTH = 0;
-    private final int MIDDLE_X = 400 , MIDDLE_Y = 580;// MIDDLE_HEIGHT = 0, MIDDLE_WIDTH = 0;
-    private final int RIGHT_X = 700 , RIGHT_Y = 580;// RIGHT_HEIGHT = 0, RIGHT_WIDTH = 0;
+    private static final int Y_COORD = 580;
 
-    private final int STONE_WIDTH = 100, STONE_HEIGHT = 25;
+    private int stone4X, stone6X, stone5X;
 
-    private final ColorPreset ACTIVE_YELLOW = ColorPreset.PURE_YELLOW; //Change these bad boys to calibrate
-    private final ColorPreset ACTIVE_BLACK = ColorPreset.PURE_BLACK;
+    private static final int STONE_WIDTH = 100, STONE_HEIGHT = 25;
+
+    private static final ColorPreset ACTIVE_YELLOW = ColorPreset.PURE_YELLOW; //Change these bad boys to calibrate
+    private static final ColorPreset ACTIVE_BLACK = ColorPreset.PURE_BLACK;
 
     public enum SkyStoneConfigurations {
         ONE_FOUR,
@@ -52,48 +52,55 @@ public class ArdennesSkyStoneDetector {
     }
 
 
-    public ArdennesSkyStoneDetector(boolean isImageSavingEnabled) {
+    public ArdennesSkyStoneDetector(boolean isImageSavingEnabled, boolean blueSide) {
         vuforia = new Vuforia();
         this.isImageSavingEnabled = isImageSavingEnabled;
-    }
-
-    public ArdennesSkyStoneDetector(){
-        this(false);
+        if(blueSide){
+            stone4X = 300;
+            stone5X = 600;
+            stone6X = 900;
+        } else {
+            stone4X = 1030;
+            stone5X = 730;
+            stone6X = 430;
+        }
     }
 
     public SkyStoneConfigurations look(){
         Bitmap vuBitmap = vuforia.getBitmap();
         //Bitmap croppedBitmap = Bitmap.createBitmap(vuBitmap, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
 
-        Bitmap stoneLeft = Bitmap.createBitmap(vuBitmap, LEFT_X, LEFT_Y, STONE_WIDTH, STONE_HEIGHT);
-        Bitmap stoneMiddle = Bitmap.createBitmap(vuBitmap, MIDDLE_X, MIDDLE_Y, STONE_WIDTH, STONE_HEIGHT);
-        Bitmap stoneRight = Bitmap.createBitmap(vuBitmap, RIGHT_X, RIGHT_Y, STONE_WIDTH, STONE_HEIGHT);
+        Bitmap stone4 = Bitmap.createBitmap(vuBitmap, stone4X, Y_COORD, STONE_WIDTH, STONE_HEIGHT);
+        Bitmap stone5 = Bitmap.createBitmap(vuBitmap, stone5X, Y_COORD, STONE_WIDTH, STONE_HEIGHT);
+        Bitmap stone6 = Bitmap.createBitmap(vuBitmap, stone6X, Y_COORD, STONE_WIDTH, STONE_HEIGHT);
 
-        if(isImageSavingEnabled) {
+        if (isImageSavingEnabled) {
             Logger.saveImage(vuBitmap);
-            Logger.saveImage(stoneLeft);
-            Logger.saveImage(stoneMiddle);
-            Logger.saveImage(stoneRight);
+            Logger.saveImage(stone4);
+            Logger.saveImage(stone5);
+            Logger.saveImage(stone6);
         }
         //Ratio is measured blackness to yellowness. higher ratio is more likeliness to be a skystone.
 
-        double leftRatio = getColorness(stoneLeft, ACTIVE_BLACK)/getColorness(stoneLeft, ACTIVE_YELLOW);
-        double middleRatio = getColorness(stoneMiddle, ACTIVE_BLACK)/getColorness(stoneMiddle, ACTIVE_YELLOW);
-        double rightRatio = getColorness(stoneRight, ACTIVE_BLACK)/getColorness(stoneRight, ACTIVE_YELLOW);
+        double ratio4 = getColorness(stone4, ACTIVE_BLACK) / getColorness(stone4, ACTIVE_YELLOW);
+        double ratio5 = getColorness(stone5, ACTIVE_BLACK) / getColorness(stone5, ACTIVE_YELLOW);
+        double ratio6 = getColorness(stone6, ACTIVE_BLACK) / getColorness(stone6, ACTIVE_YELLOW);
 
-        FTCUtilities.addData("Left Skystone Ratio", leftRatio);
-        FTCUtilities.addData("Middle Skystone Ratio", middleRatio);
-        FTCUtilities.addData("Right Skystone Ratio", rightRatio);
+        FTCUtilities.addData("Skystone 4 Ratio", ratio4);
+        FTCUtilities.addData("Skystone 5 Ratio", ratio5);
+        FTCUtilities.addData("Skystone 6 Ratio", ratio6);
+        FTCUtilities.updateOpLogger();
 
-        if(leftRatio > middleRatio && leftRatio > rightRatio){
+        if (ratio4 > ratio5 && ratio4 > ratio6) {
             return SkyStoneConfigurations.ONE_FOUR;
-        } else if (middleRatio > leftRatio && middleRatio > leftRatio){
+        } else if (ratio5 > ratio4 && ratio5 > ratio4) {
             return SkyStoneConfigurations.TWO_FIVE;
         } else {
             return SkyStoneConfigurations.THREE_SIX;
         }
 
     }
+
 
     private double getColorness(Bitmap bitmap, ColorPreset colorPreset){//finds the closeness of a region to a color
         int color;

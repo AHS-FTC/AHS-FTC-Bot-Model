@@ -18,7 +18,6 @@ public class SerialServo {
         }
     }
 
-
     public void setPosition(double position){
         servo.setPosition(position);
     }
