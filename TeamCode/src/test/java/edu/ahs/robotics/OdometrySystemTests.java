@@ -42,8 +42,6 @@ public class OdometrySystemTests {
         double[] xInputs = {0,0,0,0};
         init(y1Inputs,y2Inputs,xInputs);
 
-
-        
         assertEquals(90, odometrySystem.getPosition().heading, .1);
     }
 
