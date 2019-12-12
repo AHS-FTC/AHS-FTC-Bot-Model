@@ -93,7 +93,7 @@ public class ArdennesSkyStoneDetector {
 
         if (ratio4 > ratio5 && ratio4 > ratio6) {
             return SkyStoneConfigurations.ONE_FOUR;
-        } else if (ratio5 > ratio4 && ratio5 > ratio4) {
+        } else if (ratio5 > ratio4 && ratio5 > ratio6) {
             return SkyStoneConfigurations.TWO_FIVE;
         } else {
             return SkyStoneConfigurations.THREE_SIX;
