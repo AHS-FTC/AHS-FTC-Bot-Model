@@ -20,7 +20,7 @@ public class OdometrySystemTests {
         OdometerMock y2 = new OdometerMock(y2Inputs);
         OdometerMock x = new OdometerMock(xInputs);
 
-        odometrySystem = new OdometrySystem(y1, y2, x, 12);
+        odometrySystem = new OdometrySystem(y1, y2, x, .1, 12);
     }
 
     @Test
