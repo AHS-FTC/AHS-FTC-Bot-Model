@@ -14,12 +14,16 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+
 public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMap exists under OpMode.
     private static HardwareMap hardwareMap;
     private static OpMode opMode;
 
     private static boolean testMode = false;
     private static Map <String, DcMotor>testMotors = new HashMap();
+    private static Map <String, Odometer>testOdometers = new HashMap();
 
 
     public static String getLogDirectory(){
@@ -105,7 +109,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
             Rev2mDistanceSensor distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, sensorName);
             return distanceSensor;
         } else {
-            throw new UnsupportedOperationException("TestMode doesn't support targetDistance sensors yet. mock it");
+            throw new UnsupportedOperationException("TestMode doesn't support distance sensors yet. mock it");
         }
     }
 
@@ -116,11 +120,25 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         testMotors.put(deviceName, motor);
     }
 
+    public static void addTestOdometer(Odometer odometer, String deviceName){
+        if(!testMode){
+            throw new UnsupportedOperationException("Not in testMode! Make sure to call startTestMode first");
+        }
+        testOdometers.put(deviceName, odometer);
+    }
+
     public static Servo getServo(String deviceName){
         if(!testMode){
             return hardwareMap.get(Servo.class, deviceName);
         } else {
             throw new Error("TestMode doesn't support servos yet. mock it");
+        }
+    }
+    public static Odometer getOdometer(String deviceName, double wheelDiameter, boolean flip){
+        if(testMode){
+            return testOdometers.get(deviceName);
+        } else {
+            return new OdometerImpl(deviceName,wheelDiameter,flip);
         }
     }
 

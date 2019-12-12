@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import edu.ahs.robotics.hardware.Robot;
-import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 //1738 mm
@@ -17,7 +14,7 @@ import edu.ahs.robotics.util.Logger;
 //@Disabled
 public class OdometryTuningOpMode extends OpMode {
     private DcMotor FL, FR, BL, BR;
-    private Odometer l, r;
+    private OdometerImpl l, r;
     private double leftDiameter = 60, rightDiameter = 60;
 
     @Override
@@ -45,8 +42,8 @@ public class OdometryTuningOpMode extends OpMode {
     }
 
     public void start(){
-        l = new Odometer("intakeL", leftDiameter, false);
-        r = new Odometer("intakeR", rightDiameter, true);
+        l = new OdometerImpl("intakeL", leftDiameter, false);
+        r = new OdometerImpl("intakeR", rightDiameter, true);
 
         l.reset();
         r.reset();
