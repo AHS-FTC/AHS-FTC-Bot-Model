@@ -96,6 +96,14 @@ public class OdometrySystem {
             dxLocal = dx;
         }
 
+        position.heading += Math.toDegrees(dHeading);//apply our heading change
+        double heading = Math.toRadians(position.heading); //in rads, duh
+
+        dxGlobal = Math.cos(heading)*dxLocal + Math.sin(heading)*dyLocal; //convert to global coords
+        dyGlobal = Math.sin(heading)*dxLocal + Math.cos(heading)*dyLocal;
+
+        position.x += dxGlobal;
+        position.y += dyGlobal;
     }
 
     public Position getPosition(){
