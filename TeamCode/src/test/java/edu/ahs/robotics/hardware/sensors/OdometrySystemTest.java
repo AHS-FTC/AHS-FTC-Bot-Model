@@ -30,9 +30,9 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().y, .1);
-        assertEquals(0, odometrySystem.getPosition().heading, .1);
-        assertEquals(0, odometrySystem.getPosition().x, .1);
+        assertEquals(12, odometrySystem.getPosition().y, .01);
+        assertEquals(0, odometrySystem.getPosition().heading, .01);
+        assertEquals(0, odometrySystem.getPosition().x, .01);
     }
 
     @Test
@@ -46,9 +46,9 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(90, odometrySystem.getPosition().heading, .1);
-        assertEquals(0, odometrySystem.getPosition().x, .1);
-        assertEquals(0, odometrySystem.getPosition().y, .1);
+        assertEquals(90, odometrySystem.getPosition().heading, .01);
+        assertEquals(0, odometrySystem.getPosition().x, .01);
+        assertEquals(0, odometrySystem.getPosition().y, .01);
 
     }
 
@@ -63,7 +63,7 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().x, .1);
+        assertEquals(12, odometrySystem.getPosition().x, .01);
     }
 
     @Test
@@ -77,8 +77,8 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().x, .1);
-        assertEquals(12, odometrySystem.getPosition().x, .1);
+        assertEquals(12, odometrySystem.getPosition().x, .01);
+        assertEquals(12, odometrySystem.getPosition().x, .01);
     }
 
     @Test
@@ -92,9 +92,9 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(500, odometrySystem.getPosition().heading, .1);
-        assertEquals(0, odometrySystem.getPosition().x, .1);
-        assertEquals(0, odometrySystem.getPosition().y, .1);
+        assertEquals(500, odometrySystem.getPosition().heading, .01);
+        assertEquals(0, odometrySystem.getPosition().x, .01);
+        assertEquals(0, odometrySystem.getPosition().y, .01);
     }
 
 //    @Test
