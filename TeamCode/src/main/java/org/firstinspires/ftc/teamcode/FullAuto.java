@@ -108,13 +108,13 @@ public class FullAuto {
         FTCUtilities.sleep(300);
         pivot(-85, .7);
         FTCUtilities.sleep(300);
-        chassis.driveStraight(-200,1, .7, .7);
+        //chassis.driveStraight(-200,1, .7, .7);
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
         arc(90,80,1,true);
         FTCUtilities.sleep(300);
-        chassis.driveStraight(-200, 1, .7, .7);
+        //chassis.driveStraight(-200, 1, .7, .7);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
 

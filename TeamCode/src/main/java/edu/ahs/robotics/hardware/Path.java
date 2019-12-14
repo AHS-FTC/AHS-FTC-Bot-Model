@@ -55,7 +55,7 @@ public class Path {
         return null;
     }
 
-    public class Point {
+    public static class Point {
         private double x;
         private double y;
 
@@ -77,7 +77,7 @@ public class Path {
         }
     }
     
-    private class PointAtTime extends Point {
+    private static class PointAtTime extends Point {
         private double time;
 
         public PointAtTime(double x, double y, double time) {

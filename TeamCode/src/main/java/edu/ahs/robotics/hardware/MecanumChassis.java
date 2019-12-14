@@ -3,7 +3,7 @@ package edu.ahs.robotics.hardware;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
@@ -29,8 +29,8 @@ public class MecanumChassis extends Chassis {
     private IMU imu;
     private OdometrySystem odometrySystem;
 
-    private Odometer leftOdometer;
-    private Odometer rightOdometer;
+    private OdometerImpl leftOdometer;
+    private OdometerImpl rightOdometer;
 
 
     public MecanumChassis(DriveUnit.Config driveUnitConfig) {
@@ -40,8 +40,8 @@ public class MecanumChassis extends Chassis {
         backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, false);
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
-        leftOdometer = new Odometer("intakeL", 60, false);
-        rightOdometer = new Odometer("intakeR", 60.3, true);
+        leftOdometer = new OdometerImpl("intakeL", 60, false);
+        rightOdometer = new OdometerImpl("intakeR", 60.3, true);
     }
 
 
