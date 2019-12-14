@@ -105,7 +105,7 @@ public class Ardennes extends Robot {
         Odometer y2 = FTCUtilities.getOdometer("intakeR", 2.3622, true);
         Odometer x = FTCUtilities.getOdometer("x", 2.3622, false); //todo give name
 
-        OdometrySystem odometrySystem = new OdometrySystem(y1, y2, x, 12); //todo calculate actual
+        OdometrySystem odometrySystem = new OdometrySystem(y1, y2, x, .1, 12); //todo calculate actuals
         return odometrySystem;
     }
 

@@ -1,4 +1,4 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.hardware.sensors;
 
 import edu.ahs.robotics.hardware.sensors.Odometer;
 
