@@ -133,6 +133,7 @@ public class MecanumChassis extends Chassis {
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
+
     }
 
     public void arc(double angle, double radius, double maxPower, boolean rightTurn) {
