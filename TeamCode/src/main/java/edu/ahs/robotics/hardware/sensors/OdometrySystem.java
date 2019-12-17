@@ -96,11 +96,11 @@ public class OdometrySystem {
             dxLocal = dx;
         }
 
-        position.heading += Math.toDegrees(dHeading);//apply our heading change
-        double heading = Math.toRadians(position.heading); //in rads, duh
+        position.heading += dHeading;//apply our heading change
+        double heading = position.heading; //in rads, duh
 
-        dxGlobal = Math.cos(heading)*dxLocal + Math.sin(heading)*dyLocal; //convert to global coords
-        dyGlobal = Math.sin(heading)*dxLocal + Math.cos(heading)*dyLocal;
+        dxGlobal = Math.sin(heading)*dxLocal + Math.cos(heading)*dyLocal; //convert to global coords. Recall that 0 rads is in direction of x axis
+        dyGlobal = Math.cos(heading)*dxLocal + Math.sin(heading)*dyLocal;
 
         position.x += dxGlobal;
         position.y += dyGlobal;

@@ -17,6 +17,7 @@ public class OdometrySystemTest {
         OdometerMock x = new OdometerMock(xInputs);
 
         odometrySystem = new OdometrySystem(y1, y2, x, .1, 12);
+        odometrySystem.resetPosition(0,0,Math.PI/2);
     }
 
     @Test
@@ -31,7 +32,7 @@ public class OdometrySystemTest {
         }
 
         assertEquals(12, odometrySystem.getPosition().y, .01);
-        assertEquals(0, odometrySystem.getPosition().heading, .01);
+        assertEquals(Math.PI/2, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
     }
 
@@ -46,7 +47,7 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(90, odometrySystem.getPosition().heading, .01);
+        assertEquals(Math.PI, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
 
@@ -78,7 +79,7 @@ public class OdometrySystemTest {
         }
 
         assertEquals(12, odometrySystem.getPosition().x, .01);
-        assertEquals(12, odometrySystem.getPosition().x, .01);
+        assertEquals(12, odometrySystem.getPosition().y, .01);
     }
 
     @Test
@@ -92,7 +93,7 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(500, odometrySystem.getPosition().heading, .01);
+        assertEquals(Math.toRadians(500) + Math.PI/2, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
     }
