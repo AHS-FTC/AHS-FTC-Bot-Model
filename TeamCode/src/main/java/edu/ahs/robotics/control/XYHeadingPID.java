@@ -12,8 +12,11 @@ public class XYHeadingPID {
 
     private double xErrorSum = 0, yErrorSum = 0, headingErrorSum = 0;
 
+    /**
+     * @param config An instance of the static Config class with configuration parameters
+     */
     public XYHeadingPID(Config config) {
-
+        this.config = config;
     }
 
     /**
@@ -53,6 +56,10 @@ public class XYHeadingPID {
             this.heading = heading;
         }
     }
+
+    /**
+     * Manages tuning parameters for XYH PID. Passed into XYHeadingPID constructor for init.
+     */
     public static class Config {
          private double xP = 0, xI = 0, xD = 0;
          private double yP = 0, yI = 0, yD = 0;

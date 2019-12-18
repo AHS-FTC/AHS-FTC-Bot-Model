@@ -17,6 +17,11 @@ import java.util.Map;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 
+/**
+ * General Utilites class to manage the crappy FTC classes
+ * Enables Mocking via the get-InsertHardwareDeviceHere- methods and the testMode boolean
+ * @author Alex Appleby
+ */
 public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMap exists under OpMode.
     private static HardwareMap hardwareMap;
     private static OpMode opMode;

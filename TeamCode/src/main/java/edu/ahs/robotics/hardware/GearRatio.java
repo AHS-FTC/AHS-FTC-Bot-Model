@@ -1,5 +1,8 @@
 package edu.ahs.robotics.hardware;
 
+/**
+ * Somewhat superfluous class that represents a gear ratio in hardware
+ */
 public class GearRatio {
     private int inputTeeth;
     private int outputTeeth;

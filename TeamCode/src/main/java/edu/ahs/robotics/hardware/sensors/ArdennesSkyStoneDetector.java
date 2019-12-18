@@ -7,6 +7,10 @@ import android.graphics.Color;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 
+/**
+ * Detector class that uses the Vuforia engine to grab a bitmap from the phone camera and detect the location of the Skystone.
+ * @author Alex Appleby
+ */
 public class ArdennesSkyStoneDetector {
     private Vuforia vuforia;
     private boolean isImageSavingEnabled;
@@ -25,6 +29,9 @@ public class ArdennesSkyStoneDetector {
     private static final ColorPreset ACTIVE_YELLOW = ColorPreset.PURE_YELLOW; //Change these bad boys to calibrate
     private static final ColorPreset ACTIVE_BLACK = ColorPreset.PURE_BLACK;
 
+    /**
+     * Represents each of the three field conditions based on the dice roll.
+     */
     public enum SkyStoneConfigurations {
         ONE_FOUR,
         TWO_FIVE,
@@ -66,6 +73,10 @@ public class ArdennesSkyStoneDetector {
         }
     }
 
+    /**
+     * Runs the image processing code.
+     * @return The location of the skystone in SkyStoneConfigurations form
+     */
     public SkyStoneConfigurations look(){
         Bitmap vuBitmap = vuforia.getBitmap();
         //Bitmap croppedBitmap = Bitmap.createBitmap(vuBitmap, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -131,6 +142,16 @@ public class ArdennesSkyStoneDetector {
         //return 1/averageDistance; //average
     }
 
+    /**
+     * Gets the distance between two colors via 3 dimensional distance formula.
+     * @param r Actual red value
+     * @param g Actual green value
+     * @param b Actual blue value
+     * @param targetR Target red value
+     * @param targetG Target green value
+     * @param targetB Target blue value
+     * @return Distance between actual color and target color
+     */
     private double getColorDistance(int r, int g, int b, int targetR, int targetG, int targetB){//does the actual mAthS
         int rDifference = r - targetR;
         int gDifference = g - targetG;
