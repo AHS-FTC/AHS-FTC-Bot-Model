@@ -1,7 +1,6 @@
 package edu.ahs.robotics.hardware;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import edu.ahs.robotics.autocommands.autopaths.functions.Position;
 
@@ -9,12 +8,15 @@ public class Path {
     private final ArrayList<PointAtTime> pointAtTimes;
     double x;
     double y;
-    private static final double MAX_VELOCITY = 1;
+    private double maxVelocity;
+    double totalDistance = 0;
+    double totalTime = 0;
 
-    public Path(ArrayList<Point> points) {
+    public Path(ArrayList<Point> points, double maxVelocity) {
         pointAtTimes = new ArrayList<>();
         pointAtTimes.add(new PointAtTime(points.get(0), 0));
-        double totalDistance = 0;
+
+        this.maxVelocity = maxVelocity;
 
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);
@@ -22,37 +24,53 @@ public class Path {
 
             double distance = current.distanceTo(previous);
             totalDistance += distance;
-            double time = totalDistance / MAX_VELOCITY;
+            totalTime = calculateTimeAtDistance(totalDistance);
 
-            pointAtTimes.add(new PointAtTime(current, time));
+            pointAtTimes.add(new PointAtTime(current, totalTime));
         }
     }
 
+    private double calculateTimeAtDistance(double distance) {
+        return distance / maxVelocity;
+    }
+
     /**
-     * Finds the target location for the robot based on elapsed time
+     * Finds the target location for the robot based on elapsed totalTime
      * @param currentTime
      * @return
      */
     public Position getTargetPosition(double currentTime) {
-        //math for target position based on time and interpolating
+        //math for target position based on totalTime and interpolating
         //is this where the d term goes?
-        PointAtTime last = pointAtTimes.get(0);
+
+        if (currentTime > totalTime) {
+            currentTime = totalTime;
+        }
+
+        PointAtTime previous = pointAtTimes.get(0);
+        PointAtTime next = pointAtTimes.get(1);
+
 
         for (int i = 1; i < pointAtTimes.size(); i++) {
 
-            PointAtTime next = pointAtTimes.get(i);
+            next = pointAtTimes.get(i);
+            previous = pointAtTimes.get(i-1);
+
             if (next.time >= currentTime) {
-                //Interpolate between last and current to find target position
-                double ratio = (currentTime - last.time) / (next.time - last.time);
-                double deltaX = next.getX() - last.getX();
-                double deltaY = next.getY() - last.getY();
-                double targetX = last.getX() + (ratio * deltaX);
-                double targetY = last.getY() + (ratio * deltaY);
-                double targetHeading = Math.atan(deltaY/deltaX);
-                return new Position(targetX,targetY,targetHeading);
+                break;
             }
+
         }
-        return null;
+
+        //Interpolate between previous and current to find target position
+        double ratio = (currentTime - previous.time) / (next.time - previous.time);
+        double deltaX = next.getX() - previous.getX();
+        double deltaY = next.getY() - previous.getY();
+        double targetX = previous.getX() + (ratio * deltaX);
+        double targetY = previous.getY() + (ratio * deltaY);
+        double targetHeading = Math.atan(deltaY/deltaX);
+
+        return new Position(targetX,targetY,targetHeading);
     }
 
     public static class Point {
