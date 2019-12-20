@@ -36,7 +36,7 @@ public class OdometrySystem {
         position = new Position(0,0,0);
         velocity = new Velocity(0,0);
         lastPosition = new Position(0,0,0);
-        lastTime = System.currentTimeMillis();
+        lastTime = FTCUtilities.getCurrentTimeMillis();
 
         this.xInchesPerDegree = xInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
@@ -127,14 +127,14 @@ public class OdometrySystem {
         long currentTime = FTCUtilities.getCurrentTimeMillis();
 
         double distance = position.distanceTo(lastPosition);
-        double deltaTime = (lastTime - currentTime)/1000.0;//in seconds, duh
+        double deltaTime = (currentTime - lastTime)/1000.0;//in seconds, duh
 
         double speed = distance/deltaTime;
-        double direction = position.angleTo(lastPosition);
+        double direction = lastPosition.angleTo(position);
 
         velocity.setVelocity(speed,direction);
 
-        lastPosition = position;
+        lastPosition = new Position(position.x, position.y, position.heading); //todo ask john if this is nessicary
         lastTime = currentTime;
     }
 

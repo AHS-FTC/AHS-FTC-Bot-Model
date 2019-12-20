@@ -29,7 +29,7 @@ public class OdometrySystemTest {
         double[] xInputs = {0,0,0,0};
         init(y1Inputs, y2Inputs, xInputs);
 
-        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the odometrySystem constructor getting initial position
             odometrySystem.updatePosition();
         }
 
@@ -38,6 +38,7 @@ public class OdometrySystemTest {
         assertEquals(0, odometrySystem.getPosition().x, 0.0);
 
         assertEquals(0,odometrySystem.getVelocity().speed,0.0);
+        assertTrue(Double.isNaN(odometrySystem.getVelocity().direction)); //should be NaN for obvious reasons
     }
 
     @Test
@@ -74,6 +75,8 @@ public class OdometrySystemTest {
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
 
+        assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
+
     }
 
     @Test
@@ -91,7 +94,7 @@ public class OdometrySystemTest {
     }
 
     @Test
-    public void strafeAndTurn1Foot(){
+    public void strafeAndDrive1Foot(){
         double[] y1Inputs = {0,2,4,12}; //OdometrySystem references once upon init - starting with zero is a good idea
         double[] y2Inputs = {0,2,4,12};
         double[] xInputs = {0,2,4,12};
@@ -102,7 +105,9 @@ public class OdometrySystemTest {
         }
 
         assertEquals(12, odometrySystem.getPosition().x, .01);
-        assertEquals(12, odometrySystem.getPosition().x, .01);
+        assertEquals(12, odometrySystem.getPosition().y, .01);
+
+        assertEquals(Math.PI/4, odometrySystem.getVelocity().direction,0.001);
     }
 
     @Test
@@ -119,6 +124,8 @@ public class OdometrySystemTest {
         assertEquals(500, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
+
+        assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
     }
 
 //    @Test
