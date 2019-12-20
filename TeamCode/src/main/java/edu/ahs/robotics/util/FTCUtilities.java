@@ -18,7 +18,7 @@ import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 
 /**
- * General Utilites class to manage the crappy FTC classes
+ * General Utilities class to manage the crappy FTC classes
  * Enables Mocking via the get-InsertHardwareDeviceHere- methods and the testMode boolean
  * @author Alex Appleby
  */
@@ -29,6 +29,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     private static boolean testMode = false;
     private static Map <String, DcMotor>testMotors = new HashMap();
     private static Map <String, Odometer>testOdometers = new HashMap();
+    private static MockClock mockClock;
 
 
     public static String getLogDirectory(){
@@ -145,6 +146,18 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         } else {
             return new OdometerImpl(deviceName,wheelDiameter,flip);
         }
+    }
+
+    public static long getCurrentTimeMillis(){
+        if(!testMode){
+            return System.currentTimeMillis();
+        } else {
+            return mockClock.getCurrentTimeMillis();
+        }
+    }
+
+    public static void setMockClock(MockClock mockClock){
+        FTCUtilities.mockClock = mockClock;
     }
 
     public static void startTestMode(){

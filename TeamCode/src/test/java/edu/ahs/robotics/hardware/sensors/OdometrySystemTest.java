@@ -3,6 +3,7 @@ package edu.ahs.robotics.hardware.sensors;
 import org.junit.Test;
 
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.MockClock;
 
 import static org.junit.Assert.*;
 
@@ -11,12 +12,32 @@ public class OdometrySystemTest {
 
     private void init(double[] y1Inputs, double[] y2Inputs, double[] xInputs){
         FTCUtilities.startTestMode();
+        MockClock clock = new MockClock(MockClock.Mode.ADVANCE_BY_10_MILLIS);
+        FTCUtilities.setMockClock(clock);
 
         OdometerMock y1 = new OdometerMock(y1Inputs);
         OdometerMock y2 = new OdometerMock(y2Inputs);
         OdometerMock x = new OdometerMock(xInputs);
 
         odometrySystem = new OdometrySystem(y1, y2, x, .1, 12);
+    }
+
+    @Test
+    public void testNullMovement(){
+        double[] y1Inputs = {0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] y2Inputs = {0,0,0,0};
+        double[] xInputs = {0,0,0,0};
+        init(y1Inputs, y2Inputs, xInputs);
+
+        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+            odometrySystem.updatePosition();
+        }
+
+        assertEquals(0, odometrySystem.getPosition().y, 0.0);
+        assertEquals(0, odometrySystem.getPosition().heading, 0.0);
+        assertEquals(0, odometrySystem.getPosition().x, 0.0);
+
+        assertEquals(0,odometrySystem.getVelocity().speed,0.0);
     }
 
     @Test
@@ -33,6 +54,9 @@ public class OdometrySystemTest {
         assertEquals(12, odometrySystem.getPosition().y, .01);
         assertEquals(0, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
+
+        assertTrue(odometrySystem.getVelocity().speed > 0);
+        assertEquals(odometrySystem.getVelocity().direction, Math.PI / 2,0.001);
     }
 
     @Test

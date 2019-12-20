@@ -3,6 +3,7 @@ package edu.ahs.robotics.hardware.sensors;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import edu.ahs.robotics.autocommands.autopaths.functions.Position;
+import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
 
 /**
@@ -10,36 +11,50 @@ import edu.ahs.robotics.util.FTCUtilities;
  * @author Alex Appleby
  */
 public class OdometrySystem {
-    private IMU imu;
     private Position position;
-    Odometer y1, y2, x;
-    double y1Last, y2Last, xLast;
-    double xInchesPerDegree;
-    double distanceBetweenYWheels;
+    private Velocity velocity;
+
+    private Odometer y1, y2, x;
+
+    private double y1Last, y2Last, xLast;
+    private double xInchesPerDegree;
+    private double distanceBetweenYWheels;
+    private Position lastPosition;
+    private long lastTime;
 
 
     /**
      * @param y1 The 'first' odometer measuring in the Y direction. Should be interchangeable with y2
      * @param y2 The 'second' odometer measuring in the Y direction. Should be interchangeable with y1
-     * @param x The 'odometer measuring in the X direction.
-     */
+     * @param x The odometer measuring in the X direction.
+     */ //todo change axis
     public OdometrySystem(Odometer y1, Odometer y2, Odometer x, double xInchesPerDegree, double distanceBetweenYWheels) {
         this.y1 = y1;
         this.y2 = y2;
         this.x =x;
+
         position = new Position(0,0,0);
+        velocity = new Velocity(0,0);
+        lastPosition = new Position(0,0,0);
+        lastTime = System.currentTimeMillis();
+
         this.xInchesPerDegree = xInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
 
         y1Last = y1.getDistance();
         y2Last = y2.getDistance();
         xLast = x.getDistance();
+
     }
 
     /**
      * starts thread continuously monitoring position
      */
-    public void start(){
+    public void start(){ //todo make happen
+
+    }
+
+    public void stop(){
 
     }
 
@@ -104,10 +119,31 @@ public class OdometrySystem {
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+
+        updateVelocity();
+    }
+
+    private void updateVelocity(){
+        long currentTime = FTCUtilities.getCurrentTimeMillis();
+
+        double distance = position.distanceTo(lastPosition);
+        double deltaTime = (lastTime - currentTime)/1000.0;//in seconds, duh
+
+        double speed = distance/deltaTime;
+        double direction = position.angleTo(lastPosition);
+
+        velocity.setVelocity(speed,direction);
+
+        lastPosition = position;
+        lastTime = currentTime;
     }
 
     public Position getPosition(){
         return position;
+    }
+
+    public Velocity getVelocity() {
+        return velocity;
     }
 
     /**
