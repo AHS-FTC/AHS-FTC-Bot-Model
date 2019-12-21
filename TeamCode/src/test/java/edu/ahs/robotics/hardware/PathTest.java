@@ -1,5 +1,8 @@
 package edu.ahs.robotics.hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ public class PathTest {
         points.add(new Path.Point(3,2));
         Path path = new Path(points, 1);
 
-        //Test that target position is first point at totalTime 0
+        //Test that target position is first point at totalDistance 0
         Position targetPosition = path.getTargetPosition(0);
         assertEquals(0, targetPosition.x, .001);
         assertEquals(0, targetPosition.y,  .001);
@@ -30,7 +33,7 @@ public class PathTest {
         assertEquals(1, targetPosition.y, .001);
         assertEquals(45, targetPosition.getHeadingInDegrees(),  .01);
 
-        //Test what happens if currentTime is greater than totalTime
+        //Test what happens if currentTime is greater than totalDistance
         targetPosition = path.getTargetPosition(5);
         assertEquals(3, targetPosition.x,  .001);
         assertEquals(2, targetPosition.y, .001);
@@ -41,6 +44,11 @@ public class PathTest {
         assertEquals(3, targetPosition.x,  .001);
         assertEquals(2, targetPosition.y, .001);
         assertEquals(26.5650512, targetPosition.getHeadingInDegrees(),  .01);
+
+    }
+
+    @Test
+    public void testPointOfIntersection() {
 
     }
 }

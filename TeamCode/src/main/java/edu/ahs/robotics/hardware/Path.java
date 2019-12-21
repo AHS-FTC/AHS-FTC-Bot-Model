@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import edu.ahs.robotics.autocommands.autopaths.functions.Position;
 
 public class Path {
-    private final ArrayList<PointAtTime> pointAtTimes;
+    private final ArrayList<PointAtDistance> pointAtDistance;
     double x;
     double y;
     private double maxVelocity;
-    double totalDistance = 0;
     double totalTime = 0;
+    double totalDistance = 0;
 
     public Path(ArrayList<Point> points, double maxVelocity) {
-        pointAtTimes = new ArrayList<>();
-        pointAtTimes.add(new PointAtTime(points.get(0), 0));
+        pointAtDistance = new ArrayList<>();
+        pointAtDistance.add(new PointAtDistance(points.get(0), 0));
 
         this.maxVelocity = maxVelocity;
 
@@ -23,38 +23,67 @@ public class Path {
             Point previous = points.get(i-1);
 
             double distance = current.distanceTo(previous);
-            totalDistance += distance;
-            totalTime = calculateTimeAtDistance(totalDistance);
+            totalTime += distance;
+            totalDistance = calculateDistanceAtTime(totalTime);
 
-            pointAtTimes.add(new PointAtTime(current, totalTime));
+            pointAtDistance.add(new PointAtDistance(current, totalDistance));
         }
     }
 
-    private double calculateTimeAtDistance(double distance) {
-        return distance / maxVelocity;
+    private double calculateDistanceAtTime(double distance) {
+        return distance;
     }
 
-    /**
-     * Finds the target location for the robot based on elapsed totalTime
-     * @param currentTime
-     * @return
-     */
+
+
+    public Position getTargetPosition(Position robotPosition) {
+
+        PointAtDistance closest = pointAtDistance.get(0);
+        PointAtDistance nextClosest;
+        double closestDistance = closest.distanceTo(robotPosition);
+        double nextClosestDistance = Double.MAX_VALUE;
+
+        for (int i = 1; i < pointAtDistance.size(); i++) {
+            PointAtDistance currentPoint = this.pointAtDistance.get(i);
+            double currentDistance = currentPoint.distanceTo(robotPosition);
+
+            if (currentDistance < closestDistance) {
+                nextClosestDistance = closestDistance;
+                nextClosest = closest;
+                closestDistance = currentDistance;
+                closest = currentPoint;
+            } else if (currentDistance < nextClosestDistance){
+                nextClosestDistance = currentDistance;
+                nextClosest = currentPoint;
+            } else {
+                break;
+            }
+        }
+
+
+
+        return new Position();
+    }
+
+
     public Position getTargetPosition(double currentTime) {
-        //math for target position based on totalTime and interpolating
+        //math for target position based on totalDistance and interpolating
         //is this where the d term goes?
 
-        if (currentTime > totalTime) {
-            currentTime = totalTime;
+
+
+        if (currentTime > totalDistance) {
+            currentTime = totalDistance;
         }
 
-        PointAtTime previous = pointAtTimes.get(0);
-        PointAtTime next = pointAtTimes.get(1);
+        PointAtDistance previous = pointAtDistance.get(0);
+        PointAtDistance next = pointAtDistance.get(1);
 
 
-        for (int i = 1; i < pointAtTimes.size(); i++) {
+        for (int i = 1; i < pointAtDistance.size(); i++) {
 
-            next = pointAtTimes.get(i);
-            previous = pointAtTimes.get(i-1);
+            next = pointAtDistance.get(i);
+            previous = pointAtDistance.get(i-1);
 
             if (next.time >= currentTime) {
                 break;
@@ -86,6 +115,10 @@ public class Path {
             return Math.sqrt(Math.pow(x - p.x ,2) + Math.pow(y - p.y,2));
         }
 
+        public double distanceTo(Position p) {
+            return  Math.sqrt(Math.pow(x - p.x ,2) + Math.pow(y - p.y,2));
+        }
+
         public double getX() {
             return x;
         }
@@ -95,22 +128,53 @@ public class Path {
         }
     }
     
-    private static class PointAtTime extends Point {
-        private double time;
+    private static class PointAtDistance extends Point {
+        private double distance;
 
-        public PointAtTime(double x, double y, double time) {
+        public PointAtDistance(double x, double y, double distance) {
             super(x, y);
-            this.time = time;
+            this.distance = distance;
             
         }
 
-        public PointAtTime(Point p, double time) {
-            this(p.x, p.y, time);
+        public PointAtDistance(Point p, double distance) {
+            this(p.x, p.y, distance);
         }
 
-        public double getTime() {
-            return time;
+        public double getDistance() {
+            return distance;
         }
+    }
+
+    private static class Line {
+        private double m;
+        private double b;
+
+        private Line (Point p1, Point p2) {
+            m = (p2.y - p1.y)/(p2.x - p1.x);
+            b = (-m * p1.x) + p1.y;
+        }
+
+        private Line (Point p, double m) {
+            this.m = m;
+            b = (-m * p.x) + p.y;
+        }
+
+        private Point findNearestPoint (Point p){
+            Line perpLine = new Line(p, -1/m);
+            return findIntersection(perpLine);
+        }
+
+        private Point findIntersection (Line l) {
+            double x = (b-l.b)/(l.m-m);
+            double y = getY(x);
+            return new Point(x,y);
+        }
+
+        private double getY(double x) {
+            return (m * x) + b;
+        }
+
     }
     
 
