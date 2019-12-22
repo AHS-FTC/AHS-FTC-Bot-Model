@@ -53,6 +53,8 @@ public class Line {
      * Utilizes standard matrix multiplication and linear algebra.
      * <br/>
      * <a href = "https://docs.google.com/document/d/1-YaZ2nIiVRlJiNXVc9DvnZ-Pd_QOwHxHLTtGJqQMJJA/edit?folder=1EVwkBM0pBycM7-6TNpljJVHYB1fVUfgU">Math</>
+     * <br/>
+     * <a href = "https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/">Another useful link </a>
      * @param l The line intersecting this one
      * @return The intersection
      */
