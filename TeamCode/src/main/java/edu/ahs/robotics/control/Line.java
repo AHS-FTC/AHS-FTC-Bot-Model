@@ -1,6 +1,5 @@
 package edu.ahs.robotics.control;
 
-import edu.ahs.robotics.hardware.Path;
 /**
  * Line in standard form to be compatible with basic matrix operations.
  * </br>

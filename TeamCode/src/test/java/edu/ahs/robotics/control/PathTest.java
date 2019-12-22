@@ -1,14 +1,11 @@
-package edu.ahs.robotics.hardware;
+package edu.ahs.robotics.control;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
-
-import static org.junit.Assert.*;
 
 public class PathTest {
 
@@ -18,7 +15,7 @@ public class PathTest {
 //        points.add(new Point(0,0));
 //        points.add(new Point(1,1));
 //        points.add(new Point(3,2));
-//        Path path = new Path(points, 1);
+//        Path path = new Path(points);
 //
 //        //Test that target position is first point at totalDistance 0
 //        Position targetPosition = path.getTargetPosition(0);
@@ -57,6 +54,7 @@ public class PathTest {
         points.add(new Point(0,0));
         points.add(new Point(1,1));
         Path path = new Path(points);
+
 
     }
 }

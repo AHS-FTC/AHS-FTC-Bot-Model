@@ -2,8 +2,6 @@ package edu.ahs.robotics.control;
 
 import java.util.ArrayList;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-
 public class Path {
     private final ArrayList<PointAtDistance> pointAtDistance;
     double x;

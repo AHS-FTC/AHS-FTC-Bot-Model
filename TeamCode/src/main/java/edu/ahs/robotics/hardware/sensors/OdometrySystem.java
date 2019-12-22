@@ -1,9 +1,6 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.control.Position;
 
 /**
  * A collection of Odometers used to monitor robot position. Written for Ardennes in 2019-20

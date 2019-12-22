@@ -1,4 +1,4 @@
-package edu.ahs.robotics.autocommands.autopaths.functions;
+package edu.ahs.robotics.control;
 
 /**
  * Represents the position of our robot. x and y coordinates are stored natively in inches

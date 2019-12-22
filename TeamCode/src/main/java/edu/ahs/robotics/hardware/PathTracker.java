@@ -1,6 +1,6 @@
 package edu.ahs.robotics.hardware;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
+import edu.ahs.robotics.control.Position;
 
 public class PathTracker {
     private Position currentPosition;
