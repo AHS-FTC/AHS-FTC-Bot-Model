@@ -15,7 +15,6 @@ public class Path {
         pointAtDistance.add(new PointAtDistance(points.get(0), 0));
 
         for (int i = 1; i < points.size(); i++) {
-
             Point current = points.get(i);
             Point previous = points.get(i-1);
             double distanceFromPrevious = current.distanceTo(previous);
@@ -24,19 +23,28 @@ public class Path {
         }
     }
 
-    public Position getTargetPosition(Position robotPosition) {
-        PointAtDistance[] boundingPoints = getBoundingPoints(robotPosition);
-        Point closest = boundingPoints[0];
-        Point nextClosest = boundingPoints[1];
-        Line pathLine = new Line(closest, nextClosest);
-
-        return new Position(pathLine.findIntersection());
+    public PointAtDistance getPoint(int index) {
+        return pointAtDistance.get(index);
     }
 
-    public PointAtDistance[] getBoundingPoints(Position robotPosition) {
-        PointAtDistance closest = pointAtDistance.get(0);
-        PointAtDistance nextClosest;
-        double closestDistance = closest.distanceTo(robotPosition);
+    public Position getTargetPosition(Position robotPosition) {
+        int[] boundingPoints = getBoundingPoints(robotPosition);
+        Point first = getPoint(boundingPoints[0]);
+        Point second = getPoint(boundingPoints[1]);
+        Line pathLine = new Line(first, second);
+
+        return new Position(pathLine.getClosestPointOnLine, pathLine.direction);
+    }
+
+    /**
+     *
+     * @param robotPosition
+     * @return indices of points. Use getPoint to find actual point
+     */
+    public int[] getBoundingPoints(Position robotPosition) {
+        int closest = 0;
+        int nextClosest = 1;
+        double closestDistance = pointAtDistance.get(closest).distanceTo(robotPosition);
         double nextClosestDistance = Double.MAX_VALUE;
 
         for (int i = 1; i < pointAtDistance.size(); i++) {
@@ -47,16 +55,23 @@ public class Path {
                 nextClosestDistance = closestDistance;
                 nextClosest = closest;
                 closestDistance = currentDistance;
-                closest = currentPoint;
+                closest = i;
             } else if (currentDistance < nextClosestDistance) {
                 nextClosestDistance = currentDistance;
-                nextClosest = currentPoint;
+                nextClosest = i;
             } else {
                 break;
             }
         }
-        return new PointAtDistance[] {closest, nextClosest};
+        //Return the points in order
+        if (closest < nextClosest) {
+            return new int[]{closest, nextClosest};
+        } else {
+            return new int[]{nextClosest, closest};
+        }
     }
+
+
 
 
 //    public Position getTargetPosition(double currentTime) {
@@ -97,7 +112,7 @@ public class Path {
 
 
     
-    private static class PointAtDistance extends Point {
+    public static class PointAtDistance extends Point {
         private double distance;
 
         public PointAtDistance(double x, double y, double distance) {

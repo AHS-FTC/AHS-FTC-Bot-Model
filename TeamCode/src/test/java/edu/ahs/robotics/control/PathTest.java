@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
 
+import static org.junit.Assert.*;
+
 public class PathTest {
 
 //    @Test
@@ -49,12 +51,17 @@ public class PathTest {
     }
 
     @Test
-    public void testCurrentAndNextCurrent() {
+    public void testBoundingPointsWithSimplePath() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
         points.add(new Point(1,1));
         Path path = new Path(points);
 
+        //Test at robot position 0
+        Position robotPosition = new Position(0,0,0);
+        int[] boundingPoints = path.getBoundingPoints(robotPosition);
+        assertArrayEquals(new int[] {0,1}, boundingPoints);
 
+        //Test
     }
 }
