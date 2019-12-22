@@ -1,7 +1,5 @@
 package edu.ahs.robotics.control;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-
 public class Point {
     public double x;
     public double y;

@@ -1,9 +1,6 @@
-package edu.ahs.robotics.hardware;
+package edu.ahs.robotics.control;
 
 import java.util.ArrayList;
-
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-import edu.ahs.robotics.control.Point;
 
 public class Path {
     private final ArrayList<PointAtDistance> pointAtDistance;
@@ -13,32 +10,30 @@ public class Path {
     double totalTime = 0;
     double totalDistance = 0;
 
-    public Path(ArrayList<Point> points, double maxVelocity) {
+    public Path(ArrayList<Point> points) {
         pointAtDistance = new ArrayList<>();
         pointAtDistance.add(new PointAtDistance(points.get(0), 0));
 
-        this.maxVelocity = maxVelocity;
-
         for (int i = 1; i < points.size(); i++) {
+
             Point current = points.get(i);
             Point previous = points.get(i-1);
-
-            double distance = current.distanceTo(previous);
-            totalTime += distance;
-            totalDistance = calculateDistanceAtTime(totalTime);
-
+            double distanceFromPrevious = current.distanceTo(previous);
+            totalDistance += distanceFromPrevious;
             pointAtDistance.add(new PointAtDistance(current, totalDistance));
         }
     }
 
-    private double calculateDistanceAtTime(double distance) {
-        return distance;
+    public Position getTargetPosition(Position robotPosition) {
+        PointAtDistance[] boundingPoints = getBoundingPoints(robotPosition);
+        Point closest = boundingPoints[0];
+        Point nextClosest = boundingPoints[1];
+        Line pathLine = new Line(closest, nextClosest);
+
+        return new Position(pathLine.findIntersection());
     }
 
-
-
-    public Position getTargetPosition(Position robotPosition) {
-
+    public PointAtDistance[] getBoundingPoints(Position robotPosition) {
         PointAtDistance closest = pointAtDistance.get(0);
         PointAtDistance nextClosest;
         double closestDistance = closest.distanceTo(robotPosition);
@@ -53,53 +48,52 @@ public class Path {
                 nextClosest = closest;
                 closestDistance = currentDistance;
                 closest = currentPoint;
-            } else if (currentDistance < nextClosestDistance){
+            } else if (currentDistance < nextClosestDistance) {
                 nextClosestDistance = currentDistance;
                 nextClosest = currentPoint;
             } else {
                 break;
             }
         }
-
-        return new Position();
+        return new PointAtDistance[] {closest, nextClosest};
     }
 
 
-    public Position getTargetPosition(double currentTime) {
-        //math for target position based on totalDistance and interpolating
-        //is this where the d term goes?
-
-
-
-        if (currentTime > totalDistance) {
-            currentTime = totalDistance;
-        }
-
-        PointAtDistance previous = pointAtDistance.get(0);
-        PointAtDistance next = pointAtDistance.get(1);
-
-
-        for (int i = 1; i < pointAtDistance.size(); i++) {
-
-            next = pointAtDistance.get(i);
-            previous = pointAtDistance.get(i-1);
-
-            if (next.time >= currentTime) {
-                break;
-            }
-
-        }
-
-        //Interpolate between previous and current to find target position
-        double ratio = (currentTime - previous.time) / (next.time - previous.time);
-        double deltaX = next.getX() - previous.getX();
-        double deltaY = next.getY() - previous.getY();
-        double targetX = previous.getX() + (ratio * deltaX);
-        double targetY = previous.getY() + (ratio * deltaY);
-        double targetHeading = Math.atan(deltaY/deltaX);
-
-        return new Position(targetX,targetY,targetHeading);
-    }
+//    public Position getTargetPosition(double currentTime) {
+//        //math for target position based on totalDistance and interpolating
+//        //is this where the d term goes?
+//
+//
+//
+//        if (currentTime > totalDistance) {
+//            currentTime = totalDistance;
+//        }
+//
+//        PointAtDistance previous = pointAtDistance.get(0);
+//        PointAtDistance next = pointAtDistance.get(1);
+//
+//
+//        for (int i = 1; i < pointAtDistance.size(); i++) {
+//
+//            next = pointAtDistance.get(i);
+//            previous = pointAtDistance.get(i-1);
+//
+//            if (next.time >= currentTime) {
+//                break;
+//            }
+//
+//        }
+//
+//        //Interpolate between previous and current to find target position
+//        double ratio = (currentTime - previous.time) / (next.time - previous.time);
+//        double deltaX = next.getX() - previous.getX();
+//        double deltaY = next.getY() - previous.getY();
+//        double targetX = previous.getX() + (ratio * deltaX);
+//        double targetY = previous.getY() + (ratio * deltaY);
+//        double targetHeading = Math.atan(deltaY/deltaX);
+//
+//        return new Position(targetX,targetY,targetHeading);
+//    }
 
 
     
