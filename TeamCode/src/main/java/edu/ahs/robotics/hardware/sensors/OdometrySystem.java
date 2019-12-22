@@ -2,17 +2,25 @@ package edu.ahs.robotics.hardware.sensors;
 
 import edu.ahs.robotics.autocommands.autopaths.functions.Position;
 
+import edu.ahs.robotics.control.Velocity;
+import edu.ahs.robotics.util.FTCUtilities;
+
+
 /**
  * A collection of Odometers used to monitor robot position. Written for Ardennes in 2019-20
  * @author Alex Appleby
  */
 public class OdometrySystem {
-    private IMU imu;
     private Position position;
-    Odometer y1, y2, x;
-    double y1Last, y2Last, xLast;
-    double xInchesPerDegree;
-    double distanceBetweenYWheels;
+    private Velocity velocity;
+
+    private Odometer y1, y2, x;
+
+    private double y1Last, y2Last, xLast;
+    private double xInchesPerDegree;
+    private double distanceBetweenYWheels;
+    private Position lastPosition;
+    private long lastTime;
 
     private OdometerThread odometerThread;
     private Thread thread;
@@ -20,13 +28,18 @@ public class OdometrySystem {
     /**
      * @param y1 The 'first' odometer measuring in the Y direction. Should be interchangeable with y2
      * @param y2 The 'second' odometer measuring in the Y direction. Should be interchangeable with y1
-     * @param x The 'odometer measuring in the X direction.
-     */
+     * @param x The odometer measuring in the X direction.
+     */ //todo change axis
     public OdometrySystem(Odometer y1, Odometer y2, Odometer x, double xInchesPerDegree, double distanceBetweenYWheels) {
         this.y1 = y1;
         this.y2 = y2;
         this.x =x;
+
         position = new Position(0,0,0);
+        velocity = new Velocity(0,0);
+        lastPosition = new Position(0,0,0);
+        lastTime = FTCUtilities.getCurrentTimeMillis();
+
         this.xInchesPerDegree = xInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
 
@@ -41,10 +54,11 @@ public class OdometrySystem {
     /**
      * starts thread continuously monitoring position
      */
+
     public void start(){
         thread.start();
     }
-
+  
     public void stop(){
         odometerThread.stop();
     }
@@ -110,10 +124,31 @@ public class OdometrySystem {
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+
+        updateVelocity();
+    }
+
+    private void updateVelocity(){
+        long currentTime = FTCUtilities.getCurrentTimeMillis();
+
+        double distance = position.distanceTo(lastPosition);
+        double deltaTime = (currentTime - lastTime)/1000.0;//in seconds, duh
+
+        double speed = distance/deltaTime;
+        double direction = lastPosition.angleTo(position);
+
+        velocity.setVelocity(speed,direction);
+
+        lastPosition = new Position(position.x, position.y, position.heading); //todo ask john if this is nessicary
+        lastTime = currentTime;
     }
 
     public Position getPosition(){
         return position;
+    }
+
+    public Velocity getVelocity() {
+        return velocity;
     }
 
     /**

@@ -3,6 +3,9 @@ package edu.ahs.robotics.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A class with static methods that returns motor statistics. Probably worth rewriting at some point
+ */
 public class MotorHashService {
 
 

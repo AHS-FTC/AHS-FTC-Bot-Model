@@ -1,6 +1,5 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import edu.ahs.robotics.hardware.sensors.Odometer;
 
 public class OdometerMock implements Odometer {
 
@@ -13,11 +12,11 @@ public class OdometerMock implements Odometer {
 
     @Override
     public double getDistance() {
-        if(index <= inputs.length - 1) {//todo check +1 -1
+        if(index <= inputs.length - 1) {
             index ++;
             return inputs[index-1]; // -1 to compensate for ++
         } else {
-            return inputs[inputs.length - 1];//todo check +1 -1
+            return inputs[inputs.length - 1];
         }
     }
 

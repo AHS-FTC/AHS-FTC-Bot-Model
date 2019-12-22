@@ -1,8 +1,8 @@
 package edu.ahs.robotics.hardware.sensors;
 
 import org.junit.Test;
-
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.MockClock;
 import edu.ahs.robotics.util.Logger;
 
 import static org.junit.Assert.*;
@@ -20,6 +20,8 @@ public class OdometrySystemTest {
 
     private void init(double[] y1Inputs, double[] y2Inputs, double[] xInputs){
         FTCUtilities.startTestMode();
+        MockClock clock = new MockClock(MockClock.Mode.ADVANCE_BY_10_MILLIS);
+        FTCUtilities.setMockClock(clock);
 
         OdometerMock y1 = new OdometerMock(y1Inputs);
         OdometerMock y2 = new OdometerMock(y2Inputs);
@@ -27,6 +29,25 @@ public class OdometrySystemTest {
 
         odometrySystem = new OdometrySystem(y1, y2, x, .1, 12);
         odometrySystem.resetPosition(0,0,Math.PI/2);
+    }
+
+    @Test
+    public void testNullMovement(){
+        double[] y1Inputs = {0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] y2Inputs = {0,0,0,0};
+        double[] xInputs = {0,0,0,0};
+        init(y1Inputs, y2Inputs, xInputs);
+
+        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the odometrySystem constructor getting initial position
+            odometrySystem.updatePosition();
+        }
+
+        assertEquals(0, odometrySystem.getPosition().y, 0.0);
+        assertEquals(0, odometrySystem.getPosition().heading, 0.0);
+        assertEquals(0, odometrySystem.getPosition().x, 0.0);
+
+        assertEquals(0,odometrySystem.getVelocity().speed,0.0);
+        assertTrue(Double.isNaN(odometrySystem.getVelocity().direction)); //should be NaN for obvious reasons
     }
 
     @Test
@@ -43,6 +64,9 @@ public class OdometrySystemTest {
         assertEquals(12, odometrySystem.getPosition().y, .01);
         assertEquals(Math.PI/2, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
+
+        assertTrue(odometrySystem.getVelocity().speed > 0);
+        assertEquals(odometrySystem.getVelocity().direction, Math.PI / 2,0.001);
     }
 
     @Test
@@ -59,6 +83,8 @@ public class OdometrySystemTest {
         assertEquals(Math.PI, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
+
+        assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
 
     }
 
@@ -77,7 +103,7 @@ public class OdometrySystemTest {
     }
 
     @Test
-    public void strafeAndTurn1Foot(){
+    public void strafeAndDrive1Foot(){
         double[] y1Inputs = {0,2,4,12}; //OdometrySystem references once upon init - starting with zero is a good idea
         double[] y2Inputs = {0,2,4,12};
         double[] xInputs = {0,2,4,12};
@@ -89,6 +115,9 @@ public class OdometrySystemTest {
 
         assertEquals(12, odometrySystem.getPosition().x, .01);
         assertEquals(12, odometrySystem.getPosition().y, .01);
+      
+        assertEquals(Math.PI/4, odometrySystem.getVelocity().direction,0.001);
+
     }
 
     @Test
@@ -105,6 +134,8 @@ public class OdometrySystemTest {
         assertEquals(Math.toRadians(500) + Math.PI/2, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
+
+        assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
     }
 
     @Test
