@@ -17,6 +17,8 @@ public class OdometrySystem {
     double xInchesPerDegree;
     double distanceBetweenYWheels;
 
+    private OdometerThread thread;
+
 
     /**
      * @param y1 The 'first' odometer measuring in the Y direction. Should be interchangeable with y2
@@ -34,13 +36,19 @@ public class OdometrySystem {
         y1Last = y1.getDistance();
         y2Last = y2.getDistance();
         xLast = x.getDistance();
+
+        thread = new OdometerThread();
     }
 
     /**
      * starts thread continuously monitoring position
      */
     public void start(){
+        thread.run();
+    }
 
+    public void stop(){
+        thread.stop();
     }
 
     public void resetPosition(double x, double y, double heading){
@@ -119,6 +127,25 @@ public class OdometrySystem {
      */
     private double findDeltaHeading(double y1, double y2){
         return (y1-y2)/distanceBetweenYWheels;//derived from double arcs
+    }
+
+    private class OdometerThread implements Runnable{
+        boolean isRunning;
+
+        public OdometerThread() {
+            isRunning = true;
+        }
+
+        @Override
+        public void run() {
+            while (isRunning){
+                updatePosition();
+            }
+        }
+
+        public void stop(){
+            isRunning = false;
+        }
     }
 
 }
