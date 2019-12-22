@@ -1,9 +1,6 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
 import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-import edu.ahs.robotics.util.FTCUtilities;
 
 /**
  * A collection of Odometers used to monitor robot position. Written for Ardennes in 2019-20
@@ -17,8 +14,8 @@ public class OdometrySystem {
     double xInchesPerDegree;
     double distanceBetweenYWheels;
 
-    private OdometerThread thread;
-
+    private OdometerThread odometerThread;
+    private Thread thread;
 
     /**
      * @param y1 The 'first' odometer measuring in the Y direction. Should be interchangeable with y2
@@ -37,18 +34,19 @@ public class OdometrySystem {
         y2Last = y2.getDistance();
         xLast = x.getDistance();
 
-        thread = new OdometerThread();
+        odometerThread = new OdometerThread();
+        thread = new Thread(odometerThread);
     }
 
     /**
      * starts thread continuously monitoring position
      */
     public void start(){
-        thread.run();
+        thread.start();
     }
 
     public void stop(){
-        thread.stop();
+        odometerThread.stop();
     }
 
     public void resetPosition(double x, double y, double heading){
@@ -130,21 +128,23 @@ public class OdometrySystem {
     }
 
     private class OdometerThread implements Runnable{
-        boolean isRunning;
-
-        public OdometerThread() {
-            isRunning = true;
-        }
+        private volatile boolean running;
 
         @Override
         public void run() {
-            while (isRunning){
+            running = true;
+            while (running){
                 updatePosition();
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         public void stop(){
-            isRunning = false;
+            running = false;
         }
     }
 
