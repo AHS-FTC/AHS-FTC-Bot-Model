@@ -28,4 +28,8 @@ public class Position {
         this.y = y;
         this.heading = heading;
     }
+
+    public Point getAsPoint(){
+        return new Point(x,y);
+    }
 }
