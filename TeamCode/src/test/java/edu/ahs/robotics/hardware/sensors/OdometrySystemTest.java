@@ -1,12 +1,20 @@
 package edu.ahs.robotics.hardware.sensors;
 
 import org.junit.Test;
-
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MockClock;
+import edu.ahs.robotics.util.Logger;
 
 import static org.junit.Assert.*;
 
+/**
+ * Just some test methods for OdometrySystem.
+ * Needs a few more complex tests, they are just difficult to write without a robot.
+ *
+ * Note that we <b>do not</b> use odometrySystem.start() to ensure all tests are completely deterministic.
+ * We iterate through odometrySystem.updatePosition() instead.
+ * @author Alex Appleby
+ */
 public class OdometrySystemTest {
     private OdometrySystem odometrySystem;
 
@@ -20,6 +28,7 @@ public class OdometrySystemTest {
         OdometerMock x = new OdometerMock(xInputs);
 
         odometrySystem = new OdometrySystem(y1, y2, x, .1, 12);
+        odometrySystem.resetPosition(0,0,Math.PI/2);
     }
 
     @Test
@@ -53,7 +62,7 @@ public class OdometrySystemTest {
         }
 
         assertEquals(12, odometrySystem.getPosition().y, .01);
-        assertEquals(0, odometrySystem.getPosition().heading, .01);
+        assertEquals(Math.PI/2, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
 
         assertTrue(odometrySystem.getVelocity().speed > 0);
@@ -71,7 +80,7 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(90, odometrySystem.getPosition().heading, .01);
+        assertEquals(Math.PI, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
 
@@ -106,8 +115,9 @@ public class OdometrySystemTest {
 
         assertEquals(12, odometrySystem.getPosition().x, .01);
         assertEquals(12, odometrySystem.getPosition().y, .01);
-
+      
         assertEquals(Math.PI/4, odometrySystem.getVelocity().direction,0.001);
+
     }
 
     @Test
@@ -121,11 +131,36 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(500, odometrySystem.getPosition().heading, .01);
+        assertEquals(Math.toRadians(500) + Math.PI/2, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
 
         assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
+    }
+
+    @Test
+    public void testThread(){ //todo comment out, refactor or remove this test because it's nondeterministic
+        double[] y1Inputs = {0,0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] y2Inputs = {0,0,0,0,0};
+        double[] xInputs = {0,0,0,0,0};
+
+        init(y1Inputs, y2Inputs, xInputs);
+
+        odometrySystem.start();
+
+        FTCUtilities.OpLogger("x",odometrySystem.getPosition().x);
+        FTCUtilities.OpLogger("y",odometrySystem.getPosition().y);
+
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        FTCUtilities.OpLogger("x",odometrySystem.getPosition().x);
+        FTCUtilities.OpLogger("y",odometrySystem.getPosition().y);
+
+        odometrySystem.stop();
     }
 
 //    @Test
