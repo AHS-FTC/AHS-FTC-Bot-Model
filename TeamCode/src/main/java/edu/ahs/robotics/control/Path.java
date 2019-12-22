@@ -30,7 +30,8 @@ public class Path {
         Point nextClosest = boundingPoints[1];
         Line pathLine = new Line(closest, nextClosest);
 
-        return new Position(pathLine.findIntersection());
+        return null;
+        //return new Position(pathLine.findIntersection());
     }
 
     public PointAtDistance[] getBoundingPoints(Position robotPosition) {
@@ -55,7 +56,8 @@ public class Path {
                 break;
             }
         }
-        return new PointAtDistance[] {closest, nextClosest};
+        return null;
+        //return new PointAtDistance[] {closest, nextClosest};
     }
 
 

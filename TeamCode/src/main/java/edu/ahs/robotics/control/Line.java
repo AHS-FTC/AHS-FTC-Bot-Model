@@ -20,12 +20,15 @@ public class Line {
      * @param p2 Another point on the line
      */
     public Line (Point p1, Point p2) {
-        a = p1.x - p2.x;
-        b = p2.y - p1.y;
+        a = p2.y - p1.y;
+        b = p1.x - p2.x;
         c = a*(p1.x) + b*(p1.y);
     }
 
-    public Line (double a, double b, double c){
+    /**
+     * Test and internal constructor that creates a line with predetermined constants.
+     */
+    protected Line (double a, double b, double c){
         this.a = a;
         this.b = b;
         this.c = c;
@@ -33,16 +36,17 @@ public class Line {
 
     /**
      * Gets a line perpendicular to this line that runs through a point
+     * Package protected to enable unit testing
      * @param p A point lying on the perpendicular line
      * @return The line
      */
-    private Line getPerpLineAtPoint(Point p){
+     protected Line getPerpLineAtPoint(Point p){
         double perpA = -b;
         double perpB = a;
         double perpC = (perpA * p.x) + (perpB * p.y);
 
         return new Line(perpA, perpB, perpC);
-    }
+     }
 
     /**
      * Finds the intersection between two nonfunctional lines.
@@ -52,7 +56,7 @@ public class Line {
      * @param l The line intersecting this one
      * @return The intersection
      */
-    public Point findIntersection(Line l){
+    protected Point findIntersection(Line l){
         //ax + by = c
         //dx + ey = f
 
@@ -87,6 +91,25 @@ public class Line {
         double y = (dInv * c) + (eInv * f);
 
         return new Point(x,y);
+    }
+
+    /**
+     * Gets the nearest point to a robot position on the line
+     * @param position The position of the robot, heading omitted in method
+     * @return The nearest point
+     */
+    public Point getClosestPointOnLine(Position position){
+        Point p = position.getAsPoint();
+        Line perp = getPerpLineAtPoint(p);
+        Point intersection = findIntersection(perp); //the closest point is always orthogonal to the line.
+        return intersection;
+    }
+
+    /**
+     * mainly for testing
+     */
+    protected double findSlope(){
+        return -(a/b); // dx / dy
     }
 
 //        private Point findIntersection (Line l) {
