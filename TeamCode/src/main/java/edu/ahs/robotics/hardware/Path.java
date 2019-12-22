@@ -3,6 +3,7 @@ package edu.ahs.robotics.hardware;
 import java.util.ArrayList;
 
 import edu.ahs.robotics.autocommands.autopaths.functions.Position;
+import edu.ahs.robotics.control.Point;
 
 public class Path {
     private final ArrayList<PointAtDistance> pointAtDistance;
@@ -60,8 +61,6 @@ public class Path {
             }
         }
 
-
-
         return new Position();
     }
 
@@ -102,31 +101,7 @@ public class Path {
         return new Position(targetX,targetY,targetHeading);
     }
 
-    public static class Point {
-        private double x;
-        private double y;
 
-        public Point(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public double distanceTo(Point p) {
-            return Math.sqrt(Math.pow(x - p.x ,2) + Math.pow(y - p.y,2));
-        }
-
-        public double distanceTo(Position p) {
-            return  Math.sqrt(Math.pow(x - p.x ,2) + Math.pow(y - p.y,2));
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public double getY() {
-            return y;
-        }
-    }
     
     private static class PointAtDistance extends Point {
         private double distance;
@@ -146,36 +121,7 @@ public class Path {
         }
     }
 
-    private static class Line {
-        private double m;
-        private double b;
 
-        private Line (Point p1, Point p2) {
-            m = (p2.y - p1.y)/(p2.x - p1.x);
-            b = (-m * p1.x) + p1.y;
-        }
-
-        private Line (Point p, double m) {
-            this.m = m;
-            b = (-m * p.x) + p.y;
-        }
-
-        private Point findNearestPoint (Point p){
-            Line perpLine = new Line(p, -1/m);
-            return findIntersection(perpLine);
-        }
-
-        private Point findIntersection (Line l) {
-            double x = (b-l.b)/(l.m-m);
-            double y = getY(x);
-            return new Point(x,y);
-        }
-
-        private double getY(double x) {
-            return (m * x) + b;
-        }
-
-    }
     
 
 }
