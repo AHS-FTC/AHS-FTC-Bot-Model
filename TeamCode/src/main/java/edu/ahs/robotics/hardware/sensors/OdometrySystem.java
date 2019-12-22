@@ -1,9 +1,6 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
 import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-import edu.ahs.robotics.util.FTCUtilities;
 
 /**
  * A collection of Odometers used to monitor robot position. Written for Ardennes in 2019-20
@@ -17,6 +14,8 @@ public class OdometrySystem {
     double xInchesPerDegree;
     double distanceBetweenYWheels;
 
+    private OdometerThread odometerThread;
+    private Thread thread;
 
     /**
      * @param y1 The 'first' odometer measuring in the Y direction. Should be interchangeable with y2
@@ -34,13 +33,20 @@ public class OdometrySystem {
         y1Last = y1.getDistance();
         y2Last = y2.getDistance();
         xLast = x.getDistance();
+
+        odometerThread = new OdometerThread();
+        thread = new Thread(odometerThread);
     }
 
     /**
      * starts thread continuously monitoring position
      */
     public void start(){
+        thread.start();
+    }
 
+    public void stop(){
+        odometerThread.stop();
     }
 
     public void resetPosition(double x, double y, double heading){
@@ -96,11 +102,11 @@ public class OdometrySystem {
             dxLocal = dx;
         }
 
-        position.heading += Math.toDegrees(dHeading);//apply our heading change
-        double heading = Math.toRadians(position.heading); //in rads, duh
+        position.heading += dHeading;//apply our heading change
+        double heading = position.heading; //in rads, duh
 
-        dxGlobal = Math.cos(heading)*dxLocal + Math.sin(heading)*dyLocal; //convert to global coords
-        dyGlobal = Math.sin(heading)*dxLocal + Math.cos(heading)*dyLocal;
+        dxGlobal = Math.sin(heading)*dxLocal + Math.cos(heading)*dyLocal; //convert to global coords. Recall that 0 rads is in direction of x axis
+        dyGlobal = Math.cos(heading)*dxLocal + Math.sin(heading)*dyLocal;
 
         position.x += dxGlobal;
         position.y += dyGlobal;
@@ -119,6 +125,27 @@ public class OdometrySystem {
      */
     private double findDeltaHeading(double y1, double y2){
         return (y1-y2)/distanceBetweenYWheels;//derived from double arcs
+    }
+
+    private class OdometerThread implements Runnable{
+        private volatile boolean running;
+
+        @Override
+        public void run() {
+            running = true;
+            while (running){
+                updatePosition();
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void stop(){
+            running = false;
+        }
     }
 
 }
