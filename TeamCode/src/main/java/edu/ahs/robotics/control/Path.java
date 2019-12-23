@@ -27,19 +27,42 @@ public class Path {
         return pointAtDistance.get(index);
     }
 
-    public Position getTargetPosition(Position robotPosition) {
+    /**
+     * This method takes the bounding points and calculates a third point.
+     * Then it creates a line and gets the intersection and returns it as a point.
+     * The third point is used to calculate distance from start and end because it allows for the robot to not be between the bounding points.
+     * @param robotPosition
+     * @return Returns a location that is used in Line
+     */
+    public Position getTargetLocation(Position robotPosition) {
         int[] boundingPoints = getBoundingPoints(robotPosition);
-        Point first = getPoint(boundingPoints[0]);
-        Point second = getPoint(boundingPoints[1]);
-        Line pathLine = new Line(first, second);
+        PointAtDistance first = getPoint(boundingPoints[0]);
+        PointAtDistance second = getPoint(boundingPoints[1]);
 
-        return new Position(pathLine.getClosestPointOnLine, pathLine.direction);
+        //Calculate third point and clip if it is off end of path
+        int nextIndex = boundingPoints[1] + 1;
+        if (nextIndex > pointAtDistance.size()-1){
+            nextIndex = pointAtDistance.size()-1;
+        }
+        PointAtDistance third = getPoint(nextIndex);
+
+        Line pathLine = new Line(first, second);
+        Point closestPointOnLine = pathLine.getClosestPointOnLine(robotPosition);
+
+        double deltaX = first.x - second.x;
+        double deltaY = first.y - second.y;
+
+        //Use third point to calculate
+        double distanceToEnd = totalDistance - third.distance + closestPointOnLine.distanceTo(third);
+        double distanceFromStart = third.distance - closestPointOnLine.distanceTo(third);
+
+        return new Location(closestPointOnLine, deltaX, deltaY, distanceToEnd, distanceFromStart);
     }
 
     /**
-     *
+     * This method finds the two closest points to the robot position and returns the points in order of path.
      * @param robotPosition
-     * @return indices of points. Use getPoint to find actual point
+     * @return indices of points. Use getPoint to find actual point.
      */
     public int[] getBoundingPoints(Position robotPosition) {
         int closest = 0;
@@ -63,7 +86,7 @@ public class Path {
                 break;
             }
         }
-        //Return the points in order
+        //Return the points in order of path
         if (closest < nextClosest) {
             return new int[]{closest, nextClosest};
         } else {
@@ -130,7 +153,22 @@ public class Path {
         }
     }
 
+    public static class Location {
+        public double deltaX;
+        public double deltaY;
+        public double distanceToEnd;
+        public double distanceFromStart;
+        public Point point;
 
-    
+        public Location(Point point, double deltaX, double deltaY, double distanceToEnd, double distanceFromStart) {
+            this.point = point;
+            this.deltaX = deltaX;
+            this.deltaY = deltaY;
+            this.distanceToEnd = distanceToEnd;
+            this.distanceFromStart = distanceFromStart;
+
+        }
+
+    }
 
 }
