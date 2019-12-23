@@ -18,32 +18,32 @@ import static org.junit.Assert.*;
 public class OdometrySystemTest {
     private OdometrySystem odometrySystem;
 
-    private void init(double[] y1Inputs, double[] y2Inputs, double[] xInputs){
+    private void init(double[] x1Inputs, double[] x2Inputs, double[] yInputs){
         FTCUtilities.startTestMode();
         MockClock clock = new MockClock(MockClock.Mode.ADVANCE_BY_10_MILLIS);
         FTCUtilities.setMockClock(clock);
 
-        OdometerMock y1 = new OdometerMock(y1Inputs);
-        OdometerMock y2 = new OdometerMock(y2Inputs);
-        OdometerMock x = new OdometerMock(xInputs);
+        OdometerMock x1 = new OdometerMock(x1Inputs);
+        OdometerMock x2 = new OdometerMock(x2Inputs);
+        OdometerMock y = new OdometerMock(yInputs);
 
-        odometrySystem = new OdometrySystem(y1, y2, x, .1, 12);
+        odometrySystem = new OdometrySystem(x1, x2, y, .1, 12);
         odometrySystem.resetPosition(0,0,Math.PI/2);
     }
 
     @Test
     public void testNullMovement(){
-        double[] y1Inputs = {0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
-        double[] y2Inputs = {0,0,0,0};
-        double[] xInputs = {0,0,0,0};
-        init(y1Inputs, y2Inputs, xInputs);
+        double[] x1Inputs = {0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,0,0,0};
+        double[] yInputs = {0,0,0,0};
+        init(x1Inputs, x2Inputs, yInputs);
 
-        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the odometrySystem constructor getting initial position
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the odometrySystem constructor getting initial position
             odometrySystem.updatePosition();
         }
 
         assertEquals(0, odometrySystem.getPosition().y, 0.0);
-        assertEquals(0, odometrySystem.getPosition().heading, 0.0);
+        assertEquals(0, odometrySystem.getPosition().heading, Math.PI/2);
         assertEquals(0, odometrySystem.getPosition().x, 0.0);
 
         assertEquals(0,odometrySystem.getVelocity().speed,0.0);
@@ -52,12 +52,12 @@ public class OdometrySystemTest {
 
     @Test
     public void driveForward1Foot(){
-        double[] y1Inputs = {0,2,8,12}; //OdometrySystem references once upon init - starting with zero is a good idea
-        double[] y2Inputs = {0,2,8,12};
-        double[] xInputs = {0,0,0,0};
-        init(y1Inputs, y2Inputs, xInputs);
+        double[] x1Inputs = {0,2,8,12}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,2,8,12};
+        double[] yInputs = {0,0,0,0};
+        init(x1Inputs, x2Inputs, yInputs);
 
-        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
             odometrySystem.updatePosition();
         }
 
@@ -70,13 +70,28 @@ public class OdometrySystemTest {
     }
 
     @Test
-    public void turn90Degrees(){
-        double[] y1Inputs = {0,0,9.424775};
-        double[] y2Inputs = {0,0,-9.424775};
-        double[] xInputs = {0,0,9};
-        init(y1Inputs,y2Inputs,xInputs);
+    public void driveLeft1Foot(){
+        double[] x1Inputs = {0,2,8,12}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,2,8,12};
+        double[] yInputs = {0,0,0,0};
+        init(x1Inputs, x2Inputs, yInputs);
+        odometrySystem.resetPosition(0,0,0);
 
-        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+            odometrySystem.updatePosition();
+        }
+        assertEquals(12, odometrySystem.getPosition().x, .001);
+        assertEquals(0, odometrySystem.getPosition().y, .001);
+    }
+
+    @Test
+    public void turn90Degrees(){
+        double[] x1Inputs = {0,0,9.424775};
+        double[] x2Inputs = {0,0,-9.424775};
+        double[] yInputs = {0,0,9};
+        init(x1Inputs,x2Inputs,yInputs);
+
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
             odometrySystem.updatePosition();
         }
 
@@ -90,12 +105,12 @@ public class OdometrySystemTest {
 
     @Test
     public void strafe1Foot(){
-        double[] y1Inputs = {0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
-        double[] y2Inputs = {0,0,0,0};
-        double[] xInputs = {0,2,4,12};
-        init(y1Inputs, y2Inputs, xInputs);
+        double[] x1Inputs = {0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,0,0,0};
+        double[] yInputs = {0,2,4,12};
+        init(x1Inputs, x2Inputs, yInputs);
 
-        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
             odometrySystem.updatePosition();
         }
 
@@ -104,12 +119,12 @@ public class OdometrySystemTest {
 
     @Test
     public void strafeAndDrive1Foot(){
-        double[] y1Inputs = {0,2,4,12}; //OdometrySystem references once upon init - starting with zero is a good idea
-        double[] y2Inputs = {0,2,4,12};
-        double[] xInputs = {0,2,4,12};
-        init(y1Inputs, y2Inputs, xInputs);
+        double[] x1Inputs = {0,2,4,12}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,2,4,12};
+        double[] yInputs = {0,2,4,12};
+        init(x1Inputs, x2Inputs, yInputs);
 
-        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
             odometrySystem.updatePosition();
         }
 
@@ -122,12 +137,12 @@ public class OdometrySystemTest {
 
     @Test
     public void turn500Degrees(){
-        double[] y1Inputs = {0,0,52.3598611111}; //OdometrySystem references once upon init - starting with zero is a good idea
-        double[] y2Inputs = {0,0,-52.3598611111};
-        double[] xInputs = {0,0,50};
-        init(y1Inputs, y2Inputs, xInputs);
+        double[] x1Inputs = {0,0,52.3598611111}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,0,-52.3598611111};
+        double[] yInputs = {0,0,50};
+        init(x1Inputs, x2Inputs, yInputs);
 
-        for(int i = 0; i < y1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
             odometrySystem.updatePosition();
         }
 
@@ -140,11 +155,11 @@ public class OdometrySystemTest {
 
     @Test
     public void testThread(){ //todo comment out, refactor or remove this test because it's nondeterministic
-        double[] y1Inputs = {0,0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
-        double[] y2Inputs = {0,0,0,0,0};
-        double[] xInputs = {0,0,0,0,0};
+        double[] x1Inputs = {0,0,0,0,0}; //OdometrySystem references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,0,0,0,0};
+        double[] yInputs = {0,0,0,0,0};
 
-        init(y1Inputs, y2Inputs, xInputs);
+        init(x1Inputs, x2Inputs, yInputs);
 
         odometrySystem.start();
 
