@@ -24,8 +24,8 @@ public class MecanumChassisTest {
     public void testVectorConversionStraightForward(){
         MecanumChassis.MecanumVectors v;
 
-        double x = 0;
-        double y = 10;
+        double x = 10;
+        double y = 0;
 
         v = MecanumChassis.MecanumVectors.convertLocalVectorsToMecanumVectors(x,y);
 
@@ -37,8 +37,8 @@ public class MecanumChassisTest {
     public void testVectorConversionStrafe() {
         MecanumChassis.MecanumVectors v;
 
-        double x = 10;
-        double y = 0;
+        double x = 0;
+        double y = 10;
 
         v = MecanumChassis.MecanumVectors.convertLocalVectorsToMecanumVectors(x, y);
 

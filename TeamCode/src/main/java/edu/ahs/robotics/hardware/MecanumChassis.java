@@ -1,7 +1,11 @@
 package edu.ahs.robotics.hardware;
 
+import android.graphics.Point;
+
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import edu.ahs.robotics.autocommands.autopaths.functions.Position;
+import edu.ahs.robotics.control.XYHeadingPID;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
@@ -31,6 +35,7 @@ public class MecanumChassis extends Chassis {
 
     private OdometerImpl leftOdometer;
     private OdometerImpl rightOdometer;
+    private OdometerImpl backOdometer;
 
 
     public MecanumChassis(DriveUnit.Config driveUnitConfig) {
@@ -42,6 +47,8 @@ public class MecanumChassis extends Chassis {
 
         leftOdometer = new OdometerImpl("intakeL", 60, false);
         rightOdometer = new OdometerImpl("intakeR", 60.3, true);
+        backOdometer = new OdometerImpl("BR", 60, false); //update and tune this
+        odometrySystem = new OdometrySystem(leftOdometer,rightOdometer,backOdometer,10,10); //todo tweak constants
     }
 
 
@@ -257,6 +264,58 @@ public class MecanumChassis extends Chassis {
         Logger.getInstance().writeToFile();
     }
 
+    /**
+     * Uses XYHeading PID to navigate/adjust position to a point on the field.
+     * @param point A cartesian point on the field that the method will navigate to.
+     * @param timeOut delta time in millis to end the main correction loop
+     */
+    public void goToPointWithPID(Point point, double timeOut){
+        Position currentPosition;
+        Position targetPosition = new Position(point.x, point.y, 0);
+        double frontLeftPower = 0, frontRightPower = 0;
+        double backLeftPower = 0, backRightPower = 0;
+
+        XYHeadingPID.Correction correction;
+        MecanumVectors mecanumVectorCorrections;
+
+        XYHeadingPID.Config pidConfig = new XYHeadingPID.Config();
+        pidConfig.setYParameters(0.1,0.01, -0.01);
+        pidConfig.setXParameters(0.1,0.01, -0.01);
+        pidConfig.setHeadingParameters(0,0,0);
+
+        XYHeadingPID pid = new XYHeadingPID(pidConfig);
+
+        double startTime = FTCUtilities.getCurrentTimeMillis();
+
+        odometrySystem.start();
+
+        while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut){
+            currentPosition = odometrySystem.getPosition();
+
+            FTCUtilities.addData("x", currentPosition.x);
+            FTCUtilities.addData("y", currentPosition.y);
+            FTCUtilities.addData("heading", currentPosition.heading);
+            FTCUtilities.updateOpLogger();
+
+            correction = pid.getCorrection(currentPosition,targetPosition);
+
+            //cast corrections to mecanum vectors
+            mecanumVectorCorrections = MecanumVectors.convertLocalVectorsToMecanumVectors(correction.x, correction.y);
+
+            frontLeftPower += mecanumVectorCorrections.forwardLeft;
+            backRightPower += mecanumVectorCorrections.forwardLeft;
+
+            frontRightPower += mecanumVectorCorrections.forwardRight;
+            backLeftPower += mecanumVectorCorrections.forwardRight;
+
+            frontLeft.setPower(frontLeftPower);
+            frontRight.setPower(frontRightPower);
+            backLeft.setPower(backLeftPower);
+            backRight.setPower(backRightPower);
+        }
+        odometrySystem.stop();
+    }
+
     private double inversePower(double power) {
         //   return power * Math.abs(power);
         return Math.pow(power, 3);
@@ -285,8 +344,8 @@ public class MecanumChassis extends Chassis {
          */
          static MecanumVectors convertLocalVectorsToMecanumVectors(double x, double y){
 
-            double forwardRight = (x + y) / 2;//todo change so x is in direction of travel
-            double forwardLeft = (y - x) / 2; //todo finish documentation
+            double forwardRight = (x + y) / 2;
+            double forwardLeft = (x - y) / 2;
 
             return new MecanumVectors(forwardRight, forwardLeft);
         }
