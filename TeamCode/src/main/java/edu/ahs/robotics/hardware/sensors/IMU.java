@@ -9,6 +9,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import edu.ahs.robotics.util.FTCUtilities;
 
+/**
+ * Wrapper class to manage the FTC BNO055IMU class and facilitate mocking in the future
+ * @author Alex Appleby
+ */
 public class IMU {
     private BNO055IMU imu;
     double correction;
@@ -28,6 +32,10 @@ public class IMU {
         imu.initialize(parameters);
     }
 
+    /**
+     * Gets the IMU Heading. Oversteps the internal IMU behavior that returns degrees between 180 and -180, meaning this method can return beyond 360 and -360
+     * @return Heading in degrees
+     */
     public double getHeading(){
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC,AxesOrder.ZYX,AngleUnit.DEGREES);
 

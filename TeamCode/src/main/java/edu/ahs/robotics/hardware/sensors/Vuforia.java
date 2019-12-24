@@ -26,6 +26,10 @@ public class Vuforia {
         vuforiaLocalizer.setFrameQueueCapacity(1);
     }
 
+    /**
+     * Grabs a bitmap from the Vuforia engine for image processing
+     * @return camera output as a bitmap
+     */
     public Bitmap getBitmap(){
         Bitmap bitmap;
         VuforiaLocalizer.CloseableFrame frame;

@@ -1,43 +1,66 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import edu.ahs.robotics.control.Position;
+import edu.ahs.robotics.autocommands.autopaths.functions.Position;
+
+import edu.ahs.robotics.control.Velocity;
+import edu.ahs.robotics.util.FTCUtilities;
+
 
 /**
  * A collection of Odometers used to monitor robot position. Written for Ardennes in 2019-20
  * @author Alex Appleby
  */
 public class OdometrySystem {
-    private IMU imu;
     private Position position;
-    Odometer y1, y2, x;
-    double y1Last, y2Last, xLast;
-    double xInchesPerDegree;
-    double distanceBetweenYWheels;
+    private Velocity velocity;
 
+    private Odometer x1, x2, y;
+
+    private double x1Last, x2Last, yLast;
+    private double yInchesPerDegree;
+    private double distanceBetweenYWheels;
+    private Position lastPosition;
+    private long lastTime;
+
+    private OdometerThread odometerThread;
+    private Thread thread;
 
     /**
-     * @param y1 The 'first' odometer measuring in the Y direction. Should be interchangeable with y2
-     * @param y2 The 'second' odometer measuring in the Y direction. Should be interchangeable with y1
-     * @param x The 'odometer measuring in the X direction.
-     */
-    public OdometrySystem(Odometer y1, Odometer y2, Odometer x, double xInchesPerDegree, double distanceBetweenYWheels) {
-        this.y1 = y1;
-        this.y2 = y2;
-        this.x =x;
+     * @param x1 The 'first' odometer measuring in the X direction. Should be interchangeable with x2
+     * @param x2 The 'second' odometer measuring in the X direction. Should be interchangeable with x1
+     * @param y The odometer measuring in the Y direction.
+     */ //todo change axis
+    public OdometrySystem(Odometer x1, Odometer x2, Odometer y, double yInchesPerDegree, double distanceBetweenYWheels) {
+        this.x1 = x1;
+        this.x2 = x2;
+        this.y = y;
+
         position = new Position(0,0,0);
-        this.xInchesPerDegree = xInchesPerDegree;
+        velocity = new Velocity(0,0);
+        lastPosition = new Position(0,0,0);
+        lastTime = FTCUtilities.getCurrentTimeMillis();
+
+        this.yInchesPerDegree = yInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
 
-        y1Last = y1.getDistance();
-        y2Last = y2.getDistance();
-        xLast = x.getDistance();
+        x1Last = x1.getDistance();
+        x2Last = x2.getDistance();
+        yLast = y.getDistance();
+
+        odometerThread = new OdometerThread();
+        thread = new Thread(odometerThread);
     }
 
     /**
      * starts thread continuously monitoring position
      */
-    public void start(){
 
+    public void start(){
+        thread.start();
+    }
+  
+    public void stop(){
+        odometerThread.stop();
     }
 
     public void resetPosition(double x, double y, double heading){
@@ -50,72 +73,114 @@ public class OdometrySystem {
      * Runs central odom math, called continuously by thread and accessible in package for unit testing
      */
     void updatePosition() {
-        double y1Reading,y2Reading, xReading;
-        double dy1, dy2, dxBeforeFactorOut, dxExpected, dx, dy;
-        double dyLocal, dxLocal, dyGlobal, dxGlobal;
+        double x1Reading,x2Reading, yReading;
+        double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
+        double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
 
         //set readings from odom
-        y1Reading = y1.getDistance();
-        y2Reading = y2.getDistance();
-        xReading = x.getDistance();
+        x1Reading = x1.getDistance();
+        x2Reading = x2.getDistance();
+        yReading = y.getDistance();
 
         //find deltas
-        dy1 = y1Reading - y1Last;
-        dy2 = y2Reading - y2Last;
-        dy = (dy1 + dy2)/2; //find the average
-        dxBeforeFactorOut = xReading - xLast;
+        dx1 = x1Reading - x1Last;
+        dx2 = x2Reading - x2Last;
+        dx = (dx1 + dx2)/2; //find the average
+        dyBeforeFactorOut = yReading - yLast;
 
         //set lasts
-        y1Last = y1Reading;
-        y2Last = y2Reading;
-        xLast = xReading;
+        x1Last = x1Reading;
+        x2Last = x2Reading;
+        yLast = yReading;
 
         //find change in heading
-        dHeading = findDeltaHeading(dy1, dy2);
+        dHeading = findDeltaHeading(dx1, dx2);
 
-        //factor out the dx expected from rotation of robot
-        dxExpected = Math.toDegrees(dHeading) * xInchesPerDegree;
+        //factor out the dy expected from rotation of robot
+        dyExpected = Math.toDegrees(dHeading) * yInchesPerDegree;
 
-        //find real dx
-        dx = dxBeforeFactorOut - dxExpected;
+        //find real dy
+        dy = dyBeforeFactorOut - dyExpected;
 
         if(dHeading != 0){//courtesy of 11115, thanks gluten free
-            double yRadius = dy/dHeading; // arc length - l = theta*r
-            double xRadius = dx/dHeading;
+            double xRadius = dx/dHeading; // arc length - l = theta*r
+            double yRadius = dy/dHeading;
 
             //find the x and y components of each arc
-            dyLocal = (yRadius * Math.sin(dHeading)) - (xRadius * (1 - Math.cos(dHeading)));
-            dxLocal = (yRadius * (1 - Math.cos(dHeading))) + (xRadius * Math.sin(dHeading));
+            dxLocal = (xRadius * Math.sin(dHeading)) - (yRadius * (1 - Math.cos(dHeading)));
+            dyLocal = (xRadius * (1 - Math.cos(dHeading))) + (yRadius * Math.sin(dHeading));
 
         } else { //curve with infinite radius, aka robot moves in a straight line
-            dyLocal = dy;
             dxLocal = dx;
+            dyLocal = dy;
         }
 
-        position.heading += Math.toDegrees(dHeading);//apply our heading change
-        double heading = Math.toRadians(position.heading); //in rads, duh
+        position.heading += dHeading;//apply our heading change
+        double heading = position.heading; //in rads, duh
 
-        dxGlobal = Math.cos(heading)*dxLocal + Math.sin(heading)*dyLocal; //convert to global coords
-        dyGlobal = Math.sin(heading)*dxLocal + Math.cos(heading)*dyLocal;
+        dxGlobal = Math.sin(heading)*dyLocal + Math.cos(heading)*dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
+        dyGlobal = Math.cos(heading)*dyLocal + Math.sin(heading)*dxLocal;
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+
+        updateVelocity();
+    }
+
+    private void updateVelocity(){
+        long currentTime = FTCUtilities.getCurrentTimeMillis();
+
+        double distance = position.distanceTo(lastPosition);
+        double deltaTime = (currentTime - lastTime)/1000.0;//in seconds, duh
+
+        double speed = distance/deltaTime;
+        double direction = lastPosition.angleTo(position);
+
+        velocity.setVelocity(speed,direction);
+
+        lastPosition = new Position(position.x, position.y, position.heading); //todo ask john if this is nessicary
+        lastTime = currentTime;
     }
 
     public Position getPosition(){
         return position;
     }
 
+    public Velocity getVelocity() {
+        return velocity;
+    }
+
     /**
      * finds delta heading with two perpendicular odometers
-     * @param y1 one arc distance
-     * @param y2 the other arc distance
+     * @param x1 one arc distance
+     * @param x2 the other arc distance
      * @return the theta of the arcs in radians
      * math: https://www.desmos.com/calculator/1u5ynekr4d
      */
-    private double findDeltaHeading(double y1, double y2){
-        return (y1-y2)/distanceBetweenYWheels;//derived from double arcs
+    private double findDeltaHeading(double x1, double x2){
+        return (x1-x2)/distanceBetweenYWheels;//derived from double arcs
+    }
+
+    private class OdometerThread implements Runnable{
+        private volatile boolean running;
+
+        @Override
+        public void run() {
+            running = true;
+            while (running){
+                updatePosition();
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void stop(){
+            running = false;
+        }
     }
 
 }

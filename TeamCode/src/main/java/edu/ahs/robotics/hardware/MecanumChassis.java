@@ -291,10 +291,34 @@ public class MecanumChassis extends Chassis {
             //D controller will look a number of points ahead to determine correction
         }
 
-
-
     }
 
+    /**
+     * A class that contains vectors in local space along the axis of Mecanum Drive control.
+     * Assumes a standard configuration with 45 degree wheel pitch.
+     * Marked as package-private to enable unit testing
+     * @author Alex Applevby
+     */
+     static class MecanumVectors{
+         double forwardRight;
+         double forwardLeft;
 
+        MecanumVectors(double forwardRight, double forwardLeft) {
+            this.forwardRight = forwardRight;
+            this.forwardLeft = forwardLeft;
+        }
 
+        /**
+         * Converts local XY vectors to vectors along the axes of mecanum wheel driving
+         * @param x Magnitude of Local X vector
+         * @param y Magnitude of Local Y vector
+         */
+         static MecanumVectors convertLocalVectorsToMecanumVectors(double x, double y){
+
+            double forwardRight = (x + y) / 2;//todo change so x is in direction of travel
+            double forwardLeft = (y - x) / 2; //todo finish documentation
+
+            return new MecanumVectors(forwardRight, forwardLeft);
+        }
+    }
 }
