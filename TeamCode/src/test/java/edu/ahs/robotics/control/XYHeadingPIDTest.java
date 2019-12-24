@@ -2,8 +2,6 @@ package edu.ahs.robotics.control;
 
 import org.junit.Test;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-
 import static org.junit.Assert.*;
 
 
