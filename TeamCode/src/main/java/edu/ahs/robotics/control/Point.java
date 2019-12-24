@@ -2,6 +2,10 @@ package edu.ahs.robotics.control;
 
 import java.util.Objects;
 
+/**
+ * 2d cartesian point on the field. The cartesian origin represents the center of the field an units are in inches
+ * @author Alex and Andrew
+ */
 public class Point {
     public double x;
     public double y;
@@ -25,8 +29,14 @@ public class Point {
         return Objects.hash(x, y);
     }
 
+    /**
+     * Finds linear distance to another point in space using the standard 2d distance formula.
+     * Currently unoptimized.
+     * @param p The point in space
+     * @return distance away in inches
+     */
     public double distanceTo(Point p) {
-        return Math.sqrt(Math.pow(x - p.x ,2) + Math.pow(y - p.y,2));
+        return Math.sqrt(Math.pow(x - p.x ,2) + Math.pow(y - p.y,2)); //todo optimize by removing pow and multiplying by self
     }
 
     public double distanceTo(Position p) {

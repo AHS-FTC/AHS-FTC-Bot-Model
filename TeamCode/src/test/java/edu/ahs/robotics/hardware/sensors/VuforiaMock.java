@@ -1,4 +1,4 @@
-package edu.ahs.robotics.other;
+package edu.ahs.robotics.hardware.sensors;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

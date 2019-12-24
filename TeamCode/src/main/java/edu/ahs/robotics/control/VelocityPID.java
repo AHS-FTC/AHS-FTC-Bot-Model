@@ -1,5 +1,10 @@
 package edu.ahs.robotics.control;
 
+/**
+ * PID system for vector velocity that considers both magnitude and direction.
+ * Could be refactored to share code with other PID systems.
+ * @author Alex Appleby
+ */
 public class VelocityPID{
     Config config;
     private double speedErrorSum = 0, directionErrorSum = 0;
@@ -9,6 +14,10 @@ public class VelocityPID{
         this.config = config;
     }
 
+    /**
+     * Given current and target velocity vectors, find suitable PID adjustments.
+     * @return corrections in an enclosed Correction class.
+     */
     public Correction getCorrection(Velocity currentVelocity, Velocity targetVelocity){
         double speedCorrection = 0, directionCorrection = 0;
 
@@ -33,6 +42,9 @@ public class VelocityPID{
         return new Correction(speedCorrection, directionCorrection);
     }
 
+    /**
+     * Manages tuning parameters for VelocityPID.
+     */
     public static class Config{
         private double sP, sI, sD;
         private double dP, dI, dD;
@@ -51,6 +63,9 @@ public class VelocityPID{
 
     }
 
+    /**
+     * Enclosed class that contains correction information returned by the getCorrection() method.
+     */
     public static class Correction{
         public double speed;
         public double direction;
