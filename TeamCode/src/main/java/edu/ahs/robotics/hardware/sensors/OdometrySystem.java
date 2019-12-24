@@ -1,7 +1,6 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-
+import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
 

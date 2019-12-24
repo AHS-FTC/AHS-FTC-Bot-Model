@@ -31,8 +31,18 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import edu.ahs.robotics.hardware.SerialServo;
+import edu.ahs.robotics.hardware.Slides;
+import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.hardware.sensors.LimitSwitch;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.hardware.Intake;
+import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.MotorHashService;
 
 
 @Autonomous(name = "Ardennes Auto Red Side", group = "Linear Opmode")
@@ -42,7 +52,7 @@ public class ArdennesAutoRed extends LinearOpMode {
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-        FullAuto fullAuto = new FullAuto(false);
+        FullAuto fullAuto = new FullAuto(true);
         fullAuto.init();
         waitForStart();
         fullAuto.afterStart();

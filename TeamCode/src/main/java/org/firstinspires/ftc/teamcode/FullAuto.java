@@ -73,7 +73,22 @@ public class FullAuto {
         } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
             twoFivePlan();
         } else threeSixPlan();
+
+        FTCUtilities.sleep(300);
+        pivot(-85, .7);
+        FTCUtilities.sleep(300);
+        chassis.driveStraight(-200,.7, .65, .7,2000);
+        foundationServoLeft.setPosition(1);
+        foundationServoRight.setPosition(1);
+        FTCUtilities.sleep(500);
+        customArc(90,80,1,true, .7,.7,3000);
+        chassis.driveStraight(-300,1,.7,.7,2000);
+        FTCUtilities.sleep(300);
+        //chassis.driveStraight(-200, 1, .7, .7);
+        foundationServoLeft.setPosition(0);
+        foundationServoRight.setPosition(0);
     }
+
 
     private void oneFourPlan() {
 //        chassis.driveStraight(100, .75);
@@ -103,20 +118,8 @@ public class FullAuto {
 
         intake.startIntakeWaitForBlock(intakeTrigger);
         arc(25,2400, .7, false);
-        arc(-67, 1000, .8, true);
-        chassis.driveStraight(-850,.8);
-        FTCUtilities.sleep(300);
-        pivot(-85, .7);
-        FTCUtilities.sleep(300);
-        //chassis.driveStraight(-200,1, .7, .7);
-        foundationServoLeft.setPosition(1);
-        foundationServoRight.setPosition(1);
-        FTCUtilities.sleep(500);
-        arc(90,80,1,true);
-        FTCUtilities.sleep(300);
-        //chassis.driveStraight(-200, 1, .7, .7);
-        foundationServoLeft.setPosition(0);
-        foundationServoRight.setPosition(0);
+        arc(-67, 900, .8, true);
+        chassis.driveStraight(-1000,.8);
 
 //        arc(90, 300, .93, true);
 
@@ -129,9 +132,12 @@ public class FullAuto {
     }
 
     private void twoFivePlan() {
-        pivot(-9, .93);
         intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(900, .7);
+        arc(5,13000, .7, false);
+        arc(-73,600,.93, true);
+        chassis.driveStraight(-1100, .93);
+
+
 
         /*pivot(10, .4);
         chassis.driveStraight(600, 1);
@@ -156,9 +162,10 @@ public class FullAuto {
     }
 
     private void threeSixPlan() {
-        pivot(5, .93);
         intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.driveStraight(950, .7);
+        arc(13, 5000, .7, true);
+        arc(-80, 500, .93, true);
+        chassis.driveStraight(-1100, .93);
 
         /*chassis.pivot(-10, .4);
         chassis.driveStraight(550, 1);
@@ -176,6 +183,14 @@ public class FullAuto {
             chassis.pivot(angle, maxPower);
         }
 
+    }
+
+    private void customArc(double angle, double radius, double maxPower, boolean rightTurn, double minRampUp, double minRampDown, long timeOut) {
+        if (!blueSide) {
+            chassis.arc(angle, radius, maxPower, !rightTurn, minRampUp, minRampDown, timeOut);
+        } else {
+            chassis.arc(angle, radius, maxPower, rightTurn, minRampUp, minRampDown, timeOut);
+        }
     }
 
     private void arc(double angle, double radius, double maxPower, boolean rightTurn) {

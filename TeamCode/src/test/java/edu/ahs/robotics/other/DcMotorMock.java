@@ -1,4 +1,4 @@
-package edu.ahs.robotics;
+package edu.ahs.robotics.other;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
