@@ -1,8 +1,5 @@
 package edu.ahs.robotics.control;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
-import edu.ahs.robotics.hardware.DriveUnit;
-
 /**
  * Functional class that manages positional PID in three global dimensions
  * @author Alex Appleby

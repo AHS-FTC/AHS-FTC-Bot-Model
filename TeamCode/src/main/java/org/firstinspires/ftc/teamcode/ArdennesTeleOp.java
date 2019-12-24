@@ -248,8 +248,8 @@ public class ArdennesTeleOp extends OpMode
     private void driveActions() {
         //Calculate motion components
         double forward = getClippedPower(-gamepad1.left_stick_y, .2);
-        double strafe = Range.clip(getClippedPower(-gamepad1.left_stick_x, .2), -.4, .4);
-        double turn = getClippedPower(Math.pow(-gamepad1.right_stick_x, 3), .25);
+        double strafe = Range.clip(getClippedPower(-gamepad1.left_stick_x, .2), -1, 1);
+        double turn = getClippedPower(-gamepad1.right_stick_x, .2);
         chassis.drive3Axis(forward, strafe, turn);
     }
 

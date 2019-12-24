@@ -3,8 +3,6 @@ package edu.ahs.robotics.hardware;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-
-
 public class MecanumChassisTest {
 
     @Test

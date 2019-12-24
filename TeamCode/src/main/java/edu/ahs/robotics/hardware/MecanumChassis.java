@@ -140,6 +140,7 @@ public class MecanumChassis extends Chassis {
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
+
     }
 
     public void arc(double angle, double radius, double maxPower, boolean rightTurn) {
@@ -321,6 +322,35 @@ public class MecanumChassis extends Chassis {
         return Math.pow(power, 3);
     }
 
+    public void followPath() {
+
+        //Get position of the robot
+
+        //Get text file with coordinates
+
+        //Read text file and trim unnecessary data
+
+
+        //Start loop and add everything below
+        while (true) {
+            //Get position of the robot
+
+            //Find target point to robot
+
+            //Compare position of robot with closest point and find difference
+            //Closest point y and x then subtract the robot x y to find correction amount
+            //
+
+            //Make robot move towards target points with correction below
+
+            //P controller corrects for target point
+
+            //I controller smoothes
+
+            //D controller will look a number of points ahead to determine correction
+        }
+
+    }
 
     /**
      * A class that contains vectors in local space along the axis of Mecanum Drive control.
@@ -350,5 +380,4 @@ public class MecanumChassis extends Chassis {
             return new MecanumVectors(forwardRight, forwardLeft);
         }
     }
-
 }
