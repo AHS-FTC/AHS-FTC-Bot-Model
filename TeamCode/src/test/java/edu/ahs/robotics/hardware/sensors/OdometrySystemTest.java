@@ -42,12 +42,11 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(0, odometrySystem.getPosition().y, 0.0);
+        assertEquals(0, odometrySystem.getPosition().y(), 0.0);
         assertEquals(0, odometrySystem.getPosition().heading, Math.PI/2);
-        assertEquals(0, odometrySystem.getPosition().x, 0.0);
+        assertEquals(0, odometrySystem.getPosition().x(), 0.0);
 
         assertEquals(0,odometrySystem.getVelocity().speed,0.0);
-        assertTrue(Double.isNaN(odometrySystem.getVelocity().direction)); //should be NaN for obvious reasons
     }
 
     @Test
@@ -61,9 +60,9 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().y, .01);
+        assertEquals(12, odometrySystem.getPosition().y(), .01);
         assertEquals(Math.PI/2, odometrySystem.getPosition().heading, .01);
-        assertEquals(0, odometrySystem.getPosition().x, .01);
+        assertEquals(0, odometrySystem.getPosition().x(), .01);
 
         assertTrue(odometrySystem.getVelocity().speed > 0);
         assertEquals(odometrySystem.getVelocity().direction, Math.PI / 2,0.001);
@@ -80,8 +79,8 @@ public class OdometrySystemTest {
         for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the constructor getting initial position
             odometrySystem.updatePosition();
         }
-        assertEquals(12, odometrySystem.getPosition().x, .001);
-        assertEquals(0, odometrySystem.getPosition().y, .001);
+        assertEquals(12, odometrySystem.getPosition().x(), .001);
+        assertEquals(0, odometrySystem.getPosition().y(), .001);
     }
 
     @Test
@@ -96,8 +95,8 @@ public class OdometrySystemTest {
         }
 
         assertEquals(Math.PI, odometrySystem.getPosition().heading, .01);
-        assertEquals(0, odometrySystem.getPosition().x, .01);
-        assertEquals(0, odometrySystem.getPosition().y, .01);
+        assertEquals(0, odometrySystem.getPosition().x(), .01);
+        assertEquals(0, odometrySystem.getPosition().y(), .01);
 
         assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
 
@@ -114,7 +113,7 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().x, .01);
+        assertEquals(12, odometrySystem.getPosition().x(), .01);
     }
 
     @Test
@@ -128,8 +127,8 @@ public class OdometrySystemTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().x, .01);
-        assertEquals(12, odometrySystem.getPosition().y, .01);
+        assertEquals(12, odometrySystem.getPosition().x(), .01);
+        assertEquals(12, odometrySystem.getPosition().y(), .01);
       
         assertEquals(Math.PI/4, odometrySystem.getVelocity().direction,0.001);
 
@@ -147,8 +146,8 @@ public class OdometrySystemTest {
         }
 
         assertEquals(Math.toRadians(500) + Math.PI/2, odometrySystem.getPosition().heading, .01);
-        assertEquals(0, odometrySystem.getPosition().x, .01);
-        assertEquals(0, odometrySystem.getPosition().y, .01);
+        assertEquals(0, odometrySystem.getPosition().x(), .01);
+        assertEquals(0, odometrySystem.getPosition().y(), .01);
 
         assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
     }
@@ -163,8 +162,8 @@ public class OdometrySystemTest {
 
         odometrySystem.start();
 
-        FTCUtilities.OpLogger("x",odometrySystem.getPosition().x);
-        FTCUtilities.OpLogger("y",odometrySystem.getPosition().y);
+        FTCUtilities.OpLogger("x",odometrySystem.getPosition().x());
+        FTCUtilities.OpLogger("y",odometrySystem.getPosition().y());
 
         try {
             Thread.sleep(1);
@@ -172,8 +171,8 @@ public class OdometrySystemTest {
             e.printStackTrace();
         }
 
-        FTCUtilities.OpLogger("x",odometrySystem.getPosition().x);
-        FTCUtilities.OpLogger("y",odometrySystem.getPosition().y);
+        FTCUtilities.OpLogger("x",odometrySystem.getPosition().x());
+        FTCUtilities.OpLogger("y",odometrySystem.getPosition().y());
 
         odometrySystem.stop();
     }

@@ -4,7 +4,7 @@ import android.graphics.Point;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
-import edu.ahs.robotics.autocommands.autopaths.functions.Position;
+import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.XYHeadingPID;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
@@ -293,8 +293,8 @@ public class MecanumChassis extends Chassis {
         while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut){
             currentPosition = odometrySystem.getPosition();
 
-            FTCUtilities.addData("x", currentPosition.x);
-            FTCUtilities.addData("y", currentPosition.y);
+            FTCUtilities.addData("x", currentPosition.x());
+            FTCUtilities.addData("y", currentPosition.y());
             FTCUtilities.addData("heading", currentPosition.heading);
             FTCUtilities.updateOpLogger();
 

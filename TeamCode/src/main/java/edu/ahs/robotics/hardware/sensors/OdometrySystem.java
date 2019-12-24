@@ -63,9 +63,7 @@ public class OdometrySystem {
     }
 
     public void resetPosition(double x, double y, double heading){
-        position.x = x;
-        position.y = y;
-        position.heading = heading;
+        position.setPosition(x,y,heading);
     }
 
     /**
@@ -121,8 +119,8 @@ public class OdometrySystem {
         dxGlobal = Math.sin(heading)*dyLocal + Math.cos(heading)*dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
         dyGlobal = Math.cos(heading)*dyLocal + Math.sin(heading)*dxLocal;
 
-        position.x += dxGlobal;
-        position.y += dyGlobal;
+        position.incrementX(dxGlobal);
+        position.incrementY(dyGlobal);
 
         updateVelocity();
     }
@@ -138,7 +136,7 @@ public class OdometrySystem {
 
         velocity.setVelocity(speed,direction);
 
-        lastPosition = new Position(position.x, position.y, position.heading); //todo ask john if this is nessicary
+        lastPosition = new Position(position.x(), position.y(), position.heading); //todo ask john if this is nessicary
         lastTime = currentTime;
     }
 
