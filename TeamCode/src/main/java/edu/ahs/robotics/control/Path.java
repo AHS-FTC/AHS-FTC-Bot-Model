@@ -34,7 +34,7 @@ public class Path {
      * @param robotPosition
      * @return Returns a location that is used in Line
      */
-    public Position getTargetLocation(Position robotPosition) {
+    public Location getTargetLocation(Position robotPosition) {
         int[] boundingPoints = getBoundingPoints(robotPosition);
         PointAtDistance first = getPoint(boundingPoints[0]);
         PointAtDistance second = getPoint(boundingPoints[1]);
@@ -49,8 +49,8 @@ public class Path {
         Line pathLine = new Line(first, second);
         Point closestPointOnLine = pathLine.getClosestPointOnLine(robotPosition);
 
-        double deltaX = first.x - second.x;
-        double deltaY = first.y - second.y;
+        double deltaX = second.x - first.x;
+        double deltaY = second.y - first.y;
 
         //Use third point to calculate
         double distanceToEnd = totalDistance - third.distance + closestPointOnLine.distanceTo(third);
@@ -166,7 +166,6 @@ public class Path {
             this.deltaY = deltaY;
             this.distanceToEnd = distanceToEnd;
             this.distanceFromStart = distanceFromStart;
-
         }
 
     }
