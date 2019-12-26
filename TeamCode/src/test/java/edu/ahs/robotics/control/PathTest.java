@@ -143,11 +143,11 @@ public class PathTest {
         double distanceToEnd = 2;
         double deltaX = 4;
         double deltaY = 0;
-        assertEquals(new Point(2,0), targetLocation.point);
+        assertEquals(new Point(2,0), targetLocation.closestPoint);
         assertEquals(distanceFromStart, targetLocation.distanceFromStart,.001);
         assertEquals(distanceToEnd, targetLocation.distanceToEnd,.001);
-        assertEquals(deltaX, targetLocation.deltaX, .001);
-        assertEquals(deltaY, targetLocation.deltaY, .001);
+        assertEquals(deltaX, targetLocation.pathDeltaX, .001);
+        assertEquals(deltaY, targetLocation.pathDeltaY, .001);
 
     }
 
@@ -165,11 +165,11 @@ public class PathTest {
         double distanceToEnd = Math.sqrt(2);
         double deltaX = 2;
         double deltaY = 2;
-        assertEquals(new Point(2,2), targetLocation.point);
+        assertEquals(new Point(2,2), targetLocation.closestPoint);
         assertEquals(distanceFromStart, targetLocation.distanceFromStart, .001);
         assertEquals(distanceToEnd, targetLocation.distanceToEnd, .001);
-        assertEquals(deltaX, targetLocation.deltaX, .001);
-        assertEquals(deltaY, targetLocation.deltaY, .001);
+        assertEquals(deltaX, targetLocation.pathDeltaX, .001);
+        assertEquals(deltaY, targetLocation.pathDeltaY, .001);
 
     }
 

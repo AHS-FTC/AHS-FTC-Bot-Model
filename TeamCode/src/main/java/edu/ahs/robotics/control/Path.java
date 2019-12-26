@@ -49,14 +49,27 @@ public class Path {
         Line pathLine = new Line(first, second);
         Point closestPointOnLine = pathLine.getClosestPointOnLine(robotPosition);
 
-        double deltaX = second.x - first.x;
-        double deltaY = second.y - first.y;
+        //Calculate Path vector
+        double pathDeltaX = second.x - first.x;
+        double pathDeltaY = second.y - first.y;
+
+        //Calculate Robot vector
+        double robotDeltaX = robotPosition.x - closestPointOnLine.x;
+        double robotDeltaY = robotPosition.y - closestPointOnLine.y;
 
         //Use third point to calculate
         double distanceToEnd = totalDistance - third.distance + closestPointOnLine.distanceTo(third);
         double distanceFromStart = third.distance - closestPointOnLine.distanceTo(third);
 
-        return new Location(closestPointOnLine, deltaX, deltaY, distanceToEnd, distanceFromStart);
+        //Find perpendicular vector p to the heading
+        double pX = pathDeltaY;
+        double pY = -pathDeltaX;
+
+        //Calculate dot product of p and robotVector normalised by length of path vector
+        double pathVectorLength = Math.sqrt(Math.pow(pathDeltaX, 2) + Math.pow(pathDeltaY, 2));
+        double distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY))/ pathVectorLength;
+
+        return new Location(closestPointOnLine, pathDeltaX, pathDeltaY, distanceToEnd, distanceFromStart, distanceToRobot);
     }
 
     /**
@@ -154,20 +167,22 @@ public class Path {
     }
 
     public static class Location {
-        public double deltaX;
-        public double deltaY;
+        public Point closestPoint;
+        public double pathDeltaX;
+        public double pathDeltaY;
         public double distanceToEnd;
         public double distanceFromStart;
-        public Point point;
+        public double distanceToRobot;
 
-        public Location(Point point, double deltaX, double deltaY, double distanceToEnd, double distanceFromStart) {
-            this.point = point;
-            this.deltaX = deltaX;
-            this.deltaY = deltaY;
+
+        public Location(Point closestPoint, double pathDeltaX, double pathDeltaY, double distanceToEnd, double distanceFromStart, double distanceToRobot) {
+            this.closestPoint = closestPoint;
+            this.pathDeltaX = pathDeltaX;
+            this.pathDeltaY = pathDeltaY;
             this.distanceToEnd = distanceToEnd;
             this.distanceFromStart = distanceFromStart;
+            this.distanceToRobot = distanceToRobot;
         }
-
     }
 
 }
