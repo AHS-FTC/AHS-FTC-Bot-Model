@@ -4,11 +4,7 @@ import java.util.ArrayList;
 
 public class Path {
     private final ArrayList<PointAtDistance> pointAtDistance;
-    double x;
-    double y;
-    private double maxVelocity;
-    double totalTime = 0;
-    double totalDistance = 0;
+    private double totalDistance = 0;
 
     public Path(ArrayList<Point> points) {
         pointAtDistance = new ArrayList<>();
@@ -29,47 +25,54 @@ public class Path {
 
     /**
      * This method takes the bounding points and calculates a third point.
-     * Then it creates a line and gets the intersection and returns it as a point.
+     * Then it creates a line, finds the intersection, and returns it as a point.
      * The third point is used to calculate distance from start and end because it allows for the robot to not be between the bounding points.
      * @param robotPosition
-     * @return Returns a location that is used in Line
+     * @return Returns a location
      */
     public Location getTargetLocation(Position robotPosition) {
+        Location loc = new Location();
+
+        //Find the 2 closest bounding points
         int[] boundingPoints = getBoundingPoints(robotPosition);
         PointAtDistance first = getPoint(boundingPoints[0]);
         PointAtDistance second = getPoint(boundingPoints[1]);
 
-        //Calculate third point and clip if it is off end of path
+        //Calculate Path vector using bounding points
+        loc.pathDeltaX = second.x - first.x;
+        loc.pathDeltaY = second.y - first.y;
+
+        //Find closest point on line to robot
+        Line pathLine = new Line(first, second);
+        loc.closestPoint = pathLine.getClosestPointOnLine(robotPosition);
+
+        //Objective: Calculate distance to end and distance from start of path
+        //Step 1: Find next (third) point on path in case robot is outside bounding points eg. Off start or end of path
         int nextIndex = boundingPoints[1] + 1;
         if (nextIndex > pointAtDistance.size()-1){
             nextIndex = pointAtDistance.size()-1;
         }
         PointAtDistance third = getPoint(nextIndex);
 
-        Line pathLine = new Line(first, second);
-        Point closestPointOnLine = pathLine.getClosestPointOnLine(robotPosition);
+        //Step 2: Use third point to calculate distances
+        loc.distanceToEnd = totalDistance - third.distance + loc.closestPoint.distanceTo(third);
+        loc.distanceFromStart = third.distance - loc.closestPoint.distanceTo(third);
 
-        //Calculate Path vector
-        double pathDeltaX = second.x - first.x;
-        double pathDeltaY = second.y - first.y;
+        //Objective: Find distance to robot from path
+        //Note: Positive distances are to the right of the path and negative are to the left
+        //Step 1: Find perpendicular vector p to the heading
+        double pX = loc.pathDeltaY;
+        double pY = -loc.pathDeltaX;
 
-        //Calculate Robot vector
-        double robotDeltaX = robotPosition.x - closestPointOnLine.x;
-        double robotDeltaY = robotPosition.y - closestPointOnLine.y;
+        //Step 2: Calculate Robot vector
+        double robotDeltaX = robotPosition.x - loc.closestPoint.x;
+        double robotDeltaY = robotPosition.y - loc.closestPoint.y;
 
-        //Use third point to calculate
-        double distanceToEnd = totalDistance - third.distance + closestPointOnLine.distanceTo(third);
-        double distanceFromStart = third.distance - closestPointOnLine.distanceTo(third);
+        //Step 3: Calculate dot product of p and robotVector normalised by length of path vector
+        double pathVectorLength = Math.sqrt(Math.pow(loc.pathDeltaX, 2) + Math.pow(loc.pathDeltaY, 2));
+        loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY))/ pathVectorLength;
 
-        //Find perpendicular vector p to the heading
-        double pX = pathDeltaY;
-        double pY = -pathDeltaX;
-
-        //Calculate dot product of p and robotVector normalised by length of path vector
-        double pathVectorLength = Math.sqrt(Math.pow(pathDeltaX, 2) + Math.pow(pathDeltaY, 2));
-        double distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY))/ pathVectorLength;
-
-        return new Location(closestPointOnLine, pathDeltaX, pathDeltaY, distanceToEnd, distanceFromStart, distanceToRobot);
+        return loc;
     }
 
     /**
@@ -161,9 +164,6 @@ public class Path {
             this(p.x, p.y, distance);
         }
 
-        public double getDistance() {
-            return distance;
-        }
     }
 
     public static class Location {
@@ -173,16 +173,6 @@ public class Path {
         public double distanceToEnd;
         public double distanceFromStart;
         public double distanceToRobot;
-
-
-        public Location(Point closestPoint, double pathDeltaX, double pathDeltaY, double distanceToEnd, double distanceFromStart, double distanceToRobot) {
-            this.closestPoint = closestPoint;
-            this.pathDeltaX = pathDeltaX;
-            this.pathDeltaY = pathDeltaY;
-            this.distanceToEnd = distanceToEnd;
-            this.distanceFromStart = distanceFromStart;
-            this.distanceToRobot = distanceToRobot;
-        }
     }
 
 }
