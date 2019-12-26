@@ -11,6 +11,7 @@ public class HeadingController {
     private double maxVelocity;
     private double leftPower = 0;
     private double rightPower = 0;
+    //Correction values
     private static final double SPEED_SCALE = 1;
     private static final double TURN_SCALE = 1;
 
@@ -20,16 +21,6 @@ public class HeadingController {
         this.minRampUp = minRampUp;
         this.maxVelocity = maxVelocity;
     }
-
-    //Get position of the robot
-
-    //Find target point to robot
-
-    //Compare position of robot with closest point and find difference
-    //Closest point y and x then subtract the robot x y to find correction amount
-    //
-
-    //Make robot move towards target points with correction below
 
     //P controller corrects for target point
 
@@ -60,7 +51,7 @@ public class HeadingController {
         double downScale = 1; //Todo adjust
         double rampDown = Math.max(downScale * (distanceToEnd), minRampDown);
         double rampUp = Math.max(upScale * (distanceFromStart), minRampUp);
-        return Math.min(rampDown,Math.min(rampUp, maxVelocity));
+        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
     }
 
     public static class Powers {
