@@ -353,6 +353,27 @@ public class MecanumChassis extends Chassis {
     }
 
     /**
+     * @return Global Position on the field
+     */
+    public Position getPosition(){
+        return odometrySystem.getPosition();
+    }
+
+    /**
+     * Begins tracking position by echoing the OdometrySystem.start() method.
+     */
+    public void startOdometrySystem(){
+        odometrySystem.start();
+    }
+
+    /**
+     * Stops odom tracking by echoing the OdometrySystem.stop() method. Call this in your OpMode stop method.
+     */
+    public void stopOdometrySystem(){
+        odometrySystem.stop();
+    }
+
+    /**
      * A class that contains vectors in local space along the axis of Mecanum Drive control.
      * Assumes a standard configuration with 45 degree wheel pitch.
      * Marked as package-private to enable unit testing

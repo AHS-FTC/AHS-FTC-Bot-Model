@@ -82,8 +82,6 @@ public class Ardennes extends Robot {
 
     public SerialServo getWrist() {return wrist;}
 
-    public OdometrySystem getOdometrySystem() { return odometrySystem; }
-
     private MecanumChassis makeChassis() {
         //Set Gear Ratio
         GearRatio driveGearRatio = new GearRatio(1,1);
