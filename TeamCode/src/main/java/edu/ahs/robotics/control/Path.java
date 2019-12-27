@@ -8,14 +8,14 @@ public class Path {
 
     public Path(ArrayList<Point> points) {
         pointAtDistance = new ArrayList<>();
-        pointAtDistance.add(new PointAtDistance(points.get(0), 0));
+        pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0));
 
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);
-            Point previous = points.get(i-1);
+            Point previous = points.get(i - 1);
             double distanceFromPrevious = current.distanceTo(previous);
             totalDistance += distanceFromPrevious;
-            pointAtDistance.add(new PointAtDistance(current, totalDistance));
+            pointAtDistance.add(new PointAtDistance(current, totalDistance, current.x - previous.x, current.y - previous.y));
         }
     }
 
@@ -27,36 +27,33 @@ public class Path {
      * This method takes the bounding points and calculates a third point.
      * Then it creates a line, finds the intersection, and returns it as a point.
      * The third point is used to calculate distance from start and end because it allows for the robot to not be between the bounding points.
+     *
      * @param robotPosition
      * @return Returns a location
      */
     public Location getTargetLocation(Position robotPosition) {
-        Location loc = new Location();
-
         //Find the 2 closest bounding points
-        int[] boundingPoints = getBoundingPoints(robotPosition);
-        PointAtDistance first = getPoint(boundingPoints[0]);
-        PointAtDistance second = getPoint(boundingPoints[1]);
+        int boundingPoint = getBoundingPoints(robotPosition);
+        PointAtDistance first = getPoint(boundingPoint);
 
-        //Calculate Path vector using bounding points
-        loc.pathDeltaX = second.x - first.x;
-        loc.pathDeltaY = second.y - first.y;
+        //Look to see if robot is past end of line (First bounding point is last point on path)
+        if (boundingPoint == pointAtDistance.size() - 1) {
+            Location loc = new Location(first);
+            loc.pathFinished = true;
+            return loc;
+        }
+
+        PointAtDistance second = getPoint(boundingPoint + 1);
+
+        Location loc = new Location(second);
 
         //Find closest point on line to robot
         Line pathLine = new Line(first, second);
         loc.closestPoint = pathLine.getClosestPointOnLine(robotPosition);
 
-        //Objective: Calculate distance to end and distance from start of path
-        //Step 1: Find next (third) point on path in case robot is outside bounding points eg. Off start or end of path
-        int nextIndex = boundingPoints[1] + 1;
-        if (nextIndex > pointAtDistance.size()-1){
-            nextIndex = pointAtDistance.size()-1;
-        }
-        PointAtDistance third = getPoint(nextIndex);
-
-        //Step 2: Use third point to calculate distances
-        loc.distanceToEnd = totalDistance - third.distance + loc.closestPoint.distanceTo(third);
-        loc.distanceFromStart = third.distance - loc.closestPoint.distanceTo(third);
+        //Calculate distance to end and distance from start of path
+        loc.distanceToEnd = (totalDistance - second.distance) + loc.closestPoint.distanceTo(second);
+        loc.distanceFromStart = second.distance - loc.closestPoint.distanceTo(second);
 
         //Objective: Find distance to robot from path
         //Note: Positive distances are to the right of the path and negative are to the left
@@ -70,61 +67,35 @@ public class Path {
 
         //Step 3: Calculate dot product of p and robotVector normalised by length of path vector
         double pathVectorLength = Math.sqrt(Math.pow(loc.pathDeltaX, 2) + Math.pow(loc.pathDeltaY, 2));
-        loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY))/ pathVectorLength;
-
-        //Objective: Look to see if the robot is at or past last point
-        //Note: If last point is second point of our bounding range then return that the path is finished
-        loc.pathFinished = false;
-        PointAtDistance lastPoint = getPoint(pointAtDistance.size() -1);
-        if (lastPoint == second) {
-
-            double robotVectorToLastX = lastPoint.x - robotPosition.x;
-            double robotVectorToLastY = lastPoint.y - robotPosition.y;
-
-            if ((robotVectorToLastX * loc.pathDeltaX) + (robotVectorToLastY * loc.pathDeltaY) <= 0) {
-                loc.pathFinished = true;
-            }
-        }
+        loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY)) / pathVectorLength;
 
         return loc;
     }
 
     /**
      * This method finds the two closest points to the robot position and returns the points in order of path.
+     *
      * @param robotPosition
      * @return indices of points. Use getPoint to find actual point.
      */
-    public int[] getBoundingPoints(Position robotPosition) {
-        int closest = 0;
-        int nextClosest = 1;
-        double closestDistance = pointAtDistance.get(closest).distanceTo(robotPosition);
-        double nextClosestDistance = Double.MAX_VALUE;
+    public int getBoundingPoints(Position robotPosition) {
+        int iFirst = 0;
 
         for (int i = 1; i < pointAtDistance.size(); i++) {
-            PointAtDistance currentPoint = this.pointAtDistance.get(i);
-            double currentDistance = currentPoint.distanceTo(robotPosition);
+            PointAtDistance current = getPoint(i);
+            double robotDeltaX = current.x - robotPosition.x;
+            double robotDeltaY = current.y - robotPosition.y;
 
-            if (currentDistance < closestDistance) {
-                nextClosestDistance = closestDistance;
-                nextClosest = closest;
-                closestDistance = currentDistance;
-                closest = i;
-            } else if (currentDistance < nextClosestDistance) {
-                nextClosestDistance = currentDistance;
-                nextClosest = i;
-            } else {
+            double componentToCurrent = (robotDeltaX * current.pathDeltaX) + (robotDeltaY * current.pathDeltaY);
+            if (componentToCurrent > 0) {
                 break;
+            } else {
+                iFirst = i;
             }
         }
-        //Return the points in order of path
-        if (closest < nextClosest) {
-            return new int[]{closest, nextClosest};
-        } else {
-            return new int[]{nextClosest, closest};
-        }
+
+        return iFirst;
     }
-
-
 
 
 //    public Position getTargetPosition(double currentTime) {
@@ -164,18 +135,21 @@ public class Path {
 //    }
 
 
-    
     public static class PointAtDistance extends Point {
         private double distance;
+        private double pathDeltaX;
+        private double pathDeltaY;
 
-        public PointAtDistance(double x, double y, double distance) {
+        public PointAtDistance(double x, double y, double distance, double pathDeltaX, double pathDeltaY) {
             super(x, y);
             this.distance = distance;
-            
+            this.pathDeltaX = pathDeltaX;
+            this.pathDeltaY = pathDeltaY;
+
         }
 
-        public PointAtDistance(Point p, double distance) {
-            this(p.x, p.y, distance);
+        public PointAtDistance(Point p, double distance, double pathDeltaX, double pathDeltaY) {
+            this(p.x, p.y, distance, pathDeltaX, pathDeltaY);
         }
 
     }
@@ -188,6 +162,12 @@ public class Path {
         public double distanceFromStart;
         public double distanceToRobot;
         public boolean pathFinished;
+
+        public Location(PointAtDistance pointAtDistance) {
+            pathFinished = false;
+            pathDeltaX = pointAtDistance.pathDeltaX;
+            pathDeltaY = pointAtDistance.pathDeltaY;
+        }
     }
 
 }
