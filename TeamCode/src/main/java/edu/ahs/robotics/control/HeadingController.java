@@ -32,7 +32,7 @@ public class HeadingController {
     public Powers getUpdatedPowers(Position robotPosition, Velocity robotVelocity) {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
-        if (targetLocation.distanceToEnd > 0) {
+        if (!targetLocation.pathFinished) {
             double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
 
             double speedError = targetSpeed - robotVelocity.speed;
@@ -54,7 +54,7 @@ public class HeadingController {
             rightPower = 0.0;
         }
 
-        return new Powers(leftPower, rightPower, targetLocation.distanceToEnd <= 0.0);
+        return new Powers(leftPower, rightPower, targetLocation.pathFinished);
     }
 
     private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {

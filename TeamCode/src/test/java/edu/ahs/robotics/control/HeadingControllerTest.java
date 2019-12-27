@@ -102,19 +102,15 @@ public class HeadingControllerTest {
         HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
         assertEquals(0, powers.leftPower, .001);
         assertEquals(0, powers.rightPower, .001);
-        assertTrue(powers.pathFinished);
 
         robotPosition = new Position(0, 3, 0);
         powers = controller.getUpdatedPowers(robotPosition, velocity);
-
-        assertFalse(powers.pathFinished);
 
         robotPosition = new Position(0, 5, 0);
         powers = controller.getUpdatedPowers(robotPosition, velocity);
 
         assertEquals(0, powers.leftPower, .001);
         assertEquals(0, powers.rightPower, .001);
-        assertTrue(powers.pathFinished);
     }
     @Test
     public void testPowersStayInRangeWhileRamping() {

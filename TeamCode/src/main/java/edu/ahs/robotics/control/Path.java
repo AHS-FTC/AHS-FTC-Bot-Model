@@ -72,6 +72,20 @@ public class Path {
         double pathVectorLength = Math.sqrt(Math.pow(loc.pathDeltaX, 2) + Math.pow(loc.pathDeltaY, 2));
         loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY))/ pathVectorLength;
 
+        //Objective: Look to see if the robot is at or past last point
+        //Note: If last point is second point of our bounding range then return that the path is finished
+        loc.pathFinished = false;
+        PointAtDistance lastPoint = getPoint(pointAtDistance.size() -1);
+        if (lastPoint == second) {
+
+            double robotVectorToLastX = lastPoint.x - robotPosition.x;
+            double robotVectorToLastY = lastPoint.y - robotPosition.y;
+
+            if ((robotVectorToLastX * loc.pathDeltaX) + (robotVectorToLastY * loc.pathDeltaY) <= 0) {
+                loc.pathFinished = true;
+            }
+        }
+
         return loc;
     }
 
@@ -173,6 +187,7 @@ public class Path {
         public double distanceToEnd;
         public double distanceFromStart;
         public double distanceToRobot;
+        public boolean pathFinished;
     }
 
 }
