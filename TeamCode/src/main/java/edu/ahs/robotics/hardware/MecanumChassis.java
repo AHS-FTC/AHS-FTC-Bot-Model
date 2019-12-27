@@ -320,9 +320,9 @@ public class MecanumChassis extends Chassis {
      * @param point A cartesian point on the field that the method will navigate to.
      * @param timeOut delta time in millis to end the main correction loop
      */
-    public void goToPointWithPID(Point point, double timeOut){
-        Position currentPosition;
-        Position targetPosition = new Position(point.x, point.y, 0);
+    public void goToPointWithPID(Point point, long timeOut){
+        Position currentPosition = getPosition();
+        Position targetPosition = new Position(point, 0);
         double frontLeftPower = 0, frontRightPower = 0;
         double backLeftPower = 0, backRightPower = 0;
 
@@ -330,13 +330,13 @@ public class MecanumChassis extends Chassis {
         MecanumVectors mecanumVectorCorrections;
 
         XYHeadingPID.Config pidConfig = new XYHeadingPID.Config();
-        pidConfig.setYParameters(0.1,0.01, -0.01);
-        pidConfig.setXParameters(0.1,0.01, -0.01);
+        pidConfig.setYParameters(0.01,0.001, -0.05);
+        pidConfig.setXParameters(0.01,0.001, -0.05);
         pidConfig.setHeadingParameters(0,0,0);
 
         XYHeadingPID pid = new XYHeadingPID(pidConfig);
 
-        double startTime = FTCUtilities.getCurrentTimeMillis();
+        long startTime = FTCUtilities.getCurrentTimeMillis();
 
         //odometrySystem.start(); // commented out because this should probably be handled at a higher level
 
@@ -344,7 +344,7 @@ public class MecanumChassis extends Chassis {
             throw new Warning("tried to do a goToPointWithPID without the odometrySystem running");
         }
 
-        while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut){
+        while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut && currentPosition.distanceTo(targetPosition) > 0.1){
             currentPosition = getPosition();
 
             FTCUtilities.addData("x", currentPosition.x());
@@ -357,11 +357,11 @@ public class MecanumChassis extends Chassis {
             //cast corrections to mecanum vectors
             mecanumVectorCorrections = MecanumVectors.convertLocalVectorsToMecanumVectors(correction.x, correction.y);
 
-            frontLeftPower += mecanumVectorCorrections.forwardLeft;
-            backRightPower += mecanumVectorCorrections.forwardLeft;
+            frontLeftPower += mecanumVectorCorrections.forwardRight; // may change depending on wheel config
+            backRightPower += mecanumVectorCorrections.forwardRight;
 
-            frontRightPower += mecanumVectorCorrections.forwardRight;
-            backLeftPower += mecanumVectorCorrections.forwardRight;
+            frontRightPower += mecanumVectorCorrections.forwardLeft;
+            backLeftPower += mecanumVectorCorrections.forwardLeft;
 
             frontLeft.setPower(frontLeftPower);
             frontRight.setPower(frontRightPower);
@@ -450,7 +450,7 @@ public class MecanumChassis extends Chassis {
      * A class that contains vectors in local space along the axis of Mecanum Drive control.
      * Assumes a standard configuration with 45 degree wheel pitch.
      * Marked as package-private to enable unit testing
-     * @author Alex Applevby
+     * @author Alex Appleby
      */
      static class MecanumVectors{
          double forwardRight;
@@ -468,8 +468,8 @@ public class MecanumChassis extends Chassis {
          */
          static MecanumVectors convertLocalVectorsToMecanumVectors(double x, double y){
 
-            double forwardRight = (x + y) / 2;
-            double forwardLeft = (x - y) / 2;
+            double forwardRight = (x - y) / 2;
+            double forwardLeft = (x + y) / 2;
 
             return new MecanumVectors(forwardRight, forwardLeft);
         }
