@@ -1,16 +1,17 @@
 package edu.ahs.robotics.hardware;
 
-import android.graphics.Point;
-
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Position;
+import edu.ahs.robotics.control.Velocity;
+import edu.ahs.robotics.control.VelocityPID;
 import edu.ahs.robotics.control.XYHeadingPID;
-import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.control.Point;
 
 public class MecanumChassis extends Chassis {
 
@@ -30,7 +31,6 @@ public class MecanumChassis extends Chassis {
     private ChassisMotors.Mecanum BACK_LEFT = ChassisMotors.Mecanum.BACKLEFT;
     private ChassisMotors.Mecanum BACK_RIGHT = ChassisMotors.Mecanum.BACKRIGHT;
 
-    private IMU imu;
     private OdometrySystem odometrySystem;
 
     private OdometerImpl leftOdometer;
@@ -38,29 +38,20 @@ public class MecanumChassis extends Chassis {
     private OdometerImpl backOdometer;
 
 
-    public MecanumChassis(DriveUnit.Config driveUnitConfig) {
+    public MecanumChassis(DriveUnit.Config driveUnitConfig, OdometrySystem odometrySystem) {
         super();
         frontLeft = new SingleDriveUnit(FRONT_LEFT.getDeviceName(), driveUnitConfig, false);
         frontRight = new SingleDriveUnit(FRONT_RIGHT.getDeviceName(), driveUnitConfig, true);
         backLeft = new SingleDriveUnit(BACK_LEFT.getDeviceName(), driveUnitConfig, false);
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
-        leftOdometer = new OdometerImpl("intakeL", 60, false);
-        rightOdometer = new OdometerImpl("intakeR", 60.3, true);
-        backOdometer = new OdometerImpl("BR", 60, false); //update and tune this
-        odometrySystem = new OdometrySystem(leftOdometer,rightOdometer,backOdometer,10,10); //todo tweak constants
+        this.odometrySystem = odometrySystem;
     }
 
-
-    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu) {
-        this(driveUnitConfig);
-        this.imu = imu;
-    }
-
-//    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystem odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
+//    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystemImpl odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
 //        this(driveUnitConfig, imu);
 //
-//        odometrySystem = new OdometrySystem(FTCUtilities.getMotor(xMotorName), FTCUtilities.getMotor(yMotorName), imu, odometryWheelDiameter);
+//        odometrySystem = new OdometrySystemImpl(FTCUtilities.getMotor(xMotorName), FTCUtilities.getMotor(yMotorName), imu, odometryWheelDiameter);
 //    }
 
 
@@ -265,6 +256,65 @@ public class MecanumChassis extends Chassis {
         Logger.getInstance().writeToFile();
     }
 
+    public void velocityDrive(Path path, double maxSpeed){
+        Position initialPosition = getPosition();
+        /*Velocity initialVelocity = getVelocity();*/
+
+        double distanceToEnd = path.getTargetLocation(initialPosition).distanceToEnd;
+
+        double leftPower = 0.1, rightPower = 0.1; //initial power vals programmed in
+
+        double rampDownScale = 3; //scales the sqrt graph for ramp down. Because all parabolas are similar, this is the only possible scale factor.
+
+        VelocityPID.Config config = new VelocityPID.Config();
+        config.setSpeedParams(0.01, 0.0005,  -0.001);
+        config.setDirectionParams(0.01,0.0005,-0.001);
+
+        VelocityPID pid = new VelocityPID(config);
+        VelocityPID.Correction correction;
+
+        if(!odometrySystem.isRunning()){
+            throw new Warning("tried to do a velocityDrive without the odometrySystem running");
+        }
+
+        while (distanceToEnd > 0.05) { //0.05 is quite arbitrary
+            double targetSpeed;
+
+            Position currentPosition = getPosition();
+            Velocity currentVelocity = getVelocity();
+
+            Path.Location location = path.getTargetLocation(currentPosition);
+
+            Velocity targetVelocity = Velocity.makeVelocityFromDxDy(location.deltaX,location.deltaY);
+
+            distanceToEnd = path.getTargetLocation(currentPosition).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
+
+            targetSpeed = Math.min(maxSpeed, rampDownScale * Math.sqrt(distanceToEnd));
+
+            // target speed math: https://www.desmos.com/calculator/31kvlxmlhn
+
+            targetVelocity.speed = targetSpeed; //scale the velocity vector
+
+            correction = pid.getCorrection(currentVelocity,targetVelocity); //get the corrections
+
+            leftPower += correction.speed; //speed up all motors
+            rightPower += correction.speed;
+
+            leftPower -= correction.direction; // make direction adjustment
+            rightPower += correction.direction;
+
+            frontLeft.setPower(leftPower); //set powers
+            backLeft.setPower(leftPower);
+
+            frontRight.setPower(rightPower);
+            backRight.setPower(rightPower);
+
+            //FTCUtilities.addData("leftPower", leftPower);
+            //FTCUtilities.addData("rightPower", rightPower);
+            //FTCUtilities.updateOpLogger();
+        }
+    }
+
     /**
      * Uses XYHeading PID to navigate/adjust position to a point on the field.
      * @param point A cartesian point on the field that the method will navigate to.
@@ -288,10 +338,14 @@ public class MecanumChassis extends Chassis {
 
         double startTime = FTCUtilities.getCurrentTimeMillis();
 
-        odometrySystem.start();
+        //odometrySystem.start(); // commented out because this should probably be handled at a higher level
+
+        if(!odometrySystem.isRunning()){
+            throw new Warning("tried to do a goToPointWithPID without the odometrySystem running");
+        }
 
         while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut){
-            currentPosition = odometrySystem.getPosition();
+            currentPosition = getPosition();
 
             FTCUtilities.addData("x", currentPosition.x());
             FTCUtilities.addData("y", currentPosition.y());
@@ -314,7 +368,19 @@ public class MecanumChassis extends Chassis {
             backLeft.setPower(backLeftPower);
             backRight.setPower(backRightPower);
         }
-        odometrySystem.stop();
+        //odometrySystem.stop();
+    }
+
+    /**
+     * Sets the position of the robot using the odometrySystem.resetPosition() method.
+     * Should be utilized at the start at an OpMode to clarify your starting position.
+     * <a href ="https://docs.google.com/drawings/d/1CasrlxBprQIvFcZTe8vHDQQWJD0nevVGOtdnTtcSpAw/edit?usp=sharing">Utilizes standard coordinate conventions</a>
+     * @param x X position in inches
+     * @param y Y position in inches
+     * @param heading Heading in radians. Use the Math.toRadians() method if you have no guts
+     */
+    public void setPosition(double x, double y, double heading){
+        odometrySystem.resetPosition(x, y, heading);
     }
 
     private double inversePower(double power) {
@@ -359,15 +425,19 @@ public class MecanumChassis extends Chassis {
         return odometrySystem.getPosition();
     }
 
+    private Velocity getVelocity(){ // may make public at some point
+        return odometrySystem.getVelocity();
+    }
+
     /**
-     * Begins tracking position by echoing the OdometrySystem.start() method.
+     * Begins tracking position by echoing the OdometrySystemImpl.start() method.
      */
     public void startOdometrySystem(){
         odometrySystem.start();
     }
 
     /**
-     * Stops odom tracking by echoing the OdometrySystem.stop() method. Call this in your OpMode stop method.
+     * Stops odom tracking by echoing the OdometrySystemImpl.stop() method. Call this in your OpMode stop method.
      */
     public void stopOdometrySystem(){
         odometrySystem.stop();

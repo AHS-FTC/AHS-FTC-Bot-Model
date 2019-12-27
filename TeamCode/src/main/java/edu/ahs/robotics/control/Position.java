@@ -64,7 +64,7 @@ public class Position {
     }
 
     /**
-     * Increments the position x value by a double amount. Utilized primarily in OdometrySystem.
+     * Increments the position x value by a double amount. Utilized primarily in OdometrySystemImpl.
      * @param increment How much is being added to x. Can be negative.
      */
     public void incrementX(double increment){
@@ -72,7 +72,7 @@ public class Position {
     }
 
     /**
-     * Increments the position y value by a double amount. Utilized primarily in OdometrySystem.
+     * Increments the position y value by a double amount. Utilized primarily in OdometrySystemImpl.
      * @param increment How much is being added to y. Can be negative.
      */
     public void incrementY(double increment){

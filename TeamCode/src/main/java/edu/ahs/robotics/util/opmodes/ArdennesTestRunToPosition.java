@@ -27,45 +27,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
+import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.control.Position;
+import edu.ahs.robotics.hardware.ChassisMotors;
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 
 /**
- * Test OpMode for tuning the true diameter of the odometer wheels on Ardennes. The 60mm REV wheels have bad tolerances.
- * This OpMode doesn't utilize the Ardennes class structure and instead directly accesses the encoders via the hardwaremap.
- * You may have to look over this code to make sure it's accurate before using/reusing it.
- * </br>
- * Using this class does require some math. Take the total distance you push your robot and divide it by the amount of rotations to figure out the circumference of the wheel.
- * Knowing the circumference calculate diameter by dividing by pi.
- * The diameter of each wheel should come out to be close to 60mm or 2.36 inches (if you're using the Ardennes rev wheels).
+ * Test OpMode that tests the Position PID in the goToPointWithPID() method housed by the MecanumChassis class.
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Odometery Logger", group="Iterative OpMode")
+@TeleOp(name="Ardennes Run To Position", group="Iterative OpMode")
 @Disabled
-public class ArdennesWheelTuningOpMode extends OpMode
+public class ArdennesTestRunToPosition extends OpMode
 {
-    private DcMotor left, right, back;
-    private static final double TICKS_PER_ROTATION = 1440;
+    private Ardennes ardennes;
+    private Point target;
+
 
     @Override
     public void init() {
-        left = hardwareMap.get(DcMotor.class,"left");
-        right = hardwareMap.get(DcMotor.class,"right");
-        back = hardwareMap.get(DcMotor.class,"back");
+        ardennes = new Ardennes();
+        ardennes.getChassis().setPosition(5,5,Math.PI/2);
+        ardennes.getChassis().startOdometrySystem();
 
-
-        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        back.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        target = new Point(0,0);
     }
 
     @Override
@@ -74,18 +66,16 @@ public class ArdennesWheelTuningOpMode extends OpMode
 
     @Override
     public void start() {
+        ardennes.getChassis().goToPointWithPID(target,5000);
     }
 
     @Override
     public void loop() {
-        telemetry.addData("Left Rotations", (left.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("Right Rotations", (right.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("Back Rotations", (back.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.update();
+
     }
     @Override
     public void stop() {
-
+        ardennes.getChassis().stopOdometrySystem();
     }
 
 }
