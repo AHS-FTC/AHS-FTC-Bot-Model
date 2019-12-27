@@ -425,7 +425,10 @@ public class MecanumChassis extends Chassis {
         return odometrySystem.getPosition();
     }
 
-    private Velocity getVelocity(){ // may make public at some point
+    /**
+     * @return Velocity Vector in inches per second
+     */
+    public Velocity getVelocity(){
         return odometrySystem.getVelocity();
     }
 

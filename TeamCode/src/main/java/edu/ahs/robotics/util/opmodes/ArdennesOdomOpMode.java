@@ -34,7 +34,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import edu.ahs.robotics.control.Position;
+import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.FTCUtilities;
 
 /**
  * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
@@ -46,6 +48,9 @@ public class ArdennesOdomOpMode extends OpMode
 {
     private Ardennes ardennes;
     private Position position;
+    private Velocity velocity;
+
+    private double lastTime;
 
     @Override
     public void init() {
@@ -59,15 +64,24 @@ public class ArdennesOdomOpMode extends OpMode
 
     @Override
     public void start() {
+        lastTime = FTCUtilities.getCurrentTimeMillis();
     }
 
     @Override
     public void loop() {
+        double currentTime = FTCUtilities.getCurrentTimeMillis();
+
         position = ardennes.getChassis().getPosition();
-        telemetry.addData("x", position.x());
-        telemetry.addData("y", position.y());
-        telemetry.addData("heading", position.heading);
+        velocity = ardennes.getChassis().getVelocity();
+
+        telemetry.addData("x -ins", position.x());
+        telemetry.addData("y -ins", position.y());
+        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
+        telemetry.addData("speed -in/s", velocity.speed);
+        telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction));
+        telemetry.addData("delta time -millis", currentTime - lastTime);
         telemetry.update();
+        lastTime = currentTime;
     }
     @Override
     public void stop() {
