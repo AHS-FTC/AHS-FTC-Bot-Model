@@ -12,8 +12,8 @@ public class HeadingController {
     private double leftPower = 0;
     private double rightPower = 0;
     //Correction values
-    private static final double SPEED_SCALE = 1;
-    private static final double TURN_SCALE = 1;
+    private static final double SPEED_SCALE = .01;
+    private static final double TURN_SCALE = .01;
 
     public HeadingController(Path path, double minRampDown, double minRampUp, double maxVelocity) {
         this.path = path;
@@ -32,18 +32,29 @@ public class HeadingController {
     public Powers getUpdatedPowers(Position robotPosition, Velocity robotVelocity) {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
-        double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
+        if (targetLocation.distanceToEnd > 0) {
+            double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
 
-        double speedError = targetSpeed - robotVelocity.speed;
+            double speedError = targetSpeed - robotVelocity.speed;
 
-        leftPower += speedError * SPEED_SCALE;
-        rightPower += speedError * SPEED_SCALE;
+            leftPower += speedError * SPEED_SCALE;
+            rightPower += speedError * SPEED_SCALE;
 
-        leftPower -= targetLocation.distanceToRobot * TURN_SCALE;
-        rightPower += targetLocation.distanceToRobot * TURN_SCALE;
+            leftPower -= targetLocation.distanceToRobot * TURN_SCALE;
+            rightPower += targetLocation.distanceToRobot * TURN_SCALE;
 
-        //Todo Clip powers to 1 by ratio?
-        return new Powers(leftPower, rightPower);
+            //Clip powers to 1 by maximum power
+            double maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
+            if (maxPower > 1.0) {
+                leftPower = leftPower / maxPower;
+                rightPower = rightPower / maxPower;
+            }
+        } else {
+            leftPower = 0.0;
+            rightPower = 0.0;
+        }
+
+        return new Powers(leftPower, rightPower, targetLocation.distanceToEnd <= 0.0);
     }
 
     private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
@@ -55,12 +66,14 @@ public class HeadingController {
     }
 
     public static class Powers {
-        double leftPower;
-        double rightPower;
+        public double leftPower;
+        public double rightPower;
+        public boolean pathFinished;
 
-        public Powers(double leftPower, double rightPower) {
+        public Powers(double leftPower, double rightPower, boolean pathFinished) {
             this.leftPower = leftPower;
             this.rightPower = rightPower;
+            this.pathFinished = pathFinished;
         }
     }
 }
