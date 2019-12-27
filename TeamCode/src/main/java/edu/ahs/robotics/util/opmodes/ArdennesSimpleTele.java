@@ -32,67 +32,61 @@ package edu.ahs.robotics.util.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import edu.ahs.robotics.control.Position;
-import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /**
- * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
+ * Test OpMode for driving Ardennes. Not dependent on BotModel
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Odometery Logger", group="Iterative OpMode")
-@Disabled
-public class ArdennesOdomOpMode extends OpMode
+@TeleOp(name="Ardennes Simple TeleOp", group="Iterative OpMode")
+//@Disabled
+public class ArdennesSimpleTele extends OpMode
 {
-    private Ardennes ardennes;
-    private Position position;
-    private Velocity velocity;
-
-    private double lastTime;
-
-    private ArdennesSimpleTele tele;
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
 
     @Override
     public void init() {
-        ardennes = new Ardennes();
-        ardennes.getChassis().startOdometrySystem();
+        frontLeft = hardwareMap.get(DcMotor.class, "FL");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
+        backLeft = hardwareMap.get(DcMotor.class,"BL");
+        backRight = hardwareMap.get(DcMotor.class,"BR");
 
-        tele = new ArdennesSimpleTele();
-        tele.init();
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
     }
 
     @Override
     public void init_loop() {
+
     }
 
     @Override
     public void start() {
-        lastTime = FTCUtilities.getCurrentTimeMillis();
+
     }
 
     @Override
     public void loop() {
-        tele.loop();
+        double forward = gamepad1.left_stick_y;
+        double strafe = gamepad1.left_stick_x;
+        double turn = gamepad1.right_stick_x;
 
-        double currentTime = FTCUtilities.getCurrentTimeMillis();
-
-        position = ardennes.getChassis().getPosition();
-        velocity = ardennes.getChassis().getVelocity();
-
-        telemetry.addData("x -ins", position.x());
-        telemetry.addData("y -ins", position.y());
-        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
-        telemetry.addData("speed -in/s", velocity.speed);
-        telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction));
-        telemetry.addData("delta time -millis", currentTime - lastTime);
-        telemetry.update();
-        lastTime = currentTime;
+        frontLeft.setPower(forward - strafe - turn);
+        frontRight.setPower(forward + strafe + turn);
+        backLeft.setPower(forward + strafe - turn);
+        backRight.setPower(forward - strafe + turn);
     }
+
     @Override
-    public void stop() {
-        ardennes.getChassis().stopOdometrySystem();
+    public void stop(){
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
     }
 
 }
