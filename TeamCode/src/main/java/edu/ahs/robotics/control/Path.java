@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Path {
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
+    private int iFirst = 0;
 
     public Path(ArrayList<Point> points) {
         pointAtDistance = new ArrayList<>();
@@ -79,9 +80,8 @@ public class Path {
      * @return indices of points. Use getPoint to find actual point.
      */
     public int getBoundingPoints(Position robotPosition) {
-        int iFirst = 0;
 
-        for (int i = 1; i < pointAtDistance.size(); i++) {
+        for (int i = iFirst + 1; i < pointAtDistance.size(); i++) {
             PointAtDistance current = getPoint(i);
             double robotDeltaX = current.x - robotPosition.x;
             double robotDeltaY = current.y - robotPosition.y;
@@ -96,44 +96,6 @@ public class Path {
 
         return iFirst;
     }
-
-
-//    public Position getTargetPosition(double currentTime) {
-//        //math for target position based on totalDistance and interpolating
-//        //is this where the d term goes?
-//
-//
-//
-//        if (currentTime > totalDistance) {
-//            currentTime = totalDistance;
-//        }
-//
-//        PointAtDistance previous = pointAtDistance.get(0);
-//        PointAtDistance next = pointAtDistance.get(1);
-//
-//
-//        for (int i = 1; i < pointAtDistance.size(); i++) {
-//
-//            next = pointAtDistance.get(i);
-//            previous = pointAtDistance.get(i-1);
-//
-//            if (next.time >= currentTime) {
-//                break;
-//            }
-//
-//        }
-//
-//        //Interpolate between previous and current to find target position
-//        double ratio = (currentTime - previous.time) / (next.time - previous.time);
-//        double deltaX = next.getX() - previous.getX();
-//        double deltaY = next.getY() - previous.getY();
-//        double targetX = previous.getX() + (ratio * deltaX);
-//        double targetY = previous.getY() + (ratio * deltaY);
-//        double targetHeading = Math.atan(deltaY/deltaX);
-//
-//        return new Position(targetX,targetY,targetHeading);
-//    }
-
 
     public static class PointAtDistance extends Point {
         private double distance;

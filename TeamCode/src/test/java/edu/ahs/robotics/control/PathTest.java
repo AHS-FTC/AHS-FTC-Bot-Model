@@ -323,17 +323,17 @@ public class PathTest {
         points.add(new Point(0, 4));
         Path path = new Path(points);
 
-        //Test location at robot position at end of path
-        Position robotPosition = new Position(0, 4, 0);
+        //Test location at robot position during path
+        Position robotPosition = new Position(0, 2, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
-        assertTrue(targetLocation.pathFinished);
+        assertFalse(targetLocation.pathFinished);
 
-        //Test location at robot position during path
-        robotPosition = new Position(0, 2, 0);
+        //Test location at robot position at end of path
+        robotPosition = new Position(0, 4, 0);
         targetLocation = path.getTargetLocation(robotPosition);
 
-        assertFalse(targetLocation.pathFinished);
+        assertTrue(targetLocation.pathFinished);
 
         //Test location at robot position over end of path
         robotPosition = new Position(0, 5, 0);
