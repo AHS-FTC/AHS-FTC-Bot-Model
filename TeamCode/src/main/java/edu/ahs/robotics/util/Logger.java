@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class Logger {
@@ -42,40 +43,23 @@ public class Logger {
     Make sure to save file or change name in between runs so that your file is not overwritten
     IF THIS IS NOT DONE DATA WILL BE LOST
      */
-
-    private static Logger instance;
-    private Map<Cats, ArrayList<String>> entriesByCategory;
-
-    public static enum Cats {
-        MOTORPOW("Motor Power"), ENCODERDIST("Encoder Distance"),DESIDIST("Desired Distance"),ERROR("Error"),
-        POWADJ("Power Adjustment"),TIME("Time"),PADJUSTMENT("P Adjustment"),IADJUSTMENT("I Adjustment"),DADJUSTMENT("D Adjustment"),DDADJUSTMENT("DD Adjustment");
-
-        private String name;
-
-        private String getName(){return name;}
-
-        private Cats(String s) { this.name = s;}
+    private String fileName;
+    private String[] categories;
+    private Map<String, ArrayList<String>> entriesByCategory;
+    public Logger(String name, String... cats){
+        fileName=name;
+        categories= new String[cats.length];
+        System.arraycopy(cats,0,categories,0,cats.length);
+        entriesByCategory = new HashMap<>();
+        for (int i = 0; i < cats.length; i++) {
+            entriesByCategory.put(categories[i], new ArrayList<String>());
+        }
     }
-
-    private String fileName = "Data.csv";
-
-    static {
-        instance = new Logger();
+    public String[] getCats(){
+        return categories;
     }
 
     private FileWriter csvWriter = null;
-
-    public static Logger getInstance() {
-        return instance;
-    }
-
-    private Logger() {
-        entriesByCategory = new HashMap<>();
-        for (int i = 0; i < Cats.values().length; i++) {
-            entriesByCategory.put(Cats.values()[i], new ArrayList<String>());
-
-        }
-    }
 
     public void writeToFile() {
         try {
@@ -85,10 +69,9 @@ public class Logger {
             }
             file.createNewFile();
             csvWriter = new FileWriter(file);
-            for (Map.Entry<Cats, ArrayList<String>> s : entriesByCategory.entrySet()) {
-                csvWriter.append(s.getKey().getName());
-                csvWriter.append(", ");
-                ArrayList<String> list = s.getValue();
+            for (int i = 0; i < categories.length; i++) {
+                String catagory = categories[i];
+                List list = entriesByCategory.get(catagory);
                 Iterator<String> iterator = list.iterator();
                 while (iterator.hasNext()) {
                     csvWriter.append(iterator.next());
@@ -98,7 +81,6 @@ public class Logger {
                 }
 
                 csvWriter.append("\n");
-
             }
             csvWriter.flush();
             csvWriter.close();
@@ -127,7 +109,7 @@ public class Logger {
 
     }
 
-    public static void append(Cats title, String data) {
-        getInstance().entriesByCategory.get(title).add(data);
+    public void append(String title, String data) {
+        entriesByCategory.get(title).add(data);
     }
 }
