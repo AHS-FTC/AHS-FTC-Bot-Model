@@ -4,9 +4,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.control.Point;
-
 import static org.junit.Assert.*;
 
 public class PathTest {
@@ -21,33 +18,33 @@ public class PathTest {
 
         //Test at robot position 0
         Position robotPosition = new Position(0,0,0);
-        int boundingPoint = path.getBoundingPoints(robotPosition);
-        assertEquals(0, boundingPoint);
+        path.updateFirstBoundingPoint(robotPosition);
+        assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at robot position -1
         Position robotPositionBeforeStartOfPath = new Position(-1,-3,10);
-        boundingPoint = path.getBoundingPoints(robotPositionBeforeStartOfPath);
-        assertEquals(0, boundingPoint);
+        path.updateFirstBoundingPoint(robotPositionBeforeStartOfPath);
+        assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at position between bounding points
         Position robotPositionDuringPath = new Position(2,1,0);
-        boundingPoint = path.getBoundingPoints(robotPositionDuringPath);
-        assertEquals(0, boundingPoint);
+        path.updateFirstBoundingPoint(robotPositionDuringPath);
+        assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at left of path
         Position robotPositionLeftOfPath = new Position(3,-2,0);
-        boundingPoint = path.getBoundingPoints(robotPositionLeftOfPath);
-        assertEquals(0, boundingPoint);
+        path.updateFirstBoundingPoint(robotPositionLeftOfPath);
+        assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at right of path
         Position robotPositionRightOfPath = new Position(3,2,0);
-        boundingPoint = path.getBoundingPoints(robotPositionRightOfPath);
-        assertEquals(0, boundingPoint);
+        path.updateFirstBoundingPoint(robotPositionRightOfPath);
+        assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at farthest point
         Position robotPositionAtLastPoint = new Position(4,2,0);
-        boundingPoint = path.getBoundingPoints(robotPositionAtLastPoint);
-        assertEquals(1, boundingPoint);
+        path.updateFirstBoundingPoint(robotPositionAtLastPoint);
+        assertEquals(1, path.iFirstBoundingPoint);
     }
 
     @Test
@@ -62,33 +59,33 @@ public class PathTest {
 
         //Test at robot position 0
         Position robotPosition = new Position(0,0,0);
-        int boundingPoints = path.getBoundingPoints(robotPosition);
-        assertEquals(0, boundingPoints);
+        path.updateFirstBoundingPoint(robotPosition);
+        assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at robot position -1
         Position robotPositionBeforeStartOfPath = new Position(-1,-3,0);
-        boundingPoints = path.getBoundingPoints(robotPositionBeforeStartOfPath);
-        assertEquals(0, boundingPoints);
+        path.updateFirstBoundingPoint(robotPositionBeforeStartOfPath);
+        assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at position between bounding points
         Position robotPositionDuringPath = new Position(2,2,0);
-        boundingPoints = path.getBoundingPoints(robotPositionDuringPath);
-        assertEquals(1, boundingPoints);
+        path.updateFirstBoundingPoint(robotPositionDuringPath);
+        assertEquals(1, path.iFirstBoundingPoint);
 
         //Test at left of path
         Position robotPositionLeftOfPath = new Position(3,2,0);
-        boundingPoints = path.getBoundingPoints(robotPositionLeftOfPath);
-        assertEquals(1, boundingPoints);
+        path.updateFirstBoundingPoint(robotPositionLeftOfPath);
+        assertEquals(1, path.iFirstBoundingPoint);
 
         //Test at right of path
         Position robotPositionRightOfPath = new Position(3,4,0);
-        boundingPoints = path.getBoundingPoints(robotPositionRightOfPath);
-        assertEquals(2, boundingPoints);
+        path.updateFirstBoundingPoint(robotPositionRightOfPath);
+        assertEquals(2, path.iFirstBoundingPoint);
 
         //Test at farthest point
         Position robotPositionAtLastPoint = new Position(6,6,0);
-        boundingPoints = path.getBoundingPoints(robotPositionAtLastPoint);
-        assertEquals(4, boundingPoints);
+        path.updateFirstBoundingPoint(robotPositionAtLastPoint);
+        assertEquals(4, path.iFirstBoundingPoint);
     }
 
     @Test

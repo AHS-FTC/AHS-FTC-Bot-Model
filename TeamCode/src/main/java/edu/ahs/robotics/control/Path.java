@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Path {
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
-    private int iFirst = 0;
+    /* Package visible for testing*/ int iFirstBoundingPoint = 0;
 
     public Path(ArrayList<Point> points) {
         pointAtDistance = new ArrayList<>();
@@ -34,17 +34,17 @@ public class Path {
      */
     public Location getTargetLocation(Position robotPosition) {
         //Find the 2 closest bounding points
-        int boundingPoint = getBoundingPoints(robotPosition);
-        PointAtDistance first = getPoint(boundingPoint);
+        updateFirstBoundingPoint(robotPosition);
+        PointAtDistance first = getPoint(iFirstBoundingPoint);
 
         //Look to see if robot is past end of line (First bounding point is last point on path)
-        if (boundingPoint == pointAtDistance.size() - 1) {
+        if (iFirstBoundingPoint == pointAtDistance.size() - 1) {
             Location loc = new Location(first);
             loc.pathFinished = true;
             return loc;
         }
 
-        PointAtDistance second = getPoint(boundingPoint + 1);
+        PointAtDistance second = getPoint(iFirstBoundingPoint + 1);
 
         Location loc = new Location(second);
 
@@ -79,9 +79,9 @@ public class Path {
      * @param robotPosition
      * @return indices of points. Use getPoint to find actual point.
      */
-    public int getBoundingPoints(Position robotPosition) {
+    public void updateFirstBoundingPoint(Position robotPosition) {
 
-        for (int i = iFirst + 1; i < pointAtDistance.size(); i++) {
+        for (int i = iFirstBoundingPoint + 1; i < pointAtDistance.size(); i++) {
             PointAtDistance current = getPoint(i);
             double robotDeltaX = current.x - robotPosition.x;
             double robotDeltaY = current.y - robotPosition.y;
@@ -90,11 +90,9 @@ public class Path {
             if (componentToCurrent > 0) {
                 break;
             } else {
-                iFirst = i;
+                iFirstBoundingPoint = i;
             }
         }
-
-        return iFirst;
     }
 
     public static class PointAtDistance extends Point {
