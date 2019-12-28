@@ -1,18 +1,21 @@
 package edu.ahs.robotics.util;
 
 import android.os.Environment;
+import android.renderscript.ScriptGroup;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
@@ -69,6 +72,15 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
             System.out.println(caption + ": " + object);
         }
     }
+
+    public static void addLine(String line){
+        if(!testMode) {
+            opMode.telemetry.addLine(line);
+        } else {
+            System.out.println(line);
+        }
+    }
+
     public static void updateOpLogger(){
         if(!testMode){
             opMode.telemetry.update();
@@ -156,6 +168,8 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         }
     }
 
+
+
     public static void setMockClock(MockClock mockClock){
         FTCUtilities.mockClock = mockClock;
     }
@@ -165,4 +179,32 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     }
 
     private FTCUtilities () {} //no constructo statico
+
+
+//    public static class MockableGamePad {
+//    private static String lastInput;
+//    private static Scanner input = new Scanner(System.in);
+//
+//    public static double rightTrigger(){
+//        if(testMode){
+//            getInput();
+//            if(lastInput.contains("rt")){
+//                return 1;
+//            } else if (lastInput.contains("RT")){
+//                return -1;
+//            } else {
+//                return 0;
+//            }
+//        } else {
+//            return opMode.gamepad1.right_trigger;
+//        }
+//    }
+//
+//
+//
+//        private static void getInput(){
+//            lastInput = input.nextLine();
+//        }
+//    }
+
 }
