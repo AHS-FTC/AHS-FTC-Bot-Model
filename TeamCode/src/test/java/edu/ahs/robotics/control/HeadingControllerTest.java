@@ -49,7 +49,7 @@ public class HeadingControllerTest {
         Path path = new Path(points);
         HeadingController controller = new HeadingController(path, 12, 12, 12);
         Position robotPosition = new Position(0, 0, 0);
-        Velocity velocity = new Velocity(0, 0);
+        Velocity velocity = Velocity.makeVelocity(0, 0);
         HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
 
         assertTrue(powers.leftPower > 0);
@@ -69,7 +69,7 @@ public class HeadingControllerTest {
         Path path = new Path(points);
         HeadingController controller = new HeadingController(path, 12, 12, 12);
         Position robotPosition = new Position(1, 0, 0);
-        Velocity velocity = new Velocity(0, 0);
+        Velocity velocity = Velocity.makeVelocity(0, 0);
         HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
 
         assertTrue(powers.rightPower > powers.leftPower);
@@ -84,7 +84,7 @@ public class HeadingControllerTest {
         Path path = new Path(points);
         HeadingController controller = new HeadingController(path, 12, 12, 12);
         Position robotPosition = new Position(-1, 0, 0);
-        Velocity velocity = new Velocity(0, 0);
+        Velocity velocity = Velocity.makeVelocity(0, 0);
         HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
 
         assertTrue(powers.leftPower > powers.rightPower);
@@ -98,7 +98,7 @@ public class HeadingControllerTest {
         Path path = new Path(points);
         HeadingController controller = new HeadingController(path, 12, 12, 12);
         Position robotPosition = new Position(0, 4, 0);
-        Velocity velocity = new Velocity(0, 0);
+        Velocity velocity = Velocity.makeVelocity(0, 0);
         HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
         assertEquals(0, powers.leftPower, .001);
         assertEquals(0, powers.rightPower, .001);
@@ -120,7 +120,7 @@ public class HeadingControllerTest {
         Path path = new Path(points);
         HeadingController controller = new HeadingController(path, 12, 12, 12);
         Position robotPosition = new Position(0, 0, 0);
-        Velocity velocity = new Velocity(0, 0);
+        Velocity velocity = Velocity.makeVelocity(0, 0);
         double maxPower;
         do {
             HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
@@ -138,7 +138,7 @@ public class HeadingControllerTest {
         Path path = new Path(points);
         HeadingController controller = new HeadingController(path, 12, 12, 12);
         Position robotPosition = new Position(1, 0, 0);
-        Velocity velocity = new Velocity(0, 0);
+        Velocity velocity = Velocity.makeVelocity(0, 0);
         double maxPower;
         do {
             HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);

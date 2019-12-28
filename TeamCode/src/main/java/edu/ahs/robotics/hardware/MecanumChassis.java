@@ -288,7 +288,7 @@ public class MecanumChassis extends Chassis {
 
             Path.Location location = path.getTargetLocation(currentPosition);
 
-            Velocity targetVelocity = Velocity.makeVelocityFromDxDy(location.deltaX,location.deltaY);
+            Velocity targetVelocity = Velocity.makeVelocityFromDxDy(location.pathDeltaX,location.pathDeltaY);
 
             distanceToEnd = path.getTargetLocation(currentPosition).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
 
