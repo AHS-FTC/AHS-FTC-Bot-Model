@@ -57,6 +57,10 @@ public class ArdennesSimpleTele extends OpMode
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
@@ -75,9 +79,9 @@ public class ArdennesSimpleTele extends OpMode
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
 
-        frontLeft.setPower(forward - strafe - turn);
+        frontLeft.setPower(forward + strafe - turn);
         frontRight.setPower(forward + strafe + turn);
-        backLeft.setPower(forward + strafe - turn);
+        backLeft.setPower(forward - strafe - turn);
         backRight.setPower(forward - strafe + turn);
     }
 

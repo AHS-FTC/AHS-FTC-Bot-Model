@@ -95,11 +95,11 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer y1 = FTCUtilities.getOdometer("intakeL", 2.3622,false);
-        Odometer y2 = FTCUtilities.getOdometer("intakeR", 2.3622, true);
-        Odometer x = FTCUtilities.getOdometer("x", 2.3622, false); //todo give name
+        Odometer x1 = FTCUtilities.getOdometer("intakeL", 2.3622,false);
+        Odometer x2 = FTCUtilities.getOdometer("intakeR", 2.3622, true);
+        Odometer y = FTCUtilities.getOdometer("BR", 2.3622, false); //todo give name
 
-        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(y1, y2, x, .1, 12); //todo calculate actuals
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, .1, 14.5); //todo calculate actuals
         return odometrySystem;
     }
 

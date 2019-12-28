@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import edu.ahs.robotics.util.FTCUtilities;
+
 
 /**
  * Test OpMode for tuning the true diameter of the odometer wheels on Ardennes. The 60mm REV wheels have bad tolerances.
@@ -45,19 +47,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * The diameter of each wheel should come out to be close to 60mm or 2.36 inches (if you're using the Ardennes rev wheels).
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Odometery Logger", group="Iterative OpMode")
-@Disabled
+@TeleOp(name="Ardennes Odometery Wheel Tuner", group="Iterative OpMode")
+//@Disabled
 public class ArdennesWheelTuningOpMode extends OpMode
 {
     private DcMotor left, right, back;
     private static final double TICKS_PER_ROTATION = 1440;
+    private ArdennesSimpleTele tele;
 
     @Override
     public void init() {
-        left = hardwareMap.get(DcMotor.class,"left"); //todo make these correct before using
-        right = hardwareMap.get(DcMotor.class,"right");
-        back = hardwareMap.get(DcMotor.class,"back");
-
+        left = hardwareMap.get(DcMotor.class,"intakeL");
+        right = hardwareMap.get(DcMotor.class,"intakeR");
+        back = hardwareMap.get(DcMotor.class,"BR");
 
         left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -66,6 +68,11 @@ public class ArdennesWheelTuningOpMode extends OpMode
         left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         back.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        tele = new ArdennesSimpleTele();
+        tele.hardwareMap = hardwareMap;
+        tele.init();
+        tele.gamepad1 = gamepad1;
     }
 
     @Override
@@ -78,9 +85,11 @@ public class ArdennesWheelTuningOpMode extends OpMode
 
     @Override
     public void loop() {
+        tele.loop();
         telemetry.addData("Left Rotations", (left.getCurrentPosition()/TICKS_PER_ROTATION));
         telemetry.addData("Right Rotations", (right.getCurrentPosition()/TICKS_PER_ROTATION));
         telemetry.addData("Back Rotations", (back.getCurrentPosition()/TICKS_PER_ROTATION));
+        telemetry.addData("back reading", back.getCurrentPosition());
         telemetry.update();
     }
     @Override
