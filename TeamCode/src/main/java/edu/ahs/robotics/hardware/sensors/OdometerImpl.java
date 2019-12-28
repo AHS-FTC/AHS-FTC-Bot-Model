@@ -4,12 +4,21 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import edu.ahs.robotics.util.FTCUtilities;
 
+/**
+ * Non-Mock implementation of the Odometer interface that runs on the robot. Reads encoder values, tracks, and returns distance based on wheel diameter.
+ * @author Alex Appleby
+ */
 public class OdometerImpl implements Odometer {
-    private DcMotor motor;
-    private double wheelCircumference;// in mm
-    private final double TICKS_PER_ROTATION = 1440;
-    private int direction = 1;
+    private DcMotor motor; //we use the crappy DcMotor class from FTC to access encoder values. Kind of a hack, but that's how it be.
+    private double wheelCircumference;// in inches, used to be in mm
+    private final double TICKS_PER_ROTATION = 1440; //specific to our S4T encoders. May be in need of change for other S4T models or different encoders.
+    private int direction = 1; //enables flip. only 1 or -1.
 
+    /**
+     * @param deviceName A string that ties the encoder sensor to the motor port of a DcMotor. Should be the same as whatever motor it's attached to.
+     * @param wheelDiameter The diameter of the odometer wheel in inches. Likely needs to be tuned to reflect tolerances of wheel.
+     * @param flip Whether or not this returns flipped values. Probably determine this by experimentation.
+     */
     public OdometerImpl(String deviceName, double wheelDiameter, boolean flip) {
         motor = FTCUtilities.getMotor(deviceName);
         reset();
@@ -19,13 +28,19 @@ public class OdometerImpl implements Odometer {
         }
     }
 
+    /**
+     * @return Distance of rotation in inches.
+     */
     @Override
     public double getDistance(){
         int ticks = motor.getCurrentPosition();
-        double distance = (ticks*wheelCircumference)/TICKS_PER_ROTATION;
+        double distance = (ticks*wheelCircumference)/TICKS_PER_ROTATION; // rotations / ticks per rotation but combined for optimization
         return direction*distance;
     }
 
+    /**
+     * Resets encoder so that getDistance yields 0.
+     */
     @Override
     public void reset(){
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

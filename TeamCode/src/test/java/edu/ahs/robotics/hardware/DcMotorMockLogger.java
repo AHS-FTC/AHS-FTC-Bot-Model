@@ -1,22 +1,30 @@
-package edu.ahs.robotics.other;
+package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import java.util.ArrayList;
+
 import edu.ahs.robotics.util.MotorHashService;
 
+/**
+ * DcMotorMock that sneakily stores motor positions to facilitate in testing.
+ * @author Alex Appleby
+ */
+public class DcMotorMockLogger implements DcMotor {
 
-public class DcMotorMock implements DcMotor {
+    ArrayList<Double> powerList;
 
     private long startTime = System.currentTimeMillis();
-    private double distance;
     private double motorPower;
     private RunMode runMode;
-    private final double EFFICIENCY = 1.70
-            ;
     private MotorHashService.MotorTypes motorType;
     private Direction direction = Direction.FORWARD;
+
+    public DcMotorMockLogger() {
+        powerList = new ArrayList<>();
+    }
 
     @Override
     public MotorConfigurationType getMotorType() {
@@ -75,23 +83,12 @@ public class DcMotorMock implements DcMotor {
 
     @Override
     public int getCurrentPosition() {
-        encoderUpdate();
-        return (int)distance;
+        return 0;
     }
 
     @Override
     public void setMode(RunMode mode) {
-        if(mode == DcMotor.RunMode.STOP_AND_RESET_ENCODER){
-            zeroTime();
-            distance = 0;
-            runMode = mode;
-        } if (mode == DcMotor.RunMode.RUN_WITHOUT_ENCODER){
-            runMode = mode;
-        }
-        else {
-            throw new UnsupportedOperationException("The RunMode you tried to use has not been set up with class DcMotorMock");
-        }
-
+        runMode = mode;
     }
 
     @Override
@@ -114,7 +111,7 @@ public class DcMotorMock implements DcMotor {
     @Override
     public void setPower(double power) {
         motorPower = power;
-        encoderUpdate();
+        powerList.add(power);
     }
 
     @Override
@@ -147,24 +144,12 @@ public class DcMotorMock implements DcMotor {
 
     }
 
-    DcMotorMock(MotorHashService.MotorTypes motorType) {
-        this.motorType = motorType;
-    }
-
     @Override
     public void close() {
 
     }
 
-    private void encoderUpdate(){//encoderUpdate allows for a more realistic modeling of motors by keeping a running tally of encoder value change rather than a static rate estimate
-        double elapsedTime = System.currentTimeMillis() - startTime;
-        zeroTime();
-        double ticksPerTime = MotorHashService.getTicks(motorType) * MotorHashService.getRPMs(motorType)/60000 * motorPower * elapsedTime * EFFICIENCY;
-        //ticks per rotation * rotations per millisecond * motorPower scalar * milliseconds * efficiency scalar
-        distance += ticksPerTime;
-    }
-
-    private void zeroTime(){
-        startTime = System.currentTimeMillis();
+    public ArrayList<Double> getPowerList(){
+        return powerList;
     }
 }
