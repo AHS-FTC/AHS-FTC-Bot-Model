@@ -58,8 +58,8 @@ public class XYHeadingPID {
     private LocalPosition convertToLocalCoordinates(Position robotPosition, Position targetPosition){
         double heading = robotPosition.heading;
 
-        double globalDX = targetPosition.x() - robotPosition.x();
-        double globalDY = targetPosition.y() - robotPosition.y();
+        double globalDX = targetPosition.x - robotPosition.x;
+        double globalDY = targetPosition.y - robotPosition.y;
 
         double x = Math.cos(heading) * globalDX + Math.sin(heading) * globalDY; //math here is derived from taking trig components
         double y = Math.cos(heading) * globalDY + Math.sin(heading) * globalDX; //x is forward

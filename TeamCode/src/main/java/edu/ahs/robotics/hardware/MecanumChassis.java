@@ -347,8 +347,8 @@ public class MecanumChassis extends Chassis {
         while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut && currentPosition.distanceTo(targetPosition) > 0.1){
             currentPosition = getPosition();
 
-            FTCUtilities.addData("x", currentPosition.x());
-            FTCUtilities.addData("y", currentPosition.y());
+            FTCUtilities.addData("x", currentPosition.x);
+            FTCUtilities.addData("y", currentPosition.y);
             FTCUtilities.addData("heading", currentPosition.heading);
             FTCUtilities.updateOpLogger();
 
@@ -372,7 +372,7 @@ public class MecanumChassis extends Chassis {
     }
 
     /**
-     * Sets the position of the robot using the odometrySystem.resetPosition() method.
+     * Sets the position of the robot using the odometrySystem.setPosition() method.
      * Should be utilized at the start at an OpMode to clarify your starting position.
      * <a href ="https://docs.google.com/drawings/d/1CasrlxBprQIvFcZTe8vHDQQWJD0nevVGOtdnTtcSpAw/edit?usp=sharing">Utilizes standard coordinate conventions</a>
      * @param x X position in inches
@@ -380,7 +380,7 @@ public class MecanumChassis extends Chassis {
      * @param heading Heading in radians. Use the Math.toRadians() method if you have no guts
      */
     public void setPosition(double x, double y, double heading){
-        odometrySystem.resetPosition(x, y, heading);
+        odometrySystem.setPosition(x, y, heading);
     }
 
     private double inversePower(double power) {

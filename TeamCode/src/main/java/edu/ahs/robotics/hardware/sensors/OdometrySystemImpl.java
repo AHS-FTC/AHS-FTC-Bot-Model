@@ -23,7 +23,6 @@ public class OdometrySystemImpl implements OdometrySystem{
     private long lastTime;
 
     private OdometerThread odometerThread;
-    private Thread thread;
 
     /**
      * @param x1 The 'first' odometer measuring in the X direction. Should be interchangeable with x2
@@ -43,28 +42,36 @@ public class OdometrySystemImpl implements OdometrySystem{
         this.yInchesPerDegree = yInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
 
-        x1Last = x1.getDistance();
-        x2Last = x2.getDistance();
-        yLast = y.getDistance();
-
         odometerThread = new OdometerThread();
-        thread = new Thread(odometerThread);
     }
 
     /**
      * starts thread continuously monitoring position
      */
-
     public void start(){
-        thread.start();
+        resetEncoders();
+        odometerThread.start();
     }
   
     public void stop(){
-        odometerThread.stop();
+        odometerThread.end();
     }
 
-    public void resetPosition(double x, double y, double heading){
+    public void setPosition(double x, double y, double heading){
         position.setPosition(x,y,heading);
+        lastPosition.copyFrom(position);
+    }
+
+    /**
+     * Resets encoders and sets lasts. Package Protected for testing access.
+     */
+    void resetEncoders(){
+        x1.reset();
+        x2.reset();
+        y.reset();
+        x1Last = x1.getDistance();
+        x2Last = x2.getDistance();
+        yLast = y.getDistance();
     }
 
     /**
@@ -84,7 +91,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         //find deltas
         dx1 = x1Reading - x1Last;
         dx2 = x2Reading - x2Last;
-        dx = (dx1 + dx2)/2; //find the average
+        dx = (dx1 + dx2)/2.0; //find the average
         dyBeforeFactorOut = yReading - yLast;
 
         //set lasts
@@ -100,6 +107,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         //find real dy
         dy = dyBeforeFactorOut - dyExpected;
+        //dy = 0.0; //temporary until we get y encoder
 
         if(dHeading != 0){//courtesy of 11115, thanks gluten free
             double xRadius = dx/dHeading; // arc length - l = theta*r
@@ -115,13 +123,12 @@ public class OdometrySystemImpl implements OdometrySystem{
         }
 
         position.heading += dHeading;//apply our heading change
-        double heading = position.heading; //in rads, duh
 
-        dxGlobal = Math.sin(heading)*dyLocal + Math.cos(heading)*dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
-        dyGlobal = Math.cos(heading)*dyLocal + Math.sin(heading)*dxLocal;
+        dxGlobal = Math.sin(position.heading)*dyLocal + Math.cos(position.heading)*dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
+        dyGlobal = Math.cos(position.heading)*dyLocal + Math.sin(position.heading)*dxLocal;
 
-        position.incrementX(dxGlobal);
-        position.incrementY(dyGlobal);
+        position.x += dxGlobal;
+        position.y += dyGlobal;
 
         updateVelocity();
     }
@@ -137,7 +144,8 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         velocity.setVelocity(speed,direction);
 
-        lastPosition = new Position(position.x(), position.y(), position.heading); //todo ask john if this is nessicary
+        //lastPosition = new Position(position.x,position.y,position.heading);
+        lastPosition.copyFrom(position);
         lastTime = currentTime;
     }
 
@@ -165,7 +173,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         return (x1-x2)/distanceBetweenYWheels;//derived from double arcs
     }
 
-    private class OdometerThread implements Runnable{
+    private class OdometerThread extends Thread{
         private volatile boolean running;
 
         @Override
@@ -176,12 +184,12 @@ public class OdometrySystemImpl implements OdometrySystem{
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+
                 }
             }
         }
 
-        public void stop(){
+        public void end(){
             running = false;
         }
     }

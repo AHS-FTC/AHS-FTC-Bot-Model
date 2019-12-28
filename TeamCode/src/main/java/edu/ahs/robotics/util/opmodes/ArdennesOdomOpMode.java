@@ -81,8 +81,8 @@ public class ArdennesOdomOpMode extends OpMode
         position = ardennes.getChassis().getPosition();
         velocity = ardennes.getChassis().getVelocity();
 
-        telemetry.addData("x -ins", position.x());
-        telemetry.addData("y -ins", position.y());
+        telemetry.addData("x -ins", position.x);
+        telemetry.addData("y -ins", position.y);
         telemetry.addData("heading -deg", Math.toDegrees(position.heading));
         telemetry.addData("speed -in/s", velocity.speed);
         telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction));

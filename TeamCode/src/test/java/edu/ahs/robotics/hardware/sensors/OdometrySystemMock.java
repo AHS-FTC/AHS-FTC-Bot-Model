@@ -56,7 +56,7 @@ public class OdometrySystemMock implements OdometrySystem {
     }
 
     @Override
-    public void resetPosition(double x, double y, double heading){
+    public void setPosition(double x, double y, double heading){
         //literally nobody cares about this method
     }
 }

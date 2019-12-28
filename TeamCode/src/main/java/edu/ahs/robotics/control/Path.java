@@ -62,7 +62,7 @@ public class Path {
     /**
      * This method finds the two closest points to the robot position and returns the points in order of path.
      * @param robotPosition
-     * @return indices of points. Use getPoint to find actual point.
+     * @return indices of points. Use getAsPoint to find actual point.
      */
     public int[] getBoundingPoints(Position robotPosition) {
         int closest = 0;

@@ -7,7 +7,8 @@ package edu.ahs.robotics.control;
  * @author Alex and Andrew
  */
 public class Position {
-    private Point point;
+    public double x;
+    public double y;
 
     /**
      * Heading of a robot position stored in radians. 0 rad faces the global x axis, where bot local and global coordinates align.
@@ -16,7 +17,9 @@ public class Position {
     public double heading;
 
     public Position(double x, double y, double heading) {
-        this(new Point(x,y), heading); // call the other 'officialer' constructor
+        this.x = x;
+        this.y = y;
+        this.heading = heading;
     }
 
     /**
@@ -25,8 +28,16 @@ public class Position {
      * @param heading
      */
     public Position(Point point, double heading){
-        this.point = point;
-        this.heading = heading;
+        this(point.x, point.y, heading);
+    }
+
+    /**
+     * Sets position fields based on another position
+     */
+    public void copyFrom(Position p){
+        this.x = p.x;
+        this.y = p.y;
+        this.heading = p.heading;
     }
 
     /**
@@ -50,37 +61,13 @@ public class Position {
      * @param heading Direction of robot in radians
      */
     public void setPosition(double x, double y, double heading){
-        point.x = x;
-        point.y = y;
+        this.x = x;
+        this.y = y;
         this.heading = heading;
     }
 
-    public double x(){
-        return point.x;
-    }
-
-    public double y(){
-        return point.y;
-    }
-
-    /**
-     * Increments the position x value by a double amount. Utilized primarily in OdometrySystemImpl.
-     * @param increment How much is being added to x. Can be negative.
-     */
-    public void incrementX(double increment){
-        point.x += increment;
-    }
-
-    /**
-     * Increments the position y value by a double amount. Utilized primarily in OdometrySystemImpl.
-     * @param increment How much is being added to y. Can be negative.
-     */
-    public void incrementY(double increment){
-        point.y += increment;
-    }
-
     public Point getAsPoint(){
-        return point;
+        return new Point(x,y);
     }
 
     /**
@@ -89,18 +76,17 @@ public class Position {
      * @return the scalar distance to the other position
      */
     public double distanceTo(Position targetPosition){
-        double xDistance = targetPosition.x() - point.x;
-        double yDistance = targetPosition.y() - point.x;
+        double xDistance = targetPosition.x - x;
+        double yDistance = targetPosition.y - x;
 
         return Math.sqrt(xDistance * xDistance  +  yDistance * yDistance); //distance formula
     }
 
 
     /**
-     * Borrows angleTo() method in point and omits heading.
+     * Borrows angleTo() method in Point and omits heading.
      * @return angle in radians.
      */
-    public double angleTo(Position position){
-        return point.angleTo(position.getAsPoint());
+    public double angleTo(Position position){ return getAsPoint().angleTo(position.getAsPoint());
     }
 }

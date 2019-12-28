@@ -18,5 +18,5 @@ public interface OdometrySystem {
 
     boolean isRunning();
 
-    void resetPosition(double x, double y, double heading);
+    void setPosition(double x, double y, double heading);
 }
