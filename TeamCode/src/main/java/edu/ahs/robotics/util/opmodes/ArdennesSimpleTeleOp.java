@@ -41,9 +41,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
  */
 @TeleOp(name="Ardennes Simple TeleOp", group="Iterative OpMode")
 //@Disabled
-public class ArdennesSimpleTele extends OpMode
+public class ArdennesSimpleTeleOp extends OpMode
 {
-    private DcMotor frontLeft, frontRight, backLeft, backRight;
+    protected DcMotor frontLeft, frontRight, backLeft, backRight;
 
     @Override
     public void init() {
