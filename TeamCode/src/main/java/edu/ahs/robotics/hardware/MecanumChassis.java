@@ -2,6 +2,9 @@ package edu.ahs.robotics.hardware;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import edu.ahs.robotics.control.HeadingController;
+import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
@@ -285,7 +288,7 @@ public class MecanumChassis extends Chassis {
 
             Path.Location location = path.getTargetLocation(currentPosition);
 
-            Velocity targetVelocity = Velocity.makeVelocityFromDxDy(location.deltaX,location.deltaY);
+            Velocity targetVelocity = Velocity.makeVelocityFromDxDy(location.pathDeltaX,location.pathDeltaY);
 
             distanceToEnd = path.getTargetLocation(currentPosition).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
 
@@ -388,7 +391,8 @@ public class MecanumChassis extends Chassis {
         return Math.pow(power, 3);
     }
 
-    public void followPath() {
+    public void followPath(Path path) {
+        HeadingController headingController = new HeadingController(path, 1 ,1 ,1);
 
         //Get position of the robot
 
@@ -399,21 +403,7 @@ public class MecanumChassis extends Chassis {
 
         //Start loop and add everything below
         while (true) {
-            //Get position of the robot
 
-            //Find target point to robot
-
-            //Compare position of robot with closest point and find difference
-            //Closest point y and x then subtract the robot x y to find correction amount
-            //
-
-            //Make robot move towards target points with correction below
-
-            //P controller corrects for target point
-
-            //I controller smoothes
-
-            //D controller will look a number of points ahead to determine correction
         }
 
     }
