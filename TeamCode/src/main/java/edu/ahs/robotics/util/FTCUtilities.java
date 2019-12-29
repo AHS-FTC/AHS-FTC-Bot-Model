@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -66,6 +68,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     }
 
     public static void addData(String caption, Object object){
+
         if(!testMode) {
             opMode.telemetry.addData(caption, object);
         } else {
