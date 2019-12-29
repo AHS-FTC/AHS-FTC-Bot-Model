@@ -338,4 +338,34 @@ public class PathTest {
 
         assertTrue(targetLocation.pathFinished);
     }
+
+    @Test
+    public void testLookAheadRightSide() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 4));
+        points.add(new Point(4,8));
+        Path path = new Path(points);
+
+        //Test location at robot position during path
+        Position robotPosition = new Position(0, 0, 0);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+
+        assertEquals(Math.cos(Math.PI/4.0), targetLocation.lookAheadDelta, .001);
+    }
+
+    @Test
+    public void testLookAheadLeftSide() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 4));
+        points.add(new Point(-4,8));
+        Path path = new Path(points);
+
+        //Test location at robot position during path
+        Position robotPosition = new Position(0, 0, 0);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+
+        assertEquals(-Math.cos(Math.PI/4.0), targetLocation.lookAheadDelta, .001);
+    }
 }
