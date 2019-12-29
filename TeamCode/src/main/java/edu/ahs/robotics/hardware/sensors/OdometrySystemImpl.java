@@ -112,8 +112,8 @@ public class OdometrySystemImpl implements OdometrySystem{
         dyExpected = Math.toDegrees(dHeading) * yInchesPerDegree;
 
         //find real dy
-        //dy = dyBeforeFactorOut - dyExpected;
-        dy = 0.0; //temporary until we get y encoder
+        dy = dyBeforeFactorOut - dyExpected;
+        //dy = 0.0; //temporary until we get y encoder
 
         if(dHeading != 0){//courtesy of 11115, thanks gluten free
             double xRadius = dx/dHeading; // arc length - l = theta*r

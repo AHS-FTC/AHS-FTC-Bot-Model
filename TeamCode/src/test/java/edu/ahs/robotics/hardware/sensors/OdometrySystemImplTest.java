@@ -1,6 +1,8 @@
 package edu.ahs.robotics.hardware.sensors;
 
 import org.junit.Test;
+
+import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MockClock;
 
@@ -150,6 +152,81 @@ public class OdometrySystemImplTest {
         assertEquals(0, odometrySystem.getPosition().y, .01);
 
         assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
+    }
+
+    @Test
+    public void testVelocity(){
+        double[] x1Inputs = {0,2,6,12,18,22,25,25,23,23}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,2,6,12,18,22,25,25,23,23};
+        double[] yInputs = {0,0,0,0,0,0,0,0,0,0};
+
+        //---------------- custom init
+        FTCUtilities.startTestMode();
+        MockClock clock = new MockClock(MockClock.Mode.CUSTOM_TIME_STEP);
+        clock.setTimeStep(1000); //advance by a second to make velocity calculations easier
+        FTCUtilities.setMockClock(clock);
+
+        OdometerMock x1 = new OdometerMock(x1Inputs);
+        OdometerMock x2 = new OdometerMock(x2Inputs);
+        OdometerMock y = new OdometerMock(yInputs);
+
+        odometrySystem = new OdometrySystemImpl(x1, x2, y, .1, 12);
+        odometrySystem.setPosition(0,0,0); // note different heading
+        odometrySystem.resetEncoders();
+
+        Velocity velocity;
+        //---------------- custom init
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(2,velocity.speed, 0.0001);
+        assertEquals(0,velocity.direction, 0.0001);
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(4,velocity.speed, 0.0001);
+        assertEquals(0,velocity.direction, 0.0001);
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(6,velocity.speed, 0.0001);
+        assertEquals(0,velocity.direction, 0.0001);
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(6,velocity.speed, 0.0001);
+        assertEquals(0,velocity.direction, 0.0001);
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(4,velocity.speed, 0.0001);
+        assertEquals(0,velocity.direction, 0.0001);
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(3,velocity.speed, 0.0001);
+        assertEquals(0,velocity.direction, 0.0001);
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(0,velocity.speed, 0.0001);
+        assertEquals(0,velocity.direction, 0.0001);
+
+        odometrySystem.updatePosition();
+        velocity = odometrySystem.getVelocity();
+
+        assertEquals(2,velocity.speed, 0.0001);
+        assertEquals(Math.PI,velocity.direction, 0.0001); // backwards now
+
+        assertEquals(2,velocity.speed, 0.0001);
+        assertEquals(Math.PI,velocity.direction, 0.0001);
     }
 
 
