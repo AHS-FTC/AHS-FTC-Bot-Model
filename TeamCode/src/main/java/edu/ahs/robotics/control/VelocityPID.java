@@ -6,12 +6,11 @@ package edu.ahs.robotics.control;
  * @author Alex Appleby
  */
 public class VelocityPID{
-    Config config;
-    private double speedErrorSum = 0, directionErrorSum = 0;
-    private double lastSpeedError = 0, lastDirectionError = 0;
+    private PID speedPID, directionPID;
 
     public VelocityPID(Config config) {
-        this.config = config;
+        speedPID = new PID(config.sP, config.sI, config.sD);
+        directionPID = new PID(config.dP, config.dI, config.dD);
     }
 
     /**
@@ -19,25 +18,8 @@ public class VelocityPID{
      * @return corrections in an enclosed Correction class.
      */
     public Correction getCorrection(Velocity currentVelocity, Velocity targetVelocity){
-        double speedCorrection = 0, directionCorrection = 0;
-
-        double speedError = targetVelocity.speed - currentVelocity.speed;
-        double directionError = targetVelocity.direction - currentVelocity.direction;
-
-        speedCorrection += speedError * config.sP; //proportional
-        directionCorrection += directionError * config.dP;
-
-        speedErrorSum += speedError;
-        directionErrorSum += directionError;
-
-        speedCorrection += speedErrorSum * config.sI; //integral
-        directionCorrection += directionErrorSum * config.dI;
-
-        speedCorrection += (speedError - lastSpeedError) * config.sD; //derivative
-        directionCorrection += (directionError - lastDirectionError) * config.dD;
-
-        lastSpeedError = speedError; //update lasts
-        lastDirectionError = directionError;
+        double speedCorrection = speedPID.getCorrection(currentVelocity.speed, targetVelocity.speed);
+        double directionCorrection = directionPID.getCorrection(currentVelocity.direction, targetVelocity.direction);
 
         return new Correction(speedCorrection, directionCorrection);
     }
