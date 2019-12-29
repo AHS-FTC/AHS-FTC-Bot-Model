@@ -30,73 +30,26 @@
 package edu.ahs.robotics.util.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import edu.ahs.robotics.control.Position;
-import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-
 /**
- * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
+ * Test OpMode for driving Ardennes. Not dependent on BotModel. Drives with tank controls, disabling any lateral movement.
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Odometery Logger", group="Iterative OpMode")
-//@Disabled
-public class ArdennesOdomOpMode extends OpMode
+@TeleOp(name="Ardennes Simple Tank TeleOp", group="Iterative OpMode")
+@Disabled
+public class ArdennesSimpleTankTeleOp extends ArdennesSimpleTeleOp
 {
-    private Ardennes ardennes;
-    private Position position;
-    private Velocity velocity;
-
-    private double lastTime;
-
-    private ArdennesSimpleTankTeleOp tele;
-
-    @Override
-    public void init() {
-        FTCUtilities.setOpMode(this);
-        ardennes = new Ardennes();
-
-        tele = new ArdennesSimpleTankTeleOp();
-        tele.hardwareMap = hardwareMap;
-        tele.gamepad1 = gamepad1;
-        tele.init();
-    }
-
-    @Override
-    public void init_loop() {
-    }
-
-    @Override
-    public void start() {
-        lastTime = FTCUtilities.getCurrentTimeMillis();
-        ardennes.getChassis().startOdometrySystem();
-    }
 
     @Override
     public void loop() {
-        tele.loop();
+        double left = gamepad1.left_stick_y;
+        double right = gamepad1.right_stick_y;
 
-        double currentTime = FTCUtilities.getCurrentTimeMillis();
-
-        position = ardennes.getChassis().getPosition();
-        velocity = ardennes.getChassis().getVelocity();
-
-        telemetry.addData("x -ins", position.x);
-        telemetry.addData("y -ins", position.y);
-        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
-        telemetry.addData("speed -in/s", velocity.speed);
-        telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction));
-        telemetry.addData("delta time -millis", currentTime - lastTime);
-        telemetry.update();
-        lastTime = currentTime;
-    }
-    @Override
-    public void stop() {
-        tele.stop();
-        ardennes.getChassis().stopOdometrySystem();
+        frontLeft.setPower(left);
+        frontRight.setPower(right);
+        backLeft.setPower(left);
+        backRight.setPower(right);
     }
 
 }

@@ -29,12 +29,9 @@
 
 package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
-import edu.ahs.robotics.util.FTCUtilities;
 
 
 /**
@@ -53,7 +50,7 @@ public class ArdennesWheelTuningOpMode extends OpMode
 {
     private DcMotor left, right, back;
     private static final double TICKS_PER_ROTATION = 1440;
-    private ArdennesSimpleTele tele;
+    private ArdennesSimpleTeleOp tele;
 
     @Override
     public void init() {
@@ -69,7 +66,7 @@ public class ArdennesWheelTuningOpMode extends OpMode
         right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         back.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        tele = new ArdennesSimpleTele();
+        tele = new ArdennesSimpleTeleOp();
         tele.hardwareMap = hardwareMap;
         tele.init();
         tele.gamepad1 = gamepad1;
