@@ -35,8 +35,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
+import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
 
 /**
  * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
@@ -46,9 +50,12 @@ import edu.ahs.robotics.util.FTCUtilities;
 //@Disabled
 public class ArdennesOdomOpMode extends OpMode
 {
-    private Ardennes ardennes;
+    //private Ardennes ardennes;
+    private OdometrySystemImpl odometrySystem;
     private Position position;
     private Velocity velocity;
+    private double startTime;
+    private Logger logger;
 
     private double lastTime;
 
@@ -57,7 +64,14 @@ public class ArdennesOdomOpMode extends OpMode
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
-        ardennes = new Ardennes();
+        //ardennes = new Ardennes();
+
+        OdometerImpl x1 = new OdometerImpl("intakeL", 2.302383, false); //tuned val
+        OdometerImpl x2 = new OdometerImpl("intakeR", 2.330675, true); //tuned val
+        OdometerImpl y = new OdometerImpl("BR", 2.366, false);
+        odometrySystem = new OdometrySystemImpl(x1,x2,y, 0,14.5);
+
+        logger = new Logger("odometry","x","y","heading","speed","dot","time");
 
         tele = new ArdennesSimpleTankTeleOp();
         tele.hardwareMap = hardwareMap;
@@ -72,7 +86,8 @@ public class ArdennesOdomOpMode extends OpMode
     @Override
     public void start() {
         lastTime = FTCUtilities.getCurrentTimeMillis();
-        ardennes.getChassis().startOdometrySystem();
+        startTime = FTCUtilities.getCurrentTimeMillis();
+        odometrySystem.start();
     }
 
     @Override
@@ -81,8 +96,8 @@ public class ArdennesOdomOpMode extends OpMode
 
         double currentTime = FTCUtilities.getCurrentTimeMillis();
 
-        position = ardennes.getChassis().getPosition();
-        velocity = ardennes.getChassis().getVelocity();
+        position = odometrySystem.getPosition();
+        velocity = odometrySystem.getVelocity();
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);
@@ -91,12 +106,21 @@ public class ArdennesOdomOpMode extends OpMode
         telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction));
         telemetry.addData("delta time -millis", currentTime - lastTime);
         telemetry.update();
+
+        logger.append("x", String.valueOf(position.x));
+        logger.append("y", String.valueOf(position.y));
+        logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
+        logger.append("speed", String.valueOf(velocity.speed));
+        logger.append("dot", String.valueOf(Math.toDegrees(velocity.direction)));
+        logger.append("time", String.valueOf(FTCUtilities.getCurrentTimeMillis() - startTime));
+
         lastTime = currentTime;
     }
     @Override
     public void stop() {
         tele.stop();
-        ardennes.getChassis().stopOdometrySystem();
+        logger.writeToFile();
+        odometrySystem.stop();
     }
 
 }

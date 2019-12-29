@@ -46,8 +46,8 @@ public class Logger {
     private String fileName;
     private String[] categories;
     private Map<String, ArrayList<String>> entriesByCategory;
-    public Logger(String name, String... cats){
-        fileName=name;
+    public Logger(String fileName, String... cats){
+        this.fileName = fileName;
         categories= new String[cats.length];
         System.arraycopy(cats,0,categories,0,cats.length);
         entriesByCategory = new HashMap<>();
@@ -109,7 +109,7 @@ public class Logger {
 
     }
 
-    public void append(String title, String data) {
-        entriesByCategory.get(title).add(data);
+    public void append(String category, String data) {
+        entriesByCategory.get(category).add(data);
     }
 }

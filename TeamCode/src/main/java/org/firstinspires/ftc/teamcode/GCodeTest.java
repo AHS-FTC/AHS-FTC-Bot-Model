@@ -33,19 +33,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import edu.ahs.robotics.hardware.Intake;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.Path;
-import edu.ahs.robotics.hardware.SerialServo;
-import edu.ahs.robotics.hardware.Slides;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.MotorHashService;
 
 
 @Autonomous(name = "GCode Test", group = "Linear Opmode")
