@@ -46,8 +46,10 @@ public class Logger {
     private String fileName;
     private String[] categories;
     private Map<String, ArrayList<String>> entriesByCategory;
-    public Logger(String name, String... cats){
-        fileName=name;
+
+
+    public Logger(String fileName, String... cats){
+        this.fileName = fileName + ".csv";
         categories= new String[cats.length];
         System.arraycopy(cats,0,categories,0,cats.length);
         entriesByCategory = new HashMap<>();
@@ -69,19 +71,44 @@ public class Logger {
             }
             file.createNewFile();
             csvWriter = new FileWriter(file);
-            for (int i = 0; i < categories.length; i++) {
-                String catagory = categories[i];
-                List list = entriesByCategory.get(catagory);
-                Iterator<String> iterator = list.iterator();
-                while (iterator.hasNext()) {
-                    csvWriter.append(iterator.next());
-                    if (iterator.hasNext()) {
+
+            int length = entriesByCategory.get(categories[0]).size();
+
+            for(int i = 0; i < categories.length; i ++){ // write the categories first
+                csvWriter.append(categories[i]);
+                if( i< categories.length - 1){
+                    csvWriter.append(", ");
+                }
+            }
+            csvWriter.append("\n");
+
+            for(int j = 0; j < length; j++){
+                for (int i = 0; i < categories.length; i++) {
+                    String category = categories[i];
+                    List<String> list = entriesByCategory.get(category);
+                    String data = list.get(j);
+                    csvWriter.append(data);
+                    if( i< categories.length - 1){
                         csvWriter.append(", ");
                     }
                 }
-
                 csvWriter.append("\n");
             }
+
+//
+//            for (int i = 0; i < categories.length; i++) {
+//                String catagory = categories[i];
+//                List list = entriesByCategory.get(catagory);
+//                Iterator<String> iterator = list.iterator();
+//                while (iterator.hasNext()) {
+//                    csvWriter.append(iterator.next());
+//                    if (iterator.hasNext()) {
+//                        csvWriter.append(", ");
+//                    }
+//                }
+//
+//                csvWriter.append("\n");
+//            }
             csvWriter.flush();
             csvWriter.close();
         } catch (IOException e) {
@@ -109,7 +136,7 @@ public class Logger {
 
     }
 
-    public void append(String title, String data) {
-        entriesByCategory.get(title).add(data);
+    public void append(String category, String data) {
+        entriesByCategory.get(category).add(data);
     }
 }

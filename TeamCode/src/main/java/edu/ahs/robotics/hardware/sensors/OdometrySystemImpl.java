@@ -3,6 +3,7 @@ package edu.ahs.robotics.hardware.sensors;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
 
 
 /**
@@ -24,6 +25,8 @@ public class OdometrySystemImpl implements OdometrySystem{
 
     private OdometerThread odometerThread;
 
+    private Logger logger;
+
     /**
      * @param x1 The 'first' odometer measuring in the X direction. Should be interchangeable with x2
      * @param x2 The 'second' odometer measuring in the X direction. Should be interchangeable with x1
@@ -43,6 +46,8 @@ public class OdometrySystemImpl implements OdometrySystem{
         this.distanceBetweenYWheels = distanceBetweenYWheels;
 
         odometerThread = new OdometerThread();
+
+        logger = new Logger("sensorStats", "x1","x2");
     }
 
     /**
@@ -54,6 +59,7 @@ public class OdometrySystemImpl implements OdometrySystem{
     }
   
     public void stop(){
+        logger.writeToFile();
         odometerThread.end();
     }
 
@@ -106,8 +112,8 @@ public class OdometrySystemImpl implements OdometrySystem{
         dyExpected = Math.toDegrees(dHeading) * yInchesPerDegree;
 
         //find real dy
-        dy = dyBeforeFactorOut - dyExpected;
-        //dy = 0.0; //temporary until we get y encoder
+        //dy = dyBeforeFactorOut - dyExpected;
+        dy = 0.0; //temporary until we get y encoder
 
         if(dHeading != 0){//courtesy of 11115, thanks gluten free
             double xRadius = dx/dHeading; // arc length - l = theta*r
@@ -129,6 +135,9 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+
+        logger.append("x1", String.valueOf(x1Reading));
+        logger.append("x2", String.valueOf(x2Reading));
 
         updateVelocity();
     }

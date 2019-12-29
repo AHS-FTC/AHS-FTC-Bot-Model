@@ -256,7 +256,7 @@ public class MecanumChassis extends Chassis {
         } finally {
             setPowerAll(0);
         }
-        Logger.getInstance().writeToFile();
+        //Logger.getInstance().writeToFile();
     }
 
     public void velocityDrive(Path path, double maxSpeed){

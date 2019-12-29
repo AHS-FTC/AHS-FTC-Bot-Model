@@ -27,29 +27,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "GCode Test", group = "Linear Opmode")
+/**
+ * OpMode that tests Logger on the phones.
+ * @author Alex Appleby and Gavin Heil
+ */
+@TeleOp(name="Logger Test", group="Iterative OpMode")
 //@Disabled
-public class GCodeTest extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-
+public class LoggerTestOpMode extends OpMode
+{
+    private Logger logger;
+    private int i, j, k;
 
     @Override
-    public void runOpMode() {
-        FTCUtilities.setOpMode(this);
-        waitForStart();
-        GCodeReader.openFile("1001.csv");
+    public void init() {
+        logger = new Logger("test", "one", "two", "three");
     }
+
+    @Override
+    public void loop() {
+        logger.append("one", String.valueOf(i));
+        logger.append("two", String.valueOf(j));
+        logger.append("three", String.valueOf(k));
+
+        i++;
+        j++;
+        k++;
+    }
+
+    @Override
+    public void stop(){
+        logger.writeToFile();
+    }
+
 }

@@ -48,19 +48,19 @@ public class OdometryTuningOpMode extends OpMode {
         l.reset();
         r.reset();
 
-        Logger.append(Logger.Cats.DESIDIST, String.valueOf(leftDiameter));
-        Logger.append(Logger.Cats.DDADJUSTMENT, String.valueOf(rightDiameter));
+        //Logger.append(Logger.Cats.DESIDIST, String.valueOf(leftDiameter));
+        //Logger.append(Logger.Cats.DDADJUSTMENT, String.valueOf(rightDiameter));
     }
 
     public void loop(){
-        Logger.append(Logger.Cats.MOTORPOW, String.valueOf(l.getRotations()));
-        Logger.append(Logger.Cats.ENCODERDIST, String.valueOf(r.getRotations()));
+        //Logger.append(Logger.Cats.MOTORPOW, String.valueOf(l.getRotations()));
+        //Logger.append(Logger.Cats.ENCODERDIST, String.valueOf(r.getRotations()));
 
         telemetry.addData("left rots", l.getRotations());
         telemetry.addData("right rots", r.getRotations());
         telemetry.update();
     }
     public void stop(){
-        Logger.getInstance().writeToFile();
+        //Logger.getInstance().writeToFile();
     }
 }

@@ -197,16 +197,16 @@ public class DriveLoggerOp extends LinearOpMode {
             telemetry.addData("time", runtime.milliseconds());
 
 
-            Logger.append(Logger.Cats.TIME,String.valueOf(runtime.milliseconds()));
-            Logger.append(Logger.Cats.DADJUSTMENT, String.valueOf(Math.toDegrees(heading)));
-            Logger.append(Logger.Cats.POWADJ, String.valueOf(dyIns/dHeading));
+            //Logger.append(Logger.Cats.TIME,String.valueOf(runtime.milliseconds()));
+            //Logger.append(Logger.Cats.DADJUSTMENT, String.valueOf(Math.toDegrees(heading)));
+            //Logger.append(Logger.Cats.POWADJ, String.valueOf(dyIns/dHeading));
             //Logger.append(Logger.Cats.POWADJ, String.valueOf(yTicks));
             //Logger.append(Logger.Cats.MOTORPOW,String.valueOf(dHeading));
             //Logger.append(Logger.Cats.MOTORPOW,);
 
             //Logger.append(Logger.Cats.DESIDIST, String.valueOf(dyTicks));
-            Logger.append(Logger.Cats.MOTORPOW, String.valueOf(localY));
-            Logger.append(Logger.Cats.ERROR, String.valueOf(dyIns));
+            //Logger.append(Logger.Cats.MOTORPOW, String.valueOf(localY));
+            //Logger.append(Logger.Cats.ERROR, String.valueOf(dyIns));
 
             frontLeft.setPower(gamepad1.right_stick_y+gamepad1.right_stick_x+gamepad1.left_stick_x); //todo flip strafe and rot
             frontRight.setPower(gamepad1.right_stick_y-gamepad1.right_stick_x-gamepad1.left_stick_x);
@@ -215,7 +215,7 @@ public class DriveLoggerOp extends LinearOpMode {
 
             telemetry.update();
         }
-        Logger.getInstance().writeToFile();
+        //Logger.getInstance().writeToFile();
     }
 
     private double getAngle(BNO055IMU imu) {
