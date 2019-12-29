@@ -33,6 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+
+import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
@@ -61,9 +65,9 @@ public class TestAuto extends LinearOpMode {
         MotorHashService.init();
         ardennes = new Ardennes();
         detector = new ArdennesSkyStoneDetector(false, true);
-        Intake intake = ardennes.getIntake();
+//        Intake intake = ardennes.getIntake();
         MecanumChassis chassis = ardennes.getChassis();
-        Slides slides = ardennes.getSlides();
+        /*Slides slides = ardennes.getSlides();
         SerialServo foundationServoLeft = ardennes.getLeftFoundation();
         SerialServo foundationServoRight = ardennes.getRightFoundation();
         SerialServo gripper = ardennes.getGripper();
@@ -74,9 +78,17 @@ public class TestAuto extends LinearOpMode {
         gripper.setPosition(0);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
-        yslide.setPosition(0);
+        yslide.setPosition(0);*/
 
         waitForStart();
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(24,0));
+        Path path = new Path(points);
+
+        chassis.startOdometrySystem();
+        chassis.followPath(path);
+
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
         //sleep(10000);
         //chassis.arc(90, 1000, .93, true);
@@ -84,7 +96,7 @@ public class TestAuto extends LinearOpMode {
         //sleep(5000);
         //chassis.pivot(10, .93);
 
-        intake.startIntakeWaitForBlock(intakeTrigger);
+      /*  intake.startIntakeWaitForBlock(intakeTrigger);
         chassis.arc(40,1450, .65, false);
         chassis.arc(-46, 1500, .8, true);
         chassis.driveStraight(-800,.8);
@@ -97,20 +109,20 @@ public class TestAuto extends LinearOpMode {
         sleep(500);
         chassis.arc(90,80,1,true);
         sleep(300);
-        chassis.driveStraight(-200, 1);
+        chassis.driveStraight(-200, 1);*/
 
 
 
-//        slides.setTargetLevel(2);
-//        slides.runSlidesToTargetLevel();
-//        sleep(300);
-//        yslide.setPosition(1);
-//        sleep(1500);
-//        gripper.setPosition(0);
-//        sleep(1000);
-//        yslide.setPosition(0);
-//        sleep(1000);
-//        slides.resetSlidesToOriginalPosition();
+       /* slides.setTargetLevel(2);
+        slides.runSlidesToTargetLevel();
+        sleep(300);
+        yslide.setPosition(1);
+        sleep(1500);
+        gripper.setPosition(0);
+        sleep(1000);
+        yslide.setPosition(0);
+        sleep(1000);
+        slides.resetSlidesToOriginalPosition();*/
 
 
     }

@@ -392,19 +392,18 @@ public class MecanumChassis extends Chassis {
     }
 
     public void followPath(Path path) {
-        HeadingController headingController = new HeadingController(path, 1 ,1 ,1);
+        HeadingController headingController = new HeadingController(path, 4 ,4 ,10); //in inches per second
+        HeadingController.Powers powers;
+        do {
+            powers = headingController.getUpdatedPowers(getPosition(), getVelocity());
 
-        //Get position of the robot
+            frontLeft.setPower(powers.leftPower);
+            backLeft.setPower(powers.leftPower);
 
-        //Get text file with coordinates
-
-        //Read text file and trim unnecessary data
-
-
-        //Start loop and add everything below
-        while (true) {
-
+            frontRight.setPower(powers.rightPower);
+            backRight.setPower(powers.rightPower);
         }
+        while (!powers.pathFinished);
 
     }
 
