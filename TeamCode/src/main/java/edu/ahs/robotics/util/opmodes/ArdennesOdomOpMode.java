@@ -43,7 +43,7 @@ import edu.ahs.robotics.util.FTCUtilities;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Odometery Logger", group="Iterative OpMode")
-@Disabled
+//@Disabled
 public class ArdennesOdomOpMode extends OpMode
 {
     private Ardennes ardennes;
@@ -52,14 +52,16 @@ public class ArdennesOdomOpMode extends OpMode
 
     private double lastTime;
 
-    private ArdennesSimpleTeleOp tele;
+    private ArdennesSimpleTankTeleOp tele;
 
     @Override
     public void init() {
+        FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        ardennes.getChassis().startOdometrySystem();
 
-        tele = new ArdennesSimpleTeleOp();
+        tele = new ArdennesSimpleTankTeleOp();
+        tele.hardwareMap = hardwareMap;
+        tele.gamepad1 = gamepad1;
         tele.init();
     }
 
@@ -70,6 +72,7 @@ public class ArdennesOdomOpMode extends OpMode
     @Override
     public void start() {
         lastTime = FTCUtilities.getCurrentTimeMillis();
+        ardennes.getChassis().startOdometrySystem();
     }
 
     @Override
@@ -92,6 +95,7 @@ public class ArdennesOdomOpMode extends OpMode
     }
     @Override
     public void stop() {
+        tele.stop();
         ardennes.getChassis().stopOdometrySystem();
     }
 

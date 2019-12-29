@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Simple TeleOp", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesSimpleTeleOp extends OpMode
 {
     protected DcMotor frontLeft, frontRight, backLeft, backRight;

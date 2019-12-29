@@ -29,6 +29,7 @@
 
 package edu.ahs.robotics.util.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 /**
@@ -36,7 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Simple Tank TeleOp", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesSimpleTankTeleOp extends ArdennesSimpleTeleOp
 {
 
