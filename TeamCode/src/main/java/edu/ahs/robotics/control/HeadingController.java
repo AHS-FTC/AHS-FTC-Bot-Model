@@ -3,9 +3,11 @@ package edu.ahs.robotics.control;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.Logger;
 
 public class HeadingController {
     Path path;
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedError", "distanceToRobot");
     private double minRampDown;
     private double minRampUp;
     private double maxVelocity;
@@ -43,6 +45,12 @@ public class HeadingController {
             leftPower -= targetLocation.distanceToRobot * TURN_SCALE;
             rightPower += targetLocation.distanceToRobot * TURN_SCALE;
 
+            logger.append("leftPower", String.valueOf(leftPower));
+            logger.append("rightPower", String.valueOf(rightPower));
+            logger.append("targetSpeed", String.valueOf(targetSpeed));
+            logger.append("speedError", String.valueOf(speedError));
+            logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
+
             //Clip powers to 1 by maximum power
             double maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
             if (maxPower > 1.0) {
@@ -52,6 +60,7 @@ public class HeadingController {
         } else {
             leftPower = 0.0;
             rightPower = 0.0;
+            logger.writeToFile();
         }
 
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);
