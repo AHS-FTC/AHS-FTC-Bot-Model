@@ -4,16 +4,13 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.control.HeadingController;
 import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.control.VelocityPID;
-import edu.ahs.robotics.control.XYHeadingPID;
+import edu.ahs.robotics.control.pid.VelocityPID;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.control.Point;
 
 public class MecanumChassis extends Chassis {
@@ -329,15 +326,15 @@ public class MecanumChassis extends Chassis {
         double frontLeftPower = 0, frontRightPower = 0;
         double backLeftPower = 0, backRightPower = 0;
 
-        XYHeadingPID.Correction correction;
+        PositionPID.Correction correction;
         MecanumVectors mecanumVectorCorrections;
 
-        XYHeadingPID.Config pidConfig = new XYHeadingPID.Config();
+        PositionPID.Config pidConfig = new PositionPID.Config();
         pidConfig.setYParameters(0.01,0.001, -0.05);
         pidConfig.setXParameters(0.01,0.001, -0.05);
         pidConfig.setHeadingParameters(0,0,0);
 
-        XYHeadingPID pid = new XYHeadingPID(pidConfig);
+        PositionPID pid = new PositionPID(pidConfig);
 
         long startTime = FTCUtilities.getCurrentTimeMillis();
 

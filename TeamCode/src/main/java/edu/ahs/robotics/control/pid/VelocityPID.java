@@ -1,4 +1,6 @@
-package edu.ahs.robotics.control;
+package edu.ahs.robotics.control.pid;
+
+import edu.ahs.robotics.control.Velocity;
 
 /**
  * PID system for vector velocity that considers both magnitude and direction.
