@@ -61,6 +61,6 @@ public class OdometryTuningOpMode extends OpMode {
         telemetry.update();
     }
     public void stop(){
-        //Logger.getInstance().writeToFile();
+        //Logger.getInstance().stopWriting();
     }
 }

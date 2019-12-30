@@ -35,8 +35,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
-import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
@@ -116,7 +114,7 @@ public class ArdennesOdomOpMode extends OpMode
     @Override
     public void stop() {
         tele.stop();
-        logger.writeToFile();
+        logger.stopWriting();
         chassis.stopOdometrySystem();
     }
 

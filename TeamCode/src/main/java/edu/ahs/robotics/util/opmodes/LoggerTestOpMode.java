@@ -41,7 +41,7 @@ import edu.ahs.robotics.util.Logger;
  * @author Alex Appleby and Gavin Heil
  */
 @TeleOp(name="Logger Test", group="Iterative OpMode")
-@Disabled
+//@Disabled
 public class LoggerTestOpMode extends OpMode
 {
     private Logger logger;
@@ -50,6 +50,7 @@ public class LoggerTestOpMode extends OpMode
     @Override
     public void init() {
         logger = new Logger("test", "one", "two", "three");
+        logger.startWriting();
     }
 
     @Override
@@ -57,6 +58,7 @@ public class LoggerTestOpMode extends OpMode
         logger.append("one", String.valueOf(i));
         logger.append("two", String.valueOf(j));
         logger.append("three", String.valueOf(k));
+        logger.writeLine();
 
         i++;
         j++;
@@ -65,7 +67,7 @@ public class LoggerTestOpMode extends OpMode
 
     @Override
     public void stop(){
-        logger.writeToFile();
+        logger.stopWriting();
     }
 
 }
