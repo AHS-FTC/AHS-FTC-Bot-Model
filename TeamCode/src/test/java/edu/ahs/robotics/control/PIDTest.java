@@ -37,4 +37,15 @@ public class PIDTest {
 
     }
 
+    @Test
+    public void testProportionality(){
+        PID pid = new PID(1,0,0);
+
+        double bigCorrection = pid.getCorrection(0,10);
+        double smolCorrection = pid.getCorrection(5,10);
+
+        assertTrue(bigCorrection > smolCorrection);
+
+    }
+
 }
