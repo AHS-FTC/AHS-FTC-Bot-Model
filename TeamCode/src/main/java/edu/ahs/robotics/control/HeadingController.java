@@ -7,7 +7,7 @@ import edu.ahs.robotics.util.Logger;
 
 public class HeadingController {
     Path path;
-    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedError", "distanceToRobot", "lookAheadDelta");
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedError", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY");
     private double minRampDown;
     private double minRampUp;
     private double maxVelocity;
@@ -50,13 +50,16 @@ public class HeadingController {
             /*leftPower -= (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);
             rightPower += (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);*/
 
-            logger.append("leftPower", String.valueOf(leftPower));
-            logger.append("rightPower", String.valueOf(rightPower));
             logger.append("targetSpeed", String.valueOf(targetSpeed));
             logger.append("speedError", String.valueOf(speedError));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
+            logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
             logger.append("lookAheadDelta", String.valueOf(targetLocation.lookAheadDelta));
-            logger.writeLine();
+            logger.append("robotPositionX", String.valueOf(robotPosition.x));
+            logger.append("robotPositionY", String.valueOf(robotPosition.y));
+            logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
+            logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
+            logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
@@ -68,7 +71,13 @@ public class HeadingController {
         } else {
             leftPower = 0.0;
             rightPower = 0.0;
+
         }
+
+        logger.append("leftPower", String.valueOf(leftPower));
+        logger.append("rightPower", String.valueOf(rightPower));
+        logger.append("isFinished", String.valueOf(targetLocation.pathFinished));
+        logger.writeLine();
 
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);
     }
