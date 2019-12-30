@@ -8,39 +8,6 @@ import static org.junit.Assert.*;
 
 public class HeadingControllerTest {
 
-//    @Test
-//    public void getUpdatedPowersWithDiagonal() {
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(new Point(1,1));
-//        points.add(new Point(3,3));
-//        Path path = new Path(points);
-//        HeadingController controller = new HeadingController(path, 1,1,1);
-//        Position robotPosition = new Position(4,0,0);
-//        Path.Location targetLocation = path.getTargetLocation(robotPosition);
-//        Velocity velocity = new Velocity(12, 0);
-//        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
-//        HeadingController.Powers expectedPowers = new HeadingController.Powers(1,1);
-//
-//        assertEquals(expectedPowers.rightPower, powers.rightPower, .001);
-//        assertEquals(expectedPowers.leftPower, powers.leftPower, .001);
-//    }
-//
-//    @Test
-//    public void getUpdatedPowersWithStraight() {
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(new Point(0,0));
-//        points.add(new Point(0,4));
-//        Path path = new Path(points);
-//        HeadingController controller = new HeadingController(path, 1,1,1);
-//        Position robotPosition = new Position(0,2,0);
-//        Velocity velocity = new Velocity(12, 0);
-//        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
-//        HeadingController.Powers expectedPowers = new HeadingController.Powers(1,1);
-//
-//        assertEquals(expectedPowers.rightPower, powers.rightPower, .001);
-//        assertEquals(expectedPowers.leftPower, powers.leftPower, .001);
-//    }
-
     @Test
     public void getPowersRampsUp() {
         ArrayList<Point> points = new ArrayList<>();

@@ -25,6 +25,8 @@ public class HeadingController {
         this.minRampUp = minRampUp;
         this.maxVelocity = maxVelocity;
         this.maxPower = maxPower;
+
+        logger.startWriting();
     }
 
     //P controller corrects for target point
@@ -45,8 +47,8 @@ public class HeadingController {
             leftPower += speedError * SPEED_SCALE;
             rightPower += speedError * SPEED_SCALE;
 
-            leftPower -= (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);
-            rightPower += (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);
+            /*leftPower -= (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);
+            rightPower += (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);*/
 
             logger.append("leftPower", String.valueOf(leftPower));
             logger.append("rightPower", String.valueOf(rightPower));
@@ -54,6 +56,7 @@ public class HeadingController {
             logger.append("speedError", String.valueOf(speedError));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("lookAheadDelta", String.valueOf(targetLocation.lookAheadDelta));
+            logger.writeLine();
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));

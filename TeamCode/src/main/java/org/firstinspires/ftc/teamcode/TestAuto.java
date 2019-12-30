@@ -95,7 +95,7 @@ public class TestAuto extends LinearOpMode {
         try {
             chassis.followPath(path);
         } finally {
-            logger.writeToFile();
+            logger.stopWriting();
         }
 
         stop();
