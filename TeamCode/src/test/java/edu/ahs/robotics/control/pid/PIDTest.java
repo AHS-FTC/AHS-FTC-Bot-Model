@@ -1,6 +1,8 @@
-package edu.ahs.robotics.control;
+package edu.ahs.robotics.control.pid;
 
 import org.junit.Test;
+
+import edu.ahs.robotics.control.pid.PID;
 
 import static org.junit.Assert.*;
 

@@ -1,10 +1,12 @@
-package edu.ahs.robotics.control;
+package edu.ahs.robotics.control.pid;
+
+import edu.ahs.robotics.control.Position;
 
 /**
  * Functional class that manages positional PID in three global dimensions
  * @author Alex Appleby
  */
-public class XYHeadingPID {
+public class PositionPID {
     private Config config;
 
     private double xErrorSum = 0, yErrorSum = 0, headingErrorSum = 0;
@@ -13,7 +15,7 @@ public class XYHeadingPID {
     /**
      * @param config An instance of the static Config class with configuration parameters
      */
-    public XYHeadingPID(Config config) {
+    public PositionPID(Config config) {
         this.config = config;
     }
 
@@ -92,7 +94,7 @@ public class XYHeadingPID {
     }
 
     /**
-     * Manages tuning parameters for XYH PID. Passed into XYHeadingPID constructor for init.
+     * Manages tuning parameters for XYH PID. Passed into PositionPID constructor for init.
      */
     public static class Config {
          private double xP = 0, xI = 0, xD = 0;

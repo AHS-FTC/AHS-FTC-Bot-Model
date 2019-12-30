@@ -1,4 +1,4 @@
-package edu.ahs.robotics.control;
+package edu.ahs.robotics.control.pid;
 
 /**
  * General PID class applicable for whatever the  h e c k  you want.
