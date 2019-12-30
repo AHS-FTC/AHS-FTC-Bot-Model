@@ -1,8 +1,5 @@
 package edu.ahs.robotics.control;
 
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.Trigger;
-import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.Logger;
 
 public class HeadingController {
@@ -15,7 +12,7 @@ public class HeadingController {
     private double leftPower = 0.0;
     private double rightPower = 0.0;
     //Correction values
-    private static final double SPEED_SCALE = .001;
+    private static final double SPEED_SCALE = .004;
     private static final double TURN_SCALE = .01;
     public static final double LOOK_AHEAD_SCALE = 0.2;
 
@@ -28,13 +25,6 @@ public class HeadingController {
 
         logger.startWriting();
     }
-
-    //P controller corrects for target point
-
-    //I controller smoothes
-
-    //D controller will look a number of points ahead to determine correction
-
 
     public Powers getUpdatedPowers(Position robotPosition, Velocity robotVelocity) {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
@@ -87,8 +77,8 @@ public class HeadingController {
     }
 
     private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
-        double upScale = 1; //Todo adjust
-        double downScale = 1; //Todo adjust
+        double upScale = 8; //Todo adjust
+        double downScale = 4; //Todo adjust
         double rampDown = Math.max(downScale * (distanceToEnd), minRampDown);
         double rampUp = Math.max(upScale * (distanceFromStart), minRampUp);
         return Math.min(rampDown, Math.min(rampUp, maxVelocity));
