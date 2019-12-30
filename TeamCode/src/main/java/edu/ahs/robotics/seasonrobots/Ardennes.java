@@ -95,7 +95,7 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeL", 2.3622,false);
+        Odometer x1 = FTCUtilities.getOdometer("intakeL", 2.3622,true); //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
         Odometer x2 = FTCUtilities.getOdometer("intakeR", 2.3622, true);
         Odometer y = FTCUtilities.getOdometer("BR", 2.3622, false); //todo give name
 

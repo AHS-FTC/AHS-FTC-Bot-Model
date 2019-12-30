@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 @TeleOp(name="Ardennes Simple Tank TeleOp", group="Iterative OpMode")
 @Disabled
-public class ArdennesSimpleTankTeleOp extends ArdennesSimpleTeleOp
+public class SimpleTankTeleOp extends SimpleTeleOp
 {
 
     @Override
