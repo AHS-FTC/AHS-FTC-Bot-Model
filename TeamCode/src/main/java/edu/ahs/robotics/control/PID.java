@@ -10,12 +10,24 @@ public class PID {
 
     private double p,i,d;
 
+    /**
+     * To disable any correction factor, use a scalar of zero.
+     * @param p Proportional correction scalar
+     * @param i Integral correction scalar. Generally small relative to Proportional scalar.
+     * @param d Derivative scalar. Based on error derivative rather than function derivative, thus normally positive.
+     */
     public PID(double p,double i,double d) {
         this.p = p;
         this.i = i;
         this.d = d;
     }
 
+    /**
+     * Gets a PID-derived Correction. Also logs values for integral and derivative errors.
+     * @param current Current value of dependent variable
+     * @param target Target Value of dependent variable
+     * @return PID correction to independent variable
+     */
     public double getCorrection(double current, double target){
        double correction = 0;
 
@@ -28,6 +40,8 @@ public class PID {
        correction += errorSum * i;
 
        correction += (error - lastError)* d;
+
+       lastError = error;
 
        return correction;
     }
