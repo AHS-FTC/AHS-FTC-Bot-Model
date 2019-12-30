@@ -96,8 +96,11 @@ public class Logger {
             for (int i = 0; i < categories.length; i++) {
                 String category = categories[i];
                 List<String> list = entriesByCategory.get(category);
-                String data = list.get(lastLine);
-                csvWriter.append(data);
+                if (lastLine < list.size()) {
+                    csvWriter.append(list.get(lastLine));
+                } else {
+                    csvWriter.append(" ");
+                }
                 if (i < categories.length - 1) {
                     csvWriter.append(", ");
                 }

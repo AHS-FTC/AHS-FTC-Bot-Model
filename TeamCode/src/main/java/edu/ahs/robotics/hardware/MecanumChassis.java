@@ -392,7 +392,7 @@ public class MecanumChassis extends Chassis {
     }
 
     public void followPath(Path path) {
-        HeadingController headingController = new HeadingController(path, 4 ,4 ,10, .3); //in inches per second
+        HeadingController headingController = new HeadingController(path, 4 ,4 ,16, .5); //in inches per second
         HeadingController.Powers powers;
         do {
             powers = headingController.getUpdatedPowers(getPosition(), getVelocity());

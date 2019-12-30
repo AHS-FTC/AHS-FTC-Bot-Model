@@ -7,7 +7,7 @@ import edu.ahs.robotics.util.Logger;
 
 public class HeadingController {
     Path path;
-    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedError", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY");
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedError", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed");
     private double minRampDown;
     private double minRampUp;
     private double maxVelocity;
@@ -15,7 +15,7 @@ public class HeadingController {
     private double leftPower = 0.0;
     private double rightPower = 0.0;
     //Correction values
-    private static final double SPEED_SCALE = .01;
+    private static final double SPEED_SCALE = .001;
     private static final double TURN_SCALE = .01;
     public static final double LOOK_AHEAD_SCALE = 0.2;
 
@@ -60,6 +60,7 @@ public class HeadingController {
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
             logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
             logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
+            logger.append("robotSpeed", String.valueOf(robotVelocity.speed));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
@@ -71,13 +72,16 @@ public class HeadingController {
         } else {
             leftPower = 0.0;
             rightPower = 0.0;
-
         }
 
         logger.append("leftPower", String.valueOf(leftPower));
         logger.append("rightPower", String.valueOf(rightPower));
         logger.append("isFinished", String.valueOf(targetLocation.pathFinished));
         logger.writeLine();
+
+        if (targetLocation.pathFinished) {
+            logger.stopWriting();
+        }
 
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);
     }

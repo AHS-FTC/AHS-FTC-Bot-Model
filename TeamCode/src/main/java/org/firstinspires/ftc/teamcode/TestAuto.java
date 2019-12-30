@@ -57,11 +57,6 @@ public class TestAuto extends LinearOpMode {
     private Ardennes ardennes;
     private ArdennesSkyStoneDetector detector;
     private TriggerDistanceSensor intakeTrigger;
-    private static Logger logger;
-
-    public static void setLogger(Logger l){
-        logger = l;
-    }
 
     @Override
     public void runOpMode() {
@@ -92,11 +87,8 @@ public class TestAuto extends LinearOpMode {
         Path path = new Path(points);
         chassis.startOdometrySystem();
 
-        try {
-            chassis.followPath(path);
-        } finally {
-            logger.stopWriting();
-        }
+
+        chassis.followPath(path);
 
         stop();
 
