@@ -11,18 +11,20 @@ public class HeadingController {
     private double minRampDown;
     private double minRampUp;
     private double maxVelocity;
-    private double leftPower = 0;
-    private double rightPower = 0;
+    private double maxPower;
+    private double leftPower = 0.0;
+    private double rightPower = 0.0;
     //Correction values
     private static final double SPEED_SCALE = .01;
     private static final double TURN_SCALE = .01;
     public static final double LOOK_AHEAD_SCALE = 0.2;
 
-    public HeadingController(Path path, double minRampDown, double minRampUp, double maxVelocity) {
+    public HeadingController(Path path, double minRampDown, double minRampUp, double maxVelocity, double maxPower) {
         this.path = path;
         this.minRampDown = minRampDown;
         this.minRampUp = minRampUp;
         this.maxVelocity = maxVelocity;
+        this.maxPower = maxPower;
     }
 
     //P controller corrects for target point
@@ -53,16 +55,16 @@ public class HeadingController {
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("lookAheadDelta", String.valueOf(targetLocation.lookAheadDelta));
 
-            //Clip powers to 1 by maximum power
-            double maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
-            if (maxPower > 1.0) {
-                leftPower = leftPower / maxPower;
-                rightPower = rightPower / maxPower;
+            //Clip powers to maxPower by higher power
+            double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
+            if (higherPower > maxPower) {
+                leftPower = (leftPower / higherPower) * maxPower;
+                rightPower = (rightPower / higherPower) * maxPower;
             }
+
         } else {
             leftPower = 0.0;
             rightPower = 0.0;
-            logger.writeToFile();
         }
 
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);

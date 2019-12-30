@@ -57,7 +57,11 @@ public class TestAuto extends LinearOpMode {
     private Ardennes ardennes;
     private ArdennesSkyStoneDetector detector;
     private TriggerDistanceSensor intakeTrigger;
+    private static Logger logger;
 
+    public static void setLogger(Logger l){
+        logger = l;
+    }
 
     @Override
     public void runOpMode() {
@@ -86,9 +90,16 @@ public class TestAuto extends LinearOpMode {
         points.add(new Point(0,0));
         points.add(new Point(24,0));
         Path path = new Path(points);
-
         chassis.startOdometrySystem();
-        chassis.followPath(path);
+
+        try {
+            chassis.followPath(path);
+        } finally {
+            logger.writeToFile();
+        }
+
+        stop();
+
 
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
         //sleep(10000);
