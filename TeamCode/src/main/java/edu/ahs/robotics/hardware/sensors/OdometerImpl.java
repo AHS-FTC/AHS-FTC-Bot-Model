@@ -6,13 +6,14 @@ import edu.ahs.robotics.util.FTCUtilities;
 
 /**
  * Non-Mock implementation of the Odometer interface that runs on the robot. Reads encoder values, tracks, and returns distance based on wheel diameter.
+ *  <b>IMPORTANT:</b> setDirection() method on DcMotor changes encoder direction
  * @author Alex Appleby
  */
 public class OdometerImpl implements Odometer {
     private DcMotor motor; //we use the crappy DcMotor class from FTC to access encoder values. Kind of a hack, but that's how it be.
     private double wheelCircumference;// in inches, used to be in mm
     private final double TICKS_PER_ROTATION = 1440; //specific to our S4T encoders. May be in need of change for other S4T models or different encoders.
-    private int direction = 1; //enables flip. only 1 or -1.
+    private int direction = 1; //enables flip. only 1 or -1. //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
 
     /**
      * @param deviceName A string that ties the encoder sensor to the motor port of a DcMotor. Should be the same as whatever motor it's attached to.

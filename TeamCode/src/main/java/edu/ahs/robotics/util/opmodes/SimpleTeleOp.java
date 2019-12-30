@@ -29,51 +29,68 @@
 
 package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.util.FTCUtilities;
-
-
-@TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
+/**
+ * Test OpMode for driving Ardennes. Not dependent on BotModel
+ * @author Alex Appleby
+ */
+@TeleOp(name="Ardennes Simple TeleOp", group="Iterative OpMode")
 @Disabled
-public class ArdennesSensorLoggerOpMode extends OpMode
+public class SimpleTeleOp extends OpMode
 {
-    BNO055IMU bnoIMU;
-    IMU imu;
-    TouchSensor limitSwitch;
+    protected DcMotor frontLeft, frontRight, backLeft, backRight;
 
     @Override
     public void init() {
-        FTCUtilities.setOpMode(this);
-        bnoIMU = FTCUtilities.getIMU("imu");
-        imu = new IMU(bnoIMU);
-        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
+        frontLeft = hardwareMap.get(DcMotor.class, "FL");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
+        backLeft = hardwareMap.get(DcMotor.class,"BL");
+        backRight = hardwareMap.get(DcMotor.class,"BR");
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
     public void init_loop() {
+
     }
 
     @Override
     public void start() {
+
     }
 
     @Override
     public void loop() {
-        FTCUtilities.addData("IMU",imu.getHeading());
-        FTCUtilities.addData("pressed?", limitSwitch.isPressed());
-        FTCUtilities.updateOpLogger();
+        double forward = gamepad1.left_stick_y;
+        double strafe = gamepad1.left_stick_x;
+        double turn = gamepad1.right_stick_x;
+
+        frontLeft.setPower(forward + strafe - turn);
+        frontRight.setPower(forward + strafe + turn);
+        backLeft.setPower(forward - strafe - turn);
+        backRight.setPower(forward - strafe + turn);
     }
+
     @Override
-    public void stop() {
+    public void stop(){
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
     }
 
 }

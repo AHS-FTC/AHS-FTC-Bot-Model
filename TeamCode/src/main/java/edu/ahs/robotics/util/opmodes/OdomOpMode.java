@@ -36,19 +36,17 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
-import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
-import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 
 /**
- * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
+ * Test OpMode for logging and debugging the OdometrySystemImpl.
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Odometery Logger", group="Iterative OpMode")
+@TeleOp(name="Odometery OpMode", group="Iterative OpMode")
 //@Disabled
-public class ArdennesOdomOpMode extends OpMode
+public class OdomOpMode extends OpMode
 {
     //private Ardennes ardennes;
     private OdometrySystemImpl odometrySystem;
@@ -59,7 +57,7 @@ public class ArdennesOdomOpMode extends OpMode
 
     private double lastTime;
 
-    private ArdennesSimpleTankTeleOp tele;
+    private SimpleTankTeleOp tele;
 
     @Override
     public void init() {
@@ -73,7 +71,7 @@ public class ArdennesOdomOpMode extends OpMode
 
         logger = new Logger("odometry","x","y","heading","speed","dot","time");
 
-        tele = new ArdennesSimpleTankTeleOp();
+        tele = new SimpleTankTeleOp();
         tele.hardwareMap = hardwareMap;
         tele.gamepad1 = gamepad1;
         tele.init();

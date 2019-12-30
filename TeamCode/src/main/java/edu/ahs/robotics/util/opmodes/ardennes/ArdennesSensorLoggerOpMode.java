@@ -27,37 +27,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics.util.opmodes;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.control.Position;
-import edu.ahs.robotics.hardware.ChassisMotors;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.util.FTCUtilities;
 
-/**
- * Test OpMode that tests the Position PID in the goToPointWithPID() method housed by the MecanumChassis class.
- * @author Alex Appleby
- */
-@TeleOp(name="Ardennes Run To Position", group="Iterative OpMode")
+
+@TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
 @Disabled
-public class ArdennesTestRunToPosition extends OpMode
+public class ArdennesSensorLoggerOpMode extends OpMode
 {
-    private Ardennes ardennes;
-    private Point target;
-
+    BNO055IMU bnoIMU;
+    IMU imu;
+    TouchSensor limitSwitch;
 
     @Override
     public void init() {
-        ardennes = new Ardennes();
-        ardennes.getChassis().setPosition(5,5,Math.PI/2);
-        ardennes.getChassis().startOdometrySystem();
-
-        target = new Point(0,0);
+        FTCUtilities.setOpMode(this);
+        bnoIMU = FTCUtilities.getIMU("imu");
+        imu = new IMU(bnoIMU);
+        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
     }
 
     @Override
@@ -66,16 +64,16 @@ public class ArdennesTestRunToPosition extends OpMode
 
     @Override
     public void start() {
-        ardennes.getChassis().goToPointWithPID(target,5000);
     }
 
     @Override
     public void loop() {
-
+        FTCUtilities.addData("IMU",imu.getHeading());
+        FTCUtilities.addData("pressed?", limitSwitch.isPressed());
+        FTCUtilities.updateOpLogger();
     }
     @Override
     public void stop() {
-        ardennes.getChassis().stopOdometrySystem();
     }
 
 }

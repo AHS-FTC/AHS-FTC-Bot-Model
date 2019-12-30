@@ -27,70 +27,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics.util.opmodes;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.control.Position;
+import edu.ahs.robotics.hardware.ChassisMotors;
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 
 /**
- * Test OpMode for driving Ardennes. Not dependent on BotModel
+ * Test OpMode that tests the Position PID in the goToPointWithPID() method housed by the MecanumChassis class.
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Simple TeleOp", group="Iterative OpMode")
+@TeleOp(name="Ardennes Run To Position", group="Iterative OpMode")
 @Disabled
-public class ArdennesSimpleTeleOp extends OpMode
+public class ArdennesTestRunToPosition extends OpMode
 {
-    protected DcMotor frontLeft, frontRight, backLeft, backRight;
+    private Ardennes ardennes;
+    private Point target;
+
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backLeft = hardwareMap.get(DcMotor.class,"BL");
-        backRight = hardwareMap.get(DcMotor.class,"BR");
+        ardennes = new Ardennes();
+        ardennes.getChassis().setPosition(5,5,Math.PI/2);
+        ardennes.getChassis().startOdometrySystem();
 
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        target = new Point(0,0);
     }
 
     @Override
     public void init_loop() {
-
     }
 
     @Override
     public void start() {
-
+        ardennes.getChassis().goToPointWithPID(target,5000);
     }
 
     @Override
     public void loop() {
-        double forward = gamepad1.left_stick_y;
-        double strafe = gamepad1.left_stick_x;
-        double turn = gamepad1.right_stick_x;
 
-        frontLeft.setPower(forward + strafe - turn);
-        frontRight.setPower(forward + strafe + turn);
-        backLeft.setPower(forward - strafe - turn);
-        backRight.setPower(forward - strafe + turn);
     }
-
     @Override
-    public void stop(){
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
+    public void stop() {
+        ardennes.getChassis().stopOdometrySystem();
     }
 
 }
