@@ -215,7 +215,7 @@ public class DriveLoggerOp extends LinearOpMode {
 
             telemetry.update();
         }
-        //Logger.getInstance().writeToFile();
+        //Logger.getInstance().stopWriting();
     }
 
     private double getAngle(BNO055IMU imu) {

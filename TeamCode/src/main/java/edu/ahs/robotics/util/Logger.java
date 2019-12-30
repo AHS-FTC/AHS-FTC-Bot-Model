@@ -3,6 +3,8 @@ package edu.ahs.robotics.util;
 import android.graphics.Bitmap;
 import android.os.Environment;
 
+import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -30,7 +32,7 @@ public class Logger {
     you can do this in the append function, by using Integer.toString(int) or Double.toString(double)
 
     FINALIZE AND WRITE FILE:
-    Use function logger.getinstance().writeToFile();
+    Use function logger.getinstance().stopWriting();
     Make sure to write this after your robot.executePlan();
     Otherwise, file will never be written and data is lost
 
@@ -46,6 +48,7 @@ public class Logger {
     private String fileName;
     private String[] categories;
     private Map<String, ArrayList<String>> entriesByCategory;
+    private int lastLine = 0;
 
 
     public Logger(String fileName, String... cats){
@@ -63,7 +66,7 @@ public class Logger {
 
     private FileWriter csvWriter = null;
 
-    public void writeToFile() {
+    public void startWriting() {
         try {
             File file = new File(FTCUtilities.getLogDirectory(), fileName);
             if (file.exists()) {
@@ -72,9 +75,7 @@ public class Logger {
             file.createNewFile();
             csvWriter = new FileWriter(file);
 
-            int length = entriesByCategory.get(categories[0]).size();
-
-            for(int i = 0; i < categories.length; i ++){ // write the categories first
+             for(int i = 0; i < categories.length; i ++){ // write the categories first
                 csvWriter.append(categories[i]);
                 if( i< categories.length - 1){
                     csvWriter.append(", ");
@@ -82,34 +83,35 @@ public class Logger {
             }
             csvWriter.append("\n");
 
-            for(int j = 0; j < length; j++){
-                for (int i = 0; i < categories.length; i++) {
-                    String category = categories[i];
-                    List<String> list = entriesByCategory.get(category);
-                    String data = list.get(j);
-                    csvWriter.append(data);
-                    if( i< categories.length - 1){
-                        csvWriter.append(", ");
-                    }
-                }
-                csvWriter.append("\n");
-            }
-
-//
-//            for (int i = 0; i < categories.length; i++) {
-//                String catagory = categories[i];
-//                List list = entriesByCategory.get(catagory);
-//                Iterator<String> iterator = list.iterator();
-//                while (iterator.hasNext()) {
-//                    csvWriter.append(iterator.next());
-//                    if (iterator.hasNext()) {
-//                        csvWriter.append(", ");
-//                    }
-//                }
-//
-//                csvWriter.append("\n");
-//            }
             csvWriter.flush();
+
+         } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void writeLine(){
+        try {
+            for (int i = 0; i < categories.length; i++) {
+                String category = categories[i];
+                List<String> list = entriesByCategory.get(category);
+                String data = list.get(lastLine);
+                csvWriter.append(data);
+                if (i < categories.length - 1) {
+                    csvWriter.append(", ");
+                }
+            }
+            csvWriter.append("\n");
+            lastLine++;
+            csvWriter.flush();
+        } catch (Exception e){
+            throw new Warning(e.getMessage());
+        }
+    }
+
+    public void stopWriting() {
+        try{
             csvWriter.close();
         } catch (IOException e) {
             e.printStackTrace();

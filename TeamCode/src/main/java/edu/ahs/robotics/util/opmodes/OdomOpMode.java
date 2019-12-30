@@ -29,7 +29,6 @@
 
 package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -117,7 +116,7 @@ public class OdomOpMode extends OpMode
     @Override
     public void stop() {
         tele.stop();
-        logger.writeToFile();
+        logger.stopWriting();
         odometrySystem.stop();
     }
 

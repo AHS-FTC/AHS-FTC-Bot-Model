@@ -86,7 +86,7 @@ public class MecanumChassis extends Chassis {
                 FTCUtilities.OpLogger("Delta Heading", imu.getHeading());
             }
             setPowerAll(0);
-            //Logger.getInstance().writeToFile();
+            //Logger.getInstance().stopWriting();
 
         } else if(pointTurn.type == PointTurn.Type.ABSOLUTE){
 
@@ -256,7 +256,7 @@ public class MecanumChassis extends Chassis {
         } finally {
             setPowerAll(0);
         }
-        //Logger.getInstance().writeToFile();
+        //Logger.getInstance().stopWriting();
     }
 
     public void velocityDrive(Path path, double maxSpeed){

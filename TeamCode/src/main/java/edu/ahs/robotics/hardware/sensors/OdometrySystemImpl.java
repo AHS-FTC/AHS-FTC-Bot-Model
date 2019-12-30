@@ -59,7 +59,7 @@ public class OdometrySystemImpl implements OdometrySystem{
     }
   
     public void stop(){
-        logger.writeToFile();
+        logger.stopWriting();
         odometerThread.end();
     }
 
