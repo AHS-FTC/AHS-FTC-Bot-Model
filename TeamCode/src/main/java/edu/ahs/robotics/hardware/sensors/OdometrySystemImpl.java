@@ -170,7 +170,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         double speed = deltaDistance * 1000/(double)deltaTime;
 
         double direction = lastPosition.angleTo(position);
-        velocity.setVelocity(speed,direction);
+        velocity.setVelocityFromSpeedDirection(speed,direction);
 
         lastPosition.copyFrom(position);
 
