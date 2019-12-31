@@ -47,6 +47,7 @@ import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
+import edu.ahs.robotics.util.Tuner;
 
 
 @Autonomous(name = "Test Auto", group = "Linear Opmode")
@@ -79,6 +80,13 @@ public class TestAuto extends LinearOpMode {
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);*/
+
+
+        ArrayList<Tuner.Vals> tuningValues = new ArrayList<>();
+        tuningValues.add(Tuner.Vals.P);
+        tuningValues.add(Tuner.Vals.D);
+
+        Tuner.start(tuningValues);
 
         waitForStart();
         ArrayList<Point> points = new ArrayList<>();

@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class Tuner {
     public static HashMap<Vals,Double> tuningParams; // the actual output mapped to a val enum
     private static boolean running = false;
-    private static final double SPEED_CONSTANT   = 0.00001; // the speed at which values change
+    private static final double SPEED_CONSTANT = 0.000001; // the speed at which values change
 
     /**
      * Enums for reference in a HashMap that work as keys to access tuned values. To be added to at the convenience of the dev.
@@ -88,11 +88,15 @@ public class Tuner {
                 tuningParams.put(currentValKey, currentValDouble);
             }
             FTCUtilities.updateOpLogger();
+
+            if (gamepad1.x) {
+                stop();
+            }
         }
     }
 
     /**
-     * Ends main tuner loop while keeping tuning vals in tact and accessible
+     * Ends main tuner loop while keeping tuning vals intact and accessible
      */
     public static void stop(){
         running = false;

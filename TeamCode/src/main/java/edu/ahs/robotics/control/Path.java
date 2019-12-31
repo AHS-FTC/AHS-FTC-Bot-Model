@@ -155,11 +155,13 @@ public class Path {
         public double distanceToRobot;
         public boolean pathFinished;
         public double lookAheadDelta;
+        public double pathSegmentLength;
 
         public Location(PointAtDistance pointAtDistance) {
             pathFinished = false;
             pathDeltaX = pointAtDistance.pathDeltaX;
             pathDeltaY = pointAtDistance.pathDeltaY;
+            pathSegmentLength = pointAtDistance.distanceToPrevious;
         }
     }
 

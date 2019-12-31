@@ -394,11 +394,14 @@ public class MecanumChassis extends Chassis {
         do {
             powers = headingController.getUpdatedPowers(getPosition(), getVelocity());
 
-            frontLeft.setPower(powers.leftPower);
-            backLeft.setPower(powers.leftPower);
+            double inverseLeft = inversePower(powers.leftPower);
+            double inverseRight = inversePower(powers.rightPower);
 
-            frontRight.setPower(powers.rightPower);
-            backRight.setPower(powers.rightPower);
+            frontLeft.setPower(inverseLeft);
+            backLeft.setPower(inverseLeft);
+
+            frontRight.setPower(inverseRight);
+            backRight.setPower(inverseRight);
         }
         while (!powers.pathFinished);
 

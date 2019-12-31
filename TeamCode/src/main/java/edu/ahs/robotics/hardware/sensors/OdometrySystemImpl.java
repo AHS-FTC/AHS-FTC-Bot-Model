@@ -53,7 +53,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1","x2");
+        logger = new Logger("sensorStats", "x1","x2","speed");
 
         Arrays.fill(distanceBuffer,0.0);
         Arrays.fill(timeBuffer,0);
@@ -65,6 +65,7 @@ public class OdometrySystemImpl implements OdometrySystem{
     public void start(){
         resetEncoders();
         odometerThread.start();
+        logger.startWriting();
     }
   
     public void stop(){
@@ -176,6 +177,9 @@ public class OdometrySystemImpl implements OdometrySystem{
         lastPosition.copyFrom(position);
 
         bufferIndex = nextBufferIndex(); //iterate bufferIndex
+
+        logger.append("speed", String.valueOf(speed));
+        logger.writeLine();
     }
 
     public Position getPosition(){
