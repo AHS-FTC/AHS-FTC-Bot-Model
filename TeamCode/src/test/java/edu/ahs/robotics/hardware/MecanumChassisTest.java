@@ -149,11 +149,11 @@ public class MecanumChassisTest {
         ArrayList<Velocity> velocities = new ArrayList<>();
         ArrayList<Position> positions = new ArrayList<>();
 
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0)); //6 - 1
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0)); //6 - 1
 
         positions.add(new Position(0,0,0));
         positions.add(new Position(20,0,0));

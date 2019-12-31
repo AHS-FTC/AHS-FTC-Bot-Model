@@ -35,7 +35,7 @@ public class HeadingController {
         if (!targetLocation.pathFinished) {
             double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
 
-            double speedError = targetSpeed - robotVelocity.speed;
+            double speedError = targetSpeed - robotVelocity.speed();
 
             leftPower += speedError * SPEED_SCALE;
             rightPower += speedError * SPEED_SCALE;

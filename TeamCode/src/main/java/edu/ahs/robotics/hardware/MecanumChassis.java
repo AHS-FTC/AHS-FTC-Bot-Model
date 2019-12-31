@@ -285,7 +285,7 @@ public class MecanumChassis extends Chassis {
 
             Path.Location location = path.getTargetLocation(currentPosition);
 
-            Velocity targetVelocity = Velocity.makeVelocityFromDxDy(location.pathDeltaX,location.pathDeltaY);
+            Velocity targetVelocity = Velocity.makeVelocity(location.pathDeltaX,location.pathDeltaY);
 
             distanceToEnd = path.getTargetLocation(currentPosition).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
 
@@ -293,7 +293,7 @@ public class MecanumChassis extends Chassis {
 
             // target speed math: https://www.desmos.com/calculator/31kvlxmlhn
 
-            targetVelocity.speed = targetSpeed; //scale the velocity vector
+            targetVelocity.scaleMagnitude(targetSpeed); //scale the velocity vector
 
             correction = pid.getCorrection(currentVelocity,targetVelocity); //get the corrections
 
