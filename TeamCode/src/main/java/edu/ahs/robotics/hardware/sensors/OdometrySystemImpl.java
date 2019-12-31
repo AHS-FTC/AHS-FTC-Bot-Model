@@ -1,5 +1,7 @@
 package edu.ahs.robotics.hardware.sensors;
 
+import java.util.Arrays;
+
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -17,11 +19,16 @@ public class OdometrySystemImpl implements OdometrySystem{
 
     private Odometer x1, x2, y;
 
+    private static final int BUFFER_SIZE = 10;
+    private int bufferIndex = 0;
+    private double[] distanceBuffer = new double[BUFFER_SIZE];
+    private long[] timeBuffer = new long[BUFFER_SIZE];
+    private double distance = 0.0;
+
     private double x1Last, x2Last, yLast;
     private double yInchesPerDegree;
     private double distanceBetweenYWheels;
     private Position lastPosition;
-    private long lastTime;
 
     private OdometerThread odometerThread;
 
@@ -40,14 +47,16 @@ public class OdometrySystemImpl implements OdometrySystem{
         position = new Position(0,0,0);
         velocity = Velocity.makeVelocity(0,0);
         lastPosition = new Position(0,0,0);
-        lastTime = FTCUtilities.getCurrentTimeMillis();
 
         this.yInchesPerDegree = yInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1", "x2", "distance", "deltaTime", "speed");
+        logger = new Logger("sensorStats", "x1","x2");
+
+        Arrays.fill(distanceBuffer,0.0);
+        Arrays.fill(timeBuffer,0);
     }
 
     /**
@@ -56,7 +65,6 @@ public class OdometrySystemImpl implements OdometrySystem{
     public void start(){
         resetEncoders();
         odometerThread.start();
-        logger.startWriting();
     }
   
     public void stop(){
@@ -90,7 +98,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
 
-        long currentTime = System.nanoTime(); //Calculate time immediately before getting readings from odometry
+        long currentTime = FTCUtilities.getCurrentTimeMillis();
 
         //set readings from odom
         x1Reading = x1.getDistance();
@@ -145,28 +153,29 @@ public class OdometrySystemImpl implements OdometrySystem{
         logger.append("x1", String.valueOf(x1Reading));
         logger.append("x2", String.valueOf(x2Reading));
 
-
         updateVelocity(currentTime);
     }
 
     private void updateVelocity(long currentTime){
+        double distanceTraveled = position.distanceTo(lastPosition); //distance travelled between last point and this point
+        distance += distanceTraveled; // running sum of distances
 
-        double distance = position.distanceTo(lastPosition);
-        double deltaTime = (currentTime - lastTime)/1.0E9;//in seconds, duh
+        distanceBuffer[bufferIndex] = distance;
+        timeBuffer[bufferIndex] = currentTime;
 
-        double speed = distance/deltaTime;
+        int nextBufferIndex = nextBufferIndex();
+
+        double deltaDistance = distance - distanceBuffer[nextBufferIndex];
+        long deltaTime = currentTime - timeBuffer[nextBufferIndex];
+
+        double speed = deltaDistance * 1000/(double)deltaTime;
+
         double direction = lastPosition.angleTo(position);
-
         velocity.setVelocity(speed,direction);
 
-        //lastPosition = new Position(position.x,position.y,position.heading);
         lastPosition.copyFrom(position);
-        lastTime = currentTime;
 
-        logger.append("distance", String.valueOf(distance));
-        logger.append("deltaTime", String.valueOf(deltaTime));
-        logger.append("speed", String.valueOf(speed));
-        logger.writeLine();
+        bufferIndex = nextBufferIndex(); //iterate bufferIndex
     }
 
     public Position getPosition(){
@@ -179,6 +188,14 @@ public class OdometrySystemImpl implements OdometrySystem{
 
     public boolean isRunning(){
         return odometerThread.running;
+    }
+
+    private int nextBufferIndex(){
+        if(bufferIndex == BUFFER_SIZE - 1){
+            return 0;
+        } else {
+            return bufferIndex + 1;
+        }
     }
 
 
