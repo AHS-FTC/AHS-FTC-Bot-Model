@@ -47,7 +47,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1","x2");
+        logger = new Logger("sensorStats", "x1", "x2", "distance", "deltaTime", "speed");
     }
 
     /**
@@ -56,6 +56,7 @@ public class OdometrySystemImpl implements OdometrySystem{
     public void start(){
         resetEncoders();
         odometerThread.start();
+        logger.startWriting();
     }
   
     public void stop(){
@@ -88,6 +89,8 @@ public class OdometrySystemImpl implements OdometrySystem{
         double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
+
+        long currentTime = System.nanoTime(); //Calculate time immediately before getting readings from odometry
 
         //set readings from odom
         x1Reading = x1.getDistance();
@@ -142,14 +145,14 @@ public class OdometrySystemImpl implements OdometrySystem{
         logger.append("x1", String.valueOf(x1Reading));
         logger.append("x2", String.valueOf(x2Reading));
 
-        updateVelocity();
+
+        updateVelocity(currentTime);
     }
 
-    private void updateVelocity(){
-        long currentTime = FTCUtilities.getCurrentTimeMillis();
+    private void updateVelocity(long currentTime){
 
         double distance = position.distanceTo(lastPosition);
-        double deltaTime = (currentTime - lastTime)/1000.0;//in seconds, duh
+        double deltaTime = (currentTime - lastTime)/1.0E9;//in seconds, duh
 
         double speed = distance/deltaTime;
         double direction = lastPosition.angleTo(position);
@@ -159,6 +162,11 @@ public class OdometrySystemImpl implements OdometrySystem{
         //lastPosition = new Position(position.x,position.y,position.heading);
         lastPosition.copyFrom(position);
         lastTime = currentTime;
+
+        logger.append("distance", String.valueOf(distance));
+        logger.append("deltaTime", String.valueOf(deltaTime));
+        logger.append("speed", String.valueOf(speed));
+        logger.writeLine();
     }
 
     public Position getPosition(){

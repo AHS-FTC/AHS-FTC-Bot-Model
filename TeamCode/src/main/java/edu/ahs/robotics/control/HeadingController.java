@@ -1,10 +1,12 @@
 package edu.ahs.robotics.control;
 
+import edu.ahs.robotics.control.pid.PID;
 import edu.ahs.robotics.util.Logger;
 
 public class HeadingController {
     Path path;
     Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedError", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed");
+    private PID speedPID;
     private double minRampDown;
     private double minRampUp;
     private double maxVelocity;
@@ -12,7 +14,7 @@ public class HeadingController {
     private double leftPower = 0.0;
     private double rightPower = 0.0;
     //Correction values
-    private static final double SPEED_SCALE = .004;
+//    private static final double SPEED_SCALE = .004;
     private static final double TURN_SCALE = .01;
     public static final double LOOK_AHEAD_SCALE = 0.2;
 
@@ -23,6 +25,8 @@ public class HeadingController {
         this.maxVelocity = maxVelocity;
         this.maxPower = maxPower;
 
+        speedPID = new PID(.003, .00005, .001);
+
         logger.startWriting();
     }
 
@@ -32,16 +36,20 @@ public class HeadingController {
         if (!targetLocation.pathFinished) {
             double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
 
-            double speedError = targetSpeed - robotVelocity.speed;
+            /*double speedError = targetSpeed - robotVelocity.speed;
 
             leftPower += speedError * SPEED_SCALE;
-            rightPower += speedError * SPEED_SCALE;
+            rightPower += speedError * SPEED_SCALE;*/
+
+            double speedCorrection = speedPID.getCorrection(robotVelocity.speed, targetSpeed);
+            leftPower += speedCorrection;
+            rightPower += speedCorrection;
 
             /*leftPower -= (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);
             rightPower += (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);*/
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
-            logger.append("speedError", String.valueOf(speedError));
+//            logger.append("speedError", String.valueOf(speedError));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
             logger.append("lookAheadDelta", String.valueOf(targetLocation.lookAheadDelta));
@@ -78,7 +86,7 @@ public class HeadingController {
 
     private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
         double upScale = 8; //Todo adjust
-        double downScale = 4; //Todo adjust
+        double downScale = 1; //Todo adjust
         double rampDown = Math.max(downScale * (distanceToEnd), minRampDown);
         double rampUp = Math.max(upScale * (distanceFromStart), minRampUp);
         return Math.min(rampDown, Math.min(rampUp, maxVelocity));
