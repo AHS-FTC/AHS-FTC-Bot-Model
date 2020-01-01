@@ -50,7 +50,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, odometrySystem.getPosition().heading, Math.PI/2);
         assertEquals(0, odometrySystem.getPosition().x, 0.0);
 
-        assertEquals(0,odometrySystem.getVelocity().speed,0.0);
+        assertEquals(0,odometrySystem.getVelocity().speed(),0.0);
     }
 
     @Test
@@ -68,8 +68,8 @@ public class OdometrySystemImplTest {
         assertEquals(Math.PI/2, odometrySystem.getPosition().heading, .01);
         assertEquals(0, odometrySystem.getPosition().x, .01);
 
-        assertTrue(odometrySystem.getVelocity().speed > 0);
-        assertEquals(odometrySystem.getVelocity().direction, Math.PI / 2,0.001);
+        assertTrue(odometrySystem.getVelocity().speed() > 0);
+        assertEquals(odometrySystem.getVelocity().direction(), Math.PI / 2,0.001);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
 
-        assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
+        assertEquals(0,odometrySystem.getVelocity().speed(), 0.01);
 
     }
 
@@ -134,7 +134,7 @@ public class OdometrySystemImplTest {
         assertEquals(12, odometrySystem.getPosition().x, .01);
         assertEquals(12, odometrySystem.getPosition().y, .01);
       
-        assertEquals(Math.PI/4, odometrySystem.getVelocity().direction,0.001);
+        assertEquals(Math.PI/4, odometrySystem.getVelocity().direction(),0.001);
 
     }
 
@@ -153,7 +153,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, odometrySystem.getPosition().x, .01);
         assertEquals(0, odometrySystem.getPosition().y, .01);
 
-        assertEquals(0,odometrySystem.getVelocity().speed, 0.01);
+        assertEquals(0,odometrySystem.getVelocity().speed(), 0.01);
     }
 
     @Test
@@ -185,8 +185,8 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
             velocity = odometrySystem.getVelocity();
 
-            assertEquals(2,velocity.speed, 0.0001);
-            assertEquals(0,velocity.direction, 0.0001);
+            assertEquals(2,velocity.speed(), 0.0001);
+            assertEquals(0,velocity.direction(), 0.0001);
         }
 
     }

@@ -3,12 +3,14 @@ package edu.ahs.robotics.control;
 import java.util.ArrayList;
 
 import edu.ahs.robotics.control.pid.PID;
+import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.ParameterLookup;
 import edu.ahs.robotics.util.Tuner;
 
 public class HeadingController {
     Path path;
-    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "actualSpeed");
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath");
     private PID speedPID;
     private double minRampDownSpeed;
     private double minRampUpSpeed;
@@ -16,6 +18,7 @@ public class HeadingController {
     private double maxPower;
     private double leftPower = .5;
     private double rightPower = .5;
+
     //Correction values
 //    private static final double SPEED_SCALE = .001;
     private static final double TURN_SCALE = .01;
@@ -28,8 +31,10 @@ public class HeadingController {
         this.maxVelocity = maxVelocity;
         this.maxPower = maxPower;
 
-        double pCoeff = Tuner.tuningParams.get(Tuner.Vals.P);
-        double dCoeff = Tuner.tuningParams.get(Tuner.Vals.D);
+        ParameterLookup lookup = FTCUtilities.getParameterLookup();
+
+        double pCoeff = lookup.getParameter("p");
+        double dCoeff = lookup.getParameter("d");
         speedPID = new PID(pCoeff, 0.0, dCoeff); //i .00005, d .001
 
         logger.startWriting();
@@ -41,18 +46,10 @@ public class HeadingController {
         if (!targetLocation.pathFinished) {
             double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
 
-            /*double speedError = targetSpeed - robotVelocity.speed;
+            double speedAlongPath = (robotVelocity.dx * targetLocation.pathDeltaX) + (robotVelocity.dy * targetLocation.pathDeltaY);
+            speedAlongPath /= targetLocation.pathSegmentLength;
 
-            leftPower += speedError * SPEED_SCALE;
-            rightPower += speedError * SPEED_SCALE;*/
-
-            double vDeltaX = Math.cos(robotVelocity.direction) * robotVelocity.speed;
-            double vDeltaY = Math.sin(robotVelocity.direction) * robotVelocity.speed;
-
-            double actualSpeed = (vDeltaX * targetLocation.pathDeltaX) + (vDeltaY * targetLocation.pathDeltaY);
-            actualSpeed /= targetLocation.pathSegmentLength;
-
-            double speedCorrection = speedPID.getCorrection(actualSpeed, targetSpeed);
+            double speedCorrection = speedPID.getCorrection(speedAlongPath, targetSpeed);
             leftPower += speedCorrection;
             rightPower += speedCorrection;
 
@@ -61,7 +58,7 @@ public class HeadingController {
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
             logger.append("speedCorrection", String.valueOf(speedCorrection));
-            logger.append("actualSpeed", String.valueOf(actualSpeed));
+            logger.append("speedAlongPath", String.valueOf(speedAlongPath));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
             logger.append("lookAheadDelta", String.valueOf(targetLocation.lookAheadDelta));
@@ -70,7 +67,7 @@ public class HeadingController {
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
             logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
             logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
-            logger.append("robotSpeed", String.valueOf(robotVelocity.speed));
+            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));

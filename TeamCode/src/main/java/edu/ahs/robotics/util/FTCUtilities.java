@@ -35,6 +35,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     private static Map <String, DcMotor>testMotors = new HashMap();
     private static Map <String, Odometer>testOdometers = new HashMap();
     private static MockClock mockClock;
+    private static ParameterLookup parameterLookup;
 
 
     public static String getLogDirectory(){
@@ -171,7 +172,13 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         }
     }
 
+    public static ParameterLookup getParameterLookup() {
+        return parameterLookup;
+    }
 
+    public static void setParameterLookup(ParameterLookup parameterLookup) {
+        FTCUtilities.parameterLookup = parameterLookup;
+    }
 
     public static void setMockClock(MockClock mockClock){
         FTCUtilities.mockClock = mockClock;

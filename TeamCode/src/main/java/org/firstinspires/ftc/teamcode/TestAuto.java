@@ -56,6 +56,7 @@ public class TestAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
+    private Tuner tuner;
     private ArdennesSkyStoneDetector detector;
     private TriggerDistanceSensor intakeTrigger;
 
@@ -64,6 +65,8 @@ public class TestAuto extends LinearOpMode {
 
         FTCUtilities.setOpMode(this);
         MotorHashService.init();
+        tuner = new Tuner();
+        FTCUtilities.setParameterLookup(tuner);
         ardennes = new Ardennes();
         detector = new ArdennesSkyStoneDetector(false, true);
 //        Intake intake = ardennes.getIntake();
@@ -81,12 +84,7 @@ public class TestAuto extends LinearOpMode {
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);*/
 
-
-        ArrayList<Tuner.Vals> tuningValues = new ArrayList<>();
-        tuningValues.add(Tuner.Vals.P);
-        tuningValues.add(Tuner.Vals.D);
-
-        Tuner.start(tuningValues);
+        tuner.start("p", "d");
 
         waitForStart();
         ArrayList<Point> points = new ArrayList<>();
@@ -94,7 +92,6 @@ public class TestAuto extends LinearOpMode {
         points.add(new Point(60,0));
         Path path = new Path(points);
         chassis.startOdometrySystem();
-
 
         chassis.followPath(path);
 

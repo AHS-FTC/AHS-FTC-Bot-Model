@@ -45,7 +45,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         this.y = y;
 
         position = new Position(0,0,0);
-        velocity = Velocity.makeVelocity(0,0);
+        velocity = Velocity.makeVelocityFromSpeedDirection(0,0);
         lastPosition = new Position(0,0,0);
 
         this.yInchesPerDegree = yInchesPerDegree;
@@ -54,6 +54,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         odometerThread = new OdometerThread();
 
         logger = new Logger("sensorStats", "x1","x2","speed");
+        logger.startWriting();
 
         Arrays.fill(distanceBuffer,0.0);
         Arrays.fill(timeBuffer,0);
@@ -65,7 +66,6 @@ public class OdometrySystemImpl implements OdometrySystem{
     public void start(){
         resetEncoders();
         odometerThread.start();
-        logger.startWriting();
     }
   
     public void stop(){
@@ -93,7 +93,7 @@ public class OdometrySystemImpl implements OdometrySystem{
     /**
      * Runs central odom math, called continuously by thread and accessible in package for unit testing
      */
-    void updatePosition() {
+    synchronized void updatePosition() {
         double x1Reading,x2Reading, yReading;
         double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
@@ -182,11 +182,11 @@ public class OdometrySystemImpl implements OdometrySystem{
         logger.writeLine();
     }
 
-    public Position getPosition(){
+    public synchronized Position getPosition(){
         return position;
     }
 
-    public Velocity getVelocity() {
+    public synchronized Velocity getVelocity() {
         return velocity;
     }
 

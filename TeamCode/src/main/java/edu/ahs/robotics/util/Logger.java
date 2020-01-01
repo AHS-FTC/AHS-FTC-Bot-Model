@@ -146,6 +146,10 @@ public class Logger {
     }
 
     public void append(String category, String data) {
-        entriesByCategory.get(category).add(data);
+        ArrayList<String> dataList = entriesByCategory.get(category);
+        if (dataList == null) {
+            throw new Error("Logger.append invoked with unknown category : " + category);
+        }
+        dataList.add(data);
     }
 }
