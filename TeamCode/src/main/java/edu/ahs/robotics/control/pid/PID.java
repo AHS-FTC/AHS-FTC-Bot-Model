@@ -45,4 +45,11 @@ public class PID {
 
        return correction;
     }
+
+    /**
+     * Removes integral values for cases in which application changes
+     */
+    public void trashIntegral(){
+        errorSum = 0;
+    }
 }
