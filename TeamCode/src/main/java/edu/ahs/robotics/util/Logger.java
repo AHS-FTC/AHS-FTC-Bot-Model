@@ -49,6 +49,7 @@ public class Logger {
     private String[] categories;
     private Map<String, ArrayList<String>> entriesByCategory;
     private int lastLine = 0;
+    private long startTime;
 
 
     public Logger(String fileName, String... cats){
@@ -74,7 +75,9 @@ public class Logger {
             }
             file.createNewFile();
             csvWriter = new FileWriter(file);
+            startTime = System.currentTimeMillis();
 
+            csvWriter.append("Time, ");
              for(int i = 0; i < categories.length; i ++){ // write the categories first
                 csvWriter.append(categories[i]);
                 if( i< categories.length - 1){
@@ -93,11 +96,15 @@ public class Logger {
 
     public void writeLine(){
         try {
+            csvWriter.append(String.valueOf(System.currentTimeMillis() - startTime) + ", ");
             for (int i = 0; i < categories.length; i++) {
                 String category = categories[i];
                 List<String> list = entriesByCategory.get(category);
-                String data = list.get(lastLine);
-                csvWriter.append(data);
+                if (lastLine < list.size()) {
+                    csvWriter.append(list.get(lastLine));
+                } else {
+                    csvWriter.append(" ");
+                }
                 if (i < categories.length - 1) {
                     csvWriter.append(", ");
                 }
@@ -139,6 +146,10 @@ public class Logger {
     }
 
     public void append(String category, String data) {
-        entriesByCategory.get(category).add(data);
+        ArrayList<String> dataList = entriesByCategory.get(category);
+        if (dataList == null) {
+            throw new Error("Logger.append invoked with unknown category : " + category);
+        }
+        dataList.add(data);
     }
 }

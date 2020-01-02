@@ -3,20 +3,30 @@ package edu.ahs.robotics.control;
 import java.util.ArrayList;
 
 public class Path {
+    public static final double LOOK_AHEAD_DISTANCE = 6.0;
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
-    /* Package visible for testing*/ int iFirstBoundingPoint = 0;
 
-    public Path(ArrayList<Point> points) {
+
+    /* Package visible for testing*/ int iFirstBoundingPoint = 0;
+    private double minRampUpSpeed;
+    private double minRampDownSpeed;
+    private double maxVelocity;
+
+    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity) {
         pointAtDistance = new ArrayList<>();
-        pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0));
+        pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0, 0));
+
+        this.minRampUpSpeed = minRampUpSpeed;
+        this.minRampDownSpeed = minRampDownSpeed;
+        this.maxVelocity = maxVelocity;
 
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);
             Point previous = points.get(i - 1);
             double distanceFromPrevious = current.distanceTo(previous);
             totalDistance += distanceFromPrevious;
-            pointAtDistance.add(new PointAtDistance(current, totalDistance, current.x - previous.x, current.y - previous.y));
+            pointAtDistance.add(new PointAtDistance(current, totalDistance, current.x - previous.x, current.y - previous.y, distanceFromPrevious));
         }
     }
 
@@ -53,8 +63,11 @@ public class Path {
         loc.closestPoint = pathLine.getClosestPointOnLine(robotPosition);
 
         //Calculate distance to end and distance from start of path
-        loc.distanceToEnd = (totalDistance - second.distance) + loc.closestPoint.distanceTo(second);
-        loc.distanceFromStart = second.distance - loc.closestPoint.distanceTo(second);
+        loc.distanceToEnd = (totalDistance - second.distanceFromStart) + loc.closestPoint.distanceTo(second);
+        loc.distanceFromStart = second.distanceFromStart - loc.closestPoint.distanceTo(second);
+
+        //Set lookAheadDelta based on location
+        setLookAheadDelta(loc);
 
         //Objective: Find distance to robot from path
         //Note: Positive distances are to the right of the path and negative are to the left
@@ -70,7 +83,44 @@ public class Path {
         double pathVectorLength = Math.sqrt(Math.pow(loc.pathDeltaX, 2) + Math.pow(loc.pathDeltaY, 2));
         loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY)) / pathVectorLength;
 
+        //Calculate speed at location
+        loc.speed = getTargetSpeed(loc.distanceFromStart, loc.distanceToEnd);
+
         return loc;
+    }
+
+    private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
+        double upScale = 2; //Todo adjust
+        double downScale = 1; //Todo adjust
+        double rampDown = (downScale * distanceToEnd) + minRampDownSpeed;
+        double rampUp = (upScale * distanceFromStart) + minRampUpSpeed;
+        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
+    }
+
+    /**
+     * Given a location, look through points after your second bounding point to find a distance that is at least LOOK_AHEAD_DISTANCE away.
+     * Then find the sine of the angle between the 2 segments. Positive is right of line, negative is left.
+     * @param loc
+     */
+    private void setLookAheadDelta(Location loc) {
+        double distanceToNext;
+        PointAtDistance second = getPoint(iFirstBoundingPoint + 1);
+        PointAtDistance ahead = second;
+
+        for (int i = iFirstBoundingPoint + 1; i < pointAtDistance.size(); i++) {
+            ahead = getPoint(i);
+            distanceToNext = loc.closestPoint.distanceTo(ahead);
+            if (distanceToNext >= LOOK_AHEAD_DISTANCE) {
+                break;
+            }
+        }
+
+        //Find the perpendicular line to your current path segment for sine
+        double pX = loc.pathDeltaY;
+        double pY = -loc.pathDeltaX;
+
+        double delta = (pX * ahead.pathDeltaX) + (pY * ahead.pathDeltaY);
+        loc.lookAheadDelta = delta / (second.distanceToPrevious * ahead.distanceToPrevious);
     }
 
     /**
@@ -96,20 +146,22 @@ public class Path {
     }
 
     public static class PointAtDistance extends Point {
-        private double distance;
+        private double distanceFromStart;
         private double pathDeltaX;
         private double pathDeltaY;
+        private double distanceToPrevious;
 
-        public PointAtDistance(double x, double y, double distance, double pathDeltaX, double pathDeltaY) {
+        public PointAtDistance(double x, double y, double distanceFromStart, double pathDeltaX, double pathDeltaY, double distanceToPrevious) {
             super(x, y);
-            this.distance = distance;
+            this.distanceFromStart = distanceFromStart;
             this.pathDeltaX = pathDeltaX;
             this.pathDeltaY = pathDeltaY;
+            this.distanceToPrevious= distanceToPrevious;
 
         }
 
-        public PointAtDistance(Point p, double distance, double pathDeltaX, double pathDeltaY) {
-            this(p.x, p.y, distance, pathDeltaX, pathDeltaY);
+        public PointAtDistance(Point p, double distanceFromStart, double pathDeltaX, double pathDeltaY, double distanceToPrevious) {
+            this(p.x, p.y, distanceFromStart, pathDeltaX, pathDeltaY, distanceToPrevious);
         }
 
     }
@@ -122,11 +174,15 @@ public class Path {
         public double distanceFromStart;
         public double distanceToRobot;
         public boolean pathFinished;
+        public double lookAheadDelta;
+        public double pathSegmentLength;
+        public double speed;
 
         public Location(PointAtDistance pointAtDistance) {
             pathFinished = false;
             pathDeltaX = pointAtDistance.pathDeltaX;
             pathDeltaY = pointAtDistance.pathDeltaY;
+            pathSegmentLength = pointAtDistance.distanceToPrevious;
         }
     }
 

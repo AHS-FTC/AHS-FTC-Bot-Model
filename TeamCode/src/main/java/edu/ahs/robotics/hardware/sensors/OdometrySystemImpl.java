@@ -53,7 +53,8 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1","x2");
+        logger = new Logger("sensorStats", "x1","x2","speed");
+        logger.startWriting();
 
         Arrays.fill(distanceBuffer,0.0);
         Arrays.fill(timeBuffer,0);
@@ -97,6 +98,8 @@ public class OdometrySystemImpl implements OdometrySystem{
         double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
+
+        long currentTime = FTCUtilities.getCurrentTimeMillis();
 
         //set readings from odom
         x1Reading = x1.getDistance();
@@ -148,11 +151,10 @@ public class OdometrySystemImpl implements OdometrySystem{
         logger.append("x1", String.valueOf(x1Reading));
         logger.append("x2", String.valueOf(x2Reading));
 
-        updateVelocity();
+        updateVelocity(currentTime);
     }
 
-    private void updateVelocity(){
-        long currentTime = FTCUtilities.getCurrentTimeMillis();
+    private void updateVelocity(long currentTime){
         double distanceTraveled = position.distanceTo(lastPosition); //distance travelled between last point and this point
         distance += distanceTraveled; // running sum of distances
 
@@ -172,6 +174,9 @@ public class OdometrySystemImpl implements OdometrySystem{
         lastPosition.copyFrom(position);
 
         bufferIndex = nextBufferIndex(); //iterate bufferIndex
+
+        logger.append("speed", String.valueOf(speed));
+        logger.writeLine();
     }
 
     public synchronized Position getPosition(){

@@ -1,68 +1,94 @@
 package edu.ahs.robotics.control;
 
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.Trigger;
-import edu.ahs.robotics.seasonrobots.Ardennes;
+import java.util.ArrayList;
+
+import edu.ahs.robotics.control.pid.PID;
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.ParameterLookup;
+import edu.ahs.robotics.util.Tuner;
 
 public class HeadingController {
     Path path;
-    private double minRampDown;
-    private double minRampUp;
-    private double maxVelocity;
-    private double leftPower = 0;
-    private double rightPower = 0;
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "correctionP", "correctionI", "correctionD", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath");
+    private PID speedPID;
+    private double maxPower;
+    private double leftPower = .6;
+    private double rightPower = .6;
+
     //Correction values
-    private static final double SPEED_SCALE = .01;
+//    private static final double SPEED_SCALE = .001;
     private static final double TURN_SCALE = .01;
+    public static final double LOOK_AHEAD_SCALE = 0.2;
 
-    public HeadingController(Path path, double minRampDown, double minRampUp, double maxVelocity) {
+    public HeadingController(Path path, double maxPower) {
         this.path = path;
-        this.minRampDown = minRampDown;
-        this.minRampUp = minRampUp;
-        this.maxVelocity = maxVelocity;
+        this.maxPower = maxPower;
+
+        ParameterLookup lookup = FTCUtilities.getParameterLookup();
+
+        double pCoeff = lookup.getParameter("p");
+        double dCoeff = lookup.getParameter("d");
+        speedPID = new PID(pCoeff, 0.0, dCoeff); //i .00005, d .001
+
+        logger.startWriting();
     }
-
-    //P controller corrects for target point
-
-    //I controller smoothes
-
-    //D controller will look a number of points ahead to determine correction
-
 
     public Powers getUpdatedPowers(Position robotPosition, Velocity robotVelocity) {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
         if (!targetLocation.pathFinished) {
-            double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
+            double targetSpeed = targetLocation.speed;
 
-            double speedError = targetSpeed - robotVelocity.speed();
+            double speedAlongPath = (robotVelocity.dx * targetLocation.pathDeltaX) + (robotVelocity.dy * targetLocation.pathDeltaY);
+            speedAlongPath /= targetLocation.pathSegmentLength;
 
-            leftPower += speedError * SPEED_SCALE;
-            rightPower += speedError * SPEED_SCALE;
+            PID.Corrections corrections = speedPID.getCorrection(speedAlongPath, targetSpeed);
+            double speedCorrection = corrections.totalCorrection;
+            leftPower += speedCorrection;
+            rightPower += speedCorrection;
 
-            leftPower -= targetLocation.distanceToRobot * TURN_SCALE;
-            rightPower += targetLocation.distanceToRobot * TURN_SCALE;
+            /*leftPower -= (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);
+            rightPower += (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);*/
 
-            //Clip powers to 1 by maximum power
-            double maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
-            if (maxPower > 1.0) {
-                leftPower = leftPower / maxPower;
-                rightPower = rightPower / maxPower;
+            logger.append("targetSpeed", String.valueOf(targetSpeed));
+            logger.append("speedCorrection", String.valueOf(speedCorrection));
+            logger.append("correctionP", String.valueOf(corrections.correctionP));
+            logger.append("correctionI", String.valueOf(corrections.correctionI));
+            logger.append("correctionD", String.valueOf(corrections.correctionD));
+            logger.append("speedAlongPath", String.valueOf(speedAlongPath));
+            logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
+            logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
+            logger.append("lookAheadDelta", String.valueOf(targetLocation.lookAheadDelta));
+            logger.append("robotPositionX", String.valueOf(robotPosition.x));
+            logger.append("robotPositionY", String.valueOf(robotPosition.y));
+            logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
+            logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
+            logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
+            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
+
+            //Clip powers to maxPower by higher power
+            double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
+            if (higherPower > maxPower) {
+                leftPower = (leftPower / higherPower) * maxPower;
+                rightPower = (rightPower / higherPower) * maxPower;
             }
+
         } else {
             leftPower = 0.0;
             rightPower = 0.0;
         }
 
-        return new Powers(leftPower, rightPower, targetLocation.pathFinished);
-    }
+        logger.append("leftPower", String.valueOf(leftPower));
+        logger.append("rightPower", String.valueOf(rightPower));
+        logger.append("isFinished", String.valueOf(targetLocation.pathFinished));
+        logger.writeLine();
 
-    private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
-        double upScale = 1; //Todo adjust
-        double downScale = 1; //Todo adjust
-        double rampDown = Math.max(downScale * (distanceToEnd), minRampDown);
-        double rampUp = Math.max(upScale * (distanceFromStart), minRampUp);
-        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
+        if (targetLocation.pathFinished) {
+            logger.stopWriting();
+        }
+
+        return new Powers(leftPower, rightPower, targetLocation.pathFinished);
     }
 
     public static class Powers {
