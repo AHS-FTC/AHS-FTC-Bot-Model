@@ -6,11 +6,20 @@ public class Path {
     public static final double LOOK_AHEAD_DISTANCE = 6.0;
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
-    /* Package visible for testing*/ int iFirstBoundingPoint = 0;
 
-    public Path(ArrayList<Point> points) {
+
+    /* Package visible for testing*/ int iFirstBoundingPoint = 0;
+    private double minRampUpSpeed;
+    private double minRampDownSpeed;
+    private double maxVelocity;
+
+    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity) {
         pointAtDistance = new ArrayList<>();
         pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0, 0));
+
+        this.minRampUpSpeed = minRampUpSpeed;
+        this.minRampDownSpeed = minRampDownSpeed;
+        this.maxVelocity = maxVelocity;
 
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);
@@ -74,7 +83,18 @@ public class Path {
         double pathVectorLength = Math.sqrt(Math.pow(loc.pathDeltaX, 2) + Math.pow(loc.pathDeltaY, 2));
         loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY)) / pathVectorLength;
 
+        //Calculate speed at location
+        loc.speed = getTargetSpeed(loc.distanceFromStart, loc.distanceToEnd);
+
         return loc;
+    }
+
+    private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
+        double upScale = 2; //Todo adjust
+        double downScale = 1; //Todo adjust
+        double rampDown = (downScale * distanceToEnd) + minRampDownSpeed;
+        double rampUp = (upScale * distanceFromStart) + minRampUpSpeed;
+        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
     }
 
     /**
@@ -156,6 +176,7 @@ public class Path {
         public boolean pathFinished;
         public double lookAheadDelta;
         public double pathSegmentLength;
+        public double speed;
 
         public Location(PointAtDistance pointAtDistance) {
             pathFinished = false;

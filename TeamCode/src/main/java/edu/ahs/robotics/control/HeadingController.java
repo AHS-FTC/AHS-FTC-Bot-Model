@@ -10,25 +10,19 @@ import edu.ahs.robotics.util.Tuner;
 
 public class HeadingController {
     Path path;
-    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath");
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "correctionP", "correctionI", "correctionD", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath");
     private PID speedPID;
-    private double minRampDownSpeed;
-    private double minRampUpSpeed;
-    private double maxVelocity;
     private double maxPower;
-    private double leftPower = .5;
-    private double rightPower = .5;
+    private double leftPower = .6;
+    private double rightPower = .6;
 
     //Correction values
 //    private static final double SPEED_SCALE = .001;
     private static final double TURN_SCALE = .01;
     public static final double LOOK_AHEAD_SCALE = 0.2;
 
-    public HeadingController(Path path, double minRampDownSpeed, double minRampUpSpeed, double maxVelocity, double maxPower) {
+    public HeadingController(Path path, double maxPower) {
         this.path = path;
-        this.minRampDownSpeed = minRampDownSpeed;
-        this.minRampUpSpeed = minRampUpSpeed;
-        this.maxVelocity = maxVelocity;
         this.maxPower = maxPower;
 
         ParameterLookup lookup = FTCUtilities.getParameterLookup();
@@ -44,12 +38,13 @@ public class HeadingController {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
         if (!targetLocation.pathFinished) {
-            double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
+            double targetSpeed = targetLocation.speed;
 
             double speedAlongPath = (robotVelocity.dx * targetLocation.pathDeltaX) + (robotVelocity.dy * targetLocation.pathDeltaY);
             speedAlongPath /= targetLocation.pathSegmentLength;
 
-            double speedCorrection = speedPID.getCorrection(speedAlongPath, targetSpeed);
+            PID.Corrections corrections = speedPID.getCorrection(speedAlongPath, targetSpeed);
+            double speedCorrection = corrections.totalCorrection;
             leftPower += speedCorrection;
             rightPower += speedCorrection;
 
@@ -58,6 +53,9 @@ public class HeadingController {
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
             logger.append("speedCorrection", String.valueOf(speedCorrection));
+            logger.append("correctionP", String.valueOf(corrections.correctionP));
+            logger.append("correctionI", String.valueOf(corrections.correctionI));
+            logger.append("correctionD", String.valueOf(corrections.correctionD));
             logger.append("speedAlongPath", String.valueOf(speedAlongPath));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
@@ -91,14 +89,6 @@ public class HeadingController {
         }
 
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);
-    }
-
-    private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
-        double upScale = 2; //Todo adjust
-        double downScale = 1; //Todo adjust
-        double rampDown = Math.max(downScale * (distanceToEnd), minRampDownSpeed);
-        double rampUp = Math.max(upScale * (distanceFromStart), minRampUpSpeed);
-        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
     }
 
     public static class Powers {

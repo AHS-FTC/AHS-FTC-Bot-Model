@@ -40,10 +40,10 @@ public class PointPID {
      * @return Correction class containing corrections in two dimensions.
      */
     public Correction getCorrection(Point current, Point target){
-        double xCorrection = xPID.getCorrection(current.x, target.x);
-        double yCorrection = yPID.getCorrection(current.y, target.y);
+        PID.Corrections xCorrection = xPID.getCorrection(current.x, target.x);
+        PID.Corrections yCorrection = yPID.getCorrection(current.y, target.y);
 
-        return new Correction(xCorrection, yCorrection);
+        return new Correction(xCorrection.totalCorrection, yCorrection.totalCorrection);
     }
 
     /**

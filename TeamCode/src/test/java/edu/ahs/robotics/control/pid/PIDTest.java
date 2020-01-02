@@ -11,31 +11,31 @@ public class PIDTest {
     public void testDerivative(){
         PID pid = new PID(0,0,1);
         pid.getCorrection(1,10); //large error
-        double correction = pid.getCorrection(9.9,10); //small error
+        PID.Corrections corrections = pid.getCorrection(9.9,10); //small error
 
-        assertTrue(correction < 0);
+        assertTrue(corrections.totalCorrection < 0);
     }
 
     @Test
     public void testNull(){
         PID pid = new PID(0,0,0);
-        double correction = pid.getCorrection(0,10);
+        PID.Corrections correction = pid.getCorrection(0,10);
 
-        assertEquals(0,correction,0);
+        assertEquals(0,correction.totalCorrection,0);
     }
 
 
     @Test
     public void testIntegral(){
         PID pid = new PID(0,1,0);
-        double initialCorrection = pid.getCorrection(0,1);
+        PID.Corrections initialCorrection = pid.getCorrection(0,1);
 
         pid.getCorrection(0,1);//wind up integral
         pid.getCorrection(0,1);
 
 
-        double correction = pid.getCorrection(0,10);
-        assertTrue(correction > initialCorrection);
+        PID.Corrections correction = pid.getCorrection(0,10);
+        assertTrue(correction.totalCorrection > initialCorrection.totalCorrection);
 
     }
 
@@ -43,10 +43,10 @@ public class PIDTest {
     public void testProportionality(){
         PID pid = new PID(1,0,0);
 
-        double bigCorrection = pid.getCorrection(0,10);
-        double smolCorrection = pid.getCorrection(5,10);
+        PID.Corrections bigCorrection = pid.getCorrection(0,10);
+        PID.Corrections smolCorrection = pid.getCorrection(5,10);
 
-        assertTrue(bigCorrection > smolCorrection);
+        assertTrue(bigCorrection.totalCorrection > smolCorrection.totalCorrection);
 
     }
 

@@ -13,7 +13,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
         points.add(new Point(4,2));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
 
         //Test at robot position 0
@@ -55,7 +55,7 @@ public class PathTest {
         points.add(new Point(3,3));
         points.add(new Point(5,3));
         points.add(new Point(6,6));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test at robot position 0
         Position robotPosition = new Position(0,0,0);
@@ -93,7 +93,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
         points.add(new Point(4,0));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position 2
         Position robotPosition = new Position(2,0,0);
@@ -117,7 +117,7 @@ public class PathTest {
         points.add(new Point(1,1));
         points.add(new Point(3,3));
         points.add(new Point(6,3));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test lookAhead at start
         Position robotPosition = new Position(1, 1, 0);
@@ -154,7 +154,7 @@ public class PathTest {
         points.add(new Point(-1,-1));
         points.add(new Point(-3,-3));
         points.add(new Point(-3,-6));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test lookAhead at start
         Position robotPosition = new Position(-1, -1, 0);
@@ -183,12 +183,16 @@ public class PathTest {
         assertTrue(targetLocation.pathFinished);
     }
 
+    private Path makePath(ArrayList<Point> points) {
+        return new Path(points, 12, 4, 36);
+    }
+
     @Test
     public void testGetDistanceToRobotBottomRightQuadrant() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(1,-1));
         points.add(new Point(3,-3));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position x = 2, y = -2, left of line
         Position robotPosition = new Position(4,0,0);
@@ -216,7 +220,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(-1,1));
         points.add(new Point(-3,3));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position x = 2, y = -2, left of line
         Position robotPosition = new Position(-4,0,0);
@@ -244,7 +248,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(-1,1));
         points.add(new Point(-3,5));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position x = -2, y = 3, left of line
         Position robotPosition = new Position(-4,2,0);
@@ -272,7 +276,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(-1,0));
         points.add(new Point(3,0));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position x = 2, y = 0, left of line
         Position robotPosition = new Position(2,2,0);
@@ -300,7 +304,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,-1));
         points.add(new Point(0,3));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position x = 0, y = 2, left of line
         Position robotPosition = new Position(-2,2,0);
@@ -328,7 +332,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position during path
         Position robotPosition = new Position(0, 2, 0);
@@ -355,7 +359,7 @@ public class PathTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         points.add(new Point(4,8));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position during path
         Position robotPosition = new Position(0, 0, 0);
@@ -370,7 +374,7 @@ public class PathTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         points.add(new Point(-4,8));
-        Path path = new Path(points);
+        Path path = makePath(points);
 
         //Test location at robot position during path
         Position robotPosition = new Position(0, 0, 0);

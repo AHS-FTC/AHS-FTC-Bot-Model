@@ -90,7 +90,7 @@ public class TestAuto extends LinearOpMode {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
         points.add(new Point(60,0));
-        Path path = new Path(points);
+        Path path = new Path(points, 12, 4, 36);
         chassis.startOdometrySystem();
 
         chassis.followPath(path);
