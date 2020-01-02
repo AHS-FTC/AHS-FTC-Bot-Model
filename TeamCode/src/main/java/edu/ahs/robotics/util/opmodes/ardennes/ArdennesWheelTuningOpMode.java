@@ -29,10 +29,16 @@
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
 
 
@@ -47,15 +53,18 @@ import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Odometery Wheel Tuner", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesWheelTuningOpMode extends OpMode
 {
     private DcMotor left, right, back;
     private static final double TICKS_PER_ROTATION = 1440;
+    private Odometer backOdom;
     private SimpleTeleOp tele;
+    private IMU imu;
 
     @Override
     public void init() {
+        FTCUtilities.setOpMode(this);
         left = hardwareMap.get(DcMotor.class,"intakeL");
         right = hardwareMap.get(DcMotor.class,"intakeR");
         back = hardwareMap.get(DcMotor.class,"BR");
@@ -72,6 +81,9 @@ public class ArdennesWheelTuningOpMode extends OpMode
         tele.hardwareMap = hardwareMap;
         tele.init();
         tele.gamepad1 = gamepad1;
+
+        backOdom = new OdometerImpl("BR",2.387, false, 4000);
+        imu = new IMU(hardwareMap.get(BNO055IMU.class, "imu"));
     }
 
     @Override
@@ -85,10 +97,12 @@ public class ArdennesWheelTuningOpMode extends OpMode
     @Override
     public void loop() {
         tele.loop();
-        telemetry.addData("Left Rotations", (left.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("Right Rotations", (right.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("Back Rotations", (back.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("back reading", back.getCurrentPosition());
+        //telemetry.addData("Left Rotations", (left.getCurrentPosition()/TICKS_PER_ROTATION));
+        //telemetry.addData("Right Rotations", (right.getCurrentPosition()/TICKS_PER_ROTATION));
+        //telemetry.addData("Back Rotations", (back.getCurrentPosition()/4000.0));
+        //telemetry.addData("back reading", back.getCurrentPosition());
+        telemetry.addData("imu reading", imu.getHeading());
+        telemetry.addData("odom reading", backOdom.getDistance());
         telemetry.update();
     }
     @Override

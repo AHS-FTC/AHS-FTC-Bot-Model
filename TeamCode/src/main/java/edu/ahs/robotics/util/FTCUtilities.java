@@ -159,7 +159,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         if(testMode){
             return testOdometers.get(deviceName);
         } else {
-            return new OdometerImpl(deviceName,wheelDiameter,flip);
+            return new OdometerImpl(deviceName,wheelDiameter,flip, 1440.0);
         }
     }
 

@@ -103,9 +103,6 @@ public class OdometrySystemImpl implements OdometrySystem{
         x2Reading = x2.getDistance();
         yReading = y.getDistance();
 
-        FTCUtilities.addData("x1",x1Reading);
-        FTCUtilities.addData("x2",x2Reading);
-
         //find deltas
         dx1 = x1Reading - x1Last;
         dx2 = x2Reading - x2Last;

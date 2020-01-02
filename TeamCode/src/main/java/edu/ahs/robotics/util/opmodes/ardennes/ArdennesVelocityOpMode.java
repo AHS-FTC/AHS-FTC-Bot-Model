@@ -29,6 +29,7 @@
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -45,7 +46,7 @@ import edu.ahs.robotics.util.opmodes.SimpleTankTeleOp;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes VelocityOpMode", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesVelocityOpMode extends OpMode
 {
     private Ardennes ardennes;

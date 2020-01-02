@@ -27,54 +27,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics.util.opmodes;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
-import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
 
 /**
- * Test OpMode for logging and debugging the OdometrySystemImpl.
+ * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
  * @author Alex Appleby
  */
-@TeleOp(name="Odometery OpMode", group="Iterative OpMode")
-@Disabled
-public class OdomOpMode extends OpMode
+@TeleOp(name="Ardennes Odometery OpMode", group="Iterative OpMode")
+//@Disabled
+public class ArdennesOdometryDebuggingOpMode extends OpMode
 {
-    //private Ardennes ardennes;
-    private OdometrySystemImpl odometrySystem;
     private Position position;
     private Velocity velocity;
     private double startTime;
     private Logger logger;
+    private Ardennes ardennes;
+    private MecanumChassis chassis;
 
     private double lastTime;
 
-    private SimpleTankTeleOp tele;
 
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
-        //ardennes = new Ardennes();
-
-        OdometerImpl x1 = new OdometerImpl("intakeL", 2.302383, false,1440); //tuned val
-        OdometerImpl x2 = new OdometerImpl("intakeR", 2.330675, true,1440); //tuned val
-        OdometerImpl y = new OdometerImpl("BR", 2.366, false,4000);
-        odometrySystem = new OdometrySystemImpl(x1,x2,y, 0,14.5);
-
-        logger = new Logger("odometry","x","y","heading","speed","dot","time");
-
-        tele = new SimpleTankTeleOp();
-        tele.hardwareMap = hardwareMap;
-        tele.gamepad1 = gamepad1;
-        tele.init();
+        ardennes = new Ardennes();
+        chassis = ardennes.getChassis();
     }
 
     @Override
@@ -85,17 +73,15 @@ public class OdomOpMode extends OpMode
     public void start() {
         lastTime = FTCUtilities.getCurrentTimeMillis();
         startTime = FTCUtilities.getCurrentTimeMillis();
-        odometrySystem.start();
+        chassis.startOdometrySystem();
     }
 
     @Override
     public void loop() {
-        tele.loop();
-
         double currentTime = FTCUtilities.getCurrentTimeMillis();
 
-        position = odometrySystem.getPosition();
-        velocity = odometrySystem.getVelocity();
+        position = chassis.getPosition();
+        velocity = chassis.getVelocity();
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);
@@ -110,15 +96,13 @@ public class OdomOpMode extends OpMode
         logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
         logger.append("speed", String.valueOf(velocity.speed()));
         logger.append("dot", String.valueOf(Math.toDegrees(velocity.direction())));
-        logger.append("time", String.valueOf(FTCUtilities.getCurrentTimeMillis() - startTime));
 
         lastTime = currentTime;
     }
     @Override
     public void stop() {
-        tele.stop();
         logger.stopWriting();
-        odometrySystem.stop();
+        chassis.stopOdometrySystem();
     }
 
 }

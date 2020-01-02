@@ -12,7 +12,7 @@ import edu.ahs.robotics.util.FTCUtilities;
 public class OdometerImpl implements Odometer {
     private DcMotor motor; //we use the crappy DcMotor class from FTC to access encoder values. Kind of a hack, but that's how it be.
     private double wheelCircumference;// in inches, used to be in mm
-    private final double TICKS_PER_ROTATION = 1440; //specific to our S4T encoders. May be in need of change for other S4T models or different encoders.
+    private double ticksPerRotation; //specific to our S4T encoders. May be in need of change for other S4T models or different encoders.
     private int direction = 1; //enables flip. only 1 or -1. //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
 
     /**
@@ -20,13 +20,14 @@ public class OdometerImpl implements Odometer {
      * @param wheelDiameter The diameter of the odometer wheel in inches. Likely needs to be tuned to reflect tolerances of wheel.
      * @param flip Whether or not this returns flipped values. Probably determine this by experimentation.
      */
-    public OdometerImpl(String deviceName, double wheelDiameter, boolean flip) {
+    public OdometerImpl(String deviceName, double wheelDiameter, boolean flip, double ticksPerRotation) {
         motor = FTCUtilities.getMotor(deviceName);
         reset();
         wheelCircumference = wheelDiameter*Math.PI;
         if(flip){
             direction = -1;
         }
+        this.ticksPerRotation = ticksPerRotation;
     }
 
     /**
@@ -35,7 +36,7 @@ public class OdometerImpl implements Odometer {
     @Override
     public double getDistance(){
         int ticks = motor.getCurrentPosition();
-        double distance = (ticks*wheelCircumference)/TICKS_PER_ROTATION; // rotations / ticks per rotation but combined for optimization
+        double distance = (ticks*wheelCircumference)/ ticksPerRotation; // rotations / ticks per rotation but combined for optimization
         return direction*distance;
     }
 
@@ -49,7 +50,7 @@ public class OdometerImpl implements Odometer {
     }
     public double getRotations(){
         int ticks = motor.getCurrentPosition();
-        double rotations = ticks/TICKS_PER_ROTATION;
+        double rotations = ticks/ ticksPerRotation;
         return direction*rotations;
     }
 }
