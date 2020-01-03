@@ -44,7 +44,7 @@ import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
  * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Odometery OpMode", group="Iterative OpMode")
+@TeleOp(name="Ardennes Odometry OpMode", group="Iterative OpMode")
 //@Disabled
 public class ArdennesOdomOpMode extends OpMode
 {
