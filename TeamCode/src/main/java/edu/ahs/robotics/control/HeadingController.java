@@ -1,16 +1,14 @@
 package edu.ahs.robotics.control;
 
-import java.util.ArrayList;
-
 import edu.ahs.robotics.control.pid.PID;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.ParameterLookup;
-import edu.ahs.robotics.util.Tuner;
 
 public class HeadingController {
     Path path;
-    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "correctionP", "correctionI", "correctionD", "distanceToRobot", "distanceToEnd", "lookAheadDelta", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath");
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "correctionP", "correctionI", "correctionD", "distanceToRobot", "distanceToEnd", "lookAheadTurn", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath");
+    double downCorrectionScale;
     private PID speedPID;
     private double maxPower;
     private double leftPower = .6;
@@ -29,6 +27,7 @@ public class HeadingController {
 
         double pCoeff = lookup.getParameter("p");
         double dCoeff = lookup.getParameter("d");
+        downCorrectionScale = lookup.getParameter("down");
         speedPID = new PID(pCoeff, 0.0, dCoeff); //i .00005, d .001
 
         logger.startWriting();
@@ -38,18 +37,22 @@ public class HeadingController {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
         if (!targetLocation.pathFinished) {
-            double targetSpeed = targetLocation.speed;
+            double targetSpeed = targetLocation.lookAheadSpeed;
 
             double speedAlongPath = (robotVelocity.dx * targetLocation.pathDeltaX) + (robotVelocity.dy * targetLocation.pathDeltaY);
             speedAlongPath /= targetLocation.pathSegmentLength;
 
             PID.Corrections corrections = speedPID.getCorrection(speedAlongPath, targetSpeed);
             double speedCorrection = corrections.totalCorrection;
+            if (speedCorrection < 0) {
+                speedCorrection *= downCorrectionScale;
+            }
+
             leftPower += speedCorrection;
             rightPower += speedCorrection;
 
-            /*leftPower -= (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);
-            rightPower += (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadDelta * LOOK_AHEAD_SCALE);*/
+            /*leftPower -= (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadTurn * LOOK_AHEAD_SCALE);
+            rightPower += (targetLocation.distanceToRobot * TURN_SCALE) + (targetLocation.lookAheadTurn * LOOK_AHEAD_SCALE);*/
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
             logger.append("speedCorrection", String.valueOf(speedCorrection));
@@ -59,7 +62,7 @@ public class HeadingController {
             logger.append("speedAlongPath", String.valueOf(speedAlongPath));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
-            logger.append("lookAheadDelta", String.valueOf(targetLocation.lookAheadDelta));
+            logger.append("lookAheadTurn", String.valueOf(targetLocation.lookAheadTurn));
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));

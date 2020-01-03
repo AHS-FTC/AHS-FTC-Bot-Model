@@ -17,7 +17,7 @@ public class MecanumChassis extends Chassis {
 
     private static final double ROBOT_WIDTH = 333;
     public static final int MIN_TARGET_DISTANCE = 5;
-    public static final double DISTANCE_PER_360 = 1001;
+    public static final double DISTANCE_PER_360 = 39.40945;
     private static final double LEFT_INITIAL_SHIFT = 0;
     private static final double LEFT_INITIAL_SCALE = 1.02;
     private SingleDriveUnit frontLeft;
@@ -202,7 +202,7 @@ public class MecanumChassis extends Chassis {
             double powerRight = inversePower((rightTarget / maxTarget) * (minRampUp));
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeout) {
-                double leftDistance = -leftOdometer.getDistance();
+                double leftDistance = leftOdometer.getDistance();
                 double rightDistance = rightOdometer.getDistance();
 
                 double leftDistanceRatio = leftDistance / leftTarget;

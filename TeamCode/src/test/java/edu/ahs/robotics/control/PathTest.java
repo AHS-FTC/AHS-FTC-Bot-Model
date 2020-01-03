@@ -123,7 +123,7 @@ public class PathTest {
         Position robotPosition = new Position(1, 1, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
-        assertEquals(Math.cos(Math.PI/4.0), targetLocation.lookAheadDelta, .001);
+        assertEquals(Math.cos(Math.PI/4.0), targetLocation.lookAheadTurn, .001);
 
         //Test location at robot position x=2 y=2
         robotPosition = new Position(4,0,0);
@@ -160,7 +160,7 @@ public class PathTest {
         Position robotPosition = new Position(-1, -1, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
-        assertEquals(-Math.cos(Math.PI/4.0), targetLocation.lookAheadDelta, .001);
+        assertEquals(-Math.cos(Math.PI/4.0), targetLocation.lookAheadTurn, .001);
 
         //Test location at robot position x = -2, y = -2, left of line
         robotPosition = new Position(0,-4,0);
@@ -365,7 +365,7 @@ public class PathTest {
         Position robotPosition = new Position(0, 0, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
-        assertEquals(Math.cos(Math.PI/4.0), targetLocation.lookAheadDelta, .001);
+        assertEquals(Math.cos(Math.PI/4.0), targetLocation.lookAheadTurn, .001);
     }
 
     @Test
@@ -380,6 +380,6 @@ public class PathTest {
         Position robotPosition = new Position(0, 0, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
-        assertEquals(-Math.cos(Math.PI/4.0), targetLocation.lookAheadDelta, .001);
+        assertEquals(-Math.cos(Math.PI/4.0), targetLocation.lookAheadTurn, .001);
     }
 }
