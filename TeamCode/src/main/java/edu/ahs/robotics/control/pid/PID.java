@@ -77,4 +77,11 @@ public class PID {
         public double totalCorrection = 0;
 
     }
+
+    /**
+     * Removes integral values for cases in which application changes
+     */
+    public void trashIntegral(){
+        errorSum = 0;
+    }
 }

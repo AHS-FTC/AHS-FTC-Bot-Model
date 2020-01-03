@@ -42,8 +42,8 @@ public class OdometryTuningOpMode extends OpMode {
     }
 
     public void start(){
-        l = new OdometerImpl("intakeL", leftDiameter, false);
-        r = new OdometerImpl("intakeR", rightDiameter, true);
+        l = new OdometerImpl("intakeL", leftDiameter, false,1440);
+        r = new OdometerImpl("intakeR", rightDiameter, true,1440);
 
         l.reset();
         r.reset();

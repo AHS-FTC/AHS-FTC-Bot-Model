@@ -59,4 +59,14 @@ public class OdometrySystemMock implements OdometrySystem {
     public void setPosition(double x, double y, double heading){
         //literally nobody cares about this method
     }
+
+    @Override
+    public Odometer getX1Odometer() {
+        return null;
+    }
+
+    @Override
+    public Odometer getX2Odometer() {
+        return null;
+    }
 }

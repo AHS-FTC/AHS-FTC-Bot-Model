@@ -8,7 +8,7 @@ import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.control.pid.VelocityPID;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.control.Point;
@@ -33,9 +33,8 @@ public class MecanumChassis extends Chassis {
 
     private OdometrySystem odometrySystem;
 
-    private OdometerImpl leftOdometer;
-    private OdometerImpl rightOdometer;
-    private OdometerImpl backOdometer;
+    private Odometer leftOdometer;
+    private Odometer rightOdometer;
 
 
     public MecanumChassis(DriveUnit.Config driveUnitConfig, OdometrySystem odometrySystem) {
@@ -46,6 +45,8 @@ public class MecanumChassis extends Chassis {
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
         this.odometrySystem = odometrySystem;
+        leftOdometer = odometrySystem.getX1Odometer(); // this can easily change based on the definition of the x1 odometer
+        rightOdometer = odometrySystem.getX2Odometer();
     }
 
 //    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystemImpl odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {

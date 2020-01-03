@@ -19,4 +19,8 @@ public interface OdometrySystem {
     boolean isRunning();
 
     void setPosition(double x, double y, double heading);
+
+    Odometer getX1Odometer();
+
+    Odometer getX2Odometer();
 }

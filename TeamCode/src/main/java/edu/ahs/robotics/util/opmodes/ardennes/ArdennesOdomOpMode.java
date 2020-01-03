@@ -38,7 +38,7 @@ import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.opmodes.SimpleTankTeleOp;
+import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
 
 /**
  * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
@@ -59,7 +59,7 @@ public class ArdennesOdomOpMode extends OpMode
 
     private double lastTime;
 
-    private SimpleTankTeleOp tele;
+    private OpMode teleOp;
 
     @Override
     public void init() {
@@ -67,10 +67,10 @@ public class ArdennesOdomOpMode extends OpMode
         ardennes = new Ardennes();
         logger = new Logger("odometry","x","y","heading","speed","dot","time");
 
-        tele = new SimpleTankTeleOp();
-        tele.hardwareMap = hardwareMap;
-        tele.gamepad1 = gamepad1;
-        tele.init();
+        teleOp = new SimpleTeleOp();
+        teleOp.hardwareMap = hardwareMap;
+        teleOp.gamepad1 = gamepad1;
+        teleOp.init();
         chassis = ardennes.getChassis();
     }
 
@@ -87,7 +87,7 @@ public class ArdennesOdomOpMode extends OpMode
 
     @Override
     public void loop() {
-        tele.loop();
+        teleOp.loop();
 
         double currentTime = FTCUtilities.getCurrentTimeMillis();
 
@@ -113,7 +113,7 @@ public class ArdennesOdomOpMode extends OpMode
     }
     @Override
     public void stop() {
-        tele.stop();
+        teleOp.stop();
         logger.stopWriting();
         chassis.stopOdometrySystem();
     }

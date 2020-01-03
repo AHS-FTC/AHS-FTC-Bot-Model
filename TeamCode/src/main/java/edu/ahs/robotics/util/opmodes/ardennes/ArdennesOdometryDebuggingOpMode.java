@@ -27,54 +27,63 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics.util.opmodes;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
-import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
 
 /**
- * Test OpMode for logging and debugging the OdometrySystemImpl.
+ * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
  * @author Alex Appleby
  */
-@TeleOp(name="Odometery OpMode", group="Iterative OpMode")
-@Disabled
-public class OdomOpMode extends OpMode
+@TeleOp(name="Ardennes Odometery Debugging OpMode", group="Iterative OpMode")
+//@Disabled
+public class ArdennesOdometryDebuggingOpMode extends OpMode
 {
-    //private Ardennes ardennes;
-    private OdometrySystemImpl odometrySystem;
     private Position position;
     private Velocity velocity;
-    private double startTime;
+    private double startTime = 0;
     private Logger logger;
+    private Ardennes ardennes;
+    private MecanumChassis chassis;
+
+    private DcMotor fl,fr,bl,br;
 
     private double lastTime;
 
-    private SimpleTankTeleOp tele;
 
     @Override
     public void init() {
+        fl = hardwareMap.get(DcMotor.class, "FL");
+        fr = hardwareMap.get(DcMotor.class, "FR");
+        bl = hardwareMap.get(DcMotor.class, "BL");
+        br = hardwareMap.get(DcMotor.class, "BR");
+
+        fl.setDirection(DcMotorSimple.Direction.REVERSE);
+        fr.setDirection(DcMotorSimple.Direction.FORWARD);
+        bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        br.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         FTCUtilities.setOpMode(this);
-        //ardennes = new Ardennes();
-
-        OdometerImpl x1 = new OdometerImpl("intakeL", 2.302383, false,1440); //tuned val
-        OdometerImpl x2 = new OdometerImpl("intakeR", 2.330675, true,1440); //tuned val
-        OdometerImpl y = new OdometerImpl("BR", 2.366, false,4000);
-        odometrySystem = new OdometrySystemImpl(x1,x2,y, 0,14.5);
-
-        logger = new Logger("odometry","x","y","heading","speed","dot","time");
-
-        tele = new SimpleTankTeleOp();
-        tele.hardwareMap = hardwareMap;
-        tele.gamepad1 = gamepad1;
-        tele.init();
+        ardennes = new Ardennes();
+        chassis = ardennes.getChassis();
+        logger = new Logger("odometry","x","y","heading");
+        logger.startWriting();
     }
 
     @Override
@@ -85,40 +94,44 @@ public class OdomOpMode extends OpMode
     public void start() {
         lastTime = FTCUtilities.getCurrentTimeMillis();
         startTime = FTCUtilities.getCurrentTimeMillis();
-        odometrySystem.start();
+        chassis.startOdometrySystem();
     }
 
     @Override
     public void loop() {
-        tele.loop();
+
+        if(gamepad1.b){
+            fl.setPower(-0.5);
+            fr.setPower(0.5);
+            bl.setPower(0.5);
+            br.setPower(-0.5);
+        } else {
+            fl.setPower(0);
+            fr.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
+        }
 
         double currentTime = FTCUtilities.getCurrentTimeMillis();
 
-        position = odometrySystem.getPosition();
-        velocity = odometrySystem.getVelocity();
+        position = chassis.getPosition();
+        velocity = chassis.getVelocity();
 
-        telemetry.addData("x -ins", position.x);
-        telemetry.addData("y -ins", position.y);
-        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
-        telemetry.addData("speed -in/s", velocity.speed());
-        telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction()));
-        telemetry.addData("delta time -millis", currentTime - lastTime);
-        telemetry.update();
+        FTCUtilities.addData("x", String.valueOf(position.x));
+        FTCUtilities.addData("y", String.valueOf(position.y));
+        FTCUtilities.addData("heading", String.valueOf(position.getHeadingInDegrees()));
 
         logger.append("x", String.valueOf(position.x));
         logger.append("y", String.valueOf(position.y));
         logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
-        logger.append("speed", String.valueOf(velocity.speed()));
-        logger.append("dot", String.valueOf(Math.toDegrees(velocity.direction())));
-        logger.append("time", String.valueOf(FTCUtilities.getCurrentTimeMillis() - startTime));
+        logger.writeLine();
 
         lastTime = currentTime;
     }
     @Override
     public void stop() {
-        tele.stop();
         logger.stopWriting();
-        odometrySystem.stop();
+        chassis.stopOdometrySystem();
     }
 
 }

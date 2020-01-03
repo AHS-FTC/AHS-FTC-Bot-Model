@@ -54,7 +54,7 @@ public class Logger {
 
     public Logger(String fileName, String... cats){
         this.fileName = fileName + ".csv";
-        categories= new String[cats.length];
+        categories = new String[cats.length];
         System.arraycopy(cats,0,categories,0,cats.length);
         entriesByCategory = new HashMap<>();
         for (int i = 0; i < cats.length; i++) {
