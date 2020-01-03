@@ -156,11 +156,11 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
             throw new Error("TestMode doesn't support servos yet. mock it");
         }
     }
-    public static Odometer getOdometer(String deviceName, double wheelDiameter, boolean flip){
+    public static Odometer getOdometer(String deviceName, double wheelDiameter, boolean flip, double ticksPerRotation){
         if(testMode){
             return testOdometers.get(deviceName);
         } else {
-            return new OdometerImpl(deviceName,wheelDiameter,flip, 1440.0);
+            return new OdometerImpl(deviceName,wheelDiameter,flip, ticksPerRotation);
         }
     }
 

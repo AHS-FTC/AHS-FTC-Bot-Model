@@ -53,7 +53,7 @@ import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Odometery Wheel Tuner", group="Iterative OpMode")
-@Disabled
+//@Disabled
 public class ArdennesWheelTuningOpMode extends OpMode
 {
     private DcMotor left, right, back;

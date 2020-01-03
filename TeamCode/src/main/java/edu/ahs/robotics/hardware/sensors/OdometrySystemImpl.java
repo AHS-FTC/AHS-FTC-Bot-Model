@@ -38,6 +38,8 @@ public class OdometrySystemImpl implements OdometrySystem{
      * @param x1 The 'first' odometer measuring in the X direction. Should be interchangeable with x2
      * @param x2 The 'second' odometer measuring in the X direction. Should be interchangeable with x1
      * @param y The odometer measuring in the Y direction.
+     * @param yInchesPerDegree The amount of displacement given to the y odometer induced by a degree rotation to the robot. Tunable in OdometryCalibrationOpMode
+     * @see edu.ahs.robotics.util.opmodes.OdometryCalibration
      */ //todo change axis
     public OdometrySystemImpl(Odometer x1, Odometer x2, Odometer y, double yInchesPerDegree, double distanceBetweenYWheels) {
         this.x1 = x1;
@@ -53,7 +55,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1","x2","speed");
+        logger = new Logger("sensorStats", "x1","x2","y");
         logger.startWriting();
 
         Arrays.fill(distanceBuffer,0.0);
@@ -76,6 +78,16 @@ public class OdometrySystemImpl implements OdometrySystem{
     public void setPosition(double x, double y, double heading){
         position.setPosition(x,y,heading);
         lastPosition.copyFrom(position);
+    }
+
+    @Override
+    public Odometer getX1Odometer() {
+        return x1;
+    }
+
+    @Override
+    public Odometer getX2Odometer() {
+        return x2;
     }
 
     /**
@@ -150,6 +162,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         logger.append("x1", String.valueOf(x1Reading));
         logger.append("x2", String.valueOf(x2Reading));
+        logger.append("y" , String.valueOf(yReading));
 
         updateVelocity(currentTime);
     }
@@ -175,7 +188,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         bufferIndex = nextBufferIndex(); //iterate bufferIndex
 
-        logger.append("speed", String.valueOf(speed));
+        //logger.append("speed", String.valueOf(speed));
         logger.writeLine();
     }
 
@@ -227,7 +240,7 @@ public class OdometrySystemImpl implements OdometrySystem{
             }
         }
 
-        public void end(){
+        private void end(){
             running = false;
         }
     }
