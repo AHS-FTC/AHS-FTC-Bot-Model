@@ -65,7 +65,8 @@ public class ArdennesOdomOpMode extends OpMode
     public void init() {
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        logger = new Logger("odometry","x","y","heading","speed","dot","time");
+        logger = new Logger("odometry","x","y","heading","speed","dot");
+        logger.startWriting();
 
         teleOp = new SimpleTeleOp();
         teleOp.hardwareMap = hardwareMap;
@@ -107,7 +108,7 @@ public class ArdennesOdomOpMode extends OpMode
         logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
         logger.append("speed", String.valueOf(velocity.speed()));
         logger.append("dot", String.valueOf(Math.toDegrees(velocity.direction())));
-        logger.append("time", String.valueOf(FTCUtilities.getCurrentTimeMillis() - startTime));
+        logger.writeLine();
 
         lastTime = currentTime;
     }
