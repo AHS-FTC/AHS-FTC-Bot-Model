@@ -17,7 +17,7 @@ public class MecanumChassis extends Chassis {
 
     private static final double ROBOT_WIDTH = 333;
     public static final int MIN_TARGET_DISTANCE = 5;
-    public static final double DISTANCE_PER_360 = 1001;
+    public static final double DISTANCE_PER_360 = 43.8; //Tuned - real value 44.3 from getDistance xWheels //41.2 yWheels
     private static final double LEFT_INITIAL_SHIFT = 0;
     private static final double LEFT_INITIAL_SCALE = 1.02;
     private SingleDriveUnit frontLeft;
@@ -193,7 +193,7 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = 0.05;
+        final double correctionScale = 0.05; //Was 0.05
 
         leftOdometer.reset();
         rightOdometer.reset();
@@ -203,7 +203,7 @@ public class MecanumChassis extends Chassis {
             double powerRight = inversePower((rightTarget / maxTarget) * (minRampUp));
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeout) {
-                double leftDistance = -leftOdometer.getDistance();
+                double leftDistance = leftOdometer.getDistance();
                 double rightDistance = rightOdometer.getDistance();
 
                 double leftDistanceRatio = leftDistance / leftTarget;
@@ -216,8 +216,8 @@ public class MecanumChassis extends Chassis {
 
                 double maxDistance = Math.abs(leftDistance) > Math.abs(rightDistance) ? Math.abs(leftDistance) : Math.abs(rightDistance);
                 double maxRemaining = maxTarget - maxDistance;
-                double rampUp = Math.max(upScale * (maxDistance), minRampUp);
-                double rampDown = Math.max(downScale * (maxRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
+                double rampUp = (upScale * maxDistance) + minRampUp;
+                double rampDown = (downScale * maxRemaining) + minRampDown; //distanceTo accounts for flip across y axis and x offset
 
                 double targetPower = inversePower(Math.min(rampUp, Math.min(rampDown, maxPower)));
 

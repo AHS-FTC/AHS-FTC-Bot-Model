@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -39,7 +40,7 @@ import edu.ahs.robotics.util.GCodeReader;
 
 
 @Autonomous(name = "GCode Test", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class GCodeTest extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();

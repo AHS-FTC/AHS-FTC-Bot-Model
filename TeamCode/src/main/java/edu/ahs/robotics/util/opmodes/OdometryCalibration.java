@@ -1,8 +1,13 @@
 package edu.ahs.robotics.util.opmodes;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.seasonrobots.Ardennes;
@@ -54,7 +59,7 @@ public class OdometryCalibration extends OpMode {
     public void start() {
         double deltaDegrees = 360;
 
-        ardennes.getChassis().pivot(360,.7);
+        ardennes.getChassis().pivot(360,.7, .6, .55, 10000);
 
         distanceFromCenter1 = left.getDistance()/Math.PI;
         distanceFromCenter2 = right.getDistance()/Math.PI;

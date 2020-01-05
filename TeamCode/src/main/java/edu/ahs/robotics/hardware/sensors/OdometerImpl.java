@@ -36,7 +36,7 @@ public class OdometerImpl implements Odometer {
     @Override
     public double getDistance(){
         int ticks = motor.getCurrentPosition();
-        double distance = (ticks*wheelCircumference)/ ticksPerRotation; // rotations / ticks per rotation but combined for optimization
+        double distance = (ticks*wheelCircumference) / ticksPerRotation; // rotations / ticks per rotation but combined for optimization
         return direction*distance;
     }
 

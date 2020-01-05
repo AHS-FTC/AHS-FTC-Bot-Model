@@ -66,7 +66,7 @@ public class Path {
         loc.distanceToEnd = (totalDistance - second.distanceFromStart) + loc.closestPoint.distanceTo(second);
         loc.distanceFromStart = second.distanceFromStart - loc.closestPoint.distanceTo(second);
 
-        //Set lookAheadDelta based on location
+        //Set lookAheadTurn based on location
         setLookAheadDelta(loc);
 
         //Objective: Find distance to robot from path
@@ -84,14 +84,19 @@ public class Path {
         loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY)) / pathVectorLength;
 
         //Calculate speed at location
-        loc.speed = getTargetSpeed(loc.distanceFromStart, loc.distanceToEnd);
+        loc.speed = getTargetSpeed(loc.distanceFromStart);
+        loc.lookAheadSpeed = getTargetSpeed(loc.distanceFromStart + LOOK_AHEAD_DISTANCE);
 
         return loc;
     }
 
-    private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
+    private double getTargetSpeed(double distanceFromStart) {
         double upScale = 2; //Todo adjust
         double downScale = 1; //Todo adjust
+        if (distanceFromStart > totalDistance){
+            distanceFromStart = totalDistance;
+        }
+        double distanceToEnd = totalDistance - distanceFromStart;
         double rampDown = (downScale * distanceToEnd) + minRampDownSpeed;
         double rampUp = (upScale * distanceFromStart) + minRampUpSpeed;
         return Math.min(rampDown, Math.min(rampUp, maxVelocity));
@@ -120,7 +125,8 @@ public class Path {
         double pY = -loc.pathDeltaX;
 
         double delta = (pX * ahead.pathDeltaX) + (pY * ahead.pathDeltaY);
-        loc.lookAheadDelta = delta / (second.distanceToPrevious * ahead.distanceToPrevious);
+        loc.lookAheadTurn = delta / (second.distanceToPrevious * ahead.distanceToPrevious);
+
     }
 
     /**
@@ -174,7 +180,8 @@ public class Path {
         public double distanceFromStart;
         public double distanceToRobot;
         public boolean pathFinished;
-        public double lookAheadDelta;
+        public double lookAheadTurn;
+        public double lookAheadSpeed;
         public double pathSegmentLength;
         public double speed;
 

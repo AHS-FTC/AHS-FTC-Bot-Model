@@ -84,13 +84,13 @@ public class TestAuto extends LinearOpMode {
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);*/
 
-        tuner.start("p", "d");
+        tuner.start("p", "d", "down");
 
         waitForStart();
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
         points.add(new Point(60,0));
-        Path path = new Path(points, 12, 4, 36);
+        Path path = new Path(points, 12, 8, 36);
         chassis.startOdometrySystem();
 
         chassis.followPath(path);

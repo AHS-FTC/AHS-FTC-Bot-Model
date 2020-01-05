@@ -73,6 +73,32 @@ public class OdometrySystemImplTest {
     }
 
     @Test
+    public void testImperfectStrafe(){
+        double[] x1Inputs = {0,0.001,0.002,0.003}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
+        double[] x2Inputs = {0,0,0,0};
+        double[] yInputs = {0,6,8,12};
+
+        FTCUtilities.startTestMode();
+        MockClock clock = new MockClock(MockClock.Mode.ADVANCE_BY_10_MILLIS);
+        FTCUtilities.setMockClock(clock);
+
+        OdometerMock x1 = new OdometerMock(x1Inputs);
+        OdometerMock x2 = new OdometerMock(x2Inputs);
+        OdometerMock y = new OdometerMock(yInputs);
+
+        odometrySystem = new OdometrySystemImpl(x1, x2, y, .1, 12);
+        odometrySystem.setPosition(0,0,0); // at true origin
+        odometrySystem.resetEncoders();
+
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the initial call to the resetEncoders() method
+            odometrySystem.updatePosition();
+        }
+
+        assertEquals(12,odometrySystem.getPosition().y,0.1);
+        assertEquals(0,odometrySystem.getPosition().x,0.1);
+    }
+
+    @Test
     public void driveLeft1Foot(){
         double[] x1Inputs = {0,2,8,12}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
         double[] x2Inputs = {0,2,8,12};

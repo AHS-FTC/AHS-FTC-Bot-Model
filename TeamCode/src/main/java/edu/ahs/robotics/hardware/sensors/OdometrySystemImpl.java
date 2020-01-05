@@ -55,7 +55,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1","x2","y");
+        logger = new Logger("sensorStats", "x1","x2","y", "dHeading","dyBeforeFactorOut","yFactorOut");
         logger.startWriting();
 
         Arrays.fill(distanceBuffer,0.0);
@@ -70,7 +70,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         odometerThread.start();
     }
   
-    public void stop(){
+    public synchronized void stop(){
         logger.stopWriting();
         odometerThread.end();
     }
@@ -163,6 +163,10 @@ public class OdometrySystemImpl implements OdometrySystem{
         logger.append("x1", String.valueOf(x1Reading));
         logger.append("x2", String.valueOf(x2Reading));
         logger.append("y" , String.valueOf(yReading));
+        logger.append("dHeading" , String.valueOf(dHeading));
+        logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
+        logger.append("yFactorOut" , String.valueOf(dyExpected));
+        logger.writeLine();
 
         updateVelocity(currentTime);
     }
@@ -187,9 +191,6 @@ public class OdometrySystemImpl implements OdometrySystem{
         lastPosition.copyFrom(position);
 
         bufferIndex = nextBufferIndex(); //iterate bufferIndex
-
-        //logger.append("speed", String.valueOf(speed));
-        logger.writeLine();
     }
 
     public synchronized Position getPosition(){
@@ -225,18 +226,28 @@ public class OdometrySystemImpl implements OdometrySystem{
     }
 
     private class OdometerThread extends Thread{
+        private final int SLEEP_TIME = 20;
+
         private volatile boolean running;
 
         @Override
         public void run() {
+            long lastTime = FTCUtilities.getCurrentTimeMillis();
+
             running = true;
             while (running){
                 updatePosition();
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
 
+                long deltaTime = FTCUtilities.getCurrentTimeMillis() - lastTime;
+
+                if(deltaTime < SLEEP_TIME){
+                    try {
+                        Thread.sleep(SLEEP_TIME - deltaTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                lastTime = FTCUtilities.getCurrentTimeMillis();
             }
         }
 

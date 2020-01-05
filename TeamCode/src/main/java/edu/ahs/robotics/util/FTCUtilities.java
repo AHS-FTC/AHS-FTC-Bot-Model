@@ -94,7 +94,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     public static void sleep(long ms) {
         if(testMode){
             try {
-                Thread.sleep(5000);
+                Thread.sleep(ms);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
