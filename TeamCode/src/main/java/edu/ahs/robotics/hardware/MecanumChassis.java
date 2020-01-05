@@ -386,7 +386,7 @@ public class MecanumChassis extends Chassis {
 
     private double inversePower(double power) {
         //   return power * Math.abs(power);
-        return Math.pow(power, 3);
+        return Math.signum(power) * Math.pow(power, 2);
     }
 
     public void followPath(Path path) {

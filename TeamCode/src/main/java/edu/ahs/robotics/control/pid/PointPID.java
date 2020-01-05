@@ -21,8 +21,8 @@ public class PointPID {
      * @param yD Scalar for y derivative correction. Generally non-negative in this case.
      */
     public PointPID(double xP, double xI, double xD, double yP, double yI, double yD) {
-        xPID = new PID(xP,xI,xD);
-        yPID = new PID(yP,yI,yD);
+        xPID = new PID(xP,xI,xD,0);
+        yPID = new PID(yP,yI,yD,0);
     }
 
     /**
