@@ -24,6 +24,11 @@ public class Path {
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);
             Point previous = points.get(i - 1);
+
+            if (current.x == previous.x && current.y == previous.y) {
+                continue;
+            }
+
             double distanceFromPrevious = current.distanceTo(previous);
             totalDistance += distanceFromPrevious;
             pointAtDistance.add(new PointAtDistance(current, totalDistance, current.x - previous.x, current.y - previous.y, distanceFromPrevious));
@@ -35,9 +40,6 @@ public class Path {
     }
 
     /**
-     * This method takes the bounding points and calculates a third point.
-     * Then it creates a line, finds the intersection, and returns it as a point.
-     * The third point is used to calculate distance from start and end because it allows for the robot to not be between the bounding points.
      *
      * @param robotPosition
      * @return Returns a location

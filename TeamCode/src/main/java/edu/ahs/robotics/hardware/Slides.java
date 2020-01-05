@@ -31,7 +31,7 @@ public class Slides {
     private static final double I = 0;
     private static final double D = 0;
 
-    private PID pid = new PID(P,I,D);
+    private PID pid = new PID(P,I,D,0);
 
     private SlidesThread thread = new SlidesThread();
 

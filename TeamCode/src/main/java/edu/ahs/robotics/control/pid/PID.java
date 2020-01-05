@@ -1,6 +1,5 @@
 package edu.ahs.robotics.control.pid;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
@@ -12,7 +11,7 @@ public class PID {
     private double errorSum = 0;
     private double lastError = 0;
 
-    private static final int BUFFER_SIZE = 5;
+    private int errorBufferSize;
     private double[] errorBuffer;
     private int bufferIndex = 0;
 
@@ -24,13 +23,18 @@ public class PID {
      * @param p Proportional correction scalar
      * @param i Integral correction scalar. Generally small relative to Proportional scalar.
      * @param d Derivative scalar. Based on error derivative rather than function derivative, thus normally positive.
+     * @param errorBufferSize Set the ring buffer size to smooth out D term. 0 or 1 means don't use the buffer.
      */
-    public PID(double p, double i, double d) {
+    public PID(double p, double i, double d, int errorBufferSize) {
         this.p = p;
         this.i = i;
         this.d = d;
+        this.errorBufferSize = errorBufferSize;
 
-        errorBuffer = new double[BUFFER_SIZE];
+        if (errorBufferSize == 0) {
+            errorBufferSize = 1;
+        }
+        errorBuffer = new double[errorBufferSize];
         Arrays.fill(errorBuffer,0.0);
     }
 
@@ -63,7 +67,7 @@ public class PID {
     }
 
     private int nextBufferIndex(){
-        if(bufferIndex == BUFFER_SIZE - 1){
+        if(bufferIndex == errorBufferSize - 1){
             return 0;
         } else {
             return bufferIndex + 1;

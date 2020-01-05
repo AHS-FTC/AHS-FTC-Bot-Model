@@ -45,6 +45,7 @@ import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.util.Tuner;
@@ -84,12 +85,14 @@ public class TestAuto extends LinearOpMode {
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);*/
 
-        tuner.start("p", "d", "down");
+        tuner.start("p", "d", "f");
+        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
         waitForStart();
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(0,0));
-        points.add(new Point(60,0));
+
+//        ArrayList<Point> points = new ArrayList<>();
+//        points.add(new Point(0,0));
+//        points.add(new Point(60,0));
         Path path = new Path(points, 12, 8, 36);
         chassis.startOdometrySystem();
 
