@@ -26,18 +26,21 @@ public class OdometrySystemMock implements OdometrySystem {
         running = false;
     }
 
-    @Override
     public Position getPosition() {
         Position position = positions.get(positionIndex);
         positionIndex ++;
         return position;
     }
 
-    @Override
-    public Velocity getVelocity() {
+    private Velocity getVelocity() {
         Velocity velocity = velocities.get(velocityIndex);
         velocityIndex ++;
         return velocity;
+    }
+
+    @Override
+    public State getState() {
+        return new State(getPosition(),getVelocity(),0);
     }
 
     @Override

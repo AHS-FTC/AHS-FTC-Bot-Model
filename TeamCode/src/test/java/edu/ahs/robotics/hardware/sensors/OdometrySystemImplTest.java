@@ -46,11 +46,13 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(0, odometrySystem.getPosition().y, 0.0);
-        assertEquals(0, odometrySystem.getPosition().heading, Math.PI/2);
-        assertEquals(0, odometrySystem.getPosition().x, 0.0);
+        OdometrySystem.State state = odometrySystem.getState();
 
-        assertEquals(0,odometrySystem.getVelocity().speed(),0.0);
+        assertEquals(0, state.position.y, 0.0);
+        assertEquals(0, state.position.heading, Math.PI/2);
+        assertEquals(0, state.position.x, 0.0);
+
+        assertEquals(0, state.velocity.speed(),0.0);
     }
 
     @Test
@@ -64,12 +66,14 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().y, .01);
-        assertEquals(Math.PI/2, odometrySystem.getPosition().heading, .01);
-        assertEquals(0, odometrySystem.getPosition().x, .01);
+        OdometrySystem.State state = odometrySystem.getState();
 
-        assertTrue(odometrySystem.getVelocity().speed() > 0);
-        assertEquals(odometrySystem.getVelocity().direction(), Math.PI / 2,0.001);
+        assertEquals(12, state.position.y, .01);
+        assertEquals(Math.PI/2, state.position.heading, .01);
+        assertEquals(0, state.position.x, .01);
+
+        assertTrue(state.velocity.speed() > 0);
+        assertEquals(state.velocity.direction(), Math.PI / 2,0.001);
     }
 
     @Test
@@ -94,8 +98,11 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12,odometrySystem.getPosition().y,0.1);
-        assertEquals(0,odometrySystem.getPosition().x,0.1);
+        OdometrySystem.State state = odometrySystem.getState();
+
+
+        assertEquals(12,state.position.y,0.1);
+        assertEquals(0,state.position.x,0.1);
     }
 
     @Test
@@ -109,8 +116,11 @@ public class OdometrySystemImplTest {
         for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the initial call to the resetEncoders() method
             odometrySystem.updatePosition();
         }
-        assertEquals(12, odometrySystem.getPosition().x, .001);
-        assertEquals(0, odometrySystem.getPosition().y, .001);
+
+        OdometrySystem.State state = odometrySystem.getState();
+
+        assertEquals(12, state.position.x, .001);
+        assertEquals(0, state.position.y, .001);
     }
 
     @Test
@@ -124,11 +134,13 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(Math.PI, odometrySystem.getPosition().heading, .01);
-        assertEquals(0, odometrySystem.getPosition().x, .01);
-        assertEquals(0, odometrySystem.getPosition().y, .01);
+        OdometrySystem.State state = odometrySystem.getState();
 
-        assertEquals(0,odometrySystem.getVelocity().speed(), 0.01);
+        assertEquals(Math.PI, state.position.heading, .01);
+        assertEquals(0, state.position.x, .01);
+        assertEquals(0, state.position.y, .01);
+
+        assertEquals(0,state.velocity.speed(), 0.01);
 
     }
 
@@ -143,7 +155,7 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().x, .01);
+        assertEquals(12, odometrySystem.getState().position.x, .01);
     }
 
     @Test
@@ -157,10 +169,12 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(12, odometrySystem.getPosition().x, .01);
-        assertEquals(12, odometrySystem.getPosition().y, .01);
+        OdometrySystem.State state = odometrySystem.getState();
+
+        assertEquals(12, state.position.x, .01);
+        assertEquals(12, state.position.y, .01);
       
-        assertEquals(Math.PI/4, odometrySystem.getVelocity().direction(),0.001);
+        assertEquals(Math.PI/4, state.velocity.direction(),0.001);
 
     }
 
@@ -175,11 +189,13 @@ public class OdometrySystemImplTest {
             odometrySystem.updatePosition();
         }
 
-        assertEquals(Math.toRadians(500) + Math.PI/2, odometrySystem.getPosition().heading, .01);
-        assertEquals(0, odometrySystem.getPosition().x, .01);
-        assertEquals(0, odometrySystem.getPosition().y, .01);
+        OdometrySystem.State state = odometrySystem.getState();
 
-        assertEquals(0,odometrySystem.getVelocity().speed(), 0.01);
+        assertEquals(Math.toRadians(500) + Math.PI/2, state.position.heading, .01);
+        assertEquals(0, state.position.x, .01);
+        assertEquals(0, state.position.y, .01);
+
+        assertEquals(0,state.velocity.speed(), 0.01);
     }
 
     @Test
@@ -209,7 +225,7 @@ public class OdometrySystemImplTest {
 
         for(int i = 0; i < x1Inputs.length - 1; i++){
             odometrySystem.updatePosition();
-            velocity = odometrySystem.getVelocity();
+            velocity = odometrySystem.getState().velocity;
 
             assertEquals(2,velocity.speed(), 0.0001);
             assertEquals(0,velocity.direction(), 0.0001);

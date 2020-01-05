@@ -37,6 +37,7 @@ import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
@@ -95,8 +96,10 @@ public class ArdennesOdomOpMode extends OpMode
         double currentTime = FTCUtilities.getCurrentTimeMillis();
         double imuHeading = imu.getHeading();
 
-        position = chassis.getPosition();
-        velocity = chassis.getVelocity();
+        OdometrySystem.State state = chassis.getState();
+
+        position = state.position;
+        velocity = state.velocity;
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);

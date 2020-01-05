@@ -193,12 +193,8 @@ public class OdometrySystemImpl implements OdometrySystem{
         bufferIndex = nextBufferIndex(); //iterate bufferIndex
     }
 
-    public synchronized Position getPosition(){
-        return position;
-    }
-
-    public synchronized Velocity getVelocity() {
-        return velocity;
+    public State getState(){
+        return new State(position,velocity,0);
     }
 
     public boolean isRunning(){
@@ -255,5 +251,4 @@ public class OdometrySystemImpl implements OdometrySystem{
             running = false;
         }
     }
-
 }

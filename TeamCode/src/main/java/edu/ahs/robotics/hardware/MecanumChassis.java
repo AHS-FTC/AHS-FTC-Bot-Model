@@ -258,7 +258,9 @@ public class MecanumChassis extends Chassis {
     }
 
     public void velocityDrive(Path path, double maxSpeed){
-        Position initialPosition = getPosition();
+        OdometrySystem.State initialState = getState();
+
+        Position initialPosition = initialState.position;
         /*Velocity initialVelocity = getVelocity();*/
 
         double distanceToEnd = path.getTargetLocation(initialPosition).distanceToEnd;
@@ -281,8 +283,10 @@ public class MecanumChassis extends Chassis {
         while (distanceToEnd > 0.05) { //0.05 is quite arbitrary
             double targetSpeed;
 
-            Position currentPosition = getPosition();
-            Velocity currentVelocity = getVelocity();
+            OdometrySystem.State state = getState();
+
+            Position currentPosition = state.position;
+            Velocity currentVelocity = state.velocity;
 
             Path.Location location = path.getTargetLocation(currentPosition);
 
@@ -322,7 +326,7 @@ public class MecanumChassis extends Chassis {
      * @param timeOut delta time in millis to end the main correction loop
      */
     public void goToPointWithPID(Point point, long timeOut){
-        Position currentPosition = getPosition();
+        Position currentPosition = getState().position;
         Position targetPosition = new Position(point, 0);
         double frontLeftPower = 0, frontRightPower = 0;
         double backLeftPower = 0, backRightPower = 0;
@@ -346,7 +350,7 @@ public class MecanumChassis extends Chassis {
         }
 
         while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut && currentPosition.distanceTo(targetPosition) > 0.1){
-            currentPosition = getPosition();
+            currentPosition = getState().position;
 
             FTCUtilities.addData("x", currentPosition.x);
             FTCUtilities.addData("y", currentPosition.y);
@@ -393,7 +397,8 @@ public class MecanumChassis extends Chassis {
         HeadingController headingController = new HeadingController(path,  1); //Max power before inversion
         HeadingController.Powers powers;
         do {
-            powers = headingController.getUpdatedPowers(getPosition(), getVelocity());
+            OdometrySystem.State state = getState();
+            powers = headingController.getUpdatedPowers(state.position, state.velocity);
 
             double inverseLeft = inversePower(powers.leftPower);
             double inverseRight = inversePower(powers.rightPower);
@@ -411,15 +416,8 @@ public class MecanumChassis extends Chassis {
     /**
      * @return Global Position on the field
      */
-    public Position getPosition(){
-        return odometrySystem.getPosition();
-    }
-
-    /**
-     * @return Velocity Vector in inches per second
-     */
-    public Velocity getVelocity(){
-        return odometrySystem.getVelocity();
+    public OdometrySystem.State getState(){
+        return odometrySystem.getState();
     }
 
     /**
