@@ -29,68 +29,71 @@
 
 package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.util.FTCUtilities;
+
+
 /**
- * Test OpMode for driving Ardennes. Not dependent on BotModel
+ * OpMode that returns displacement values to check if wheels are correctly tuned. Also works to check ticks per rotation and rotation direction
+ * <b>Independent of BotModel, needs to be tuned before use</b>
+ * Remember that motor flips in botmodel may also affect your encoder directions.
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Simple TeleOp", group="Iterative OpMode")
-@Disabled
-public class SimpleTeleOp extends OpMode
+@TeleOp(name="Odometer tuning check OpMode", group="Iterative OpMode")
+//@Disabled
+public class WheelTuningCheckOpMode extends OpMode
 {
-    protected DcMotor frontLeft, frontRight, backLeft, backRight;
+    private Odometer leftOdom,rightOdom,backOdom;
+    private DcMotor br;
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backLeft = hardwareMap.get(DcMotor.class,"BL");
-        backRight = hardwareMap.get(DcMotor.class,"BR");
+        FTCUtilities.setOpMode(this);
 
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        br = hardwareMap.get(DcMotor.class, "BR");
+        br.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftOdom = new OdometerImpl("intakeL",2.3596, true, 1440); // remember to update these
+        rightOdom = new OdometerImpl("intakeR",2.3617, true, 1440); // tune all before use
+        backOdom = new OdometerImpl("BR",2.387, true, 4000);
+
     }
 
     @Override
     public void init_loop() {
-
     }
 
     @Override
     public void start() {
-
     }
 
     @Override
     public void loop() {
-        double forward = gamepad1.left_stick_y;
-        double strafe = gamepad1.left_stick_x;
-        double turn = gamepad1.right_stick_x;
 
-        frontLeft.setPower(forward + strafe - turn);
-        frontRight.setPower(forward - strafe + turn);
-        backLeft.setPower(forward - strafe - turn);
-        backRight.setPower(forward + strafe + turn);
+        if(gamepad1.a){
+            if(br.getDirection() == DcMotorSimple.Direction.REVERSE) {
+                br.setDirection(DcMotorSimple.Direction.FORWARD);
+            } else {
+                br.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+        }
+
+        telemetry.addData("back right direction", br.getDirection().toString());
+
+        telemetry.addData("left reading", leftOdom.getDistance());
+        telemetry.addData("right reading", rightOdom.getDistance());
+        telemetry.addData("back reading", backOdom.getDistance());
+        telemetry.update();
     }
-
     @Override
-    public void stop(){
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
+    public void stop() {
+
     }
 
 }

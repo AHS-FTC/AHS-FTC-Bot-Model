@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
@@ -94,8 +95,10 @@ public class OdomOpMode extends OpMode
 
         double currentTime = FTCUtilities.getCurrentTimeMillis();
 
-        position = odometrySystem.getPosition();
-        velocity = odometrySystem.getVelocity();
+        OdometrySystem.State state = odometrySystem.getState();
+
+        position = state.position;
+        velocity = state.velocity;
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);

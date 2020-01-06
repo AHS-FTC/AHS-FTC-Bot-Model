@@ -1,6 +1,10 @@
 package edu.ahs.robotics.hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import static org.junit.Assert.*;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -100,6 +104,7 @@ public class MecanumChassisTest {
     }
 
     @Test
+    @Ignore
     public void testPointPID(){
         Point targetPoint = new Point(0,0);
         long timeout =  100000000; // don't timeout
@@ -143,6 +148,7 @@ public class MecanumChassisTest {
 
 
     @Test
+    @Ignore
     public void testVelocityDrive(){ // standard setup that can kinda be messed around with
         double maxSpeed = 10;
 

@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
@@ -114,8 +115,10 @@ public class ArdennesOdometryDebuggingOpMode extends OpMode
 
         double currentTime = FTCUtilities.getCurrentTimeMillis();
 
-        position = chassis.getPosition();
-        velocity = chassis.getVelocity();
+        OdometrySystem.State state = chassis.getState();
+
+        position = state.position;
+        velocity = state.velocity;
 
         FTCUtilities.addData("x", String.valueOf(position.x));
         FTCUtilities.addData("y", String.valueOf(position.y));

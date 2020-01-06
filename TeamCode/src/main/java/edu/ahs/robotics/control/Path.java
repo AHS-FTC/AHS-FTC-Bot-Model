@@ -3,7 +3,7 @@ package edu.ahs.robotics.control;
 import java.util.ArrayList;
 
 public class Path {
-    public static final double LOOK_AHEAD_DISTANCE = 6.0;
+    static final double LOOK_AHEAD_DISTANCE = 6.0; /*Package visible for testing*/
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
 
@@ -68,7 +68,7 @@ public class Path {
         loc.distanceToEnd = (totalDistance - second.distanceFromStart) + loc.closestPoint.distanceTo(second);
         loc.distanceFromStart = second.distanceFromStart - loc.closestPoint.distanceTo(second);
 
-        //Set lookAheadTurn based on location
+        //Set lookAheadCurvature based on location
         setLookAheadDelta(loc);
 
         //Objective: Find distance to robot from path
@@ -106,11 +106,10 @@ public class Path {
 
     /**
      * Given a location, look through points after your second bounding point to find a distance that is at least LOOK_AHEAD_DISTANCE away.
-     * Then find the sine of the angle between the 2 segments. Positive is right of line, negative is left.
-     * @param loc
+     * Then find the curvature of an arc travel between the two bounding points, where curvature is measured as the inverse of radius (1/r).
      */
     private void setLookAheadDelta(Location loc) {
-        double distanceToNext;
+        double distanceToNext = 0;
         PointAtDistance second = getPoint(iFirstBoundingPoint + 1);
         PointAtDistance ahead = second;
 
@@ -127,8 +126,8 @@ public class Path {
         double pY = -loc.pathDeltaX;
 
         double delta = (pX * ahead.pathDeltaX) + (pY * ahead.pathDeltaY);
-        loc.lookAheadTurn = delta / (second.distanceToPrevious * ahead.distanceToPrevious);
-
+        double sine = delta / (second.distanceToPrevious * ahead.distanceToPrevious);
+        loc.lookAheadCurvature = sine / LOOK_AHEAD_DISTANCE; // (sin / L) is similar to (1 / radius) for arc travel especially for small thetas
     }
 
     /**
@@ -182,7 +181,7 @@ public class Path {
         public double distanceFromStart;
         public double distanceToRobot;
         public boolean pathFinished;
-        public double lookAheadTurn;
+        public double lookAheadCurvature;
         public double lookAheadSpeed;
         public double pathSegmentLength;
         public double speed;

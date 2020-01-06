@@ -6,6 +6,7 @@ import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.RingBuffer;
 
 
 /**
@@ -16,13 +17,13 @@ import edu.ahs.robotics.util.Logger;
 public class OdometrySystemImpl implements OdometrySystem{
     private Position position;
     private Velocity velocity;
+    private double curvature = 0; // only measured in x
 
     private Odometer x1, x2, y;
 
     private static final int BUFFER_SIZE = 10;
-    private int bufferIndex = 0;
-    private double[] distanceBuffer = new double[BUFFER_SIZE];
-    private long[] timeBuffer = new long[BUFFER_SIZE];
+    private RingBuffer<Double> distanceBuffer;
+    private RingBuffer<Long> timeBuffer;
     private double distance = 0.0;
 
     private double x1Last, x2Last, yLast;
@@ -55,11 +56,11 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1","x2","y");
+        logger = new Logger("sensorStats", "x1","x2","y", "dHeading","dyBeforeFactorOut","yFactorOut");
         logger.startWriting();
 
-        Arrays.fill(distanceBuffer,0.0);
-        Arrays.fill(timeBuffer,0);
+        distanceBuffer = new RingBuffer<>(BUFFER_SIZE,0.0);
+        timeBuffer = new RingBuffer<>(BUFFER_SIZE,0L);
     }
 
     /**
@@ -70,7 +71,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         odometerThread.start();
     }
   
-    public void stop(){
+    public synchronized void stop(){
         logger.stopWriting();
         odometerThread.end();
     }
@@ -110,6 +111,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
+        double curvature; //currently only measured in the x direction. may need to be elaborated for nonlinear movements.
 
         long currentTime = FTCUtilities.getCurrentTimeMillis();
 
@@ -147,9 +149,12 @@ public class OdometrySystemImpl implements OdometrySystem{
             dxLocal = (xRadius * Math.sin(dHeading)) - (yRadius * (1 - Math.cos(dHeading)));
             dyLocal = (xRadius * (1 - Math.cos(dHeading))) + (yRadius * Math.sin(dHeading));
 
+            curvature = 1.0/xRadius;
         } else { //curve with infinite radius, aka robot moves in a straight line
             dxLocal = dx;
             dyLocal = dy;
+
+            curvature = 0.0; // 1/infinity
         }
 
         position.heading += dHeading;//apply our heading change
@@ -159,10 +164,15 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+        this.curvature = curvature;
 
         logger.append("x1", String.valueOf(x1Reading));
         logger.append("x2", String.valueOf(x2Reading));
         logger.append("y" , String.valueOf(yReading));
+        logger.append("dHeading" , String.valueOf(dHeading));
+        logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
+        logger.append("yFactorOut" , String.valueOf(dyExpected));
+        logger.writeLine();
 
         updateVelocity(currentTime);
     }
@@ -171,13 +181,11 @@ public class OdometrySystemImpl implements OdometrySystem{
         double distanceTraveled = position.distanceTo(lastPosition); //distance travelled between last point and this point
         distance += distanceTraveled; // running sum of distances
 
-        distanceBuffer[bufferIndex] = distance;
-        timeBuffer[bufferIndex] = currentTime;
+        double oldDistance = distanceBuffer.insert(distance);
+        long oldTime = timeBuffer.insert(currentTime);
 
-        int nextBufferIndex = nextBufferIndex();
-
-        double deltaDistance = distance - distanceBuffer[nextBufferIndex];
-        long deltaTime = currentTime - timeBuffer[nextBufferIndex];
+        double deltaDistance = distance - oldDistance;
+        long deltaTime = currentTime - oldTime;
 
         double speed = deltaDistance * 1000/(double)deltaTime;
 
@@ -185,32 +193,16 @@ public class OdometrySystemImpl implements OdometrySystem{
         velocity.setVelocityFromSpeedDirection(speed,direction);
 
         lastPosition.copyFrom(position);
-
-        bufferIndex = nextBufferIndex(); //iterate bufferIndex
-
-        //logger.append("speed", String.valueOf(speed));
-        logger.writeLine();
     }
 
-    public synchronized Position getPosition(){
-        return position;
-    }
-
-    public synchronized Velocity getVelocity() {
-        return velocity;
+    public State getState(){
+        return new State(position,velocity,curvature);
     }
 
     public boolean isRunning(){
         return odometerThread.running;
     }
 
-    private int nextBufferIndex(){
-        if(bufferIndex == BUFFER_SIZE - 1){
-            return 0;
-        } else {
-            return bufferIndex + 1;
-        }
-    }
 
 
     /**
@@ -225,18 +217,28 @@ public class OdometrySystemImpl implements OdometrySystem{
     }
 
     private class OdometerThread extends Thread{
+        private final int SLEEP_TIME = 20;
+
         private volatile boolean running;
 
         @Override
         public void run() {
+            long lastTime = FTCUtilities.getCurrentTimeMillis();
+
             running = true;
             while (running){
                 updatePosition();
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
 
+                long deltaTime = FTCUtilities.getCurrentTimeMillis() - lastTime;
+
+                if(deltaTime < SLEEP_TIME){
+                    try {
+                        Thread.sleep(SLEEP_TIME - deltaTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                lastTime = FTCUtilities.getCurrentTimeMillis();
             }
         }
 
@@ -244,5 +246,4 @@ public class OdometrySystemImpl implements OdometrySystem{
             running = false;
         }
     }
-
 }

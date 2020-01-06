@@ -21,6 +21,14 @@ public class Velocity {
     }
 
     /**
+     * Copy Constructor
+     */
+    public Velocity(Velocity v){
+        this.dx = v.dx;
+        this.dy = v.dy;
+    }
+
+    /**
      * Acts as a constructor to resolve signature conflicts.
      * @param speed A.K.A magnitude in inches/second
      * @param direction in radians, follows established conventions

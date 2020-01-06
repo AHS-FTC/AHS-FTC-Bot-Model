@@ -9,7 +9,7 @@ public class HeadingController {
     //Amplifies negative power corrections to deal with momentum while decelerating
     private static final double DOWN_AMPLIFIER = 1.2;
     Path path;
-    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "speedCorrectionP", "speedCorrectionI", "speedCorrectionD", "distanceToRobot", "distanceToEnd", "lookAheadTurn", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath", "turnCorrection", "turnCorrectionP", "turnCorrectionI", "turnCorrectionD", "turnCorrectionF");
+    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "speedCorrectionP", "speedCorrectionI", "speedCorrectionD", "distanceToRobot", "distanceToEnd", "lookAheadCurvature", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath", "turnCorrection", "turnCorrectionP", "turnCorrectionI", "turnCorrectionD", "turnCorrectionF");
     double downCorrectionScale;
     private PID speedPID;
     private PID turnPID;
@@ -56,7 +56,7 @@ public class HeadingController {
             rightPower += totalSpeedCorrection;
 
             PID.Corrections turnCorrections = turnPID.getCorrection(targetLocation.distanceToRobot, 0);
-            double lookAheadTurnCorrection = (targetLocation.lookAheadTurn * fCoeff);
+            double lookAheadTurnCorrection = (targetLocation.lookAheadCurvature * fCoeff);
 
             double totalTurnCorrection = turnCorrections.totalCorrection + lookAheadTurnCorrection;
 
@@ -71,7 +71,7 @@ public class HeadingController {
             logger.append("speedAlongPath", String.valueOf(speedAlongPath));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
-            logger.append("lookAheadTurn", String.valueOf(targetLocation.lookAheadTurn));
+            logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));

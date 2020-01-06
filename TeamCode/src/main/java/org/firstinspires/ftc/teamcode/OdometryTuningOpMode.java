@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,7 +12,7 @@ import edu.ahs.robotics.util.Logger;
 //left = 9.175 rots = 60.2967 mm
 //right = 9.1 rots = 60.79
 @TeleOp(name="Odometry Tuner", group="Iterative Opmode")
-//@Disabled
+@Disabled
 public class OdometryTuningOpMode extends OpMode {
     private DcMotor FL, FR, BL, BR;
     private OdometerImpl l, r;

@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -50,7 +51,7 @@ import edu.ahs.robotics.util.FTCUtilities;
  */
 
 @TeleOp(name="Vision Test OpMode", group="Iterative Opmode")
-//@Disabled
+@Disabled
 public class VuforiaTestOp extends OpMode
 {
     //Vuforia vuforia;

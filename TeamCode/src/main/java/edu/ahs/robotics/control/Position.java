@@ -23,6 +23,13 @@ public class Position {
     }
 
     /**
+     * Copy Constructor
+     */
+    public Position(Position p){
+        copyFrom(p);
+    }
+
+    /**
      * Creates a position given a cartesian point and a heading in radians.
      * @param point
      * @param heading
