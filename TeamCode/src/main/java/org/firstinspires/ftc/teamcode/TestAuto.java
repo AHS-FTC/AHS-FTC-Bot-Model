@@ -87,7 +87,7 @@ public class TestAuto extends LinearOpMode {
 
         tuner.addParam("p", .0000001);
         tuner.addParam("d", .0000001);
-        tuner.addParam("f", .0000001);
+        tuner.addParam("f", .00001);
         tuner.start();
         ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 

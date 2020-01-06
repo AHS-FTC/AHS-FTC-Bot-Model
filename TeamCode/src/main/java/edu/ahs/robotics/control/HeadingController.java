@@ -10,16 +10,15 @@ public class HeadingController {
     //Amplifies negative power corrections to deal with momentum while decelerating
     private static final double DOWN_AMPLIFIER = 1.2;
     Path path;
-    Logger logger = new Logger("TestAutoData", "leftPower", "rightPower", "targetSpeed", "speedCorrection", "speedCorrectionP", "speedCorrectionI", "speedCorrectionD", "distanceToRobot", "distanceToEnd", "lookAheadCurvature", "isFinished", "robotPositionX", "robotPositionY", "robotPositionHeading", "closestPointX", "closestPointY", "robotSpeed", "speedAlongPath", "turnCorrection", "turnCorrectionP", "turnCorrectionI", "turnCorrectionD", "turnCorrectionF", "flippedRobotCurvature");
+    Logger logger = new Logger("TestAutoData");
     double downCorrectionScale;
     private PID speedPID;
     private PID turnPID;
     private double maxPower;
-    private double leftPower = .6;
-    private double rightPower = .6;
+    private double leftPower = .2;
+    private double rightPower = .2;
 
     //Correction values
-//    private static final double SPEED_SCALE = .001;
     private static final double TURN_SCALE = .01;
     double fCoeff;
 

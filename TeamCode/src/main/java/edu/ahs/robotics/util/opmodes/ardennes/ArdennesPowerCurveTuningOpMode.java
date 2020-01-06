@@ -29,25 +29,15 @@
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
-import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.hardware.sensors.Odometer;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.ParameterLookup;
 import edu.ahs.robotics.util.Tuner;
-import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
 
 
 /**
@@ -70,8 +60,10 @@ public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
     private MecanumChassis chassis;
     Tuner tuner = new Tuner();
     private double power;
-    private double maxSpeed = 0;
-
+    private double maxAcceleration = 0;
+    private Logger logger;
+    private long currentTime = 0;
+    private long previousTime = FTCUtilities.getCurrentTimeMillis();
 
     @Override
     public void runOpMode() {
@@ -84,23 +76,43 @@ public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
         power = tuner.getParameter("power");
 
         waitForStart();
+        logger = new Logger("PowerCurve" + Math.floor(power * 100));
+        logger.startWriting();
         chassis.startOdometrySystem();
 
         chassis.setPowerAll(power);
         telemetry.addLine(String.valueOf(power));
 
+        double previousSpeed = 0;
+
         while (opModeIsActive()) {
+            currentTime = FTCUtilities.getCurrentTimeMillis();
             velocity = chassis.getState().velocity;
 
-            if (velocity.speed() > maxSpeed) {
-                maxSpeed = velocity.speed();
+            long deltaTime = currentTime - previousTime;
+            double acceleration = (velocity.speed() - previousSpeed) / deltaTime;
+
+            previousSpeed = velocity.speed();
+            previousTime = currentTime;
+
+            if (acceleration > maxAcceleration) {
+                maxAcceleration = acceleration;
             }
 
-            telemetry.addData("maxSpeed", maxSpeed);
+            telemetry.addData("maxAcceleration", maxAcceleration);
             telemetry.update();
+
+            logger.append("maxAcceleration", String.valueOf(maxAcceleration));
+            logger.append("acceleration", String.valueOf(acceleration));
+            logger.append("deltaTime", String.valueOf(deltaTime));
+            logger.append("robotSpeed", String.valueOf(velocity.speed()));
+            logger.writeLine();
+
+            sleep(50);
         }
 
         stop();
         chassis.stopOdometrySystem();
+        logger.stopWriting();
     }
 }

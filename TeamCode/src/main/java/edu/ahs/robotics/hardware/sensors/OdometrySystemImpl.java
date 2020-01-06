@@ -56,7 +56,7 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats", "x1","x2","y", "dHeading","dyBeforeFactorOut","yFactorOut");
+        logger = new Logger("sensorStats");
         logger.startWriting();
 
         distanceBuffer = new RingBuffer<>(BUFFER_SIZE,0.0);
@@ -149,7 +149,8 @@ public class OdometrySystemImpl implements OdometrySystem{
             dxLocal = (xRadius * Math.sin(dHeading)) - (yRadius * (1 - Math.cos(dHeading)));
             dyLocal = (xRadius * (1 - Math.cos(dHeading))) + (yRadius * Math.sin(dHeading));
 
-            curvature = 1.0/xRadius;
+            curvature = (distanceBetweenYWheels * dx1) / dx2 + (distanceBetweenYWheels / 2);
+            //curvature = 1.0/xRadius;
         } else { //curve with infinite radius, aka robot moves in a straight line
             dxLocal = dx;
             dyLocal = dy;

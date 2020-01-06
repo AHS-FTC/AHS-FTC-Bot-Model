@@ -400,14 +400,11 @@ public class MecanumChassis extends Chassis {
             OdometrySystem.State state = getState();
             powers = headingController.getUpdatedPowers(state);
 
-            double inverseLeft = inversePower(powers.leftPower);
-            double inverseRight = inversePower(powers.rightPower);
+            frontLeft.setPower(powers.leftPower);
+            backLeft.setPower(powers.leftPower);
 
-            frontLeft.setPower(inverseLeft);
-            backLeft.setPower(inverseLeft);
-
-            frontRight.setPower(inverseRight);
-            backRight.setPower(inverseRight);
+            frontRight.setPower(powers.rightPower);
+            backRight.setPower(powers.rightPower);
         }
         while (!powers.pathFinished);
 
