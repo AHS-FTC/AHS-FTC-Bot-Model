@@ -398,7 +398,7 @@ public class MecanumChassis extends Chassis {
         HeadingController.Powers powers;
         do {
             OdometrySystem.State state = getState();
-            powers = headingController.getUpdatedPowers(state.position, state.velocity);
+            powers = headingController.getUpdatedPowers(state);
 
             double inverseLeft = inversePower(powers.leftPower);
             double inverseRight = inversePower(powers.rightPower);

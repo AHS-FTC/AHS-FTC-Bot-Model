@@ -30,6 +30,8 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -58,81 +60,47 @@ import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
  * The diameter of each wheel should come out to be close to 60mm or 2.36 inches (if you're using the Ardennes rev wheels).
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Power Curve Tuner", group="Iterative OpMode")
+@Autonomous(name="Ardennes Power Curve Tuner", group="Linear Opmode")
 //@Disabled
-public class ArdennesPowerCurveTuningOpMode extends OpMode {
+public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
 
     //private Ardennes ardennes;
-    private Position position;
     private Velocity velocity;
-    private double startTime;
-    private Logger logger;
     private Ardennes ardennes;
     private MecanumChassis chassis;
     Tuner tuner = new Tuner();
-
-    private double lastTime;
     private double power;
     private double maxSpeed = 0;
 
-    private OpMode teleOp;
 
     @Override
-    public void init() {
+    public void runOpMode() {
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        logger = new Logger("PowerCurve","x","y","heading","speed");
-
-        teleOp = new SimpleTeleOp();
-        teleOp.hardwareMap = hardwareMap;
-        teleOp.gamepad1 = gamepad1;
-        teleOp.init();
         chassis = ardennes.getChassis();
 
-        tuner.addParam("power", .001);
+        tuner.addParam("power", .00001);
+        tuner.start();
         power = tuner.getParameter("power");
-    }
 
-    @Override
-    public void init_loop() {
-    }
-
-    @Override
-    public void start() {
-        lastTime = FTCUtilities.getCurrentTimeMillis();
-        startTime = FTCUtilities.getCurrentTimeMillis();
+        waitForStart();
         chassis.startOdometrySystem();
+
         chassis.setPowerAll(power);
         telemetry.addLine(String.valueOf(power));
-    }
 
-    @Override
-    public void loop() {
-        teleOp.loop();
+        while (opModeIsActive()) {
+            velocity = chassis.getState().velocity;
 
-        double currentTime = FTCUtilities.getCurrentTimeMillis();
+            if (velocity.speed() > maxSpeed) {
+                maxSpeed = velocity.speed();
+            }
 
-        position = chassis.getPosition();
-        velocity = chassis.getVelocity();
-
-        if (velocity.speed() > maxSpeed) {
-            maxSpeed = velocity.speed();
+            telemetry.addData("maxSpeed", maxSpeed);
+            telemetry.update();
         }
 
-        telemetry.addData("maxSpeed", maxSpeed);
-        telemetry.update();
-
-        lastTime = currentTime;
-
-        logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
-        logger.append("speed", String.valueOf(velocity.speed()));
-        logger.writeLine();
-    }
-    @Override
-    public void stop() {
-        teleOp.stop();
-        logger.stopWriting();
+        stop();
         chassis.stopOdometrySystem();
     }
-
 }
