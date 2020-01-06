@@ -46,31 +46,26 @@ public class Logger {
     IF THIS IS NOT DONE DATA WILL BE LOST
      */
     private String fileName;
-    private String[] categories;
+    private ArrayList<String> categories;
     private Map<String, ArrayList<String>> entriesByCategory;
     private int lastLine = 0;
     private static long startTime; //shared across all loggers for synchronization
+    private boolean firstLine;
 
     static {
         startTime = System.currentTimeMillis();
     }
 
-    public Logger(String fileName, String... cats){
+    public Logger(String fileName){
         this.fileName = fileName + ".csv";
-        categories = new String[cats.length];
-        System.arraycopy(cats,0,categories,0,cats.length);
+        categories = new ArrayList<>();
         entriesByCategory = new HashMap<>();
-        for (int i = 0; i < cats.length; i++) {
-            entriesByCategory.put(categories[i], new ArrayList<String>());
-        }
-    }
-    public String[] getCats(){
-        return categories;
     }
 
     private FileWriter csvWriter = null;
 
     public void startWriting() {
+        firstLine = true;
         try {
             File file = new File(FTCUtilities.getLogDirectory(), fileName);
             if (file.exists()) {
@@ -78,36 +73,42 @@ public class Logger {
             }
             file.createNewFile();
             csvWriter = new FileWriter(file);
-
-            csvWriter.append("Time, ");
-             for(int i = 0; i < categories.length; i ++){ // write the categories first
-                csvWriter.append(categories[i]);
-                if( i< categories.length - 1){
-                    csvWriter.append(", ");
-                }
-            }
-            csvWriter.append("\n");
-
             csvWriter.flush();
 
          } catch (IOException e) {
             throw new Warning(e.getMessage());
         }
+    }
 
+    private void writeCats() throws IOException {
+        csvWriter.append("Time, ");
+        int i = 0;
+        for(String cat : categories){ // write the categories first
+           csvWriter.append(cat);
+           if(i < categories.size() - 1){
+               csvWriter.append(", ");
+           }
+           i++;
+       }
+        csvWriter.append("\n");
     }
 
     public void writeLine(){
         try {
+            if(firstLine){
+                writeCats();
+                firstLine = false;
+            }
             csvWriter.append(String.valueOf(System.currentTimeMillis() - startTime) + ", ");
-            for (int i = 0; i < categories.length; i++) {
-                String category = categories[i];
+            for (int i = 0; i < categories.size(); i++) {
+                String category = categories.get(i);
                 List<String> list = entriesByCategory.get(category);
                 if (lastLine < list.size()) {
                     csvWriter.append(list.get(lastLine));
                 } else {
                     csvWriter.append(" ");
                 }
-                if (i < categories.length - 1) {
+                if (i < categories.size() - 1) {
                     csvWriter.append(", ");
                 }
             }
@@ -127,6 +128,22 @@ public class Logger {
         }
     }
 
+
+
+    public void append(String category, String data) {
+        ArrayList<String> dataList = entriesByCategory.get(category);
+        if (dataList == null) {
+            dataList = new ArrayList<>();
+            categories.add(category);
+            entriesByCategory.put(category,dataList);
+        }
+        dataList.add(data);
+    }
+
+    /**
+     * Saves a bitmap to the phone. Sets the file name using time & date information.
+     * Saves can be found in the downloads folder of the phone.
+     */
     public static void saveImage(Bitmap bitmap){
         Calendar now = Calendar.getInstance();
         String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
@@ -145,13 +162,5 @@ public class Logger {
             throw new Warning(e.getMessage());
         }
 
-    }
-
-    public void append(String category, String data) {
-        ArrayList<String> dataList = entriesByCategory.get(category);
-        if (dataList == null) {
-            throw new Warning("Logger.append invoked with unknown category : " + category);
-        }
-        dataList.add(data);
     }
 }

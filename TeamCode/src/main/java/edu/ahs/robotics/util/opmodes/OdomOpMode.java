@@ -70,7 +70,7 @@ public class OdomOpMode extends OpMode
         OdometerImpl y = new OdometerImpl("BR", 2.366, false,4000);
         odometrySystem = new OdometrySystemImpl(x1,x2,y, 0,14.5);
 
-        logger = new Logger("odometry","x","y","heading","speed","dot","time");
+        logger = new Logger("odometry");
 
         tele = new SimpleTankTeleOp();
         tele.hardwareMap = hardwareMap;

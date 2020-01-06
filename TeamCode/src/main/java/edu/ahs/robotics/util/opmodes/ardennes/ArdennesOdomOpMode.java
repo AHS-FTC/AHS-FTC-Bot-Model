@@ -68,7 +68,7 @@ public class ArdennesOdomOpMode extends OpMode
     public void init() {
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        logger = new Logger("odometry","x","y","heading","speed","imu heading");
+        logger = new Logger("odometry");
 
         teleOp = new SimpleTeleOp();
         teleOp.hardwareMap = hardwareMap;
