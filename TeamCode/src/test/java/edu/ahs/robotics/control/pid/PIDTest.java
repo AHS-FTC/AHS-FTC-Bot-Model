@@ -24,7 +24,6 @@ public class PIDTest {
         assertEquals(0,correction.totalCorrection,0);
     }
 
-
     @Test
     public void testIntegral(){
         PID pid = new PID(0,1,0,1);

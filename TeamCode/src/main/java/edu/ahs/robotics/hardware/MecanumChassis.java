@@ -109,7 +109,7 @@ public class MecanumChassis extends Chassis {
         }
     }*/
 
-    private void setPowerAll(double motorPower) {
+    public void setPowerAll(double motorPower) {
         frontRight.setPower(motorPower);
         frontLeft.setPower(motorPower);
         backRight.setPower(motorPower);
@@ -398,16 +398,13 @@ public class MecanumChassis extends Chassis {
         HeadingController.Powers powers;
         do {
             OdometrySystem.State state = getState();
-            powers = headingController.getUpdatedPowers(state.position, state.velocity);
+            powers = headingController.getUpdatedPowers(state);
 
-            double inverseLeft = inversePower(powers.leftPower);
-            double inverseRight = inversePower(powers.rightPower);
+            frontLeft.setPower(powers.leftPower);
+            backLeft.setPower(powers.leftPower);
 
-            frontLeft.setPower(inverseLeft);
-            backLeft.setPower(inverseLeft);
-
-            frontRight.setPower(inverseRight);
-            backRight.setPower(inverseRight);
+            frontRight.setPower(powers.rightPower);
+            backRight.setPower(powers.rightPower);
         }
         while (!powers.pathFinished);
 

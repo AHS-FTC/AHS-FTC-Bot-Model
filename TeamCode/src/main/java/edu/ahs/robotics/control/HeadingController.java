@@ -1,6 +1,7 @@
 package edu.ahs.robotics.control;
 
 import edu.ahs.robotics.control.pid.PID;
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.ParameterLookup;
@@ -14,11 +15,10 @@ public class HeadingController {
     private PID speedPID;
     private PID turnPID;
     private double maxPower;
-    private double leftPower = .6;
-    private double rightPower = .6;
+    private double leftPower = .2;
+    private double rightPower = .2;
 
     //Correction values
-//    private static final double SPEED_SCALE = .001;
     private static final double TURN_SCALE = .01;
     double fCoeff;
 
@@ -37,7 +37,10 @@ public class HeadingController {
         logger.startWriting();
     }
 
-    public Powers getUpdatedPowers(Position robotPosition, Velocity robotVelocity) {
+    public Powers getUpdatedPowers(OdometrySystem.State robotState) {
+        Position robotPosition = robotState.position;
+        Velocity robotVelocity = robotState.velocity;
+
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
         if (!targetLocation.pathFinished) {
@@ -56,7 +59,8 @@ public class HeadingController {
             rightPower += totalSpeedCorrection;
 
             PID.Corrections turnCorrections = turnPID.getCorrection(targetLocation.distanceToRobot, 0);
-            double lookAheadTurnCorrection = (targetLocation.lookAheadCurvature * fCoeff);
+            double flippedRobotCurvature = -robotState.travelCurvature; //Flipped because
+            double lookAheadTurnCorrection = (targetLocation.lookAheadCurvature - flippedRobotCurvature) * fCoeff;
 
             double totalTurnCorrection = turnCorrections.totalCorrection + lookAheadTurnCorrection;
 
@@ -64,6 +68,7 @@ public class HeadingController {
             rightPower += totalTurnCorrection;
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
+            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
             logger.append("speedCorrection", String.valueOf(totalSpeedCorrection));
             logger.append("speedCorrectionP", String.valueOf(speedCorrections.correctionP));
             logger.append("speedCorrectionI", String.valueOf(speedCorrections.correctionI));
@@ -71,18 +76,18 @@ public class HeadingController {
             logger.append("speedAlongPath", String.valueOf(speedAlongPath));
             logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
             logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
-            logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
             logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
             logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
-            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
             logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
             logger.append("turnCorrectionP", String.valueOf(turnCorrections.correctionP));
             logger.append("turnCorrectionI", String.valueOf(turnCorrections.correctionI));
             logger.append("turnCorrectionD", String.valueOf(turnCorrections.correctionD));
             logger.append("turnCorrectionF", String.valueOf(lookAheadTurnCorrection));
+            logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
+            logger.append("flippedRobotCurvature", String.valueOf(flippedRobotCurvature));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
