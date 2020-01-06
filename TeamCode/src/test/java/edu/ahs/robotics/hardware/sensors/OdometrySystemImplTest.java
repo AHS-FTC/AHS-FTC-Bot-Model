@@ -53,6 +53,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, 0.0);
 
         assertEquals(0, state.velocity.speed(),0.0);
+        assertEquals(0,state.travelCurvature,0.0);
     }
 
     @Test
@@ -74,12 +75,13 @@ public class OdometrySystemImplTest {
 
         assertTrue(state.velocity.speed() > 0);
         assertEquals(state.velocity.direction(), Math.PI / 2,0.001);
+        assertEquals(0,state.travelCurvature,0.0);
     }
 
     @Test
     public void testImperfectStrafe(){
-        double[] x1Inputs = {0,0.001,0.002,0.003}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
-        double[] x2Inputs = {0,0,0,0};
+        double[] x1Inputs = {0,0.001,0.002,0.003}; //slightly turns, thus imperfect
+        double[] x2Inputs = {0,0,0,0}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
         double[] yInputs = {0,6,8,12};
 
         FTCUtilities.startTestMode();
@@ -103,6 +105,7 @@ public class OdometrySystemImplTest {
 
         assertEquals(12,state.position.y,0.1);
         assertEquals(0,state.position.x,0.1);
+        assertEquals(0,state.travelCurvature,0.5);
     }
 
     @Test
@@ -141,7 +144,28 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
+        assertEquals(Double.POSITIVE_INFINITY,state.travelCurvature,0.0);
+    }
 
+    @Test
+    public void turnNegative90Degrees(){
+        double[] x1Inputs = {0,0,-9.424775};
+        double[] x2Inputs = {0,0,9.424775};
+        double[] yInputs = {0,0,-9};
+        init(x1Inputs,x2Inputs,yInputs);
+
+        for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the initial call to the resetEncoders() method
+            odometrySystem.updatePosition();
+        }
+
+        OdometrySystem.State state = odometrySystem.getState();
+
+        assertEquals(0, state.position.heading, .01);
+        assertEquals(0, state.position.x, .01);
+        assertEquals(0, state.position.y, .01);
+
+        assertEquals(0,state.velocity.speed(), 0.01);
+        assertEquals(Double.NEGATIVE_INFINITY,state.travelCurvature,0.0);
     }
 
     @Test
@@ -156,6 +180,7 @@ public class OdometrySystemImplTest {
         }
 
         assertEquals(12, odometrySystem.getState().position.x, .01);
+        assertEquals(0,odometrySystem.getState().travelCurvature,0.5);
     }
 
     @Test
@@ -175,7 +200,7 @@ public class OdometrySystemImplTest {
         assertEquals(12, state.position.y, .01);
       
         assertEquals(Math.PI/4, state.velocity.direction(),0.001);
-
+        assertEquals(0,state.travelCurvature,0.0);
     }
 
     @Test
@@ -196,6 +221,8 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
+        assertEquals(Double.POSITIVE_INFINITY,state.travelCurvature,0.0);
+
     }
 
     @Test

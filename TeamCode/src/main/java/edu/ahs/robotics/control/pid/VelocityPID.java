@@ -11,8 +11,8 @@ public class VelocityPID{
     private PID speedPID, directionPID;
 
     public VelocityPID(Config config) {
-        speedPID = new PID(config.sP, config.sI, config.sD, 0);
-        directionPID = new PID(config.dP, config.dI, config.dD, 0);
+        speedPID = new PID(config.sP, config.sI, config.sD);
+        directionPID = new PID(config.dP, config.dI, config.dD);
     }
 
     /**

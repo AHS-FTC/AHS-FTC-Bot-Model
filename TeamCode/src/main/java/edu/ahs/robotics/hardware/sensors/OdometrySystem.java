@@ -28,12 +28,17 @@ public interface OdometrySystem {
     class State {
        public Position position;
        public Velocity velocity;
-       public double travelRadius;
+        /**
+         * Measures the current curvature of travel in the x dimension.
+         * Calculated as 1/r, where traveling with a small radius means high curvature and infinite radius yields zero curvature.
+         * For non-tank style movement the idea of curvature will need to be elaborated on.
+         */
+       public double travelCurvature;
 
-        State(Position position, Velocity velocity, double travelRadius) {
+        State(Position position, Velocity velocity, double travelCurvature) {
             this.position = new Position(position);
             this.velocity = new Velocity(velocity);
-            this.travelRadius = travelRadius;
+            this.travelCurvature = travelCurvature;
         }
     }
 }
