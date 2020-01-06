@@ -85,7 +85,10 @@ public class TestAuto extends LinearOpMode {
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);*/
 
-        tuner.start("p", "d", "f");
+        tuner.addParam("p", .0000001);
+        tuner.addParam("d", .0000001);
+        tuner.addParam("f", .0000001);
+        tuner.start();
         ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
         waitForStart();

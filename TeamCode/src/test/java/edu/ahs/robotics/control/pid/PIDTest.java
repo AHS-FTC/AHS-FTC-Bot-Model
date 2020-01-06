@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class PIDTest {
     @Test
     public void testDerivative(){
-        PID pid = new PID(0,0,1);
+        PID pid = new PID(0,0,1,1);
         pid.getCorrection(1,10); //large error
         PID.Corrections corrections = pid.getCorrection(9.9,10); //small error
 
@@ -18,7 +18,7 @@ public class PIDTest {
 
     @Test
     public void testNull(){
-        PID pid = new PID(0,0,0);
+        PID pid = new PID(0,0,0,1);
         PID.Corrections correction = pid.getCorrection(0,10);
 
         assertEquals(0,correction.totalCorrection,0);
@@ -27,7 +27,7 @@ public class PIDTest {
 
     @Test
     public void testIntegral(){
-        PID pid = new PID(0,1,0);
+        PID pid = new PID(0,1,0,1);
         PID.Corrections initialCorrection = pid.getCorrection(0,1);
 
         pid.getCorrection(0,1);//wind up integral
@@ -41,7 +41,7 @@ public class PIDTest {
 
     @Test
     public void testProportionality(){
-        PID pid = new PID(1,0,0);
+        PID pid = new PID(1,0,0,1);
 
         PID.Corrections bigCorrection = pid.getCorrection(0,10);
         PID.Corrections smolCorrection = pid.getCorrection(5,10);

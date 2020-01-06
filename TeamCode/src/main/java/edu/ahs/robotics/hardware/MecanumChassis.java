@@ -109,7 +109,7 @@ public class MecanumChassis extends Chassis {
         }
     }*/
 
-    private void setPowerAll(double motorPower) {
+    public void setPowerAll(double motorPower) {
         frontRight.setPower(motorPower);
         frontLeft.setPower(motorPower);
         backRight.setPower(motorPower);

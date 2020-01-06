@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -11,15 +13,21 @@ import java.util.HashMap;
  * @author Alex Appleby
  */
 public class Tuner implements ParameterLookup {
-    public static HashMap<String,Double> tuningParams; // the actual output mapped to a val enum
-    private static boolean running = false;
-    private static final double SPEED_CONSTANT = 0.000001; // the speed at which values change
+    private HashMap<String,Double> tuningParams; // the actual output mapped to a val enum
+    private  boolean running = false;
+    //private static final double SPEED_CONSTANT = 0.000001; // the speed at which values change
+    Map<String, Double> params = new HashMap();
+    List<String> paramNames = new ArrayList();
+
+    public void addParam(String name, double scale) {
+        params.put(name, scale);
+        paramNames.add(name);
+    }
 
     /**
      * Runs blocking main loop that logs and checks for gamepad1 inputs to tune. To be ran in init.
-     * @param paramNames
      */
-    public void start(String... paramNames){
+    public void start(){
         tuningParams = new HashMap<>();
         running = true;
         int valsListIndex = 0;
@@ -28,7 +36,7 @@ public class Tuner implements ParameterLookup {
         Switch downSwitch = new Switch();
 
 
-        for(String name: paramNames){
+        for(String name: params.keySet()){
             tuningParams.put(name,0.0);
         }
 
@@ -39,34 +47,34 @@ public class Tuner implements ParameterLookup {
                 output += name;
                 output += ": ";
                 output += Double.toString(tuningParams.get(name));
-                if(paramNames[valsListIndex].equals(name)){
+                if(paramNames.get(valsListIndex).equals(name)){
                     output += "<---"; // Indicator so that we know which value we're editing
                 }
 
                 FTCUtilities.addLine(output);
             }
 
-            if(gamepad1.dpad_down) {
+            if(gamepad1.dpad_up) {
                 if (upSwitch.flip()) {
                     if (valsListIndex >= 1) {
                         valsListIndex -= 1;
                     } else {
-                        valsListIndex = paramNames.length - 1; //wrap to top
+                        valsListIndex = paramNames.size() - 1; //wrap to top
                     }
                 }
-            } else if(gamepad1.dpad_up){
+            } else if(gamepad1.dpad_down){
                 if (downSwitch.flip()) {
-                    if (valsListIndex < paramNames.length - 1) {
+                    if (valsListIndex < paramNames.size() - 1) {
                         valsListIndex += 1;
                     } else {
                         valsListIndex = 0; // wrap around to 0
                     }
                 }
             } else {
-                String currentValKey = paramNames[valsListIndex];
+                String currentValKey = paramNames.get(valsListIndex);
                 double currentValDouble = tuningParams.get(currentValKey);
-                currentValDouble += gamepad1.right_trigger * SPEED_CONSTANT;
-                currentValDouble -= gamepad1.left_trigger * SPEED_CONSTANT;
+                currentValDouble += gamepad1.right_trigger * params.get(currentValKey);
+                currentValDouble -= gamepad1.left_trigger * params.get(currentValKey);
                 tuningParams.put(currentValKey, currentValDouble);
             }
             FTCUtilities.updateOpLogger();
