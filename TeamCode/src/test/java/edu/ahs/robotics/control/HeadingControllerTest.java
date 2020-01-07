@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.ParameterLookup;
 
@@ -27,12 +28,13 @@ public class HeadingControllerTest {
         HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(0, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.leftPower > 0);
         assertTrue(powers.rightPower > 0);
 
-        HeadingController.Powers powers2 = controller.getUpdatedPowers(robotPosition, velocity);
+        HeadingController.Powers powers2 = controller.getUpdatedPowers(state);
 
         assertTrue(powers2.leftPower > powers.leftPower);
         assertTrue(powers2.rightPower > powers.rightPower);
@@ -51,7 +53,8 @@ public class HeadingControllerTest {
         HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(1, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.rightPower > powers.leftPower);
     }
@@ -65,7 +68,8 @@ public class HeadingControllerTest {
         HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(-1, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.leftPower > powers.rightPower);
     }
@@ -79,7 +83,8 @@ public class HeadingControllerTest {
         HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(0, 4, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
         assertEquals(0, powers.leftPower, .001);
         assertEquals(0, powers.rightPower, .001);
     }
@@ -93,7 +98,8 @@ public class HeadingControllerTest {
         HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(0, 5, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
         assertEquals(0.0, powers.leftPower, .001);
         assertEquals(0.0, powers.rightPower, .001);
     }
@@ -107,9 +113,11 @@ public class HeadingControllerTest {
         HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(0, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+
         double maxPower;
         do {
-            HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+            HeadingController.Powers powers = controller.getUpdatedPowers(state);
             maxPower = Math.max(powers.leftPower, powers.rightPower);
         } while (maxPower < 1);
         assertEquals(1, maxPower, .001);
@@ -125,9 +133,11 @@ public class HeadingControllerTest {
         HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(1, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+
         double maxPower;
         do {
-            HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+            HeadingController.Powers powers = controller.getUpdatedPowers(state);
             maxPower = Math.max(Math.abs(powers.leftPower), Math.abs(powers.rightPower));
         } while (maxPower < 1);
         assertEquals(1, maxPower, .001);
