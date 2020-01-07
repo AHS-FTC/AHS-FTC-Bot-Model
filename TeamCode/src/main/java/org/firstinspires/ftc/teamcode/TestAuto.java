@@ -96,13 +96,14 @@ public class TestAuto extends LinearOpMode {
 //        ArrayList<Point> points = new ArrayList<>();
 //        points.add(new Point(0,0));
 //        points.add(new Point(60,0));
-        Path path = new Path(points, 12, 8, 36);
+        Path path = new Path(points, 4, 4, 12);
         chassis.startOdometrySystem();
 
         chassis.followPath(path);
 
-        stop();
+        chassis.stopOdometrySystem();
 
+        stop();
 
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
         //sleep(10000);

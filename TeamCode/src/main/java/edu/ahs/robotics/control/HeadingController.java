@@ -59,35 +59,34 @@ public class HeadingController {
             rightPower += totalSpeedCorrection;
 
             PID.Corrections turnCorrections = turnPID.getCorrection(targetLocation.distanceToRobot, 0);
-            double flippedRobotCurvature = -robotState.travelCurvature; //Flipped because
-            double lookAheadTurnCorrection = (targetLocation.lookAheadCurvature - flippedRobotCurvature) * fCoeff;
+            double lookAheadTurnCorrection = -1.0 * (targetLocation.lookAheadCurvature - robotState.travelCurvature) * fCoeff;
 
             double totalTurnCorrection = turnCorrections.totalCorrection + lookAheadTurnCorrection;
 
             leftPower -= totalTurnCorrection;
             rightPower += totalTurnCorrection;
 
-            logger.append("targetSpeed", String.valueOf(targetSpeed));
-            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
-            logger.append("speedCorrection", String.valueOf(totalSpeedCorrection));
-            logger.append("speedCorrectionP", String.valueOf(speedCorrections.correctionP));
-            logger.append("speedCorrectionI", String.valueOf(speedCorrections.correctionI));
-            logger.append("speedCorrectionD", String.valueOf(speedCorrections.correctionD));
-            logger.append("speedAlongPath", String.valueOf(speedAlongPath));
-            logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
-            logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
+            //logger.append("targetSpeed", String.valueOf(targetSpeed));
+            //logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
+            //logger.append("speedCorrection", String.valueOf(totalSpeedCorrection));
+            //logger.append("speedCorrectionP", String.valueOf(speedCorrections.correctionP));
+            //logger.append("speedCorrectionI", String.valueOf(speedCorrections.correctionI));
+            //logger.append("speedCorrectionD", String.valueOf(speedCorrections.correctionD));
+            //logger.append("speedAlongPath", String.valueOf(speedAlongPath));
+            //logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
+            //logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
-            logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
-            logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
-            logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
-            logger.append("turnCorrectionP", String.valueOf(turnCorrections.correctionP));
-            logger.append("turnCorrectionI", String.valueOf(turnCorrections.correctionI));
-            logger.append("turnCorrectionD", String.valueOf(turnCorrections.correctionD));
+            //logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
+            //logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
+//            logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
+//            logger.append("turnCorrectionP", String.valueOf(turnCorrections.correctionP));
+//            logger.append("turnCorrectionI", String.valueOf(turnCorrections.correctionI));
+//            logger.append("turnCorrectionD", String.valueOf(turnCorrections.correctionD));
             logger.append("turnCorrectionF", String.valueOf(lookAheadTurnCorrection));
             logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
-            logger.append("flippedRobotCurvature", String.valueOf(flippedRobotCurvature));
+            logger.append("robotCurvature", String.valueOf(robotState.travelCurvature));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
