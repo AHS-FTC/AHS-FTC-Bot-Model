@@ -35,7 +35,7 @@ public interface OdometrySystem {
          */
        public double travelCurvature;
 
-        State(Position position, Velocity velocity, double travelCurvature) {
+        public State(Position position, Velocity velocity, double travelCurvature) {
             this.position = new Position(position);
             this.velocity = new Velocity(velocity);
             this.travelCurvature = travelCurvature;
