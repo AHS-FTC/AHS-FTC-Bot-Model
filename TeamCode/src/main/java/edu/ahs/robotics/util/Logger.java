@@ -3,6 +3,8 @@ package edu.ahs.robotics.util;
 import android.graphics.Bitmap;
 import android.os.Environment;
 
+import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -30,7 +32,7 @@ public class Logger {
     you can do this in the append function, by using Integer.toString(int) or Double.toString(double)
 
     FINALIZE AND WRITE FILE:
-    Use function logger.getinstance().writeToFile();
+    Use function logger.getinstance().stopWriting();
     Make sure to write this after your robot.executePlan();
     Otherwise, file will never be written and data is lost
 
@@ -44,24 +46,26 @@ public class Logger {
     IF THIS IS NOT DONE DATA WILL BE LOST
      */
     private String fileName;
-    private String[] categories;
+    private ArrayList<String> categories;
     private Map<String, ArrayList<String>> entriesByCategory;
-    public Logger(String name, String... cats){
-        fileName=name;
-        categories= new String[cats.length];
-        System.arraycopy(cats,0,categories,0,cats.length);
-        entriesByCategory = new HashMap<>();
-        for (int i = 0; i < cats.length; i++) {
-            entriesByCategory.put(categories[i], new ArrayList<String>());
-        }
+    private int lastLine = 0;
+    private static long startTime; //shared across all loggers for synchronization
+    private boolean firstLine;
+
+    static {
+        startTime = System.currentTimeMillis();
     }
-    public String[] getCats(){
-        return categories;
+
+    public Logger(String fileName){
+        this.fileName = fileName + ".csv";
+        categories = new ArrayList<>();
+        entriesByCategory = new HashMap<>();
     }
 
     private FileWriter csvWriter = null;
 
-    public void writeToFile() {
+    public void startWriting() {
+        firstLine = true;
         try {
             File file = new File(FTCUtilities.getLogDirectory(), fileName);
             if (file.exists()) {
@@ -69,26 +73,77 @@ public class Logger {
             }
             file.createNewFile();
             csvWriter = new FileWriter(file);
-            for (int i = 0; i < categories.length; i++) {
-                String catagory = categories[i];
-                List list = entriesByCategory.get(catagory);
-                Iterator<String> iterator = list.iterator();
-                while (iterator.hasNext()) {
-                    csvWriter.append(iterator.next());
-                    if (iterator.hasNext()) {
-                        csvWriter.append(", ");
-                    }
-                }
-
-                csvWriter.append("\n");
-            }
             csvWriter.flush();
-            csvWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+         } catch (IOException e) {
+            throw new Warning(e.getMessage());
         }
     }
 
+    private void writeCats() throws IOException {
+        csvWriter.append("Time, ");
+        int i = 0;
+        for(String cat : categories){ // write the categories first
+           csvWriter.append(cat);
+           if(i < categories.size() - 1){
+               csvWriter.append(", ");
+           }
+           i++;
+       }
+        csvWriter.append("\n");
+    }
+
+    public void writeLine(){
+        try {
+            if(firstLine){
+                writeCats();
+                firstLine = false;
+            }
+            csvWriter.append(String.valueOf(System.currentTimeMillis() - startTime) + ", ");
+            for (int i = 0; i < categories.size(); i++) {
+                String category = categories.get(i);
+                List<String> list = entriesByCategory.get(category);
+                if (lastLine < list.size()) {
+                    csvWriter.append(list.get(lastLine));
+                } else {
+                    csvWriter.append(" ");
+                }
+                if (i < categories.size() - 1) {
+                    csvWriter.append(", ");
+                }
+            }
+            csvWriter.append("\n");
+            lastLine++;
+            csvWriter.flush();
+        } catch (Exception e){
+            throw new Warning(e.getMessage());
+        }
+    }
+
+    public void stopWriting() {
+        try{
+            csvWriter.close();
+        } catch (IOException e) {
+            throw new Warning(e.getMessage());
+        }
+    }
+
+
+
+    public void append(String category, String data) {
+        ArrayList<String> dataList = entriesByCategory.get(category);
+        if (dataList == null) {
+            dataList = new ArrayList<>();
+            categories.add(category);
+            entriesByCategory.put(category,dataList);
+        }
+        dataList.add(data);
+    }
+
+    /**
+     * Saves a bitmap to the phone. Sets the file name using time & date information.
+     * Saves can be found in the downloads folder of the phone.
+     */
     public static void saveImage(Bitmap bitmap){
         Calendar now = Calendar.getInstance();
         String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
@@ -104,12 +159,8 @@ public class Logger {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Warning(e.getMessage());
         }
 
-    }
-
-    public void append(String title, String data) {
-        entriesByCategory.get(title).add(data);
     }
 }

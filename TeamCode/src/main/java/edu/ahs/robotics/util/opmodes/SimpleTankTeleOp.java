@@ -38,13 +38,24 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 @TeleOp(name="Ardennes Simple Tank TeleOp", group="Iterative OpMode")
 @Disabled
-public class ArdennesSimpleTankTeleOp extends ArdennesSimpleTeleOp
+public class SimpleTankTeleOp extends SimpleTeleOp
 {
 
     @Override
     public void loop() {
         double left = gamepad1.left_stick_y;
         double right = gamepad1.right_stick_y;
+
+//        double left = 0;
+//        double right = 0;
+//        if(gamepad1.a){
+//          left = .5;
+//          right = .3;
+//        } else if(gamepad1.b) {
+//            left = -.5;
+//            right = -.3;
+//        }
+
 
         frontLeft.setPower(left);
         frontRight.setPower(right);

@@ -23,6 +23,13 @@ public class Position {
     }
 
     /**
+     * Copy Constructor
+     */
+    public Position(Position p){
+        copyFrom(p);
+    }
+
+    /**
      * Creates a position given a cartesian point and a heading in radians.
      * @param point
      * @param heading
@@ -77,7 +84,7 @@ public class Position {
      */
     public double distanceTo(Position targetPosition){
         double xDistance = targetPosition.x - x;
-        double yDistance = targetPosition.y - x;
+        double yDistance = targetPosition.y - y;
 
         return Math.sqrt(xDistance * xDistance  +  yDistance * yDistance); //distance formula
     }

@@ -4,23 +4,20 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.control.HeadingController;
 import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.hardware.sensors.IMU;
-import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.control.VelocityPID;
-import edu.ahs.robotics.control.XYHeadingPID;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.control.pid.VelocityPID;
+import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.control.Point;
 
 public class MecanumChassis extends Chassis {
 
     private static final double ROBOT_WIDTH = 333;
     public static final int MIN_TARGET_DISTANCE = 5;
-    public static final double DISTANCE_PER_360 = 1001;
+    public static final double DISTANCE_PER_360 = 43.8; //Tuned - real value 44.3 from getDistance xWheels //41.2 yWheels
     private static final double LEFT_INITIAL_SHIFT = 0;
     private static final double LEFT_INITIAL_SCALE = 1.02;
     private SingleDriveUnit frontLeft;
@@ -36,9 +33,8 @@ public class MecanumChassis extends Chassis {
 
     private OdometrySystem odometrySystem;
 
-    private OdometerImpl leftOdometer;
-    private OdometerImpl rightOdometer;
-    private OdometerImpl backOdometer;
+    private Odometer leftOdometer;
+    private Odometer rightOdometer;
 
 
     public MecanumChassis(DriveUnit.Config driveUnitConfig, OdometrySystem odometrySystem) {
@@ -49,6 +45,8 @@ public class MecanumChassis extends Chassis {
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
         this.odometrySystem = odometrySystem;
+        leftOdometer = odometrySystem.getX1Odometer(); // this can easily change based on the definition of the x1 odometer
+        rightOdometer = odometrySystem.getX2Odometer();
     }
 
 //    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystemImpl odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
@@ -86,7 +84,7 @@ public class MecanumChassis extends Chassis {
                 FTCUtilities.OpLogger("Delta Heading", imu.getHeading());
             }
             setPowerAll(0);
-            //Logger.getInstance().writeToFile();
+            //Logger.getInstance().stopWriting();
 
         } else if(pointTurn.type == PointTurn.Type.ABSOLUTE){
 
@@ -111,7 +109,7 @@ public class MecanumChassis extends Chassis {
         }
     }*/
 
-    private void setPowerAll(double motorPower) {
+    public void setPowerAll(double motorPower) {
         frontRight.setPower(motorPower);
         frontLeft.setPower(motorPower);
         backRight.setPower(motorPower);
@@ -195,7 +193,7 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = 0.05;
+        final double correctionScale = 0.05; //Was 0.05
 
         leftOdometer.reset();
         rightOdometer.reset();
@@ -205,7 +203,7 @@ public class MecanumChassis extends Chassis {
             double powerRight = inversePower((rightTarget / maxTarget) * (minRampUp));
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeout) {
-                double leftDistance = -leftOdometer.getDistance();
+                double leftDistance = leftOdometer.getDistance();
                 double rightDistance = rightOdometer.getDistance();
 
                 double leftDistanceRatio = leftDistance / leftTarget;
@@ -218,8 +216,8 @@ public class MecanumChassis extends Chassis {
 
                 double maxDistance = Math.abs(leftDistance) > Math.abs(rightDistance) ? Math.abs(leftDistance) : Math.abs(rightDistance);
                 double maxRemaining = maxTarget - maxDistance;
-                double rampUp = Math.max(upScale * (maxDistance), minRampUp);
-                double rampDown = Math.max(downScale * (maxRemaining), minRampDown); //distanceTo accounts for flip across y axis and x offset
+                double rampUp = (upScale * maxDistance) + minRampUp;
+                double rampDown = (downScale * maxRemaining) + minRampDown; //distanceTo accounts for flip across y axis and x offset
 
                 double targetPower = inversePower(Math.min(rampUp, Math.min(rampDown, maxPower)));
 
@@ -256,11 +254,13 @@ public class MecanumChassis extends Chassis {
         } finally {
             setPowerAll(0);
         }
-        Logger.getInstance().writeToFile();
+        //Logger.getInstance().stopWriting();
     }
 
     public void velocityDrive(Path path, double maxSpeed){
-        Position initialPosition = getPosition();
+        OdometrySystem.State initialState = getState();
+
+        Position initialPosition = initialState.position;
         /*Velocity initialVelocity = getVelocity();*/
 
         double distanceToEnd = path.getTargetLocation(initialPosition).distanceToEnd;
@@ -283,12 +283,14 @@ public class MecanumChassis extends Chassis {
         while (distanceToEnd > 0.05) { //0.05 is quite arbitrary
             double targetSpeed;
 
-            Position currentPosition = getPosition();
-            Velocity currentVelocity = getVelocity();
+            OdometrySystem.State state = getState();
+
+            Position currentPosition = state.position;
+            Velocity currentVelocity = state.velocity;
 
             Path.Location location = path.getTargetLocation(currentPosition);
 
-            Velocity targetVelocity = Velocity.makeVelocityFromDxDy(location.pathDeltaX,location.pathDeltaY);
+            Velocity targetVelocity = Velocity.makeVelocity(location.pathDeltaX,location.pathDeltaY);
 
             distanceToEnd = path.getTargetLocation(currentPosition).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
 
@@ -296,7 +298,7 @@ public class MecanumChassis extends Chassis {
 
             // target speed math: https://www.desmos.com/calculator/31kvlxmlhn
 
-            targetVelocity.speed = targetSpeed; //scale the velocity vector
+            targetVelocity.scaleMagnitude(targetSpeed); //scale the velocity vector
 
             correction = pid.getCorrection(currentVelocity,targetVelocity); //get the corrections
 
@@ -324,20 +326,20 @@ public class MecanumChassis extends Chassis {
      * @param timeOut delta time in millis to end the main correction loop
      */
     public void goToPointWithPID(Point point, long timeOut){
-        Position currentPosition = getPosition();
+        Position currentPosition = getState().position;
         Position targetPosition = new Position(point, 0);
         double frontLeftPower = 0, frontRightPower = 0;
         double backLeftPower = 0, backRightPower = 0;
 
-        XYHeadingPID.Correction correction;
+        PositionPID.Correction correction;
         MecanumVectors mecanumVectorCorrections;
 
-        XYHeadingPID.Config pidConfig = new XYHeadingPID.Config();
+        PositionPID.Config pidConfig = new PositionPID.Config();
         pidConfig.setYParameters(0.01,0.001, -0.05);
         pidConfig.setXParameters(0.01,0.001, -0.05);
         pidConfig.setHeadingParameters(0,0,0);
 
-        XYHeadingPID pid = new XYHeadingPID(pidConfig);
+        PositionPID pid = new PositionPID(pidConfig);
 
         long startTime = FTCUtilities.getCurrentTimeMillis();
 
@@ -348,7 +350,7 @@ public class MecanumChassis extends Chassis {
         }
 
         while (FTCUtilities.getCurrentTimeMillis() - startTime < timeOut && currentPosition.distanceTo(targetPosition) > 0.1){
-            currentPosition = getPosition();
+            currentPosition = getState().position;
 
             FTCUtilities.addData("x", currentPosition.x);
             FTCUtilities.addData("y", currentPosition.y);
@@ -388,38 +390,31 @@ public class MecanumChassis extends Chassis {
 
     private double inversePower(double power) {
         //   return power * Math.abs(power);
-        return Math.pow(power, 3);
+        return Math.signum(power) * Math.pow(power, 2);
     }
 
     public void followPath(Path path) {
-        HeadingController headingController = new HeadingController(path, 1 ,1 ,1);
+        HeadingController headingController = new HeadingController(path,  1); //Max power before inversion
+        HeadingController.Powers powers;
+        do {
+            OdometrySystem.State state = getState();
+            powers = headingController.getUpdatedPowers(state);
 
-        //Get position of the robot
+            frontLeft.setPower(powers.leftPower);
+            backLeft.setPower(powers.leftPower);
 
-        //Get text file with coordinates
-
-        //Read text file and trim unnecessary data
-
-
-        //Start loop and add everything below
-        while (true) {
-
+            frontRight.setPower(powers.rightPower);
+            backRight.setPower(powers.rightPower);
         }
+        while (!powers.pathFinished);
 
     }
 
     /**
      * @return Global Position on the field
      */
-    public Position getPosition(){
-        return odometrySystem.getPosition();
-    }
-
-    /**
-     * @return Velocity Vector in inches per second
-     */
-    public Velocity getVelocity(){
-        return odometrySystem.getVelocity();
+    public OdometrySystem.State getState(){
+        return odometrySystem.getState();
     }
 
     /**

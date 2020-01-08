@@ -32,44 +32,37 @@ package edu.ahs.robotics.util.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.util.FTCUtilities;
 
 
 /**
- * Test OpMode for tuning the true diameter of the odometer wheels on Ardennes. The 60mm REV wheels have bad tolerances.
- * This OpMode doesn't utilize the Ardennes class structure and instead directly accesses the encoders via the hardwaremap.
- * You may have to look over this code to make sure it's accurate before using/reusing it.
- * </br>
- * Using this class does require some math. Take the total distance you push your robot and divide it by the amount of rotations to figure out the circumference of the wheel.
- * Knowing the circumference calculate diameter by dividing by pi.
- * The diameter of each wheel should come out to be close to 60mm or 2.36 inches (if you're using the Ardennes rev wheels).
+ * OpMode that returns displacement values to check if wheels are correctly tuned. Also works to check ticks per rotation and rotation direction
+ * <b>Independent of BotModel, needs to be tuned before use</b>
+ * Remember that motor flips in botmodel may also affect your encoder directions.
  * @author Alex Appleby
  */
-@TeleOp(name="Ardennes Odometery Wheel Tuner", group="Iterative OpMode")
+@TeleOp(name="Odometer tuning check OpMode", group="Iterative OpMode")
 //@Disabled
-public class ArdennesWheelTuningOpMode extends OpMode
+public class WheelTuningCheckOpMode extends OpMode
 {
-    private DcMotor left, right, back;
-    private static final double TICKS_PER_ROTATION = 1440;
-    private ArdennesSimpleTeleOp tele;
+    private Odometer leftOdom,rightOdom,backOdom;
+    private DcMotor br;
 
     @Override
     public void init() {
-        left = hardwareMap.get(DcMotor.class,"intakeL");
-        right = hardwareMap.get(DcMotor.class,"intakeR");
-        back = hardwareMap.get(DcMotor.class,"BR");
+        FTCUtilities.setOpMode(this);
 
-        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br = hardwareMap.get(DcMotor.class, "BR");
+        br.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        back.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftOdom = new OdometerImpl("intakeL",2.3596, true, 1440); // remember to update these
+        rightOdom = new OdometerImpl("intakeR",2.3617, true, 1440); // tune all before use
+        backOdom = new OdometerImpl("BR",2.387, true, 4000);
 
-        tele = new ArdennesSimpleTeleOp();
-        tele.hardwareMap = hardwareMap;
-        tele.init();
-        tele.gamepad1 = gamepad1;
     }
 
     @Override
@@ -82,11 +75,20 @@ public class ArdennesWheelTuningOpMode extends OpMode
 
     @Override
     public void loop() {
-        tele.loop();
-        telemetry.addData("Left Rotations", (left.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("Right Rotations", (right.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("Back Rotations", (back.getCurrentPosition()/TICKS_PER_ROTATION));
-        telemetry.addData("back reading", back.getCurrentPosition());
+
+        if(gamepad1.a){
+            if(br.getDirection() == DcMotorSimple.Direction.REVERSE) {
+                br.setDirection(DcMotorSimple.Direction.FORWARD);
+            } else {
+                br.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+        }
+
+        telemetry.addData("back right direction", br.getDirection().toString());
+
+        telemetry.addData("left reading", leftOdom.getDistance());
+        telemetry.addData("right reading", rightOdom.getDistance());
+        telemetry.addData("back reading", backOdom.getDistance());
         telemetry.update();
     }
     @Override

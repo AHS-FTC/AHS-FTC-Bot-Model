@@ -27,30 +27,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
 
 
-@Autonomous(name = "GCode Test", group = "Linear Opmode")
+@TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
 @Disabled
-public class GCodeTest extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-
+public class ArdennesSensorLoggerOpMode extends OpMode
+{
+    BNO055IMU bnoIMU;
+    IMU imu;
+    TouchSensor limitSwitch;
 
     @Override
-    public void runOpMode() {
+    public void init() {
         FTCUtilities.setOpMode(this);
-        waitForStart();
-        GCodeReader.openFile("1001.csv");
+        bnoIMU = FTCUtilities.getIMU("imu");
+        imu = new IMU(bnoIMU);
+        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
     }
+
+    @Override
+    public void init_loop() {
+    }
+
+    @Override
+    public void start() {
+    }
+
+    @Override
+    public void loop() {
+        FTCUtilities.addData("IMU",imu.getHeading());
+        FTCUtilities.addData("pressed?", limitSwitch.isPressed());
+        FTCUtilities.updateOpLogger();
+    }
+    @Override
+    public void stop() {
+    }
+
 }

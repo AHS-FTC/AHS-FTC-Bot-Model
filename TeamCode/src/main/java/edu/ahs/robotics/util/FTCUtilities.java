@@ -1,23 +1,18 @@
 package edu.ahs.robotics.util;
 
 import android.os.Environment;
-import android.renderscript.ScriptGroup;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
@@ -27,7 +22,7 @@ import edu.ahs.robotics.hardware.sensors.OdometerImpl;
  * Enables Mocking via the get-InsertHardwareDeviceHere- methods and the testMode boolean
  * @author Alex Appleby
  */
-public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMap exists under OpMode.
+public class FTCUtilities { //handles inaccessable objects in FTCApp. hardwareMap exists under OpMode.
     private static HardwareMap hardwareMap;
     private static OpMode opMode;
 
@@ -35,6 +30,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     private static Map <String, DcMotor>testMotors = new HashMap();
     private static Map <String, Odometer>testOdometers = new HashMap();
     private static MockClock mockClock;
+    private static ParameterLookup parameterLookup;
 
 
     public static String getLogDirectory(){
@@ -93,7 +89,7 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
     public static void sleep(long ms) {
         if(testMode){
             try {
-                Thread.sleep(5000);
+                Thread.sleep(ms);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -155,11 +151,11 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
             throw new Error("TestMode doesn't support servos yet. mock it");
         }
     }
-    public static Odometer getOdometer(String deviceName, double wheelDiameter, boolean flip){
+    public static Odometer getOdometer(String deviceName, double wheelDiameter, boolean flip, double ticksPerRotation){
         if(testMode){
             return testOdometers.get(deviceName);
         } else {
-            return new OdometerImpl(deviceName,wheelDiameter,flip);
+            return new OdometerImpl(deviceName,wheelDiameter,flip, ticksPerRotation);
         }
     }
 
@@ -171,7 +167,13 @@ public class FTCUtilities { //handles inaccessable objects in FTCapp. hardwareMa
         }
     }
 
+    public static ParameterLookup getParameterLookup() {
+        return parameterLookup;
+    }
 
+    public static void setParameterLookup(ParameterLookup parameterLookup) {
+        FTCUtilities.parameterLookup = parameterLookup;
+    }
 
     public static void setMockClock(MockClock mockClock){
         FTCUtilities.mockClock = mockClock;

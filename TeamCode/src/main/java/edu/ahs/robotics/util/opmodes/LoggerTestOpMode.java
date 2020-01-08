@@ -33,49 +33,41 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.control.Position;
-import edu.ahs.robotics.hardware.ChassisMotors;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.Logger;
+
 
 /**
- * Test OpMode that tests the Position PID in the goToPointWithPID() method housed by the MecanumChassis class.
- * @author Alex Appleby
+ * OpMode that tests Logger on the phones.
+ * @author Alex Appleby and Gavin Heil
  */
-@TeleOp(name="Ardennes Run To Position", group="Iterative OpMode")
-@Disabled
-public class ArdennesTestRunToPosition extends OpMode
+@TeleOp(name="Logger Test", group="Iterative OpMode")
+//@Disabled
+public class LoggerTestOpMode extends OpMode
 {
-    private Ardennes ardennes;
-    private Point target;
-
+    private Logger logger;
+    private int i, j, k;
 
     @Override
     public void init() {
-        ardennes = new Ardennes();
-        ardennes.getChassis().setPosition(5,5,Math.PI/2);
-        ardennes.getChassis().startOdometrySystem();
-
-        target = new Point(0,0);
-    }
-
-    @Override
-    public void init_loop() {
-    }
-
-    @Override
-    public void start() {
-        ardennes.getChassis().goToPointWithPID(target,5000);
+        logger = new Logger("test");
+        logger.startWriting();
     }
 
     @Override
     public void loop() {
+        logger.append("one", String.valueOf(i));
+        logger.append("two", String.valueOf(j));
+        logger.append("three", String.valueOf(k));
+        logger.writeLine();
 
+        i++;
+        j+=2;
+        k+=3;
     }
+
     @Override
-    public void stop() {
-        ardennes.getChassis().stopOdometrySystem();
+    public void stop(){
+        logger.stopWriting();
     }
 
 }

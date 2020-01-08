@@ -1,8 +1,12 @@
 package edu.ahs.robotics.hardware.sensors;
 
+import java.util.Arrays;
+
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.RingBuffer;
 
 
 /**
@@ -13,21 +17,30 @@ import edu.ahs.robotics.util.FTCUtilities;
 public class OdometrySystemImpl implements OdometrySystem{
     private Position position;
     private Velocity velocity;
+    private double curvature = 0; // only measured in x
 
     private Odometer x1, x2, y;
+
+    private static final int BUFFER_SIZE = 10;
+    private RingBuffer<Double> distanceBuffer;
+    private RingBuffer<Long> timeBuffer;
+    private double distance = 0.0;
 
     private double x1Last, x2Last, yLast;
     private double yInchesPerDegree;
     private double distanceBetweenYWheels;
     private Position lastPosition;
-    private long lastTime;
 
     private OdometerThread odometerThread;
+
+    private Logger logger;
 
     /**
      * @param x1 The 'first' odometer measuring in the X direction. Should be interchangeable with x2
      * @param x2 The 'second' odometer measuring in the X direction. Should be interchangeable with x1
      * @param y The odometer measuring in the Y direction.
+     * @param yInchesPerDegree The amount of displacement given to the y odometer induced by a degree rotation to the robot. Tunable in OdometryCalibrationOpMode
+     * @see edu.ahs.robotics.util.opmodes.OdometryCalibration
      */ //todo change axis
     public OdometrySystemImpl(Odometer x1, Odometer x2, Odometer y, double yInchesPerDegree, double distanceBetweenYWheels) {
         this.x1 = x1;
@@ -35,14 +48,19 @@ public class OdometrySystemImpl implements OdometrySystem{
         this.y = y;
 
         position = new Position(0,0,0);
-        velocity = Velocity.makeVelocity(0,0);
+        velocity = Velocity.makeVelocityFromSpeedDirection(0,0);
         lastPosition = new Position(0,0,0);
-        lastTime = FTCUtilities.getCurrentTimeMillis();
 
         this.yInchesPerDegree = yInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
 
         odometerThread = new OdometerThread();
+
+        logger = new Logger("sensorStats");
+        logger.startWriting();
+
+        distanceBuffer = new RingBuffer<>(BUFFER_SIZE,0.0);
+        timeBuffer = new RingBuffer<>(BUFFER_SIZE,0L);
     }
 
     /**
@@ -53,13 +71,24 @@ public class OdometrySystemImpl implements OdometrySystem{
         odometerThread.start();
     }
   
-    public void stop(){
+    public synchronized void stop(){
+        logger.stopWriting();
         odometerThread.end();
     }
 
     public void setPosition(double x, double y, double heading){
         position.setPosition(x,y,heading);
         lastPosition.copyFrom(position);
+    }
+
+    @Override
+    public Odometer getX1Odometer() {
+        return x1;
+    }
+
+    @Override
+    public Odometer getX2Odometer() {
+        return x2;
     }
 
     /**
@@ -77,11 +106,14 @@ public class OdometrySystemImpl implements OdometrySystem{
     /**
      * Runs central odom math, called continuously by thread and accessible in package for unit testing
      */
-    void updatePosition() {
+    synchronized void updatePosition() {
         double x1Reading,x2Reading, yReading;
         double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
+        double curvature; //currently only measured in the x direction. may need to be elaborated for nonlinear movements.
+
+        long currentTime = FTCUtilities.getCurrentTimeMillis();
 
         //set readings from odom
         x1Reading = x1.getDistance();
@@ -117,9 +149,13 @@ public class OdometrySystemImpl implements OdometrySystem{
             dxLocal = (xRadius * Math.sin(dHeading)) - (yRadius * (1 - Math.cos(dHeading)));
             dyLocal = (xRadius * (1 - Math.cos(dHeading))) + (yRadius * Math.sin(dHeading));
 
+            curvature = (distanceBetweenYWheels * dx1) / dx2 + (distanceBetweenYWheels / 2);
+            //curvature = 1.0/xRadius;
         } else { //curve with infinite radius, aka robot moves in a straight line
             dxLocal = dx;
             dyLocal = dy;
+
+            curvature = 0.0; // 1/infinity
         }
 
         position.heading += dHeading;//apply our heading change
@@ -129,37 +165,45 @@ public class OdometrySystemImpl implements OdometrySystem{
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+        this.curvature = curvature;
 
-        updateVelocity();
+        logger.append("x1", String.valueOf(x1Reading));
+        logger.append("x2", String.valueOf(x2Reading));
+        logger.append("y" , String.valueOf(yReading));
+        logger.append("dHeading" , String.valueOf(dHeading));
+        logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
+        logger.append("yFactorOut" , String.valueOf(dyExpected));
+        logger.writeLine();
+
+        updateVelocity(currentTime);
     }
 
-    private void updateVelocity(){
-        long currentTime = FTCUtilities.getCurrentTimeMillis();
+    private void updateVelocity(long currentTime){
+        double distanceTraveled = position.distanceTo(lastPosition); //distance travelled between last point and this point
+        distance += distanceTraveled; // running sum of distances
 
-        double distance = position.distanceTo(lastPosition);
-        double deltaTime = (currentTime - lastTime)/1000.0;//in seconds, duh
+        double oldDistance = distanceBuffer.insert(distance);
+        long oldTime = timeBuffer.insert(currentTime);
 
-        double speed = distance/deltaTime;
+        double deltaDistance = distance - oldDistance;
+        long deltaTime = currentTime - oldTime;
+
+        double speed = deltaDistance * 1000/(double)deltaTime;
+
         double direction = lastPosition.angleTo(position);
+        velocity.setVelocityFromSpeedDirection(speed,direction);
 
-        velocity.setVelocity(speed,direction);
-
-        //lastPosition = new Position(position.x,position.y,position.heading);
         lastPosition.copyFrom(position);
-        lastTime = currentTime;
     }
 
-    public Position getPosition(){
-        return position;
-    }
-
-    public Velocity getVelocity() {
-        return velocity;
+    public State getState(){
+        return new State(position,velocity,curvature);
     }
 
     public boolean isRunning(){
         return odometerThread.running;
     }
+
 
 
     /**
@@ -174,24 +218,33 @@ public class OdometrySystemImpl implements OdometrySystem{
     }
 
     private class OdometerThread extends Thread{
+        private final int SLEEP_TIME = 20;
+
         private volatile boolean running;
 
         @Override
         public void run() {
+            long lastTime = FTCUtilities.getCurrentTimeMillis();
+
             running = true;
             while (running){
                 updatePosition();
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
 
+                long deltaTime = FTCUtilities.getCurrentTimeMillis() - lastTime;
+
+                if(deltaTime < SLEEP_TIME){
+                    try {
+                        Thread.sleep(SLEEP_TIME - deltaTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                lastTime = FTCUtilities.getCurrentTimeMillis();
             }
         }
 
-        public void end(){
+        private void end(){
             running = false;
         }
     }
-
 }

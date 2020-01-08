@@ -1,6 +1,10 @@
 package edu.ahs.robotics.hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import static org.junit.Assert.*;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -100,6 +104,7 @@ public class MecanumChassisTest {
     }
 
     @Test
+    @Ignore
     public void testPointPID(){
         Point targetPoint = new Point(0,0);
         long timeout =  100000000; // don't timeout
@@ -143,17 +148,18 @@ public class MecanumChassisTest {
 
 
     @Test
+    @Ignore
     public void testVelocityDrive(){ // standard setup that can kinda be messed around with
         double maxSpeed = 10;
 
         ArrayList<Velocity> velocities = new ArrayList<>();
         ArrayList<Position> positions = new ArrayList<>();
 
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0));
-        velocities.add(Velocity.makeVelocity(maxSpeed,0)); //6 - 1
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
+        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0)); //6 - 1
 
         positions.add(new Position(0,0,0));
         positions.add(new Position(20,0,0));
@@ -166,7 +172,7 @@ public class MecanumChassisTest {
         points.add(new Point(0,0));
         points.add(new Point(100,0));
 
-        Path path = new Path(points);
+        Path path = new Path(points, 12, 4, 36);
 
         init(positions, velocities);
 

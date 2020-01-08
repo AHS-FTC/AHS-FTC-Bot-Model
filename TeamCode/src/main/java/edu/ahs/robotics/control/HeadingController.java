@@ -1,68 +1,123 @@
 package edu.ahs.robotics.control;
 
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.Trigger;
-import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.control.pid.PID;
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.ParameterLookup;
 
 public class HeadingController {
+    //Amplifies negative power corrections to deal with momentum while decelerating
+    private static final double DOWN_AMPLIFIER = 1.2;
     Path path;
-    private double minRampDown;
-    private double minRampUp;
-    private double maxVelocity;
-    private double leftPower = 0;
-    private double rightPower = 0;
-    //Correction values
-    private static final double SPEED_SCALE = .01;
-    private static final double TURN_SCALE = .01;
+    Logger logger = new Logger("TestAutoData");
+    double downCorrectionScale;
+    private PID speedPID;
+    private PID turnPID;
+    private double maxPower;
+    private double leftPower = .2;
+    private double rightPower = .2;
 
-    public HeadingController(Path path, double minRampDown, double minRampUp, double maxVelocity) {
+    //Correction values
+    private static final double TURN_SCALE = .01;
+    double fCoeff;
+
+    public HeadingController(Path path, double maxPower) {
         this.path = path;
-        this.minRampDown = minRampDown;
-        this.minRampUp = minRampUp;
-        this.maxVelocity = maxVelocity;
+        this.maxPower = maxPower;
+
+        ParameterLookup lookup = FTCUtilities.getParameterLookup();
+
+        double pCoeff = lookup.getParameter("p");
+        double dCoeff = lookup.getParameter("d");
+        fCoeff = lookup.getParameter("f");
+        speedPID = new PID(.001, 0.0, .001, 5);
+        turnPID = new PID(pCoeff, 0.0, dCoeff, 5);
+
+        logger.startWriting();
     }
 
-    //P controller corrects for target point
+    public Powers getUpdatedPowers(OdometrySystem.State robotState) {
+        Position robotPosition = robotState.position;
+        Velocity robotVelocity = robotState.velocity;
 
-    //I controller smoothes
-
-    //D controller will look a number of points ahead to determine correction
-
-
-    public Powers getUpdatedPowers(Position robotPosition, Velocity robotVelocity) {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
         if (!targetLocation.pathFinished) {
-            double targetSpeed = getTargetSpeed(targetLocation.distanceFromStart, targetLocation.distanceToEnd);
+            double targetSpeed = targetLocation.lookAheadSpeed;
 
-            double speedError = targetSpeed - robotVelocity.speed;
+            double speedAlongPath = (robotVelocity.dx * targetLocation.pathDeltaX) + (robotVelocity.dy * targetLocation.pathDeltaY);
+            speedAlongPath /= targetLocation.pathSegmentLength;
 
-            leftPower += speedError * SPEED_SCALE;
-            rightPower += speedError * SPEED_SCALE;
-
-            leftPower -= targetLocation.distanceToRobot * TURN_SCALE;
-            rightPower += targetLocation.distanceToRobot * TURN_SCALE;
-
-            //Clip powers to 1 by maximum power
-            double maxPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
-            if (maxPower > 1.0) {
-                leftPower = leftPower / maxPower;
-                rightPower = rightPower / maxPower;
+            PID.Corrections speedCorrections = speedPID.getCorrection(speedAlongPath, targetSpeed);
+            double totalSpeedCorrection = speedCorrections.totalCorrection;
+            if (totalSpeedCorrection < 0) {
+                totalSpeedCorrection *= DOWN_AMPLIFIER;
             }
+
+            leftPower += totalSpeedCorrection;
+            rightPower += totalSpeedCorrection;
+
+            PID.Corrections turnCorrections = turnPID.getCorrection(targetLocation.distanceToRobot, 0);
+            double flippedRobotCurvature = -robotState.travelCurvature; //Flipped because
+            double lookAheadTurnCorrection = (targetLocation.lookAheadCurvature - flippedRobotCurvature) * fCoeff;
+
+            double totalTurnCorrection = turnCorrections.totalCorrection + lookAheadTurnCorrection;
+
+            leftPower -= totalTurnCorrection;
+            rightPower += totalTurnCorrection;
+
+            logger.append("targetSpeed", String.valueOf(targetSpeed));
+            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
+            logger.append("speedCorrection", String.valueOf(totalSpeedCorrection));
+            logger.append("speedCorrectionP", String.valueOf(speedCorrections.correctionP));
+            logger.append("speedCorrectionI", String.valueOf(speedCorrections.correctionI));
+            logger.append("speedCorrectionD", String.valueOf(speedCorrections.correctionD));
+            logger.append("speedAlongPath", String.valueOf(speedAlongPath));
+            logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
+            logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
+            logger.append("robotPositionX", String.valueOf(robotPosition.x));
+            logger.append("robotPositionY", String.valueOf(robotPosition.y));
+            logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
+            logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
+            logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
+            logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
+            logger.append("turnCorrectionP", String.valueOf(turnCorrections.correctionP));
+            logger.append("turnCorrectionI", String.valueOf(turnCorrections.correctionI));
+            logger.append("turnCorrectionD", String.valueOf(turnCorrections.correctionD));
+            logger.append("turnCorrectionF", String.valueOf(lookAheadTurnCorrection));
+            logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
+            logger.append("flippedRobotCurvature", String.valueOf(flippedRobotCurvature));
+
+            //Clip powers to maxPower by higher power
+            double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
+            if (higherPower > maxPower) {
+                leftPower = (leftPower / higherPower) * maxPower;
+                rightPower = (rightPower / higherPower) * maxPower;
+            }
+
+            if (leftPower < .2) {
+                leftPower = .2;
+            }
+            if (rightPower < .2) {
+                rightPower = .2;
+            }
+
         } else {
             leftPower = 0.0;
             rightPower = 0.0;
         }
 
-        return new Powers(leftPower, rightPower, targetLocation.pathFinished);
-    }
+        logger.append("leftPower", String.valueOf(leftPower));
+        logger.append("rightPower", String.valueOf(rightPower));
+        logger.append("isFinished", String.valueOf(targetLocation.pathFinished));
+        logger.writeLine();
 
-    private double getTargetSpeed(double distanceFromStart, double distanceToEnd) {
-        double upScale = 1; //Todo adjust
-        double downScale = 1; //Todo adjust
-        double rampDown = Math.max(downScale * (distanceToEnd), minRampDown);
-        double rampUp = Math.max(upScale * (distanceFromStart), minRampUp);
-        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
+        if (targetLocation.pathFinished) {
+            logger.stopWriting();
+        }
+
+        return new Powers(leftPower, rightPower, targetLocation.pathFinished);
     }
 
     public static class Powers {

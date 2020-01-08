@@ -8,24 +8,29 @@ package edu.ahs.robotics.util;
 public class MockClock {
     private int timeStep = 1;
     private int i;
+    private Mode mode;
 
     public enum Mode{
         ADVANCE_BY_1_MILLI,
         ADVANCE_BY_10_MILLIS,
-        CUSTOM_TIME_PROFILE
+        CUSTOM_TIME_STEP
     }
 
     public MockClock(Mode mode) {
+        this.mode = mode;
         if(mode == Mode.ADVANCE_BY_10_MILLIS){
             timeStep = 10;
-        } else if(mode == Mode.CUSTOM_TIME_PROFILE){
-            throw new UnsupportedOperationException("The custom time profile clock hasn't been developed yet in MockClock. Mock it.");
         }
     }
 
     public MockClock(){
         this(Mode.ADVANCE_BY_1_MILLI);
     }
+
+    public void setTimeStep(int timeStep){
+        this.timeStep = timeStep;
+    }
+
 
     /**
      * Intended to act as a mock of System.getCurrentTimeMillis.

@@ -27,30 +27,57 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import edu.ahs.robotics.control.Position;
+import edu.ahs.robotics.control.Velocity;
+import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.opmodes.SimpleTankTeleOp;
 
-
-@Autonomous(name = "GCode Test", group = "Linear Opmode")
+/**
+ * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
+ * @author Alex Appleby
+ */
+@TeleOp(name="Ardennes VelocityOpMode", group="Iterative OpMode")
 @Disabled
-public class GCodeTest extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
+public class ArdennesVelocityOpMode extends OpMode
+{
     private Ardennes ardennes;
-
+    private MecanumChassis chassis;
 
     @Override
-    public void runOpMode() {
+    public void init() {
         FTCUtilities.setOpMode(this);
-        waitForStart();
-        GCodeReader.openFile("1001.csv");
+        ardennes = new Ardennes();
+
+        chassis = ardennes.getChassis();
     }
+
+    @Override
+    public void init_loop() {
+    }
+
+    @Override
+    public void start() {
+        chassis.startOdometrySystem();
+        chassis.drive3Axis(0.4,0,0);
+    }
+
+    @Override
+    public void loop() {
+
+    }
+    @Override
+    public void stop() {
+        chassis.stopMotors();
+        chassis.stopOdometrySystem();
+    }
+
 }

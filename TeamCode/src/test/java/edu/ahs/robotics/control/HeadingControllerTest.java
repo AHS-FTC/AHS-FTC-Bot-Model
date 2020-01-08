@@ -1,64 +1,47 @@
 package edu.ahs.robotics.control;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ParameterLookup;
 
 import static org.junit.Assert.*;
 
 public class HeadingControllerTest {
 
-//    @Test
-//    public void getUpdatedPowersWithDiagonal() {
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(new Point(1,1));
-//        points.add(new Point(3,3));
-//        Path path = new Path(points);
-//        HeadingController controller = new HeadingController(path, 1,1,1);
-//        Position robotPosition = new Position(4,0,0);
-//        Path.Location targetLocation = path.getTargetLocation(robotPosition);
-//        Velocity velocity = new Velocity(12, 0);
-//        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
-//        HeadingController.Powers expectedPowers = new HeadingController.Powers(1,1);
-//
-//        assertEquals(expectedPowers.rightPower, powers.rightPower, .001);
-//        assertEquals(expectedPowers.leftPower, powers.leftPower, .001);
-//    }
-//
-//    @Test
-//    public void getUpdatedPowersWithStraight() {
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(new Point(0,0));
-//        points.add(new Point(0,4));
-//        Path path = new Path(points);
-//        HeadingController controller = new HeadingController(path, 1,1,1);
-//        Position robotPosition = new Position(0,2,0);
-//        Velocity velocity = new Velocity(12, 0);
-//        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
-//        HeadingController.Powers expectedPowers = new HeadingController.Powers(1,1);
-//
-//        assertEquals(expectedPowers.rightPower, powers.rightPower, .001);
-//        assertEquals(expectedPowers.leftPower, powers.leftPower, .001);
-//    }
+    @Before
+    public void init() {
+        FTCUtilities.startTestMode();
+        FTCUtilities.setParameterLookup(new ParamLookup());
+    }
 
     @Test
     public void getPowersRampsUp() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = new Path(points);
-        HeadingController controller = new HeadingController(path, 12, 12, 12);
+        Path path = makePath(points);
+        HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(0, 0, 0);
-        Velocity velocity = Velocity.makeVelocity(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.leftPower > 0);
         assertTrue(powers.rightPower > 0);
 
-        HeadingController.Powers powers2 = controller.getUpdatedPowers(robotPosition, velocity);
+        HeadingController.Powers powers2 = controller.getUpdatedPowers(state);
 
         assertTrue(powers2.leftPower > powers.leftPower);
         assertTrue(powers2.rightPower > powers.rightPower);
+    }
+
+    private Path makePath(ArrayList<Point> points) {
+        return new Path(points, 12, 4, 36);
     }
 
     @Test
@@ -66,14 +49,14 @@ public class HeadingControllerTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = new Path(points);
-        HeadingController controller = new HeadingController(path, 12, 12, 12);
+        Path path = makePath(points);
+        HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(1, 0, 0);
-        Velocity velocity = Velocity.makeVelocity(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
-        assertTrue(powers.rightPower > powers.leftPower);
-
+        assertTrue(powers.leftPower > powers.rightPower);
     }
 
     @Test
@@ -81,49 +64,60 @@ public class HeadingControllerTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = new Path(points);
-        HeadingController controller = new HeadingController(path, 12, 12, 12);
+        Path path = makePath(points);
+        HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(-1, 0, 0);
-        Velocity velocity = Velocity.makeVelocity(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+        Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
-        assertTrue(powers.leftPower > powers.rightPower);
+        assertTrue(powers.rightPower > powers.leftPower);
     }
 
     @Test
-    public void testPowersZeroAtEndAndOffEnd() {
+    public void testPowersZeroAtEnd() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = new Path(points);
-        HeadingController controller = new HeadingController(path, 12, 12, 12);
+        Path path = makePath(points);
+        HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(0, 4, 0);
-        Velocity velocity = Velocity.makeVelocity(0, 0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
-        assertEquals(0, powers.leftPower, .001);
-        assertEquals(0, powers.rightPower, .001);
-
-        robotPosition = new Position(0, 3, 0);
-        powers = controller.getUpdatedPowers(robotPosition, velocity);
-
-        robotPosition = new Position(0, 5, 0);
-        powers = controller.getUpdatedPowers(robotPosition, velocity);
-
+        Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
         assertEquals(0, powers.leftPower, .001);
         assertEquals(0, powers.rightPower, .001);
     }
+
+    @Test
+    public void testPowersZeroPastEnd() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 4));
+        Path path = makePath(points);
+        HeadingController controller = new HeadingController(path, 1);
+        Position robotPosition = new Position(0, 5, 0);
+        Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+        HeadingController.Powers powers = controller.getUpdatedPowers(state);
+        assertEquals(0.0, powers.leftPower, .001);
+        assertEquals(0.0, powers.rightPower, .001);
+    }
+
     @Test
     public void testPowersStayInRangeWhileRamping() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = new Path(points);
-        HeadingController controller = new HeadingController(path, 12, 12, 12);
+        Path path = makePath(points);
+        HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(0, 0, 0);
-        Velocity velocity = Velocity.makeVelocity(0, 0);
+        Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+
         double maxPower;
         do {
-            HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+            HeadingController.Powers powers = controller.getUpdatedPowers(state);
             maxPower = Math.max(powers.leftPower, powers.rightPower);
         } while (maxPower < 1);
         assertEquals(1, maxPower, .001);
@@ -135,15 +129,28 @@ public class HeadingControllerTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = new Path(points);
-        HeadingController controller = new HeadingController(path, 12, 12, 12);
+        Path path = makePath(points);
+        HeadingController controller = new HeadingController(path, 1);
         Position robotPosition = new Position(1, 0, 0);
-        Velocity velocity = Velocity.makeVelocity(0, 0);
+        Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
+
         double maxPower;
         do {
-            HeadingController.Powers powers = controller.getUpdatedPowers(robotPosition, velocity);
+            HeadingController.Powers powers = controller.getUpdatedPowers(state);
             maxPower = Math.max(Math.abs(powers.leftPower), Math.abs(powers.rightPower));
         } while (maxPower < 1);
         assertEquals(1, maxPower, .001);
+    }
+
+    private class ParamLookup implements ParameterLookup {
+        @Override
+        public double getParameter(String name) {
+            if (name.equals("p")) {
+
+                return .001;
+            }
+            return 0;
+        }
     }
 }
