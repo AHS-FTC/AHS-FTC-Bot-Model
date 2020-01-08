@@ -173,7 +173,7 @@ public class Slides {
             }
             pid.trashIntegral(); // integral should stay at zero per 'pid sesh'
         } else { //do the pid thing
-            double correction = pid.getCorrection(target,current).totalCorrection;
+            double correction = pid.getCorrection(current - target).totalCorrection;
             motorPower += correction;
             setPower(motorPower);
         }

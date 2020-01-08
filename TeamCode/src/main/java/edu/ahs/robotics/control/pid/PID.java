@@ -39,15 +39,11 @@ public class PID {
 
     /**
      * Gets a PID-derived Correction. Also stores values for integral and derivative errors.
-     *
-     * @param current Current value of dependent variable
-     * @param target  Target Value of dependent variable
+     * @param error The amount of error to correct for. Generally measured as target - current.
      * @return PID correction to independent variable
      */
-    public Corrections getCorrection(double current, double target) {
+    public Corrections getCorrection(double error) {
         Corrections corrections = new Corrections();
-
-        double error = target - current;
 
         errorSum += error;
 
