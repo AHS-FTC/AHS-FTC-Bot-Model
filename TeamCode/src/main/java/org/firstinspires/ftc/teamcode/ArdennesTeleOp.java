@@ -90,12 +90,13 @@ public class ArdennesTeleOp extends OpMode
 
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
+    private int targetLevel = 0; //todo consider initializing
+
+    private Switch slideControlSwitch;
 
     private ElapsedTime time;
 
     private double lastTime;
-
-    //todo add serbos
 
     @Override
     public void init() {
@@ -164,62 +165,89 @@ public class ArdennesTeleOp extends OpMode
 
     private void slideActions() {
 
-        //if either trigger is pressed then run the slides
-        if(gamepad2.left_trigger >= TRIGGER_THRESHOLD || gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
-            slidesMoving = true;
-            //if the slides are running to a level, cancel and run with manual control
-            if(runToLevelMode){
-                runToLevelMode = false;
-                slides.setManualControlMode();
+        if(gamepad2.left_trigger >= TRIGGER_THRESHOLD || gamepad2.right_trigger >= TRIGGER_THRESHOLD){
+            if(slides.isAutoControl()){
+                slides.stopAutoControl();
             }
-            //run slides at power
             double slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
             slides.runAtPower(slidesPower);
+        } else if(!slides.isAutoControl()) { // if slides aren't in auto control, freeze them
+            slides.freeze();
         }
 
-        //if slides are not in run to level mode and are not receiving inputs from triggers, stop motors
-        if (gamepad2.left_trigger < TRIGGER_THRESHOLD && gamepad2.right_trigger < TRIGGER_THRESHOLD){
-            if (!runToLevelMode && slidesMoving) {
-                slides.stopMotors();
-                slidesMoving = false;
+        if(gamepad2.y){
+            if(slideControlSwitch.flip()){
+                targetLevel++;
+                slides.setTargetLevel(targetLevel);
+                slides.startAutoControl();
+            }
+        }
+        if(gamepad2.x){
+            if(slideControlSwitch.flip()){
+                targetLevel--;
+                slides.setTargetLevel(targetLevel);
+                slides.startAutoControl();
             }
         }
 
-        yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y, 0, 1);
-        ySlide.setPosition(yServoPosition);
+        //todo add a drop button
 
-        //press x to increase levels for stacking
-        if (gamepad2.x) {
-            if (!xPressed) {
-                xPressed = true;
-                slides.incrementTargetLevel();
-            }
-        } else {
-            xPressed = false;
-        }
-
-        if (gamepad2.y) {
-            runToLevelMode = true;
-            slides.runSlidesToTargetLevel();
-        }
-
-        //press right bumper to reset slides to original position
-        if (gamepad2.right_bumper) {
-            if(gripperToggle.isEnabled()) {
-                gripperToggle.flip();
-                updateGripper();
-            }
-            if (wristToggle.isEnabled()) {
-                wristToggle.flip();
-                activateWrist();
-            }
-            yServoPosition = 0;
-            slides.setManualControlMode();
-            runToLevelMode = false;
-            ySlide.setPosition(yServoPosition);
-            FTCUtilities.sleep(500);
-            slides.resetSlidesToOriginalPosition();
-        }
+//        //if either trigger is pressed then run the slides
+//        if(gamepad2.left_trigger >= TRIGGER_THRESHOLD || gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
+//            slidesMoving = true;
+//            //if the slides are running to a level, cancel and run with manual control
+//            if(runToLevelMode){
+//                runToLevelMode = false;
+//                slides.setManualControlMode();
+//            }
+//            //run slides at power
+//            double slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
+//            slides.runAtPower(slidesPower);
+//        }
+//
+//        //if slides are not in run to level mode and are not receiving inputs from triggers, stop motors
+//        if (gamepad2.left_trigger < TRIGGER_THRESHOLD && gamepad2.right_trigger < TRIGGER_THRESHOLD){
+//            if (!runToLevelMode && slidesMoving) {
+//                slides.stopMotors();
+//                slidesMoving = false;
+//            }
+//        }
+//
+//        yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y, 0, 1);
+//        ySlide.setPosition(yServoPosition);
+//
+//        //press x to increase levels for stacking
+//        if (gamepad2.x) {
+//            if (!xPressed) {
+//                xPressed = true;
+//                slides.incrementTargetLevel();
+//            }
+//        } else {
+//            xPressed = false;
+//        }
+//
+//        if (gamepad2.y) {
+//            runToLevelMode = true;
+//            slides.runSlidesToTargetLevel();
+//        }
+//
+//        //press right bumper to reset slides to original position
+//        if (gamepad2.right_bumper) {
+//            if(gripperToggle.isEnabled()) {
+//                gripperToggle.flip();
+//                updateGripper();
+//            }
+//            if (wristToggle.isEnabled()) {
+//                wristToggle.flip();
+//                activateWrist();
+//            }
+//            yServoPosition = 0;
+//            slides.setManualControlMode();
+//            runToLevelMode = false;
+//            ySlide.setPosition(yServoPosition);
+//            FTCUtilities.sleep(500);
+//            slides.resetSlidesToOriginalPosition();
+//        }
     }
 
     private void triggers() {

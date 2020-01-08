@@ -85,24 +85,25 @@ public class TestAuto extends LinearOpMode {
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);*/
 
-        tuner.addParam("p", .0000001);
-        tuner.addParam("d", .0000001);
+        tuner.addParam("p", .000001);
+        tuner.addParam("d", .000001);
         tuner.addParam("f", .00001);
         tuner.start();
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        //ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
         waitForStart();
 
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(new Point(0,0));
-//        points.add(new Point(60,0));
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(60,0));
         Path path = new Path(points, 12, 8, 36);
         chassis.startOdometrySystem();
 
         chassis.followPath(path);
 
-        stop();
+        chassis.stopOdometrySystem();
 
+        stop();
 
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
         //sleep(10000);

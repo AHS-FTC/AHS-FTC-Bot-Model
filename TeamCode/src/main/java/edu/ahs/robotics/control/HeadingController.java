@@ -13,7 +13,8 @@ public class HeadingController {
     Logger logger = new Logger("TestAutoData");
     double downCorrectionScale;
     private PID speedPID;
-    private PID turnPID;
+    private PID positionPID;
+    private PID directionPID;
     private double maxPower;
     private double leftPower = .2;
     private double rightPower = .2;
@@ -32,7 +33,9 @@ public class HeadingController {
         double dCoeff = lookup.getParameter("d");
         fCoeff = lookup.getParameter("f");
         speedPID = new PID(.001, 0.0, .001, 5);
-        turnPID = new PID(pCoeff, 0.0, dCoeff, 5);
+        //positionPID = new PID(pCoeff, 0.0, dCoeff, 5);
+        positionPID = new PID(0.0, 0.0, 0.0, 5);
+        directionPID = new PID(pCoeff,0.0,dCoeff,5);
 
         logger.startWriting();
     }
@@ -58,36 +61,43 @@ public class HeadingController {
             leftPower += totalSpeedCorrection;
             rightPower += totalSpeedCorrection;
 
-            PID.Corrections turnCorrections = turnPID.getCorrection(targetLocation.distanceToRobot, 0);
-            double flippedRobotCurvature = -robotState.travelCurvature; //Flipped because
-            double lookAheadTurnCorrection = (targetLocation.lookAheadCurvature - flippedRobotCurvature) * fCoeff;
+            PID.Corrections positionCorrections = positionPID.getCorrection(targetLocation.distanceToRobot, 0);
+            double directionError = getDirectionError(targetLocation.pathDirection, robotPosition.heading);//for multi directional movements, velocity.direction may be more appropriate
+            PID.Corrections directionCorrections = directionPID.getCorrection(-directionError, 0);
+            double curvatureCorrection = -1.0 * (targetLocation.lookAheadCurvature - robotState.travelCurvature) * fCoeff;
 
-            double totalTurnCorrection = turnCorrections.totalCorrection + lookAheadTurnCorrection;
+            double totalTurnCorrection = positionCorrections.totalCorrection + directionCorrections.totalCorrection + curvatureCorrection;
 
             leftPower -= totalTurnCorrection;
             rightPower += totalTurnCorrection;
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
             logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
-            logger.append("speedCorrection", String.valueOf(totalSpeedCorrection));
-            logger.append("speedCorrectionP", String.valueOf(speedCorrections.correctionP));
-            logger.append("speedCorrectionI", String.valueOf(speedCorrections.correctionI));
-            logger.append("speedCorrectionD", String.valueOf(speedCorrections.correctionD));
-            logger.append("speedAlongPath", String.valueOf(speedAlongPath));
-            logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
-            logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
+            //logger.append("speedCorrection", String.valueOf(totalSpeedCorrection));
+            //logger.append("speedCorrectionP", String.valueOf(speedCorrections.correctionP));
+            //logger.append("speedCorrectionI", String.valueOf(speedCorrections.correctionI));
+            //logger.append("speedCorrectionD", String.valueOf(speedCorrections.correctionD));
+            //logger.append("speedAlongPath", String.valueOf(speedAlongPath));
+            //logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
+            //logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
-            logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
-            logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
-            logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
-            logger.append("turnCorrectionP", String.valueOf(turnCorrections.correctionP));
-            logger.append("turnCorrectionI", String.valueOf(turnCorrections.correctionI));
-            logger.append("turnCorrectionD", String.valueOf(turnCorrections.correctionD));
-            logger.append("turnCorrectionF", String.valueOf(lookAheadTurnCorrection));
+            logger.append("path Direction", String.valueOf(targetLocation.pathDirection));
+            //logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
+            //logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
+            logger.append("direction error", String.valueOf(directionError));
+            logger.append("direction correction", String.valueOf(directionCorrections.totalCorrection));
+            logger.append("direction P correction", String.valueOf(directionCorrections.correctionP));
+            logger.append("direction D correction", String.valueOf(directionCorrections.correctionD));
+
+//            logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
+//            logger.append("turnCorrectionP", String.valueOf(positionCorrections.correctionP));
+//            logger.append("turnCorrectionI", String.valueOf(positionCorrections.correctionI));
+//            logger.append("turnCorrectionD", String.valueOf(positionCorrections.correctionD));
+            logger.append("turnCorrectionF", String.valueOf(curvatureCorrection));
             logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
-            logger.append("flippedRobotCurvature", String.valueOf(flippedRobotCurvature));
+            logger.append("robotCurvature", String.valueOf(robotState.travelCurvature));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
@@ -96,11 +106,11 @@ public class HeadingController {
                 rightPower = (rightPower / higherPower) * maxPower;
             }
 
-            if (leftPower < .2) {
-                leftPower = .2;
+            if (leftPower < .05) {
+                leftPower = .05;
             }
-            if (rightPower < .2) {
-                rightPower = .2;
+            if (rightPower < .05) {
+                rightPower = .05;
             }
 
         } else {
@@ -118,6 +128,21 @@ public class HeadingController {
         }
 
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);
+    }
+
+    /**
+     * Finds direction error ensuring appropriate angle wrapping.
+     */
+    private double getDirectionError(double targetDirection, double currentDirection){
+        double error = targetDirection - currentDirection;
+
+        if(error > Math.PI){
+            error -= (2 * Math.PI);
+        } else if (error < -Math.PI){
+            error += (2 * Math.PI);
+        }
+
+        return error;
     }
 
     public static class Powers {

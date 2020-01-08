@@ -1,7 +1,5 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import java.util.Arrays;
-
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -12,19 +10,26 @@ import edu.ahs.robotics.util.RingBuffer;
 /**
  * A collection of Odometers used to monitor robot position. Written for Ardennes in 2019-20
  * Implementation of the class, capable of being mocked at a higher level.
+ *
  * @author Alex Appleby
  */
-public class OdometrySystemImpl implements OdometrySystem{
+public class OdometrySystemImpl implements OdometrySystem {
     private Position position;
     private Velocity velocity;
     private double curvature = 0; // only measured in x
 
     private Odometer x1, x2, y;
 
-    private static final int BUFFER_SIZE = 10;
+    private static final int VELOCITY_BUFFER_SIZE = 10;
     private RingBuffer<Double> distanceBuffer;
     private RingBuffer<Long> timeBuffer;
     private double distance = 0.0;
+    private int loopCount = 0;
+
+    private static final int ARC_BUFFER_SIZE = 10;
+
+    private RingBuffer<Double> x1Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
+    private RingBuffer<Double> x2Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
 
     private double x1Last, x2Last, yLast;
     private double yInchesPerDegree;
@@ -36,20 +41,20 @@ public class OdometrySystemImpl implements OdometrySystem{
     private Logger logger;
 
     /**
-     * @param x1 The 'first' odometer measuring in the X direction. Should be interchangeable with x2
-     * @param x2 The 'second' odometer measuring in the X direction. Should be interchangeable with x1
-     * @param y The odometer measuring in the Y direction.
+     * @param x1               The 'first' odometer measuring in the X direction. Should be interchangeable with x2
+     * @param x2               The 'second' odometer measuring in the X direction. Should be interchangeable with x1
+     * @param y                The odometer measuring in the Y direction.
      * @param yInchesPerDegree The amount of displacement given to the y odometer induced by a degree rotation to the robot. Tunable in OdometryCalibrationOpMode
      * @see edu.ahs.robotics.util.opmodes.OdometryCalibration
-     */ //todo change axis
+     */
     public OdometrySystemImpl(Odometer x1, Odometer x2, Odometer y, double yInchesPerDegree, double distanceBetweenYWheels) {
         this.x1 = x1;
         this.x2 = x2;
         this.y = y;
 
-        position = new Position(0,0,0);
-        velocity = Velocity.makeVelocityFromSpeedDirection(0,0);
-        lastPosition = new Position(0,0,0);
+        position = new Position(0, 0, 0);
+        velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
+        lastPosition = new Position(0, 0, 0);
 
         this.yInchesPerDegree = yInchesPerDegree;
         this.distanceBetweenYWheels = distanceBetweenYWheels;
@@ -57,27 +62,27 @@ public class OdometrySystemImpl implements OdometrySystem{
         odometerThread = new OdometerThread();
 
         logger = new Logger("sensorStats");
-        logger.startWriting();
 
-        distanceBuffer = new RingBuffer<>(BUFFER_SIZE,0.0);
-        timeBuffer = new RingBuffer<>(BUFFER_SIZE,0L);
+        distanceBuffer = new RingBuffer<>(VELOCITY_BUFFER_SIZE, 0.0);
+        timeBuffer = new RingBuffer<>(VELOCITY_BUFFER_SIZE, 0L);
     }
 
     /**
      * starts thread continuously monitoring position
      */
-    public void start(){
+    public void start() {
+        logger.startWriting();
         resetEncoders();
         odometerThread.start();
     }
-  
-    public synchronized void stop(){
+
+    public synchronized void stop() {
         logger.stopWriting();
         odometerThread.end();
     }
 
-    public void setPosition(double x, double y, double heading){
-        position.setPosition(x,y,heading);
+    public void setPosition(double x, double y, double heading) {
+        position.setPosition(x, y, heading);
         lastPosition.copyFrom(position);
     }
 
@@ -94,7 +99,7 @@ public class OdometrySystemImpl implements OdometrySystem{
     /**
      * Resets encoders and sets lasts. Package Protected for testing access.
      */
-    void resetEncoders(){
+    void resetEncoders() {
         x1.reset();
         x2.reset();
         y.reset();
@@ -107,11 +112,10 @@ public class OdometrySystemImpl implements OdometrySystem{
      * Runs central odom math, called continuously by thread and accessible in package for unit testing
      */
     synchronized void updatePosition() {
-        double x1Reading,x2Reading, yReading;
+        double x1Reading, x2Reading, yReading;
         double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
-        double curvature; //currently only measured in the x direction. may need to be elaborated for nonlinear movements.
 
         long currentTime = FTCUtilities.getCurrentTimeMillis();
 
@@ -123,7 +127,7 @@ public class OdometrySystemImpl implements OdometrySystem{
         //find deltas
         dx1 = x1Reading - x1Last;
         dx2 = x2Reading - x2Last;
-        dx = (dx1 + dx2)/2.0; //find the average
+        dx = (dx1 + dx2) / 2.0; //find the average
         dyBeforeFactorOut = yReading - yLast;
 
         //set lasts
@@ -141,44 +145,65 @@ public class OdometrySystemImpl implements OdometrySystem{
         dy = dyBeforeFactorOut - dyExpected;
         //dy = 0.0; //temporary until we get y encoder
 
-        if(dHeading != 0){//courtesy of 11115, thanks gluten free
-            double xRadius = dx/dHeading; // arc length - l = theta*r
-            double yRadius = dy/dHeading;
+
+        if (dHeading != 0) {//courtesy of 11115, thanks gluten free
+            double xRadius = dx / dHeading; // arc length - l = theta*r
+            double yRadius = dy / dHeading;
 
             //find the x and y components of each arc
             dxLocal = (xRadius * Math.sin(dHeading)) - (yRadius * (1 - Math.cos(dHeading)));
             dyLocal = (xRadius * (1 - Math.cos(dHeading))) + (yRadius * Math.sin(dHeading));
 
-            curvature = (distanceBetweenYWheels * dx1) / dx2 + (distanceBetweenYWheels / 2);
-            //curvature = 1.0/xRadius;
+
         } else { //curve with infinite radius, aka robot moves in a straight line
             dxLocal = dx;
             dyLocal = dy;
-
-            curvature = 0.0; // 1/infinity
         }
 
-        position.heading += dHeading;//apply our heading change
+        updateCurvature(x1Reading, x2Reading);
 
-        dxGlobal = Math.sin(position.heading)*dyLocal + Math.cos(position.heading)*dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
-        dyGlobal = Math.cos(position.heading)*dyLocal + Math.sin(position.heading)*dxLocal;
+        position.heading += dHeading;//apply our heading change. important to do not for heading buffer.
+
+        dxGlobal = Math.sin(position.heading) * dyLocal + Math.cos(position.heading) * dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
+        dyGlobal = Math.cos(position.heading) * dyLocal + Math.sin(position.heading) * dxLocal;
 
         position.x += dxGlobal;
         position.y += dyGlobal;
-        this.curvature = curvature;
 
-        logger.append("x1", String.valueOf(x1Reading));
-        logger.append("x2", String.valueOf(x2Reading));
-        logger.append("y" , String.valueOf(yReading));
-        logger.append("dHeading" , String.valueOf(dHeading));
-        logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
-        logger.append("yFactorOut" , String.valueOf(dyExpected));
-        logger.writeLine();
+        //logger.append("x1", String.valueOf(x1Reading));
+        //logger.append("x2", String.valueOf(x2Reading));
+        //logger.append("y", String.valueOf(yReading));
+        //logger.append("dHeading", String.valueOf(dHeading));
+        //logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
+        //logger.append("yFactorOut", String.valueOf(dyExpected));
 
         updateVelocity(currentTime);
+
+        logger.append("direction of travel", String.valueOf(velocity.direction()));
+        logger.append("x" , String.valueOf(position.x));
+        logger.append("y" , String.valueOf(position.y));
+        logger.writeLine();
     }
 
-    private void updateVelocity(long currentTime){
+    /**
+     * <a href = "https://math.stackexchange.com/questions/1216990/find-radius-of-two-concentric-arcs">Math</a>
+     */
+    private void updateCurvature(double x1Reading, double x2Reading) {
+        double oldx1 = x1Buffer.insert(x1Reading);
+        double oldx2 = x2Buffer.insert(x2Reading);
+
+        if (loopCount++ < ARC_BUFFER_SIZE) {
+            curvature = 0.0;
+        } else {
+            double bufferDx1 = x1Reading - oldx1;
+            double bufferDx2 = x2Reading - oldx2;
+
+            double arcDifference = bufferDx2 - bufferDx1;
+            curvature = (2.0 * arcDifference) / (distanceBetweenYWheels * (bufferDx1 + bufferDx2));
+        }
+    }
+
+    private void updateVelocity(long currentTime) {
         double distanceTraveled = position.distanceTo(lastPosition); //distance travelled between last point and this point
         distance += distanceTraveled; // running sum of distances
 
@@ -188,36 +213,36 @@ public class OdometrySystemImpl implements OdometrySystem{
         double deltaDistance = distance - oldDistance;
         long deltaTime = currentTime - oldTime;
 
-        double speed = deltaDistance * 1000/(double)deltaTime;
+        double speed = deltaDistance * 1000 / (double) deltaTime;
 
         double direction = lastPosition.angleTo(position);
-        velocity.setVelocityFromSpeedDirection(speed,direction);
+        velocity.setVelocityFromSpeedDirection(speed, direction);
 
         lastPosition.copyFrom(position);
     }
 
-    public State getState(){
-        return new State(position,velocity,curvature);
+    public State getState() {
+        return new State(position, velocity, curvature);
     }
 
-    public boolean isRunning(){
+    public boolean isRunning() {
         return odometerThread.running;
     }
 
 
-
     /**
      * finds delta heading with two perpendicular odometers
+     *
      * @param x1 one arc distance
      * @param x2 the other arc distance
      * @return the theta of the arcs in radians
      * math: https://www.desmos.com/calculator/1u5ynekr4d
      */
-    private double findDeltaHeading(double x1, double x2){
-        return (x1-x2)/distanceBetweenYWheels;//derived from double arcs
+    private double findDeltaHeading(double x1, double x2) {
+        return (x1 - x2) / distanceBetweenYWheels;//derived from double arcs
     }
 
-    private class OdometerThread extends Thread{
+    private class OdometerThread extends Thread {
         private final int SLEEP_TIME = 20;
 
         private volatile boolean running;
@@ -227,12 +252,12 @@ public class OdometrySystemImpl implements OdometrySystem{
             long lastTime = FTCUtilities.getCurrentTimeMillis();
 
             running = true;
-            while (running){
+            while (running) {
                 updatePosition();
 
                 long deltaTime = FTCUtilities.getCurrentTimeMillis() - lastTime;
 
-                if(deltaTime < SLEEP_TIME){
+                if (deltaTime < SLEEP_TIME) {
                     try {
                         Thread.sleep(SLEEP_TIME - deltaTime);
                     } catch (InterruptedException e) {
@@ -243,7 +268,7 @@ public class OdometrySystemImpl implements OdometrySystem{
             }
         }
 
-        private void end(){
+        private void end() {
             running = false;
         }
     }

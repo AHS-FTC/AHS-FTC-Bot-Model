@@ -156,6 +156,7 @@ public class Path {
         private double distanceFromStart;
         private double pathDeltaX;
         private double pathDeltaY;
+        private double direction;
         private double distanceToPrevious;
 
         public PointAtDistance(double x, double y, double distanceFromStart, double pathDeltaX, double pathDeltaY, double distanceToPrevious) {
@@ -163,12 +164,21 @@ public class Path {
             this.distanceFromStart = distanceFromStart;
             this.pathDeltaX = pathDeltaX;
             this.pathDeltaY = pathDeltaY;
+            findDirection();
             this.distanceToPrevious= distanceToPrevious;
 
         }
 
         public PointAtDistance(Point p, double distanceFromStart, double pathDeltaX, double pathDeltaY, double distanceToPrevious) {
             this(p.x, p.y, distanceFromStart, pathDeltaX, pathDeltaY, distanceToPrevious);
+        }
+
+        private void findDirection(){
+            double d = Math.atan2(pathDeltaY, pathDeltaX);
+            if(d < 0){
+                d += (2 * Math.PI);
+            }
+            direction = d;
         }
 
     }
@@ -178,6 +188,7 @@ public class Path {
         public double pathDeltaX;
         public double pathDeltaY;
         public double distanceToEnd;
+        public double pathDirection;
         public double distanceFromStart;
         public double distanceToRobot;
         public boolean pathFinished;
@@ -190,6 +201,7 @@ public class Path {
             pathFinished = false;
             pathDeltaX = pointAtDistance.pathDeltaX;
             pathDeltaY = pointAtDistance.pathDeltaY;
+            pathDirection = pointAtDistance.direction;
             pathSegmentLength = pointAtDistance.distanceToPrevious;
         }
     }
