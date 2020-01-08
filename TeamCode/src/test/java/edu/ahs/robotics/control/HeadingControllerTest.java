@@ -56,7 +56,7 @@ public class HeadingControllerTest {
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
         HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
-        assertTrue(powers.rightPower > powers.leftPower);
+        assertTrue(powers.leftPower > powers.rightPower);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class HeadingControllerTest {
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0);
         HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
-        assertTrue(powers.leftPower > powers.rightPower);
+        assertTrue(powers.rightPower > powers.leftPower);
     }
 
     @Test
