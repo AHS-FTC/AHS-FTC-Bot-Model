@@ -31,6 +31,9 @@ public class Slides {
     private static final double I = 0;
     private static final double D = 0;
 
+    private boolean frozen = false;
+    private int freezeHeight = 0;
+
     private PID pid = new PID(P,I,D,0);
 
     private SlidesThread thread = new SlidesThread();
@@ -50,10 +53,6 @@ public class Slides {
         setManualControlMode();
 
         limitSwitch = new LimitSwitch("limitSwitch");
-    }
-
-    public void goToBottom(){
-        targetLevel = 0;
     }
 
 
@@ -102,11 +101,20 @@ public class Slides {
     }
 
     public void stopAutoControl(){
+        frozen = false;
         thread.end();
     }
 
+    public boolean isAutoControl(){
+        return thread.running;
+    }
+
     private int getTargetHeight(){
-        return targetLevel * ENCODER_TICKS_PER_LEVEL;
+        if(frozen){
+           return freezeHeight;
+        } else {
+            return targetLevel * ENCODER_TICKS_PER_LEVEL;
+        }
     }
 
     /**
@@ -120,8 +128,18 @@ public class Slides {
         }
     }
 
-    public void incrementTargetLevel () {
-        setTargetLevel(targetLevel+1);
+    /**
+     * Enables auto control where target slide height is where we are now, freezing slides in position.
+     * The more elegant alternative to setPower(0);
+     */
+    public void freeze(){
+        freezeHeight = getCurrentPosition();
+        frozen = true;
+        startAutoControl();
+    }
+
+    public void incrementTargetLevel (int amount) {
+        setTargetLevel(targetLevel+amount);
     }
 
     /**
@@ -136,20 +154,6 @@ public class Slides {
         rightMotor.setTargetPosition(ticksAtLevel);
         setEncoderModeRunToPostion();
         setPower(UP_POWER);
-    }
-
-    /**
-     * Retracts slides down to origin. Blocks until slides at origin
-     */
-    public void resetSlidesToOriginalPosition() {
-        setManualControlMode();
-        targetLevel = 0;
-        while(!atBottom()) {
-            setPower(DOWN_POWER);
-        }
-        stopMotors();
-        resetEncoders();
-
     }
 
     /**

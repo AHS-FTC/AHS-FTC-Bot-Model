@@ -156,6 +156,7 @@ public class Path {
         private double distanceFromStart;
         private double pathDeltaX;
         private double pathDeltaY;
+        private double direction;
         private double distanceToPrevious;
 
         public PointAtDistance(double x, double y, double distanceFromStart, double pathDeltaX, double pathDeltaY, double distanceToPrevious) {
@@ -163,6 +164,7 @@ public class Path {
             this.distanceFromStart = distanceFromStart;
             this.pathDeltaX = pathDeltaX;
             this.pathDeltaY = pathDeltaY;
+            this.direction = Math.atan2(pathDeltaX, pathDeltaY);
             this.distanceToPrevious= distanceToPrevious;
 
         }

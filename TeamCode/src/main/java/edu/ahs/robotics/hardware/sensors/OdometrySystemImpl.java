@@ -170,15 +170,19 @@ public class OdometrySystemImpl implements OdometrySystem {
         position.x += dxGlobal;
         position.y += dyGlobal;
 
-        logger.append("x1", String.valueOf(x1Reading));
-        logger.append("x2", String.valueOf(x2Reading));
-        logger.append("y", String.valueOf(yReading));
-        logger.append("dHeading", String.valueOf(dHeading));
-        logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
-        logger.append("yFactorOut", String.valueOf(dyExpected));
-        logger.writeLine();
+        //logger.append("x1", String.valueOf(x1Reading));
+        //logger.append("x2", String.valueOf(x2Reading));
+        //logger.append("y", String.valueOf(yReading));
+        //logger.append("dHeading", String.valueOf(dHeading));
+        //logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
+        //logger.append("yFactorOut", String.valueOf(dyExpected));
 
         updateVelocity(currentTime);
+
+        logger.append("direction of travel", String.valueOf(velocity.direction()));
+        logger.append("x" , String.valueOf(position.x));
+        logger.append("y" , String.valueOf(position.y));
+        logger.writeLine();
     }
 
     /**
