@@ -203,9 +203,9 @@ public class FullAuto {
     private void threeSixPlanBlue() {
         intake.runMotors(1);
         //intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.arc(17, 120, .25, false); //5000
+        chassis.arc(25, 90, .25, false); //5000
         intake.stopMotors();
-        chassis.arc(-80, 12, .8, false); //500
+        chassis.arc(-117, 4, .8, false); //500
         chassis.driveStraight(-50, .8); //1100
 
         /*chassis.pivot(-10, .4);
@@ -234,6 +234,12 @@ public class FullAuto {
     }
 
     private void threeSixPlanRed() {
+        intake.runMotors(1);
+        //intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.arc(24, 100, .25, true); //5000
+        intake.stopMotors();
+        chassis.arc(-103, 5, .8, true); //500
+        chassis.driveStraight(-50, .8); //1100
 
     }
 
