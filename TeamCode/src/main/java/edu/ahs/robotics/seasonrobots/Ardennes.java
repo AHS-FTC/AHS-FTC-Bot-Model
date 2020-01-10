@@ -30,23 +30,21 @@ public class Ardennes extends Robot {
     private Slides slides;
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo ySlide;
-    private SerialServo wrist;
-    private SerialServo intakeServo;
+    private SerialServo capstone;
 
 
     public Ardennes() {
-        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70, 300);
-        gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40, 0);
-        leftFoundation = new SerialServo("FSL", true);
-        rightFoundation = new SerialServo("FSR", false);
+        //intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70, 300);
+        //gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40, 0);
+        leftFoundation = new SerialServo("FSL", false);
+        rightFoundation = new SerialServo("FSR", true);
         intake = new Intake(1);
-        gripper = new SerialServo("gripper", true);
+        gripper = new SerialServo("gripper", false);
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
-        wrist = new SerialServo("wrist", true);
-        intakeServo = new SerialServo("intakeLock", false);
+        //capstone = new SerialServo("capstone", true);
     }
 
     public Intake getIntake(){
@@ -69,8 +67,6 @@ public class Ardennes extends Robot {
         return gripper;
     }
 
-    public SerialServo getIntakeServo() {return intakeServo;}
-
     public SerialServo getLeftFoundation() {return leftFoundation;}
     public SerialServo getRightFoundation() {return rightFoundation;}
 
@@ -78,7 +74,7 @@ public class Ardennes extends Robot {
 
     public Slides getSlides() {return slides;}
 
-    public SerialServo getWrist() {return wrist;}
+    public SerialServo getCapstone() {return capstone;}
 
     private MecanumChassis makeChassis(OdometrySystemImpl odometrySystem) {
         //Set Gear Ratio

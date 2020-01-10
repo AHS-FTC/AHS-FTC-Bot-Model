@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,16 +89,12 @@ public class FTCUtilities { //handles inaccessable objects in FTCApp. hardwareMa
     }
 
     public static void sleep(long ms) {
-        if(testMode){
             try {
                 Thread.sleep(ms);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                throw new Warning("Died in FTCUtilities sleep");
             }
-        } else if(opMode instanceof LinearOpMode){
-            LinearOpMode linearOpMode = (LinearOpMode)opMode;
-            linearOpMode.sleep(ms);
-        }
+
     }
 
     public static DcMotor getMotor(String deviceName) {

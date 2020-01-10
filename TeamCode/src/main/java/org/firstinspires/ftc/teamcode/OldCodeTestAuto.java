@@ -83,17 +83,25 @@ public class OldCodeTestAuto extends LinearOpMode {
         waitForStart();
         chassis.startOdometrySystem();
 
-        chassis.pivot(90, .7);
-        FTCUtilities.sleep(1000);
-        chassis.pivot(-90, .7);
-        FTCUtilities.sleep(1000);
-        chassis.driveStraight(36, .93);
-        FTCUtilities.sleep(1000);
-        chassis.driveStraight(-36, .93);
-        FTCUtilities.sleep(1000);
-        chassis.arc(90, 24, .93, true);
-        FTCUtilities.sleep(1000);
-        chassis.arc(90, 24, .93, false);
+        chassis.arc(30, 24, .5, true);
+        sleep(1000);
+        chassis.arc(-30, 24, .5, true);
+        sleep(1000);
+        chassis.arc(30, 24, .5, false);
+        sleep(1000);
+        chassis.arc(-30, 24, .5, false);
+
+//        chassis.pivot(90, .7);
+//        FTCUtilities.sleep(1000);
+//        chassis.pivot(-90, .7);
+//        FTCUtilities.sleep(1000);
+//        chassis.driveStraight(100, .8);
+//        FTCUtilities.sleep(1000);
+//        chassis.driveStraight(-36, .93);
+//        FTCUtilities.sleep(1000);
+//        chassis.arc(90, 24, .93, true);
+//        FTCUtilities.sleep(1000);
+//        chassis.arc(90, 24, .93, false);
 
 
         stop();

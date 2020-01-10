@@ -10,7 +10,6 @@ import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.control.pid.VelocityPID;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
-import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.util.Logger;
@@ -18,10 +17,11 @@ import edu.ahs.robotics.util.Logger;
 public class MecanumChassis extends Chassis {
 
     private static final double ROBOT_WIDTH = 14.5;
-    public static final int MIN_TARGET_DISTANCE = 5;
+    public static final int MIN_TARGET_DISTANCE = 4; //was 5
     public static final double DISTANCE_PER_360 = 44.3; //Tuned - real value 44.3 from getDistance xWheels //41.2 yWheels
     private static final double LEFT_INITIAL_SHIFT = 0;
-    private static final double LEFT_INITIAL_SCALE = 1.02;
+    private static final double LEFT_INITIAL_SCALE = 1;
+    public static final double RIGHT_AMPLIFIER = 1;
 
     Logger logger = new Logger("Mecanum Chassis Old Code");
 
@@ -202,7 +202,7 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = 0.1; //was 0.05
+        final double correctionScale = .3; //was 0.05
 
         leftOdometer.reset();
         rightOdometer.reset();
@@ -259,14 +259,21 @@ public class MecanumChassis extends Chassis {
                 FTCUtilities.addData("ramp ratio", rampRatio);
                 FTCUtilities.updateOpLogger();
 
-                logger.append("x1 Odometer", String.valueOf(odometrySystem.getX1Odometer().getDistance()));
-                logger.append("x2 Odometer", String.valueOf(odometrySystem.getX2Odometer().getDistance()));
+                logger.append("rightDistance", String.valueOf(rightDistance));
+                logger.append("leftDistance", String.valueOf(leftDistance));
+                logger.append("adjustLeft", String.valueOf(adjustLeft));
+                logger.append("adjustRight", String.valueOf(adjustRight));
+                logger.append("rightPower", String.valueOf(powerRight));
+                logger.append("leftPower", String.valueOf(powerLeft));
                 logger.writeLine();
 
             }
         } finally {
             setPowerAll(0);
         }
+    }
+
+    public void stopLogger() {
         logger.stopWriting();
     }
 

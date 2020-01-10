@@ -72,36 +72,51 @@ public class TestAuto extends LinearOpMode {
         detector = new ArdennesSkyStoneDetector(false, true);
 //        Intake intake = ardennes.getIntake();
         MecanumChassis chassis = ardennes.getChassis();
-        /*Slides slides = ardennes.getSlides();
-        SerialServo foundationServoLeft = ardennes.getLeftFoundation();
-        SerialServo foundationServoRight = ardennes.getRightFoundation();
+        Slides slides = ardennes.getSlides();
+        //SerialServo foundationServoLeft = ardennes.getLeftFoundation();
+        //SerialServo foundationServoRight = ardennes.getRightFoundation();
         SerialServo gripper = ardennes.getGripper();
         SerialServo yslide = ardennes.getySlide();
-        TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
-        TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
+        //TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
+        //TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
         gripper.setPosition(0);
-        foundationServoLeft.setPosition(0);
-        foundationServoRight.setPosition(0);
-        yslide.setPosition(0);*/
+        //foundationServoLeft.setPosition(0);
+        //foundationServoRight.setPosition(0);
+        yslide.setPosition(0);
 
-        tuner.addParam("p", .000001);
-        tuner.addParam("d", .000001);
-        tuner.addParam("f", .00001);
-        tuner.start();
+        //tuner.addParam("p-pos", .000001);
+        //tuner.addParam("d-pos", .000001);
+        //tuner.addParam("p-dir", .000001);
+        //tuner.addParam("d-dir", .000001);
+        //tuner.addParam("p-arc", .00001);
+        //tuner.addParam("d-arc", .00001);
+        //tuner.start();
         //ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
         waitForStart();
 
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(0,0));
-        points.add(new Point(60,0));
-        Path path = new Path(points, 12, 8, 36);
-        chassis.startOdometrySystem();
+        gripper.setPosition(1);
+        sleep(1000);
+        slides.setTargetLevel(2);
+        slides.runToLevel();
+        sleep(300);
+        yslide.setPosition(1);
+        sleep(1500);
+        gripper.setPosition(0);
+        sleep(1000);
+        yslide.setPosition(0);
 
-        chassis.followPath(path);
 
-        chassis.stopOdometrySystem();
+//        ArrayList<Point> points = new ArrayList<>();
+//        points.add(new Point(0,0));
+//        points.add(new Point(60,0));
+        //Path path = new Path(points, 12, 8, 36);
+        //chassis.startOdometrySystem();
+
+        //chassis.followPath(path);
+
+        //chassis.stopOdometrySystem();
 
         stop();
 
@@ -126,20 +141,6 @@ public class TestAuto extends LinearOpMode {
         chassis.arc(90,80,1,true);
         sleep(300);
         chassis.driveStraight(-200, 1);*/
-
-
-
-       /* slides.setTargetLevel(2);
-        slides.runSlidesToTargetLevel();
-        sleep(300);
-        yslide.setPosition(1);
-        sleep(1500);
-        gripper.setPosition(0);
-        sleep(1000);
-        yslide.setPosition(0);
-        sleep(1000);
-        slides.resetSlidesToOriginalPosition();*/
-
 
     }
 }

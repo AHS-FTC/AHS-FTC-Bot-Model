@@ -7,7 +7,6 @@ import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
@@ -23,73 +22,115 @@ public class FullAuto {
     private SerialServo foundationServoRight;
     private SerialServo gripper;
     private SerialServo yslide;
-    private SerialServo intakeServo;
-    private SerialServo wrist;
-    private TriggerDistanceSensor gripperTrigger;
-    private TriggerDistanceSensor intakeTrigger;
+    //private SerialServo capstone;
+    //private TriggerDistanceSensor gripperTrigger;
+    //private TriggerDistanceSensor intakeTrigger;
     private ArdennesSkyStoneDetector detector;
-    private boolean blueSide;
+    private boolean redSide;
     private ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration;
 
-    public FullAuto(boolean blueSide) {
-        this.blueSide = blueSide;
+    public FullAuto(boolean redSide) {
+        this.redSide = redSide;
     }
 
     public void init() {
 
         MotorHashService.init();
         ardennes = new Ardennes();
-        detector = new ArdennesSkyStoneDetector(false, blueSide);
+        detector = new ArdennesSkyStoneDetector(false, redSide);
         intake = ardennes.getIntake();
         chassis = ardennes.getChassis();
         slides = ardennes.getSlides();
         foundationServoLeft = ardennes.getLeftFoundation();
         foundationServoRight = ardennes.getRightFoundation();
         gripper = ardennes.getGripper();
-        intakeServo = ardennes.getIntakeServo();
         yslide = ardennes.getySlide();
-        wrist = ardennes.getWrist();
-        gripperTrigger = ardennes.getGripperTrigger();
-        intakeTrigger = ardennes.getIntakeTrigger();
+        //capstone = ardennes.getCapstone();
+        //gripperTrigger = ardennes.getGripperTrigger();
+        //intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
 
-        wrist.setPosition(-.5);
+        //capstone.setPosition(-.5);
         gripper.setPosition(0);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
         yslide.setPosition(0);
-        intakeServo.setPosition(0);
         FTCUtilities.addData("init", "finished");
         FTCUtilities.updateOpLogger();
     }
 
     public void afterStart() {
-        intakeServo.setPosition(1);
 
         stoneConfiguration = detector.look();
 
-        if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
-            oneFourPlan();
-        } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
-            twoFivePlan();
-        } else threeSixPlan();
+        if (!redSide) {
+            if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
+                oneFourPlanBlue();
+            } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
+                twoFivePlanBlue();
+            } else threeSixPlanBlue();
 
-        FTCUtilities.sleep(300);
-        pivot(-85, .7);
-        FTCUtilities.sleep(300);
-        chassis.driveStraight(-7.5,.7, .2, .2,2000); //200mm
-        foundationServoLeft.setPosition(1);
-        foundationServoRight.setPosition(1);
-        FTCUtilities.sleep(500);
-        customArc(90,3.15,1,true, .7,.7,3000); //80mm
-        chassis.driveStraight(-11.8,1,.7,.7,2000); //300 mm
+            FTCUtilities.sleep(300);
+            chassis.pivot(85, .4);
+            FTCUtilities.sleep(300);
+            chassis.driveStraight(-7.5,.3, .2, .2,2000); //200mm
+            foundationServoLeft.setPosition(1);
+            foundationServoRight.setPosition(1);
+            FTCUtilities.sleep(500);
+            chassis.driveStraight(14,1,.4,.4, 2000);
+            chassis.arc(80,3.15,1,false, .4,.4,2500); //80mm
+            chassis.driveStraight(-11.8,1,.4,.4,2000); //300 mm
+
+        } else {
+            if (ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR == stoneConfiguration) {
+                oneFourPlanRed();
+            } else if (ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE == stoneConfiguration) {
+                twoFivePlanRed();
+            } else threeSixPlanRed();
+
+            FTCUtilities.sleep(300);
+            chassis.pivot(-85, .4);
+            FTCUtilities.sleep(300);
+            chassis.driveStraight(-7.5,.3, .2, .2,2000); //200mm
+            foundationServoLeft.setPosition(1);
+            foundationServoRight.setPosition(1);
+            FTCUtilities.sleep(500);
+            chassis.driveStraight(14,1,.4,.4, 2000);
+            chassis.arc(80,3.15,1,true, .4,.4,2500); //80mm
+            chassis.driveStraight(-11.8,1,.4,.4,2000); //300 mm
+
+        }
+
+
         FTCUtilities.sleep(300);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
+        FTCUtilities.sleep(500);
+        gripper.setPosition(1);
+        FTCUtilities.sleep(1000);
+        slides.setTargetLevel(2);
+        slides.runToLevel();
+        FTCUtilities.sleep(300);
+        yslide.setPosition(1);
+        FTCUtilities.sleep(1500);
+        gripper.setPosition(0);
+        FTCUtilities.sleep(1000);
+        yslide.setPosition(0);
+        FTCUtilities.sleep(1000);
+        chassis.stopLogger();
+
     }
 
 
-    private void oneFourPlan() {
+    private void oneFourPlanBlue() {
+
+        //intake.startIntakeWaitForBlock(intakeTrigger);
+        intake.runMotors(1);
+        chassis.arc(30,72, .25, true); //2400
+        intake.stopMotors();
+        chassis.arc(-63, 17, .8, false); //900
+        chassis.driveStraight(-53,.8); //1000
+
 //        chassis.driveStraight(100, .75);
 //        //pivot(-16, .93);
 //        arc(15,1300, .65, false);
@@ -115,10 +156,7 @@ public class FullAuto {
 //        FTCUtilities.sleep(300);
 //        chassis.driveStraight(1500, .93);
 
-        intake.startIntakeWaitForBlock(intakeTrigger);
-        arc(25,94.5, .7, false); //2400
-        arc(-67, 35.4, .8, true); //900
-        chassis.driveStraight(-39.4,.8); //1000
+
 
 //        arc(90, 300, .93, true);
 
@@ -130,11 +168,13 @@ public class FullAuto {
 
     }
 
-    private void twoFivePlan() {
-        intake.startIntakeWaitForBlock(gripperTrigger);
-        arc(5,511.8, .7, false); //13000
-        arc(-73,23.6,.93, true); //600
-        chassis.driveStraight(-43.3, .93); //1100
+    private void twoFivePlanBlue() {
+        //intake.startIntakeWaitForBlock(gripperTrigger);
+        intake.runMotors(1);
+        chassis.arc(6,450, .25, true); //13000
+        intake.stopMotors();
+        chassis.arc(-81,15,.8, false); //600
+        chassis.driveStraight(-50, .8); //1100
 
 
 
@@ -160,11 +200,13 @@ public class FullAuto {
 
     }
 
-    private void threeSixPlan() {
-        intake.startIntakeWaitForBlock(gripperTrigger);
-        arc(13, 196.9, .7, true); //5000
-        arc(-80, 19.7, .93, true); //500
-        chassis.driveStraight(-43.3, .93); //1100
+    private void threeSixPlanBlue() {
+        intake.runMotors(1);
+        //intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.arc(17, 120, .25, false); //5000
+        intake.stopMotors();
+        chassis.arc(-80, 12, .8, false); //500
+        chassis.driveStraight(-50, .8); //1100
 
         /*chassis.pivot(-10, .4);
         chassis.driveStraight(550, 1);
@@ -172,32 +214,52 @@ public class FullAuto {
         intake.startIntakeWaitForBlock(ardennes.getIntakeTrigger());
         chassis.driveStraight(300, .3);
         */
+    }
+
+    private void oneFourPlanRed() {
+        intake.runMotors(1);
+        chassis.arc(30,70, .25, false); //2400
+        intake.stopMotors();
+        chassis.arc(-58, 17, .8, true); //900
+        chassis.driveStraight(-53,.8); //1000
+    }
+
+    private void twoFivePlanRed() {
+        //intake.startIntakeWaitForBlock(gripperTrigger);
+        intake.runMotors(1);
+        chassis.arc(6,450, .25, false); //13000
+        intake.stopMotors();
+        chassis.arc(-76,15,.8, true); //600
+        chassis.driveStraight(-50, .8); //1100
+    }
+
+    private void threeSixPlanRed() {
 
     }
 
-    private void pivot(double angle, double maxPower) {
-        if (!blueSide) {
-            chassis.pivot(-angle, maxPower);
-        } else {
-            chassis.pivot(angle, maxPower);
-        }
-
-    }
-
-    private void customArc(double angle, double radius, double maxPower, boolean rightTurn, double minRampUp, double minRampDown, long timeOut) {
-        if (!blueSide) {
-            chassis.arc(angle, radius, maxPower, !rightTurn, minRampUp, minRampDown, timeOut);
-        } else {
-            chassis.arc(angle, radius, maxPower, rightTurn, minRampUp, minRampDown, timeOut);
-        }
-    }
-
-    private void arc(double angle, double radius, double maxPower, boolean rightTurn) {
-        if (!blueSide) {
-            chassis.arc(angle, radius, maxPower, !rightTurn);
-        } else {
-            chassis.arc(angle, radius, maxPower, rightTurn);
-        }
-    }
+//    private void pivot(double angle, double maxPower) {
+//        if (!redSide) {
+//            chassis.pivot(-angle, maxPower);
+//        } else {
+//            chassis.pivot(angle, maxPower);
+//        }
+//
+//    }
+//
+//    private void customArc(double angle, double radius, double maxPower, boolean rightTurn, double minRampUp, double minRampDown, long timeOut) {
+//        if (!redSide) {
+//            chassis.arc(angle, radius, maxPower, !rightTurn, minRampUp, minRampDown, timeOut);
+//        } else {
+//            chassis.arc(angle, radius, maxPower, rightTurn, minRampUp, minRampDown, timeOut);
+//        }
+//    }
+//
+//    private void arc(double angle, double radius, double maxPower, boolean rightTurn) {
+//        if (!redSide) {
+//            chassis.arc(angle, radius, maxPower, !rightTurn);
+//        } else {
+//            chassis.arc(angle, radius, maxPower, rightTurn);
+//        }
+//    }
 }
 

@@ -187,6 +187,8 @@ public class OdometrySystemImpl implements OdometrySystem {
 
     /**
      * <a href = "https://math.stackexchange.com/questions/1216990/find-radius-of-two-concentric-arcs">Math</a>
+     * Curvature to the right is positive to match curvature in the Path class.
+     * @see edu.ahs.robotics.control.Path
      */
     private void updateCurvature(double x1Reading, double x2Reading) {
         double oldx1 = x1Buffer.insert(x1Reading);
