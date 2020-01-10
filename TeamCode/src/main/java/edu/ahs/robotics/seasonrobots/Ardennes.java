@@ -35,18 +35,18 @@ public class Ardennes extends Robot {
 
 
     public Ardennes() {
-        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70, 300);
-        gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40, 0);
-        leftFoundation = new SerialServo("FSL", true);
-        rightFoundation = new SerialServo("FSR", false);
+        //intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70, 300);
+        //gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 40, 0);
+        //leftFoundation = new SerialServo("FSL", true);
+        //rightFoundation = new SerialServo("FSR", false);
         intake = new Intake(1);
         gripper = new SerialServo("gripper", true);
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
-        wrist = new SerialServo("wrist", true);
-        intakeServo = new SerialServo("intakeLock", false);
+        //wrist = new SerialServo("wrist", true);
+        //intakeServo = new SerialServo("intakeLock", false);
     }
 
     public Intake getIntake(){
