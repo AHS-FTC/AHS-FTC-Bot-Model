@@ -8,7 +8,7 @@ import edu.ahs.robotics.util.ParameterLookup;
 
 public class HeadingController {
     //Amplifies negative power corrections to deal with momentum while decelerating
-    private static final double DOWN_AMPLIFIER = 1.2;
+    private static final double DOWN_AMPLIFIER = 1.5;
     Path path;
     Logger logger = new Logger("TestAutoData");
     double downCorrectionScale;
@@ -32,10 +32,10 @@ public class HeadingController {
         double pCoeff = lookup.getParameter("p");
         double dCoeff = lookup.getParameter("d");
         fCoeff = lookup.getParameter("f");
-        speedPID = new PID(.001, 0.0, .001, 5);
+        speedPID = new PID(pCoeff, 0.0, dCoeff, 5);
         //positionPID = new PID(pCoeff, 0.0, dCoeff, 5);
         positionPID = new PID(0.0, 0.0, 0.0, 5);
-        directionPID = new PID(pCoeff,0.0,dCoeff,5);
+        directionPID = new PID(0.0,0.0,0.0,5);
 
         logger.startWriting();
     }

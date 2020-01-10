@@ -77,14 +77,13 @@ public class FullAuto {
         FTCUtilities.sleep(300);
         pivot(-85, .7);
         FTCUtilities.sleep(300);
-        chassis.driveStraight(-200,.7, .65, .7,2000);
+        chassis.driveStraight(-7.5,.7, .2, .2,2000); //200mm
         foundationServoLeft.setPosition(1);
         foundationServoRight.setPosition(1);
         FTCUtilities.sleep(500);
-        customArc(90,80,1,true, .7,.7,3000);
-        chassis.driveStraight(-300,1,.7,.7,2000);
+        customArc(90,3.15,1,true, .7,.7,3000); //80mm
+        chassis.driveStraight(-11.8,1,.7,.7,2000); //300 mm
         FTCUtilities.sleep(300);
-        //chassis.driveStraight(-200, 1, .7, .7);
         foundationServoLeft.setPosition(0);
         foundationServoRight.setPosition(0);
     }
@@ -117,9 +116,9 @@ public class FullAuto {
 //        chassis.driveStraight(1500, .93);
 
         intake.startIntakeWaitForBlock(intakeTrigger);
-        arc(25,2400, .7, false);
-        arc(-67, 900, .8, true);
-        chassis.driveStraight(-1000,.8);
+        arc(25,94.5, .7, false); //2400
+        arc(-67, 35.4, .8, true); //900
+        chassis.driveStraight(-39.4,.8); //1000
 
 //        arc(90, 300, .93, true);
 
@@ -133,9 +132,9 @@ public class FullAuto {
 
     private void twoFivePlan() {
         intake.startIntakeWaitForBlock(gripperTrigger);
-        arc(5,13000, .7, false);
-        arc(-73,600,.93, true);
-        chassis.driveStraight(-1100, .93);
+        arc(5,511.8, .7, false); //13000
+        arc(-73,23.6,.93, true); //600
+        chassis.driveStraight(-43.3, .93); //1100
 
 
 
@@ -163,9 +162,9 @@ public class FullAuto {
 
     private void threeSixPlan() {
         intake.startIntakeWaitForBlock(gripperTrigger);
-        arc(13, 5000, .7, true);
-        arc(-80, 500, .93, true);
-        chassis.driveStraight(-1100, .93);
+        arc(13, 196.9, .7, true); //5000
+        arc(-80, 19.7, .93, true); //500
+        chassis.driveStraight(-43.3, .93); //1100
 
         /*chassis.pivot(-10, .4);
         chassis.driveStraight(550, 1);
