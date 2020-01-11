@@ -68,10 +68,10 @@ public class TestAuto extends LinearOpMode {
         MotorHashService.init();
         tuner = new Tuner();
         FTCUtilities.setParameterLookup(tuner);
-        //ardennes = new Ardennes();
+        ardennes = new Ardennes();
         detector = new ArdennesSkyStoneDetector(false, true);
-//        Intake intake = ardennes.getIntake();
-        //MecanumChassis chassis = ardennes.getChassis();
+        //Intake intake = ardennes.getIntake();
+        MecanumChassis chassis = ardennes.getChassis();
         //Slides slides = ardennes.getSlides();
         //SerialServo foundationServoLeft = ardennes.getLeftFoundation();
         //SerialServo foundationServoRight = ardennes.getRightFoundation();
@@ -95,6 +95,8 @@ public class TestAuto extends LinearOpMode {
         //ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
         waitForStart();
+
+        chassis.driveStraight(100, .8);
 
 //        gripper.setPosition(1);
 //        sleep(1000);
