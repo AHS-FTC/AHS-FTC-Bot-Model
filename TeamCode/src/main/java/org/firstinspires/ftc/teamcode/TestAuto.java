@@ -68,22 +68,22 @@ public class TestAuto extends LinearOpMode {
         MotorHashService.init();
         tuner = new Tuner();
         FTCUtilities.setParameterLookup(tuner);
-        ardennes = new Ardennes();
+        //ardennes = new Ardennes();
         detector = new ArdennesSkyStoneDetector(false, true);
 //        Intake intake = ardennes.getIntake();
-        MecanumChassis chassis = ardennes.getChassis();
-        Slides slides = ardennes.getSlides();
+        //MecanumChassis chassis = ardennes.getChassis();
+        //Slides slides = ardennes.getSlides();
         //SerialServo foundationServoLeft = ardennes.getLeftFoundation();
         //SerialServo foundationServoRight = ardennes.getRightFoundation();
-        SerialServo gripper = ardennes.getGripper();
-        SerialServo yslide = ardennes.getySlide();
+        //SerialServo gripper = ardennes.getGripper();
+        //SerialServo yslide = ardennes.getySlide();
         //TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
         //TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
-        slides.resetEncoders();
-        gripper.setPosition(0);
+        //slides.resetEncoders();
+        //gripper.setPosition(0);
         //foundationServoLeft.setPosition(0);
         //foundationServoRight.setPosition(0);
-        yslide.setPosition(0);
+        //yslide.setPosition(0);
 
         //tuner.addParam("p-pos", .000001);
         //tuner.addParam("d-pos", .000001);
@@ -96,16 +96,16 @@ public class TestAuto extends LinearOpMode {
 
         waitForStart();
 
-        gripper.setPosition(1);
-        sleep(1000);
-        slides.setTargetLevel(2);
-        slides.runToLevel();
-        sleep(300);
-        yslide.setPosition(1);
-        sleep(1500);
-        gripper.setPosition(0);
-        sleep(1000);
-        yslide.setPosition(0);
+//        gripper.setPosition(1);
+//        sleep(1000);
+//        slides.setTargetLevel(2);
+//        slides.runToLevel();
+//        sleep(300);
+//        yslide.setPosition(1);
+//        sleep(1500);
+//        gripper.setPosition(0);
+//        sleep(1000);
+//        yslide.setPosition(0);
 
 
 //        ArrayList<Point> points = new ArrayList<>();

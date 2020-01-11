@@ -7,6 +7,7 @@ import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
@@ -22,8 +23,8 @@ public class FullAuto {
     private SerialServo foundationServoRight;
     private SerialServo gripper;
     private SerialServo yslide;
-    //private SerialServo capstone;
-    //private TriggerDistanceSensor gripperTrigger;
+    private SerialServo capstone;
+    private TriggerDistanceSensor gripperTrigger;
     //private TriggerDistanceSensor intakeTrigger;
     private ArdennesSkyStoneDetector detector;
     private boolean redSide;
@@ -45,8 +46,8 @@ public class FullAuto {
         foundationServoRight = ardennes.getRightFoundation();
         gripper = ardennes.getGripper();
         yslide = ardennes.getySlide();
-        //capstone = ardennes.getCapstone();
-        //gripperTrigger = ardennes.getGripperTrigger();
+        capstone = ardennes.getCapstone();
+        gripperTrigger = ardennes.getGripperTrigger();
         //intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();
 
@@ -125,9 +126,8 @@ public class FullAuto {
     private void oneFourPlanBlue() {
 
         //intake.startIntakeWaitForBlock(intakeTrigger);
-        intake.runMotors(1);
-        chassis.arc(30,72, .25, true); //2400
-        intake.stopMotors();
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.arc(30,72, .3, true); //2400
         chassis.arc(-63, 17, .8, false); //900
         chassis.driveStraight(-53,.8); //1000
 
@@ -170,9 +170,8 @@ public class FullAuto {
 
     private void twoFivePlanBlue() {
         //intake.startIntakeWaitForBlock(gripperTrigger);
-        intake.runMotors(1);
-        chassis.arc(6,450, .25, true); //13000
-        intake.stopMotors();
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.arc(6,450, .3, true); //13000
         chassis.arc(-81,15,.8, false); //600
         chassis.driveStraight(-50, .8); //1100
 
@@ -201,10 +200,9 @@ public class FullAuto {
     }
 
     private void threeSixPlanBlue() {
-        intake.runMotors(1);
+        intake.startIntakeWaitForBlock(gripperTrigger);
         //intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.arc(25, 90, .25, false); //5000
-        intake.stopMotors();
+        chassis.arc(25, 90, .3, false); //5000
         chassis.arc(-117, 4, .8, false); //500
         chassis.driveStraight(-50, .8); //1100
 
@@ -217,27 +215,24 @@ public class FullAuto {
     }
 
     private void oneFourPlanRed() {
-        intake.runMotors(1);
-        chassis.arc(30,70, .25, false); //2400
-        intake.stopMotors();
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.arc(30,70, .3, false); //2400
         chassis.arc(-58, 17, .8, true); //900
         chassis.driveStraight(-53,.8); //1000
     }
 
     private void twoFivePlanRed() {
         //intake.startIntakeWaitForBlock(gripperTrigger);
-        intake.runMotors(1);
-        chassis.arc(6,450, .25, false); //13000
-        intake.stopMotors();
+        intake.startIntakeWaitForBlock(gripperTrigger);
+        chassis.arc(6,450, .3, false); //13000
         chassis.arc(-76,15,.8, true); //600
         chassis.driveStraight(-50, .8); //1100
     }
 
     private void threeSixPlanRed() {
-        intake.runMotors(1);
+        intake.startIntakeWaitForBlock(gripperTrigger);
         //intake.startIntakeWaitForBlock(gripperTrigger);
-        chassis.arc(24, 100, .25, true); //5000
-        intake.stopMotors();
+        chassis.arc(24, 100, .3, true); //5000
         chassis.arc(-103, 5, .8, true); //500
         chassis.driveStraight(-50, .8); //1100
 
