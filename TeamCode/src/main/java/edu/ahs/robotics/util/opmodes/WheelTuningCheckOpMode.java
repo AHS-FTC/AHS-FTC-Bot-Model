@@ -29,6 +29,7 @@
 
 package edu.ahs.robotics.util.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -46,7 +47,7 @@ import edu.ahs.robotics.util.FTCUtilities;
  * @author Alex Appleby
  */
 @TeleOp(name="Odometer tuning check OpMode", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class WheelTuningCheckOpMode extends OpMode
 {
     private Odometer leftOdom,rightOdom,backOdom;

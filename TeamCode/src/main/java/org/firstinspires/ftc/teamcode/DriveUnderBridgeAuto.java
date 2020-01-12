@@ -15,6 +15,7 @@ public class DriveUnderBridgeAuto extends LinearOpMode {
     private Ardennes ardennes;
     private MecanumChassis chassis;
     private SerialServo intakeServo;
+    private SerialServo captone;
 
     @Override
     public void runOpMode() {
@@ -22,10 +23,11 @@ public class DriveUnderBridgeAuto extends LinearOpMode {
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
+        captone = ardennes.getCapstone();
 
         waitForStart();
-        sleep(20000);
-        chassis.driveStraight(300, .93);
+        captone.setPosition(-.5);
+        chassis.driveStraight(4, .93);
     }
 
 }

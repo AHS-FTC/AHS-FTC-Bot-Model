@@ -1,6 +1,7 @@
 package edu.ahs.robotics.util.opmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -21,7 +22,7 @@ import edu.ahs.robotics.util.FTCUtilities;
  * @author Alex Appleby
  */
 @TeleOp(name = "Odometry System Calibration", group = "Calibration")
-//@Disabled
+@Disabled
 public class OdometryCalibration extends OpMode {
 
     Odometer left, right, back;

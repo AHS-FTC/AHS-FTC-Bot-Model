@@ -51,7 +51,7 @@ import edu.ahs.robotics.util.FTCUtilities;
  */
 
 @TeleOp(name="Vision Test OpMode", group="Iterative Opmode")
-//@Disabled
+@Disabled
 public class VuforiaTestOp extends OpMode
 {
     //Vuforia vuforia;

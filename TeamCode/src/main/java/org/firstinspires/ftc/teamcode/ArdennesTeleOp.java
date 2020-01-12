@@ -29,14 +29,17 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
+import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -100,14 +103,16 @@ public class ArdennesTeleOp extends OpMode
 
     @Override
     public void init() {
+
         FTCUtilities.setOpMode(this);
         time = new ElapsedTime();
 
         Ardennes ardennes = new Ardennes();
 
+        slides = ardennes.getSlides();
+
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
-        slides = ardennes.getSlides();
 
         gripper = ardennes.getGripper();
         capstone = ardennes.getCapstone();
@@ -148,8 +153,6 @@ public class ArdennesTeleOp extends OpMode
         time.startTime();
         lastTime = time.milliseconds();
         capstone.setPosition(-.5);
-
-        slides.resetEncoders();
     }
 
     /*
@@ -287,13 +290,13 @@ public class ArdennesTeleOp extends OpMode
         if (gamepad1.dpad_down) {
             debugToggle.flip();
             if (debugToggle.isEnabled()) {
-                telemetry.addData("deltaTime",lastTime-time.milliseconds());
-                lastTime = time.milliseconds();
+                //telemetry.addData("deltaTime",lastTime-time.milliseconds());
+                //lastTime = time.milliseconds();
                 telemetry.addData("y servo position", yServoPosition);
                 telemetry.addData("limit switch triggered?", slides.atBottom());
-                telemetry.addData("intake trigger", intakeTrigger.isTriggered());
-                telemetry.addData("intake trigger distance", intakeTrigger.getDist());
-                //telemetry.update();
+                //telemetry.addData("intake trigger", intakeTrigger.isTriggered());
+                //telemetry.addData("intake trigger distance", intakeTrigger.getDist());
+                telemetry.update();
             } else {
                 telemetry.clear();
             }
@@ -324,7 +327,7 @@ public class ArdennesTeleOp extends OpMode
         }
 
         //press b to rotate stone 90 degrees
-        if (gamepad2.b) {
+        if (gamepad2.x) {
             capstoneToggle.flip();
             activateCapstone();
         }
@@ -347,12 +350,12 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        //gamepad 1 press dpad up to enable collection mode
-        if (gamepad1.dpad_up) {
-            collectionModeToggle.flip();
-            telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
-            //telemetry.update();
-        }
+//        //gamepad 1 press dpad up to enable collection mode
+//        if (gamepad1.dpad_up) {
+//            collectionModeToggle.flip();
+//            telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
+//            //telemetry.update();
+//        }
     }
 
     private void activateCapstone() {
@@ -401,7 +404,7 @@ public class ArdennesTeleOp extends OpMode
     public void stop() {
         chassis.stopMotors();
         intake.stopMotors();
-        slides.killThread();
+//        slides.killThread();
         slides.stopMotors();
     }
 

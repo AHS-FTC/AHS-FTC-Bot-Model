@@ -62,6 +62,9 @@ public class FullAuto {
 
     public void afterStart() {
 
+        capstone.setPosition(-.55);
+        yslide.setPosition(0);
+
         stoneConfiguration = detector.look();
 
         if (!redSide) {
@@ -128,7 +131,7 @@ public class FullAuto {
         //intake.startIntakeWaitForBlock(gripperTrigger);
         intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.arc(30,72, .25, true); //2400
-        chassis.arc(-63, 17, .8, false); //900
+        chassis.arc(-79, 16.5, .8, false); //900
         chassis.driveStraight(-53,.8); //1000
 
 //        chassis.driveStraight(100, .75);
@@ -172,7 +175,7 @@ public class FullAuto {
         //intake.startIntakeWaitForBlock(gripperTrigger);
         intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.arc(6,450, .25, true); //13000
-        chassis.arc(-81,15,.8, false); //600
+        chassis.arc(-95,14,.8, false); //600
         chassis.driveStraight(-50, .8); //1100
 
 
@@ -203,7 +206,7 @@ public class FullAuto {
         intake.startIntakeWaitForBlock(gripperTrigger);
         //intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.arc(25, 90, .25, false); //5000
-        chassis.arc(-117, 4, .8, false); //500
+        chassis.arc(-129, 4, .8, false); //500
         chassis.driveStraight(-50, .8); //1100
 
         /*chassis.pivot(-10, .4);
@@ -217,7 +220,7 @@ public class FullAuto {
     private void oneFourPlanRed() {
         intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.arc(30,70, .25, false); //2400
-        chassis.arc(-58, 17, .8, true); //900
+        chassis.arc(-41, 24, .8, true); //900
         chassis.driveStraight(-53,.8); //1000
     }
 
@@ -225,7 +228,7 @@ public class FullAuto {
         //intake.startIntakeWaitForBlock(gripperTrigger);
         intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.arc(6,450, .25, false); //13000
-        chassis.arc(-76,15,.8, true); //600
+        chassis.arc(-66,19,.8, true); //600
         chassis.driveStraight(-50, .8); //1100
     }
 
@@ -233,8 +236,8 @@ public class FullAuto {
         intake.startIntakeWaitForBlock(gripperTrigger);
         //intake.startIntakeWaitForBlock(gripperTrigger);
         chassis.arc(24, 100, .25, true); //5000
-        chassis.arc(-103, 5, .8, true); //500
-        chassis.driveStraight(-50, .8); //1100
+        chassis.arc(-98, 7, .8, true); //500
+        chassis.driveStraight(-46, .8); //1100
 
     }
 

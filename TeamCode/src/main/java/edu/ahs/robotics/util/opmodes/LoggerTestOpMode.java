@@ -41,7 +41,7 @@ import edu.ahs.robotics.util.Logger;
  * @author Alex Appleby and Gavin Heil
  */
 @TeleOp(name="Logger Test", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class LoggerTestOpMode extends OpMode
 {
     private Logger logger;

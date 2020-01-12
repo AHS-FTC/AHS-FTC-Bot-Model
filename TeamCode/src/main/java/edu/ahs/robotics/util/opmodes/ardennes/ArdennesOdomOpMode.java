@@ -30,6 +30,7 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -48,7 +49,7 @@ import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Odometry OpMode", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesOdomOpMode extends OpMode
 {
     //private Ardennes ardennes;
