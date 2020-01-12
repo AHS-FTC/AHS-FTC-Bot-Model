@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 import edu.ahs.robotics.control.pid.PID;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ParameterLookup;
 
 /**
  * Vertical slides system for robot. Encapsulates motors and limit switches
@@ -21,21 +22,22 @@ public class Slides {
     private int targetLevel = 0;
 
     private static final int ENCODER_TICKS_PER_LEVEL = 420;
-    private static final int PID_ERROR_THRESHOLD = 30;
+    private static final int PID_ERROR_THRESHOLD = 4000;
     private static final int SLIDES_MAX = 4000; // maximum encoder val of slides
     private static final int MAX_LEVEL = 10;
     private static final double UP_POWER = 1;
     private static final double DOWN_POWER = -.1;
 
-    private static final double P = 0;
-    private static final double I = 0;
-    private static final double D = 0;
+    private static final double P = 0.000008;// = 0.0005;
+    private static final double I = 0.0;
+    private static final double D = 0.0;
 
-    private PID pid = new PID(P,I,D,0);
+    private boolean frozen = false;
+    private int freezeHeight = 0;
+
+    private PID pid = new PID(P,I,D,3);
 
     private SlidesThread thread = new SlidesThread();
-
-
 
     public Slides (){
         leftMotor = FTCUtilities.getMotor("slideL");
@@ -47,18 +49,20 @@ public class Slides {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        setManualControlMode();
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        thread.start();
+
+        ParameterLookup lookup = FTCUtilities.getParameterLookup();
 
         limitSwitch = new LimitSwitch("limitSwitch");
-    }
-
-    public void goToBottom(){
-        targetLevel = 0;
     }
 
 
     /**
      * Direct control over slide motors at a specified power
+     * Ensures that motors do not drive past limits.
      * @param slidesPower Value between -1 and 1 to move slides
      */
     public void runAtPower(double slidesPower) {
@@ -87,26 +91,34 @@ public class Slides {
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private void setEncoderModeRunToPostion(){
-        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
-    public void setManualControlMode() {
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
     public void startAutoControl(){
-        thread.run();
+        synchronized (thread){
+            thread.running = true;
+            thread.notifyAll();
+        }
     }
 
     public void stopAutoControl(){
-        thread.end();
+        synchronized (thread) {
+            frozen = false;
+            thread.running = false;
+        }
+    }
+
+    public void killThread(){
+        thread.kill();
+    }
+
+    public boolean isAutoControlled(){
+        return thread.running;
     }
 
     private int getTargetHeight(){
-        return targetLevel * ENCODER_TICKS_PER_LEVEL;
+        if(frozen){
+           return freezeHeight;
+        } else {
+            return targetLevel * ENCODER_TICKS_PER_LEVEL;
+        }
     }
 
     /**
@@ -118,38 +130,27 @@ public class Slides {
         if(targetLevel > Slides.MAX_LEVEL) {
             targetLevel = Slides.MAX_LEVEL;
         }
-    }
-
-    public void incrementTargetLevel () {
-        setTargetLevel(targetLevel+1);
-    }
-
-    /**
-     * Moves the slides to the level specified by incrementTargetLevel() or setTargetLevel.
-     * Nonblocking, returns immediately
-     */
-    public void runSlidesToTargetLevel() {
-        int level1 = 200;
-        int ticksAtLevel;
-        ticksAtLevel = (targetLevel-1) * ENCODER_TICKS_PER_LEVEL + level1;
-        leftMotor.setTargetPosition(ticksAtLevel);
-        rightMotor.setTargetPosition(ticksAtLevel);
-        setEncoderModeRunToPostion();
-        setPower(UP_POWER);
-    }
-
-    /**
-     * Retracts slides down to origin. Blocks until slides at origin
-     */
-    public void resetSlidesToOriginalPosition() {
-        setManualControlMode();
-        targetLevel = 0;
-        while(!atBottom()) {
-            setPower(DOWN_POWER);
+        if(targetLevel < 0){
+            targetLevel = 0;
         }
-        stopMotors();
-        resetEncoders();
+    }
 
+    public void runToLevel (){
+        double targetLevelTicks = targetLevel * ENCODER_TICKS_PER_LEVEL;
+        while (getCurrentPosition() < targetLevelTicks) {
+            runAtPower(.5);
+        }
+        runAtPower(0);
+    }
+
+    /**
+     * Enables auto control where target slide height is where we are now, freezing slides in position.
+     * The more elegant alternative to setPower(0);
+     */
+    public void freeze(){
+        freezeHeight = getCurrentPosition();
+        frozen = true;
+        startAutoControl();
     }
 
     /**
@@ -161,20 +162,33 @@ public class Slides {
         int current = getCurrentPosition();
         int error = target - current; // in ticks
 
-        if(Math.abs(error) > PID_ERROR_THRESHOLD) {
+        FTCUtilities.addData("target", target);
+        FTCUtilities.addData("current", current);
+        FTCUtilities.addData("error", current);
+
+        double correction = pid.getCorrection(error).totalCorrection;
+        motorPower += correction;
+        runAtPower(motorPower);
+
+        /*if(Math.abs(error) > PID_ERROR_THRESHOLD) {
             if(Math.signum(error) == 1){ // go up
-                setPower(UP_POWER);
+                runAtPower(UP_POWER/3);
             } else { // go down
-                setPower(DOWN_POWER);
+                runAtPower(DOWN_POWER/3);
             }
             pid.trashIntegral(); // integral should stay at zero per 'pid sesh'
         } else { //do the pid thing
-            double correction = pid.getCorrection(target,current).totalCorrection;
-            motorPower += correction;
-            setPower(motorPower);
-        }
+
+        }*/
+
+
+        FTCUtilities.addData("motor power", motorPower);
+        //FTCUtilities.addData("bottom", atBottom());
+        //FTCUtilities.addData("target level", targetLevel);
+        FTCUtilities.updateOpLogger();
     }
 
+    //USUALLY USE runAtPower(), it checks the slide limits.
     private void setPower(double power) {
         leftMotor.setPower(power);
         rightMotor.setPower(power);
@@ -187,26 +201,38 @@ public class Slides {
     /**
      * @return returns average slide height calculated by motor encoders.
      */
-    private int getCurrentPosition() {
+    public int getCurrentPosition() {
         return (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition())/2; //note integer division
     }
 
     private class SlidesThread extends Thread {
         private volatile boolean running;
+        private volatile  boolean finished;
 
-        private SlidesThread() {
+        public SlidesThread() {
             running = false;
+            finished = false;
         }
 
-        private void end(){
-            running = false;
+        private synchronized void kill(){
+                finished = true;
+                running = false;
+                notifyAll();
         }
 
         @Override
         public void run() {
-            running = true;
-            while(running){
-                autoControl();
+            while(!finished){
+                while (running){
+                    autoControl();
+                }
+                if(!finished){
+                    try {
+                        synchronized (this) {
+                            wait();
+                        }
+                    } catch (Exception e){}
+                }
             }
         }
     }

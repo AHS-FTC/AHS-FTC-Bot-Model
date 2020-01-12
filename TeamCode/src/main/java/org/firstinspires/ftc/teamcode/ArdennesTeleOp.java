@@ -66,7 +66,7 @@ public class ArdennesTeleOp extends OpMode
     private Slides slides;
     private MecanumChassis chassis;
 
-    private SerialServo gripper, wrist, ySlide, leftFoundation, rightFoundation;
+    private SerialServo gripper, capstone, ySlide, leftFoundation, rightFoundation;
     //todo add Servo capstoneServo;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
@@ -81,7 +81,7 @@ public class ArdennesTeleOp extends OpMode
 
     private Toggle foundationToggle;
     private Toggle gripperToggle;
-    private Toggle wristToggle;
+    private Toggle capstoneToggle;
     private Toggle collectionModeToggle;
     private Toggle debugToggle;
     private boolean slidesMoving = false;
@@ -90,12 +90,13 @@ public class ArdennesTeleOp extends OpMode
 
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
+    private int targetLevel = 0; //todo consider initializing
+
+    private Switch slideControlSwitch;
 
     private ElapsedTime time;
 
     private double lastTime;
-
-    //todo add serbos
 
     @Override
     public void init() {
@@ -109,25 +110,26 @@ public class ArdennesTeleOp extends OpMode
         slides = ardennes.getSlides();
 
         gripper = ardennes.getGripper();
-        wrist = ardennes.getWrist();
+        capstone = ardennes.getCapstone();
         ySlide = ardennes.getySlide();
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
 
         foundationToggle = new Toggle();
         gripperToggle = new Toggle();
-        wristToggle = new Toggle();
-        collectionModeToggle = new Toggle();
+        capstoneToggle = new Toggle();
+        //collectionModeToggle = new Toggle();
         debugToggle = new Toggle();
 
         intakeOutSwitch = new Switch();
         intakeInSwitch = new Switch();
 
-        gripperTrigger = ardennes.getGripperTrigger();
-        intakeTrigger = ardennes.getIntakeTrigger();
+        slideControlSwitch = new Switch();
 
-        telemetry.addLine("initialized");
-        telemetry.update();
+        gripperTrigger = ardennes.getGripperTrigger();
+        //intakeTrigger = ardennes.getIntakeTrigger();
+
+        gripper.setPosition(0);
 
     }
 
@@ -145,7 +147,7 @@ public class ArdennesTeleOp extends OpMode
     public void start() {
         time.startTime();
         lastTime = time.milliseconds();
-        wrist.setPosition(-.5);
+        capstone.setPosition(-.5);
 
         slides.resetEncoders();
     }
@@ -164,13 +166,40 @@ public class ArdennesTeleOp extends OpMode
 
     private void slideActions() {
 
+//        if(gamepad2.left_trigger >= TRIGGER_THRESHOLD || gamepad2.right_trigger >= TRIGGER_THRESHOLD){
+//            if(slides.isAutoControlled()){
+//                slides.stopAutoControl();
+//            }
+//            double slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
+//            slides.runAtPower(slidesPower);
+//        } //else if(!slides.isAutoControlled()) { // if slides aren't in auto control, freeze them
+//            slides.freeze();
+//        //}
+//
+//        if(gamepad2.y){
+//            if(slideControlSwitch.flip()){
+//                targetLevel++;
+//                slides.setTargetLevel(targetLevel);
+//                slides.startAutoControl();
+//            }
+//        }
+//        if(gamepad2.x){
+//            if(slideControlSwitch.flip()){
+//                targetLevel--;
+//                slides.setTargetLevel(targetLevel);
+//                slides.startAutoControl();
+//            }
+//        }
+
+
+        //todo add a drop button
+
         //if either trigger is pressed then run the slides
         if(gamepad2.left_trigger >= TRIGGER_THRESHOLD || gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
             slidesMoving = true;
             //if the slides are running to a level, cancel and run with manual control
             if(runToLevelMode){
                 runToLevelMode = false;
-                slides.setManualControlMode();
             }
             //run slides at power
             double slidesPower = gamepad2.right_trigger - (gamepad2.left_trigger * SLIDE_DOWN_POWER_SCALE);
@@ -187,39 +216,39 @@ public class ArdennesTeleOp extends OpMode
 
         yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y, 0, 1);
         ySlide.setPosition(yServoPosition);
-
-        //press x to increase levels for stacking
-        if (gamepad2.x) {
-            if (!xPressed) {
-                xPressed = true;
-                slides.incrementTargetLevel();
-            }
-        } else {
-            xPressed = false;
-        }
-
-        if (gamepad2.y) {
-            runToLevelMode = true;
-            slides.runSlidesToTargetLevel();
-        }
-
-        //press right bumper to reset slides to original position
-        if (gamepad2.right_bumper) {
-            if(gripperToggle.isEnabled()) {
-                gripperToggle.flip();
-                updateGripper();
-            }
-            if (wristToggle.isEnabled()) {
-                wristToggle.flip();
-                activateWrist();
-            }
-            yServoPosition = 0;
-            slides.setManualControlMode();
-            runToLevelMode = false;
-            ySlide.setPosition(yServoPosition);
-            FTCUtilities.sleep(500);
-            slides.resetSlidesToOriginalPosition();
-        }
+//
+//        //press x to increase levels for stacking
+//        if (gamepad2.x) {
+//            if (!xPressed) {
+//                xPressed = true;
+//                slides.incrementTargetLevel();
+//            }
+//        } else {
+//            xPressed = false;
+//        }
+//
+//        if (gamepad2.y) {
+//            runToLevelMode = true;
+//            slides.runSlidesToTargetLevel();
+//        }
+//
+//        //press right bumper to reset slides to original position
+//        if (gamepad2.right_bumper) {
+//            if(gripperToggle.isEnabled()) {
+//                gripperToggle.flip();
+//                updateGripper();
+//            }
+//            if (capstoneToggle.isEnabled()) {
+//                capstoneToggle.flip();
+//                activateWrist();
+//            }
+//            yServoPosition = 0;
+//            slides.setManualControlMode();
+//            runToLevelMode = false;
+//            ySlide.setPosition(yServoPosition);
+//            FTCUtilities.sleep(500);
+//            slides.resetSlidesToOriginalPosition();
+//        }
     }
 
     private void triggers() {
@@ -236,13 +265,13 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
-        if (intakeTrigger.isTriggered() && collectionModeToggle.isEnabled()) {
-            if (intakeMode == IntakeMode.IN) {
-                intakeMode = IntakeMode.OFF;
-                updateIntake();
-            }
-        }
+//        // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
+//        if (intakeTrigger.isTriggered() && collectionModeToggle.isEnabled()) {
+//            if (intakeMode == IntakeMode.IN) {
+//                intakeMode = IntakeMode.OFF;
+//                updateIntake();
+//            }
+//        }
     }
 
     private void driveActions() {
@@ -264,7 +293,7 @@ public class ArdennesTeleOp extends OpMode
                 telemetry.addData("limit switch triggered?", slides.atBottom());
                 telemetry.addData("intake trigger", intakeTrigger.isTriggered());
                 telemetry.addData("intake trigger distance", intakeTrigger.getDist());
-                telemetry.update();
+                //telemetry.update();
             } else {
                 telemetry.clear();
             }
@@ -295,9 +324,9 @@ public class ArdennesTeleOp extends OpMode
         }
 
         //press b to rotate stone 90 degrees
-        if (gamepad2.b && gamepad2.dpad_right ) {
-            wristToggle.flip();
-            activateWrist();
+        if (gamepad2.b) {
+            capstoneToggle.flip();
+            activateCapstone();
         }
 
         //press a to grip block
@@ -314,7 +343,7 @@ public class ArdennesTeleOp extends OpMode
                 rightFoundation.setPosition(1);
             } else {
                 leftFoundation.setPosition(0);
-                rightFoundation.setPosition(0);
+               rightFoundation.setPosition(0);
             }
         }
 
@@ -322,15 +351,15 @@ public class ArdennesTeleOp extends OpMode
         if (gamepad1.dpad_up) {
             collectionModeToggle.flip();
             telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
-            telemetry.update();
+            //telemetry.update();
         }
     }
 
-    private void activateWrist() {
-        if (wristToggle.isEnabled()) {
-            wrist.setPosition(-.5);
+    private void activateCapstone() {
+        if (capstoneToggle.isEnabled()) {
+            capstone.setPosition(-.5);
         } else {
-            wrist.setPosition(.5);
+            capstone.setPosition(.5);
         }
     }
 
@@ -350,6 +379,8 @@ public class ArdennesTeleOp extends OpMode
         } else {
             gripper.setPosition(0);
         }
+        telemetry.addData("Gripper Toggled?", gripperToggle.enabled);
+        //telemetry.update();
     }
 
     private double getClippedPower(double input, double minPower){
@@ -370,6 +401,7 @@ public class ArdennesTeleOp extends OpMode
     public void stop() {
         chassis.stopMotors();
         intake.stopMotors();
+        slides.killThread();
         slides.stopMotors();
     }
 

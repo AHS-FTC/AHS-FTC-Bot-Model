@@ -12,14 +12,19 @@ import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.util.Logger;
 
 public class MecanumChassis extends Chassis {
 
-    private static final double ROBOT_WIDTH = 333;
-    public static final int MIN_TARGET_DISTANCE = 5;
-    public static final double DISTANCE_PER_360 = 43.8; //Tuned - real value 44.3 from getDistance xWheels //41.2 yWheels
+    private static final double ROBOT_WIDTH = 14.5;
+    public static final int MIN_TARGET_DISTANCE = 4; //was 5
+    public static final double DISTANCE_PER_360 = 44.3; //Tuned - real value 44.3 from getDistance xWheels //41.2 yWheels
     private static final double LEFT_INITIAL_SHIFT = 0;
-    private static final double LEFT_INITIAL_SCALE = 1.02;
+    private static final double LEFT_INITIAL_SCALE = 1;
+    public static final double RIGHT_AMPLIFIER = 1;
+
+    Logger logger = new Logger("Mecanum Chassis Old Code");
+
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
     private SingleDriveUnit backLeft;
@@ -45,8 +50,10 @@ public class MecanumChassis extends Chassis {
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
         this.odometrySystem = odometrySystem;
-        leftOdometer = odometrySystem.getX1Odometer(); // this can easily change based on the definition of the x1 odometer
-        rightOdometer = odometrySystem.getX2Odometer();
+        leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
+        rightOdometer = odometrySystem.getX1Odometer();
+
+        logger.startWriting();
     }
 
 //    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystemImpl odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
@@ -136,8 +143,8 @@ public class MecanumChassis extends Chassis {
     }
 
     public void arc(double angle, double radius, double maxPower, boolean rightTurn) {
-        double minRampUp = .65;
-        double minRampDown = .5;
+        double minRampUp = .2;
+        double minRampDown = .15;
 
         arc(angle, radius, maxPower, rightTurn, minRampUp, minRampDown, 5000);
     }
@@ -157,20 +164,20 @@ public class MecanumChassis extends Chassis {
             rightTarget = outerTarget;
         }
         FTCUtilities.sleep(1000);
-        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .01, timeOut);
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .05, .03, timeOut);
     }
 
     public void driveStraight(double distance, double maxPower) {
-        driveStraight(distance, maxPower, .55, .45, 5000);
+        driveStraight(distance, maxPower, .2, .15, 5000);
     }
     
     public void driveStraight(double distance, double maxPower, double minRampUp, double minRampDown, long timeOut) {
-        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .02, .005, timeOut);
+        rawDrive(distance, distance, maxPower, minRampUp, minRampDown, .05, .1, timeOut);
     }
 
     public void pivot(double angle, double maxPower) {
-        double minRampUp = .6;
-        double minRampDown = .55;
+        double minRampUp = .2;
+        double minRampDown = .2;
 
         pivot(angle, maxPower, minRampUp, minRampDown, 3000);
     }
@@ -178,11 +185,13 @@ public class MecanumChassis extends Chassis {
     public void pivot(double angle, double maxPower, double minRampUp, double minRampDown, long timeOut) {
         double leftTarget = (angle * DISTANCE_PER_360) / 360.0;
         double rightTarget = -1 * leftTarget;
-        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .03, .06, timeOut);
+        rawDrive(leftTarget, rightTarget, maxPower, minRampUp, minRampDown, .06, .1, timeOut);
     }
 
 
     private void rawDrive(double leftTarget, double rightTarget, double maxPower, double minRampUp, double minRampDown, double upScale, double downScale, long timeout) {
+
+        odometrySystem.start();
 
         if (maxPower < 0 || maxPower > 1.0) {
             throw new Warning("maxPower " + maxPower + " must be between 0 and 1");
@@ -193,14 +202,14 @@ public class MecanumChassis extends Chassis {
 
         double maxTarget = Math.abs(leftTarget) > Math.abs(rightTarget) ? Math.abs(leftTarget) : Math.abs(rightTarget);
 
-        final double correctionScale = 0.05; //Was 0.05
+        final double correctionScale = .3; //was 0.05
 
         leftOdometer.reset();
         rightOdometer.reset();
 
         try {
-            double powerLeft = inversePower(((leftTarget / maxTarget) * (minRampUp) + LEFT_INITIAL_SHIFT) * LEFT_INITIAL_SCALE);
-            double powerRight = inversePower((rightTarget / maxTarget) * (minRampUp));
+            double powerLeft = ((leftTarget / maxTarget) * (minRampUp) + LEFT_INITIAL_SHIFT) * LEFT_INITIAL_SCALE;
+            double powerRight = (rightTarget / maxTarget) * (minRampUp);
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeout) {
                 double leftDistance = leftOdometer.getDistance();
@@ -219,7 +228,7 @@ public class MecanumChassis extends Chassis {
                 double rampUp = (upScale * maxDistance) + minRampUp;
                 double rampDown = (downScale * maxRemaining) + minRampDown; //distanceTo accounts for flip across y axis and x offset
 
-                double targetPower = inversePower(Math.min(rampUp, Math.min(rampDown, maxPower)));
+                double targetPower = Math.min(rampUp, Math.min(rampDown, maxPower));
 
                 double adjustLeft = correctionScale * (averageDistanceRatio - leftDistanceRatio);
                 double adjustRight = correctionScale * (averageDistanceRatio - rightDistanceRatio);
@@ -250,11 +259,22 @@ public class MecanumChassis extends Chassis {
                 FTCUtilities.addData("ramp ratio", rampRatio);
                 FTCUtilities.updateOpLogger();
 
+                logger.append("rightDistance", String.valueOf(rightDistance));
+                logger.append("leftDistance", String.valueOf(leftDistance));
+                logger.append("adjustLeft", String.valueOf(adjustLeft));
+                logger.append("adjustRight", String.valueOf(adjustRight));
+                logger.append("rightPower", String.valueOf(powerRight));
+                logger.append("leftPower", String.valueOf(powerLeft));
+                logger.writeLine();
+
             }
         } finally {
             setPowerAll(0);
         }
-        //Logger.getInstance().stopWriting();
+    }
+
+    public void stopLogger() {
+        logger.stopWriting();
     }
 
     public void velocityDrive(Path path, double maxSpeed){

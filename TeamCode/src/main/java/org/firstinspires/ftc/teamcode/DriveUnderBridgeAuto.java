@@ -22,11 +22,8 @@ public class DriveUnderBridgeAuto extends LinearOpMode {
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        intakeServo = ardennes.getIntakeServo();
-        intakeServo.setPosition(0);
 
         waitForStart();
-        intakeServo.setPosition(1);
         sleep(20000);
         chassis.driveStraight(300, .93);
     }

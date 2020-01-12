@@ -20,8 +20,8 @@ public class VelocityPID{
      * @return corrections in an enclosed Correction class.
      */
     public Correction getCorrection(Velocity currentVelocity, Velocity targetVelocity){
-        PID.Corrections speedCorrection = speedPID.getCorrection(currentVelocity.speed(), targetVelocity.speed());
-        PID.Corrections directionCorrection = directionPID.getCorrection(currentVelocity.direction(), targetVelocity.direction());
+        PID.Corrections speedCorrection = speedPID.getCorrection(targetVelocity.speed() - currentVelocity.speed());
+        PID.Corrections directionCorrection = directionPID.getCorrection(targetVelocity.direction() - currentVelocity.direction());
 
         return new Correction(speedCorrection.totalCorrection, directionCorrection.totalCorrection);
     }

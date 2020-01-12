@@ -37,23 +37,18 @@ import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.SerialServo;
-import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.util.Tuner;
 
 
-@Autonomous(name = "Test Auto", group = "Linear Opmode")
+@Autonomous(name = "Old Code Test Auto", group = "Linear Opmode")
 //@Disabled
-public class TestAuto extends LinearOpMode {
+public class OldCodeTestAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
@@ -70,57 +65,47 @@ public class TestAuto extends LinearOpMode {
         FTCUtilities.setParameterLookup(tuner);
         ardennes = new Ardennes();
         detector = new ArdennesSkyStoneDetector(false, true);
-        //Intake intake = ardennes.getIntake();
+//        Intake intake = ardennes.getIntake();
         MecanumChassis chassis = ardennes.getChassis();
-        //Slides slides = ardennes.getSlides();
-        //SerialServo foundationServoLeft = ardennes.getLeftFoundation();
-        //SerialServo foundationServoRight = ardennes.getRightFoundation();
-        //SerialServo gripper = ardennes.getGripper();
-        //SerialServo yslide = ardennes.getySlide();
-        //TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
-        //TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
-        //slides.resetEncoders();
-        //gripper.setPosition(0);
-        //foundationServoLeft.setPosition(0);
-        //foundationServoRight.setPosition(0);
-        //yslide.setPosition(0);
-
-        //tuner.addParam("p-pos", .000001);
-        //tuner.addParam("d-pos", .000001);
-        //tuner.addParam("p-dir", .000001);
-        //tuner.addParam("d-dir", .000001);
-        //tuner.addParam("p-arc", .00001);
-        //tuner.addParam("d-arc", .00001);
-        //tuner.start();
-        //ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        /*Slides slides = ardennes.getSlides();
+        SerialServo foundationServoLeft = ardennes.getLeftFoundation();
+        SerialServo foundationServoRight = ardennes.getRightFoundation();
+        SerialServo gripper = ardennes.getGripper();
+        SerialServo yslide = ardennes.getySlide();
+        TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
+        TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
+        slides.resetEncoders();
+        gripper.setPosition(0);
+        foundationServoLeft.setPosition(0);
+        foundationServoRight.setPosition(0);
+        yslide.setPosition(0);*/
 
         waitForStart();
+        chassis.startOdometrySystem();
 
-        chassis.driveStraight(100, .8);
+        chassis.arc(30, 24, .5, true);
+        sleep(1000);
+        chassis.arc(-30, 24, .5, true);
+        sleep(1000);
+        chassis.arc(30, 24, .5, false);
+        sleep(1000);
+        chassis.arc(-30, 24, .5, false);
 
-//        gripper.setPosition(1);
-//        sleep(1000);
-//        slides.setTargetLevel(2);
-//        slides.runToLevel();
-//        sleep(300);
-//        yslide.setPosition(1);
-//        sleep(1500);
-//        gripper.setPosition(0);
-//        sleep(1000);
-//        yslide.setPosition(0);
+//        chassis.pivot(90, .7);
+//        FTCUtilities.sleep(1000);
+//        chassis.pivot(-90, .7);
+//        FTCUtilities.sleep(1000);
+//        chassis.driveStraight(100, .8);
+//        FTCUtilities.sleep(1000);
+//        chassis.driveStraight(-36, .93);
+//        FTCUtilities.sleep(1000);
+//        chassis.arc(90, 24, .93, true);
+//        FTCUtilities.sleep(1000);
+//        chassis.arc(90, 24, .93, false);
 
-
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(new Point(0,0));
-//        points.add(new Point(60,0));
-        //Path path = new Path(points, 12, 8, 36);
-        //chassis.startOdometrySystem();
-
-        //chassis.followPath(path);
-
-        //chassis.stopOdometrySystem();
 
         stop();
+        chassis.stopOdometrySystem();
 
         //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
         //sleep(10000);
@@ -143,6 +128,20 @@ public class TestAuto extends LinearOpMode {
         chassis.arc(90,80,1,true);
         sleep(300);
         chassis.driveStraight(-200, 1);*/
+
+
+
+       /* slides.setTargetLevel(2);
+        slides.runSlidesToTargetLevel();
+        sleep(300);
+        yslide.setPosition(1);
+        sleep(1500);
+        gripper.setPosition(0);
+        sleep(1000);
+        yslide.setPosition(0);
+        sleep(1000);
+        slides.resetSlidesToOriginalPosition();*/
+
 
     }
 }
