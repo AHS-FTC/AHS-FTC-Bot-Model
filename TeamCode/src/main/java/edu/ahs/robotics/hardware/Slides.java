@@ -91,35 +91,35 @@ public class Slides {
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void startAutoControl(){
-        synchronized (thread){
-            thread.running = true;
-            thread.notifyAll();
-        }
-    }
+//    public void startAutoControl(){
+//        synchronized (thread){
+//            thread.running = true;
+//            thread.notifyAll();
+//        }
+//    }
+//
+//    public void stopAutoControl(){
+//        synchronized (thread) {
+//            frozen = false;
+//            thread.running = false;
+//        }
+//    }
 
-    public void stopAutoControl(){
-        synchronized (thread) {
-            frozen = false;
-            thread.running = false;
-        }
-    }
+//    public void killThread(){
+//        thread.kill();
+//    }
+//
+//    public boolean isAutoControlled(){
+//        return thread.running;
+//    }
 
-    public void killThread(){
-        thread.kill();
-    }
-
-    public boolean isAutoControlled(){
-        return thread.running;
-    }
-
-    private int getTargetHeight(){
-        if(frozen){
-           return freezeHeight;
-        } else {
-            return targetLevel * ENCODER_TICKS_PER_LEVEL;
-        }
-    }
+//    private int getTargetHeight(){
+//        if(frozen){
+//           return freezeHeight;
+//        } else {
+//            return targetLevel * ENCODER_TICKS_PER_LEVEL;
+//        }
+//    }
 
     /**
      * Sets the target level that you want the slides to achieve.
@@ -147,28 +147,28 @@ public class Slides {
      * Enables auto control where target slide height is where we are now, freezing slides in position.
      * The more elegant alternative to setPower(0);
      */
-    public void freeze(){
-        freezeHeight = getCurrentPosition();
-        frozen = true;
-        startAutoControl();
-    }
+//    public void freeze(){
+//        freezeHeight = getCurrentPosition();
+//        frozen = true;
+//        startAutoControl();
+//    }
 
     /**
      * Runs slide PID when auto control is enabled.
      * Package protected for unit testing.
      */
-    void autoControl(){
-        int target = getTargetHeight();
-        int current = getCurrentPosition();
-        int error = target - current; // in ticks
-
-        FTCUtilities.addData("target", target);
-        FTCUtilities.addData("current", current);
-        FTCUtilities.addData("error", current);
-
-        double correction = pid.getCorrection(error).totalCorrection;
-        motorPower += correction;
-        runAtPower(motorPower);
+//    void autoControl(){
+//        int target = getTargetHeight();
+//        int current = getCurrentPosition();
+//        int error = target - current; // in ticks
+//
+//        FTCUtilities.addData("target", target);
+//        FTCUtilities.addData("current", current);
+//        FTCUtilities.addData("error", current);
+//
+//        double correction = pid.getCorrection(error).totalCorrection;
+//        motorPower += correction;
+//        runAtPower(motorPower);
 
         /*if(Math.abs(error) > PID_ERROR_THRESHOLD) {
             if(Math.signum(error) == 1){ // go up
@@ -182,11 +182,11 @@ public class Slides {
         }*/
 
 
-        FTCUtilities.addData("motor power", motorPower);
-        //FTCUtilities.addData("bottom", atBottom());
-        //FTCUtilities.addData("target level", targetLevel);
-        FTCUtilities.updateOpLogger();
-    }
+//        FTCUtilities.addData("motor power", motorPower);
+//        //FTCUtilities.addData("bottom", atBottom());
+//        //FTCUtilities.addData("target level", targetLevel);
+//        FTCUtilities.updateOpLogger();
+//    }
 
     //USUALLY USE runAtPower(), it checks the slide limits.
     private void setPower(double power) {
@@ -220,20 +220,20 @@ public class Slides {
                 notifyAll();
         }
 
-        @Override
-        public void run() {
-            while(!finished){
-                while (running){
-                    autoControl();
-                }
-                if(!finished){
-                    try {
-                        synchronized (this) {
-                            wait();
-                        }
-                    } catch (Exception e){}
-                }
-            }
-        }
+//        @Override
+//        public void run() {
+//            while(!finished){
+//                while (running){
+//                    autoControl();
+//                }
+//                if(!finished){
+//                    try {
+//                        synchronized (this) {
+//                            wait();
+//                        }
+//                    } catch (Exception e){}
+//                }
+//            }
+//        }
     }
 }

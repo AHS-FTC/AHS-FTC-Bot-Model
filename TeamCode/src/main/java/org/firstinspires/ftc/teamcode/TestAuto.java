@@ -71,8 +71,8 @@ public class TestAuto extends LinearOpMode {
         ardennes = new Ardennes();
         detector = new ArdennesSkyStoneDetector(false, true);
         //Intake intake = ardennes.getIntake();
-        MecanumChassis chassis = ardennes.getChassis();
-        //Slides slides = ardennes.getSlides();
+        //MecanumChassis chassis = ardennes.getChassis();
+        Slides slides = ardennes.getSlides();
         //SerialServo foundationServoLeft = ardennes.getLeftFoundation();
         //SerialServo foundationServoRight = ardennes.getRightFoundation();
         //SerialServo gripper = ardennes.getGripper();
@@ -96,7 +96,7 @@ public class TestAuto extends LinearOpMode {
 
         waitForStart();
 
-        chassis.driveStraight(100, .8);
+//        chassis.driveStraight(100, .8);
 
 //        gripper.setPosition(1);
 //        sleep(1000);

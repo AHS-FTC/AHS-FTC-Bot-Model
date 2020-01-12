@@ -30,6 +30,7 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.control.Velocity;
@@ -51,7 +52,7 @@ import edu.ahs.robotics.util.Tuner;
  * @author Alex Appleby
  */
 @Autonomous(name="Ardennes Power Curve Tuner", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
 
     //private Ardennes ardennes;
