@@ -13,15 +13,14 @@ public class HeadingController {
     Logger logger = new Logger("TestAutoData");
     double downCorrectionScale;
     private PID speedPID;
-    private PID positionPID;
-    private PID directionPID;
-    private PID curvaturePID;
+    private PID unifiedPID;
     private double maxPower;
     private double leftPower = .2;
     private double rightPower = .2;
 
     //Correction values
     private static final double TURN_SCALE = .01;
+    private static final double LOOK_AHEAD_TIME = 0.1; //note that this is in seconds, not millis due to speed and acceleration units.
 
     public HeadingController(Path path, double maxPower) {
         this.path = path;
@@ -29,20 +28,11 @@ public class HeadingController {
 
         ParameterLookup lookup = FTCUtilities.getParameterLookup();
 
-        double pPos = lookup.getParameter("p-pos");
-        double dPos = lookup.getParameter("d-pos");
-
-        double pDir = lookup.getParameter("p-dir");
-        double dDir = lookup.getParameter("d-dir");
-
-        double pArc = lookup.getParameter("p-arc");
-        double dArc = lookup.getParameter("d-arc");
-
+        double p = lookup.getParameter("p");
+        double d = lookup.getParameter("d");
 
         speedPID = new PID(.004, 0.0, .006, 5); // -- tuned --
-        positionPID = new PID(pPos, 0.0, dPos, 5);
-        directionPID = new PID(pDir,0.0,dDir,5);
-        curvaturePID = new PID(pArc,0.0,dArc,5);
+        unifiedPID = new PID(p, 0.0, d,5);
 
         logger.startWriting();
     }
@@ -68,18 +58,17 @@ public class HeadingController {
             leftPower += totalSpeedCorrection;
             rightPower += totalSpeedCorrection;
 
-            PID.Corrections positionCorrections = positionPID.getCorrection(targetLocation.distanceToRobot);
+            Point futurePoint = getFuturePoint(robotState, LOOK_AHEAD_TIME);
+            Position futurePosition = new Position(futurePoint,0);
 
-            double directionError = getDirectionError(targetLocation.pathDirection, robotPosition.heading);//for multi directional movements, velocity.direction may be more appropriate
-            PID.Corrections directionCorrections = directionPID.getCorrection(directionError);
+            Path.Location futureTarget = path.getTargetLocation(futurePosition);
+            Point futureTargetPoint = futureTarget.closestPoint;
 
-            double curvatureError = -1.0 * (targetLocation.lookAheadCurvature - robotState.travelCurvature); // curvature to the right is positive, thus the negative sign
-            PID.Corrections curvatureCorrections = curvaturePID.getCorrection(curvatureError);
+            double error = futurePoint.distanceTo(futureTargetPoint);
+            PID.Corrections unifiedCorrections = unifiedPID.getCorrection(error);
 
-            double totalTurnCorrection = positionCorrections.totalCorrection + directionCorrections.totalCorrection + curvatureCorrections.totalCorrection;
-
-            leftPower -= totalTurnCorrection;
-            rightPower += totalTurnCorrection;
+            leftPower -= unifiedCorrections.totalCorrection; //todo fix onesidedness
+            rightPower += unifiedCorrections.totalCorrection;
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
             logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
@@ -96,18 +85,13 @@ public class HeadingController {
             logger.append("path Direction", String.valueOf(targetLocation.pathDirection));
             //logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
             //logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
-            logger.append("direction error", String.valueOf(directionError));
-            logger.append("direction correction", String.valueOf(directionCorrections.totalCorrection));
-            logger.append("direction P correction", String.valueOf(directionCorrections.correctionP));
-            logger.append("direction D correction", String.valueOf(directionCorrections.correctionD));
 
 //            logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
 //            logger.append("turnCorrectionP", String.valueOf(positionCorrections.correctionP));
 //            logger.append("turnCorrectionI", String.valueOf(positionCorrections.correctionI));
 //            logger.append("turnCorrectionD", String.valueOf(positionCorrections.correctionD));
-            logger.append("turnCorrectionF", String.valueOf(curvatureCorrections.totalCorrection));
             logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
-            logger.append("robotCurvature", String.valueOf(robotState.travelCurvature));
+            logger.append("robotCurvature", String.valueOf(robotState.travelRadius));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
@@ -138,6 +122,46 @@ public class HeadingController {
         }
 
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);
+    }
+
+    /**
+     * Gets a projected point estimated by the current state of the robot. Useful for PID and stuff.
+     * Protected for unit testing.
+     * @param robotState The current state of the robot. Note that radius is signed.
+     * @param lookAheadTime time in seconds to look ahead on the path.
+     * @return An estimation of where the robot will be lookAheadTime seconds in the future.
+     */
+    /*protected for testing*/ Point getFuturePoint(OdometrySystem.State robotState, double lookAheadTime){
+
+        double distance = (robotState.velocity.speed() * lookAheadTime) + (.5) * (robotState.acceleration * (lookAheadTime * lookAheadTime)); // suvat, ut * 1/2at^2
+        Vector h = Vector.makeUnitVector(robotState.position.heading); //make a unit vector in the direction of heading
+
+        if(robotState.travelRadius == Double.POSITIVE_INFINITY || robotState.travelRadius == Double.NEGATIVE_INFINITY){
+            h.scale(distance);
+
+            return new Point(robotState.position.x + h.x, robotState.position.y + h.y);
+        } else {
+
+            Vector perp = h.getPerpVector(); // Note that this is always leftward relative to robot
+            perp.scale(robotState.travelRadius); // a negative radius (aka traveling right) will invert this vector rightward.
+
+            double centerX = robotState.position.x + perp.x; //todo check w john
+            double centerY = robotState.position.y + perp.y;
+
+            double dx = (robotState.position.x - centerX); //effectively the unit circle components for use to derive an angle using atan2.
+            double dy = (robotState.position.y - centerY);
+
+            double angleToCurrentPos = Math.atan2(dy, dx);
+
+            double angleCurrentToTarget = distance / robotState.travelRadius;//l = theta * r. Signed radius checks out, rightward angle is globally negative when added in next line
+
+            double angleToFuturePoint = angleToCurrentPos + angleCurrentToTarget;
+
+            double x = centerX + (Math.abs(robotState.travelRadius) * Math.cos(angleToFuturePoint)); //note the absolute value on the radius
+            double y = centerY + (Math.abs(robotState.travelRadius) * Math.sin(angleToFuturePoint)); //since we're measuring this point relative to the center of the circle in global coords, we don't care about directionality
+
+            return new Point(x, y);
+        }
     }
 
     /**

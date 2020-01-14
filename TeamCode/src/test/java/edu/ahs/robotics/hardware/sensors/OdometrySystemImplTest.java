@@ -53,7 +53,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, 0.0);
 
         assertEquals(0, state.velocity.speed(),0.0);
-        assertEquals(0,state.travelCurvature,0.0);
+        assertEquals(0,state.travelRadius,0.0);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class OdometrySystemImplTest {
 
         assertTrue(state.velocity.speed() > 0);
         assertEquals(state.velocity.direction(), Math.PI / 2,0.001);
-        assertEquals(0,state.travelCurvature,0.0);
+        assertEquals(0,state.travelRadius,0.0);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class OdometrySystemImplTest {
 
         assertEquals(12,state.position.y,0.1);
         assertEquals(0,state.position.x,0.1);
-        assertEquals(0,state.travelCurvature,0.5);
+        assertEquals(0,state.travelRadius,0.5);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY,state.travelCurvature,0.0);
+        assertEquals(Double.POSITIVE_INFINITY,state.travelRadius,0.0);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY,state.travelCurvature,0.0);
+        assertEquals(Double.NEGATIVE_INFINITY,state.travelRadius,0.0);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class OdometrySystemImplTest {
         }
 
         assertEquals(12, odometrySystem.getState().position.x, .01);
-        assertEquals(0,odometrySystem.getState().travelCurvature,0.5);
+        assertEquals(0,odometrySystem.getState().travelRadius,0.5);
     }
 
     @Test
@@ -200,7 +200,7 @@ public class OdometrySystemImplTest {
         assertEquals(12, state.position.y, .01);
       
         assertEquals(Math.PI/4, state.velocity.direction(),0.001);
-        assertEquals(0,state.travelCurvature,0.0);
+        assertEquals(0,state.travelRadius,0.0);
     }
 
     @Test
@@ -221,7 +221,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY,state.travelCurvature,0.0);
+        assertEquals(Double.POSITIVE_INFINITY,state.travelRadius,0.0);
 
     }
 

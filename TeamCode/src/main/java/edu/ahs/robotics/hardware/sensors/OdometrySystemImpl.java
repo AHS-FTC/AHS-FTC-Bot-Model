@@ -16,13 +16,19 @@ import edu.ahs.robotics.util.RingBuffer;
 public class OdometrySystemImpl implements OdometrySystem {
     private Position position;
     private Velocity velocity;
-    private double curvature = 0; // only measured in x
+    private double acceleration;
+    private double radius = 0; // only measured in x
 
-    private Odometer x1, x2, y;
+    private Odometer xR, xL, y;
 
-    private static final int VELOCITY_BUFFER_SIZE = 10;
+    private static final int DISTANCE_TIME_BUFFER_SIZE = 10;
     private RingBuffer<Double> distanceBuffer;
-    private RingBuffer<Long> timeBuffer;
+    private RingBuffer<Long> velocityTimeBuffer;
+
+    private static final int SPEED_TIME_BUFFER_SIZE = 10;
+    private RingBuffer<Double> speedBuffer;
+    private RingBuffer<Long> accelerationTimeBuffer;
+
     private double distance = 0.0;
     private int loopCount = 0;
 
@@ -41,15 +47,15 @@ public class OdometrySystemImpl implements OdometrySystem {
     private Logger logger;
 
     /**
-     * @param x1               The 'first' odometer measuring in the X direction. Should be interchangeable with x2
-     * @param x2               The 'second' odometer measuring in the X direction. Should be interchangeable with x1
+     * @param xR               The 'first' odometer measuring in the X direction. Should be on the right side of the robot.
+     * @param xL               The 'second' odometer measuring in the X direction. Should be on the left side of the robot.
      * @param y                The odometer measuring in the Y direction.
      * @param yInchesPerDegree The amount of displacement given to the y odometer induced by a degree rotation to the robot. Tunable in OdometryCalibrationOpMode
      * @see edu.ahs.robotics.util.opmodes.OdometryCalibration
      */
-    public OdometrySystemImpl(Odometer x1, Odometer x2, Odometer y, double yInchesPerDegree, double distanceBetweenYWheels) {
-        this.x1 = x1;
-        this.x2 = x2;
+    public OdometrySystemImpl(Odometer xR, Odometer xL, Odometer y, double yInchesPerDegree, double distanceBetweenYWheels) {
+        this.xR = xR;
+        this.xL = xL;
         this.y = y;
 
         position = new Position(0, 0, 0);
@@ -63,8 +69,11 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         logger = new Logger("sensorStats");
 
-        distanceBuffer = new RingBuffer<>(VELOCITY_BUFFER_SIZE, 0.0);
-        timeBuffer = new RingBuffer<>(VELOCITY_BUFFER_SIZE, 0L);
+        distanceBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0.0);
+        velocityTimeBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0L);//type is long
+
+        speedBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0.0);
+        accelerationTimeBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0L);
     }
 
     /**
@@ -88,23 +97,23 @@ public class OdometrySystemImpl implements OdometrySystem {
 
     @Override
     public Odometer getX1Odometer() {
-        return x1;
+        return xR;
     }
 
     @Override
     public Odometer getX2Odometer() {
-        return x2;
+        return xL;
     }
 
     /**
      * Resets encoders and sets lasts. Package Protected for testing access.
      */
     void resetEncoders() {
-        x1.reset();
-        x2.reset();
+        xR.reset();
+        xL.reset();
         y.reset();
-        x1Last = x1.getDistance();
-        x2Last = x2.getDistance();
+        x1Last = xR.getDistance();
+        x2Last = xL.getDistance();
         yLast = y.getDistance();
     }
 
@@ -112,31 +121,31 @@ public class OdometrySystemImpl implements OdometrySystem {
      * Runs central odom math, called continuously by thread and accessible in package for unit testing
      */
     synchronized void updatePosition() {
-        double x1Reading, x2Reading, yReading;
-        double dx1, dx2, dyBeforeFactorOut, dyExpected, dy, dx;
+        double xRReading, xLReading, yReading;
+        double dxR, dxL, dyBeforeFactorOut, dyExpected, dy, dx;
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
 
         long currentTime = FTCUtilities.getCurrentTimeMillis();
 
         //set readings from odom
-        x1Reading = x1.getDistance();
-        x2Reading = x2.getDistance();
+        xRReading = xR.getDistance();
+        xLReading = xL.getDistance();
         yReading = y.getDistance();
 
         //find deltas
-        dx1 = x1Reading - x1Last;
-        dx2 = x2Reading - x2Last;
-        dx = (dx1 + dx2) / 2.0; //find the average
+        dxR = xRReading - x1Last;
+        dxL = xLReading - x2Last;
+        dx = (dxR + dxL) / 2.0; //find the average
         dyBeforeFactorOut = yReading - yLast;
 
         //set lasts
-        x1Last = x1Reading;
-        x2Last = x2Reading;
+        x1Last = xRReading;
+        x2Last = xLReading;
         yLast = yReading;
 
         //find change in heading
-        dHeading = findDeltaHeading(dx1, dx2);
+        dHeading = findDeltaHeading(dxR, dxL);
 
         //factor out the dy expected from rotation of robot
         dyExpected = Math.toDegrees(dHeading) * yInchesPerDegree;
@@ -160,7 +169,7 @@ public class OdometrySystemImpl implements OdometrySystem {
             dyLocal = dy;
         }
 
-        updateCurvature(x1Reading, x2Reading);
+        updateTravelRadius(xRReading, xLReading);
 
         position.heading += dHeading;//apply our heading change. important to do not for heading buffer.
 
@@ -170,8 +179,8 @@ public class OdometrySystemImpl implements OdometrySystem {
         position.x += dxGlobal;
         position.y += dyGlobal;
 
-        //logger.append("x1", String.valueOf(x1Reading));
-        //logger.append("x2", String.valueOf(x2Reading));
+        //logger.append("xR", String.valueOf(x1Reading));
+        //logger.append("xL", String.valueOf(x2Reading));
         //logger.append("y", String.valueOf(yReading));
         //logger.append("dHeading", String.valueOf(dHeading));
         //logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
@@ -186,22 +195,21 @@ public class OdometrySystemImpl implements OdometrySystem {
     }
 
     /**
+     * Calculates and updates a signed travel radius. Sign conveys orthoganal direction of travel. Curvature to the left is positive.
      * <a href = "https://math.stackexchange.com/questions/1216990/find-radius-of-two-concentric-arcs">Math</a>
-     * Curvature to the right is positive to match curvature in the Path class.
-     * @see edu.ahs.robotics.control.Path
      */
-    private void updateCurvature(double x1Reading, double x2Reading) {
-        double oldx1 = x1Buffer.insert(x1Reading);
-        double oldx2 = x2Buffer.insert(x2Reading);
+    private void updateTravelRadius(double xRReading, double xLReading) {
+        double oldxR = x1Buffer.insert(xRReading);
+        double oldxL = x2Buffer.insert(xLReading);
 
         if (loopCount++ < ARC_BUFFER_SIZE) {
-            curvature = 0.0;
+            radius = 0.0;
         } else {
-            double bufferDx1 = x1Reading - oldx1;
-            double bufferDx2 = x2Reading - oldx2;
+            double bufferDxR = xRReading - oldxR;
+            double bufferDxL = xLReading - oldxL;
 
-            double arcDifference = bufferDx2 - bufferDx1;
-            curvature = (2.0 * arcDifference) / (distanceBetweenYWheels * (bufferDx1 + bufferDx2));
+            double arcDifference = bufferDxR - bufferDxL; // yields positive when r is big and l is small
+            radius = (distanceBetweenYWheels * (bufferDxR + bufferDxL)) / (2.0 * arcDifference);
         }
     }
 
@@ -210,7 +218,7 @@ public class OdometrySystemImpl implements OdometrySystem {
         distance += distanceTraveled; // running sum of distances
 
         double oldDistance = distanceBuffer.insert(distance);
-        long oldTime = timeBuffer.insert(currentTime);
+        long oldTime = velocityTimeBuffer.insert(currentTime);
 
         double deltaDistance = distance - oldDistance;
         long deltaTime = currentTime - oldTime;
@@ -221,10 +229,22 @@ public class OdometrySystemImpl implements OdometrySystem {
         velocity.setVelocityFromSpeedDirection(speed, direction);
 
         lastPosition.copyFrom(position);
+
+        updateAcceleration(currentTime);
     }
 
-    public State getState() {
-        return new State(position, velocity, curvature);
+    private void updateAcceleration(long currentTime){
+        double oldTime = accelerationTimeBuffer.insert(currentTime);
+        double oldSpeed = speedBuffer.insert(velocity.speed());
+
+        double dv = velocity.speed() - oldSpeed;
+        double dt = currentTime - oldTime;
+
+        acceleration = dv/dt;
+    }
+
+    public State getState() { //todo make synchronized?
+        return new State(position, velocity, acceleration, radius);
     }
 
     public boolean isRunning() {

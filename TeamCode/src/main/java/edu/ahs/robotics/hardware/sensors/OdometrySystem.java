@@ -28,17 +28,19 @@ public interface OdometrySystem {
     class State {
        public Position position;
        public Velocity velocity;
+       public double acceleration;
         /**
-         * Measures the current curvature of travel in the x dimension.
-         * Calculated as 1/r, where traveling with a small radius means high curvature and infinite radius yields zero curvature.
-         * For non-tank style movement the idea of curvature will need to be elaborated on.
+         * Measures the signed radius of travel in the x dimension.
+         * Sign contains information on the directional nature of the travel. A positive radius indicates a leftward arc, while a negative radius indicates a rightward arc.
+         * For non-tank style movement the idea of travel radius will need to be elaborated on.
          */
-       public double travelCurvature;
+       public double travelRadius;
 
-        public State(Position position, Velocity velocity, double travelCurvature) {
+        public State(Position position, Velocity velocity, double acceleration, double travelRadius) {
             this.position = new Position(position);
             this.velocity = new Velocity(velocity);
-            this.travelCurvature = travelCurvature;
+            this.travelRadius = travelRadius;
+            this.acceleration = acceleration;
         }
     }
 }
