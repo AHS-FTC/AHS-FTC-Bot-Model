@@ -38,26 +38,35 @@ public class HeadingController {
 
         logger.startWriting();
 
-        lastTime = System.currentTimeMillis();
+        lastTime = FTCUtilities.getCurrentTimeMillis();
     }
 
+    /**
+     * Given a robot state, calculate speed and turning errors and update powers accordingly.
+     * @param robotState
+     * @return
+     */
     public Powers getUpdatedPowers(OdometrySystem.State robotState) {
-        long time = System.currentTimeMillis();
+        long time = FTCUtilities.getCurrentTimeMillis();
         long deltaTime = time - lastTime;
 
         Position robotPosition = robotState.position;
         Velocity robotVelocity = robotState.velocity;
 
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        if (!path.isFinished(robotPosition)) {
 
-        if (!targetLocation.pathFinished) {
-            double targetSpeed = targetLocation.lookAheadSpeed;
+            //Find the future point where the robot will be LOOK_AHEAD_TIME in the future
+            Point futurePoint = getFuturePoint(robotState, LOOK_AHEAD_TIME);
+            Position futurePosition = new Position(futurePoint,0);
 
-            double speedAlongPath = (robotVelocity.dx * targetLocation.pathDeltaX) + (robotVelocity.dy * targetLocation.pathDeltaY);
-            speedAlongPath /= targetLocation.pathSegmentLength;
+            //Find closest point on path to future point
+            Path.Location targetLocation = path.getTargetLocation(futurePosition);
 
-            PID.Corrections speedCorrections = speedPID.getCorrection(targetSpeed - speedAlongPath,deltaTime);
+            //Use PID to calculate speed correction
+            PID.Corrections speedCorrections = speedPID.getCorrection(targetLocation.speed - robotState.velocity.speed(), deltaTime);
             double totalSpeedCorrection = speedCorrections.totalCorrection;
+
+            //Use a down Amplifier to increase weight on negative speed corrections
             if (totalSpeedCorrection < 0) {
                 totalSpeedCorrection *= DOWN_AMPLIFIER;
             }
@@ -65,19 +74,16 @@ public class HeadingController {
             leftPower += totalSpeedCorrection;
             rightPower += totalSpeedCorrection;
 
-            Point futurePoint = getFuturePoint(robotState, LOOK_AHEAD_TIME);
-            Position futurePosition = new Position(futurePoint,0);
+            //Turn error.
+            double error = targetLocation.distanceToRobot; //signed distance where positive is robot to right of path
 
-            Path.Location futureTarget = path.getTargetLocation(futurePosition);
-
-            double error = futureTarget.distanceToRobot; //signed distance where positive is robot to right of path
-
+            //Create PID controller for turning error. Positive corrections mean turn left.
             PID.Corrections unifiedCorrections = unifiedPID.getCorrection(error,deltaTime);
 
             leftPower -= unifiedCorrections.totalCorrection;
             rightPower += unifiedCorrections.totalCorrection;
 
-            logger.append("targetSpeed", String.valueOf(targetSpeed));
+            logger.append("targetSpeed", String.valueOf(targetLocation.speed));
             logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
 
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
@@ -106,22 +112,25 @@ public class HeadingController {
                 rightPower = .05;
             }
 
-        } else {
+
+        }
+        //If the path is finished, stop motors
+        else {
             leftPower = 0.0;
             rightPower = 0.0;
         }
 
         logger.append("leftPower", String.valueOf(leftPower));
         logger.append("rightPower", String.valueOf(rightPower));
-        logger.append("isFinished", String.valueOf(targetLocation.pathFinished));
+        logger.append("isFinished", String.valueOf(path.isFinished(robotPosition)));
         logger.writeLine();
 
-        if (targetLocation.pathFinished) {
+        if (path.isFinished(robotPosition)) {
             logger.stopWriting();
         }
 
         lastTime = time;
-        return new Powers(leftPower, rightPower, targetLocation.pathFinished);
+        return new Powers(leftPower, rightPower, path.isFinished(robotPosition));
     }
 
     /**

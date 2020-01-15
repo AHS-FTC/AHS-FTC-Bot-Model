@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.MockClock;
 import edu.ahs.robotics.util.ParameterLookup;
 
 import static org.junit.Assert.*;
@@ -17,6 +18,7 @@ public class HeadingControllerTest {
     public void init() {
         FTCUtilities.startTestMode();
         FTCUtilities.setParameterLookup(new ParamLookup());
+        FTCUtilities.setMockClock(new MockClock());
     }
 
     @Test
@@ -48,12 +50,12 @@ public class HeadingControllerTest {
     public void getPowersRight() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
-        points.add(new Point(0, 4));
+        points.add(new Point(4, 0));
         Path path = makePath(points);
         HeadingController controller = new HeadingController(path, 1);
-        Position robotPosition = new Position(1, 0, 0);
+        Position robotPosition = new Position(0, 1, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
-        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,Double.POSITIVE_INFINITY);
         HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.leftPower > powers.rightPower);
@@ -63,12 +65,12 @@ public class HeadingControllerTest {
     public void getPowersLeft() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
-        points.add(new Point(0, 4));
+        points.add(new Point(4, 0));
         Path path = makePath(points);
         HeadingController controller = new HeadingController(path, 1);
-        Position robotPosition = new Position(-1, 0, 0);
+        Position robotPosition = new Position(0, -1, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
-        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0);
+        OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,Double.POSITIVE_INFINITY);
         HeadingController.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.rightPower > powers.leftPower);
