@@ -18,6 +18,8 @@ public class HeadingController {
     private double leftPower = .2;
     private double rightPower = .2;
 
+    private long lastTime;
+
     //Correction values
     private static final double TURN_SCALE = .01;
     private static final double LOOK_AHEAD_TIME = 0.1; //note that this is in seconds, not millis due to speed and acceleration units.
@@ -35,9 +37,14 @@ public class HeadingController {
         unifiedPID = new PID(p, 0.0, d,5);
 
         logger.startWriting();
+
+        lastTime = System.currentTimeMillis();
     }
 
     public Powers getUpdatedPowers(OdometrySystem.State robotState) {
+        long time = System.currentTimeMillis();
+        long deltaTime = time - lastTime;
+
         Position robotPosition = robotState.position;
         Velocity robotVelocity = robotState.velocity;
 
@@ -49,7 +56,7 @@ public class HeadingController {
             double speedAlongPath = (robotVelocity.dx * targetLocation.pathDeltaX) + (robotVelocity.dy * targetLocation.pathDeltaY);
             speedAlongPath /= targetLocation.pathSegmentLength;
 
-            PID.Corrections speedCorrections = speedPID.getCorrection(targetSpeed - speedAlongPath);
+            PID.Corrections speedCorrections = speedPID.getCorrection(targetSpeed - speedAlongPath,deltaTime);
             double totalSpeedCorrection = speedCorrections.totalCorrection;
             if (totalSpeedCorrection < 0) {
                 totalSpeedCorrection *= DOWN_AMPLIFIER;
@@ -62,36 +69,28 @@ public class HeadingController {
             Position futurePosition = new Position(futurePoint,0);
 
             Path.Location futureTarget = path.getTargetLocation(futurePosition);
-            Point futureTargetPoint = futureTarget.closestPoint;
 
-            double error = futurePoint.distanceTo(futureTargetPoint);
-            PID.Corrections unifiedCorrections = unifiedPID.getCorrection(error);
+            double error = futureTarget.distanceToRobot; //signed distance where positive is robot to right of path
 
-            leftPower -= unifiedCorrections.totalCorrection; //todo fix onesidedness
+            PID.Corrections unifiedCorrections = unifiedPID.getCorrection(error,deltaTime);
+
+            leftPower -= unifiedCorrections.totalCorrection;
             rightPower += unifiedCorrections.totalCorrection;
 
             logger.append("targetSpeed", String.valueOf(targetSpeed));
             logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
-            //logger.append("speedCorrection", String.valueOf(totalSpeedCorrection));
-            //logger.append("speedCorrectionP", String.valueOf(speedCorrections.correctionP));
-            //logger.append("speedCorrectionI", String.valueOf(speedCorrections.correctionI));
-            //logger.append("speedCorrectionD", String.valueOf(speedCorrections.correctionD));
-            //logger.append("speedAlongPath", String.valueOf(speedAlongPath));
-            //logger.append("distanceToRobot", String.valueOf(targetLocation.distanceToRobot));
-            //logger.append("distanceToEnd", String.valueOf(targetLocation.distanceToEnd));
+
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
-            logger.append("path Direction", String.valueOf(targetLocation.pathDirection));
-            //logger.append("closestPointX", String.valueOf(targetLocation.closestPoint.x));
-            //logger.append("closestPointY", String.valueOf(targetLocation.closestPoint.y));
 
-//            logger.append("turnCorrection", String.valueOf(totalTurnCorrection));
-//            logger.append("turnCorrectionP", String.valueOf(positionCorrections.correctionP));
-//            logger.append("turnCorrectionI", String.valueOf(positionCorrections.correctionI));
-//            logger.append("turnCorrectionD", String.valueOf(positionCorrections.correctionD));
-            logger.append("lookAheadCurvature", String.valueOf(targetLocation.lookAheadCurvature));
-            logger.append("robotCurvature", String.valueOf(robotState.travelRadius));
+            logger.append("futureX", String.valueOf(futurePoint.x));
+            logger.append("futureY", String.valueOf(futurePoint.y));
+
+            logger.append("error", String.valueOf(error));
+
+            logger.append("acceleration", String.valueOf(robotState.acceleration));
+            logger.append("travel radius", String.valueOf(robotState.travelRadius));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
@@ -121,6 +120,7 @@ public class HeadingController {
             logger.stopWriting();
         }
 
+        lastTime = time;
         return new Powers(leftPower, rightPower, targetLocation.pathFinished);
     }
 
@@ -150,6 +150,10 @@ public class HeadingController {
 
             double dx = (robotState.position.x - centerX); //effectively the unit circle components for use to derive an angle using atan2.
             double dy = (robotState.position.y - centerY);
+
+            if(dy == 0 && dx == 0){
+                return new Point(centerX, centerY);
+            }
 
             double angleToCurrentPos = Math.atan2(dy, dx);
 

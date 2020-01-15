@@ -151,6 +151,21 @@ public class HeadingControllerTest {
     }
 
     @Test
+    public void testNullMovement(){
+        Position p = new Position(0,0,0);
+        Velocity v = Velocity.makeVelocityFromSpeedDirection(0,0); //direction actually doesnt matter. Wrong?
+
+        OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,0);
+        HeadingController controller = new HeadingController(null, 0);
+
+        Point futurePoint = controller.getFuturePoint(state,1);
+
+        assertEquals(0, futurePoint.x, 0.0000001);
+        assertEquals(0, futurePoint.y,0.0000001);
+
+    }
+
+    @Test
     public void testFuturePointFullRotation(){ //travels full circumference of unit circle
         Position p = new Position(3,4,2);
         Velocity v = Velocity.makeVelocityFromSpeedDirection(2 * Math.PI,0); //direction actually doesnt matter. Wrong?
@@ -162,7 +177,6 @@ public class HeadingControllerTest {
 
         assertEquals(p.x, futurePoint.x,0.000001); // it goes full circle lmao
         assertEquals(p.y, futurePoint.y,0.000001);
-
     }
 
     @Test

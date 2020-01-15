@@ -22,7 +22,7 @@ public class VelocityPIDTest {
         init(config);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(1,1); //new Velocity(1, 1);
 
-        VelocityPID.Correction correction = pid.getCorrection(velocity, velocity);
+        VelocityPID.Correction correction = pid.getCorrection(velocity, velocity,0);
         assertEquals(0,correction.speed,0);
         assertEquals(0,correction.direction,0);
     }
@@ -38,8 +38,8 @@ public class VelocityPIDTest {
         Velocity wrongVelocity = Velocity.makeVelocityFromSpeedDirection(2,2);//new Velocity(2, 2);
         Velocity wrongerVelocity = Velocity.makeVelocityFromSpeedDirection(10,10);// new Velocity(10,10);
 
-        VelocityPID.Correction smolCorrection = pid.getCorrection(velocity, wrongVelocity);
-        VelocityPID.Correction thicCorrection = pid.getCorrection(velocity, wrongerVelocity);
+        VelocityPID.Correction smolCorrection = pid.getCorrection(velocity, wrongVelocity,0);
+        VelocityPID.Correction thicCorrection = pid.getCorrection(velocity, wrongerVelocity,0);
 
         assertTrue(thicCorrection.direction > smolCorrection.direction);
         assertTrue(thicCorrection.speed > smolCorrection.speed);
@@ -55,7 +55,7 @@ public class VelocityPIDTest {
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(1,1); //new Velocity(1, 1);
         Velocity veryWrongVelocity = Velocity.makeVelocityFromSpeedDirection(100,100); //new Velocity(100,100);
 
-        VelocityPID.Correction thicCorrection = pid.getCorrection(velocity, veryWrongVelocity);
+        VelocityPID.Correction thicCorrection = pid.getCorrection(velocity, veryWrongVelocity,0);
 
         assertEquals(0,thicCorrection.direction,0);
         assertEquals(0,thicCorrection.speed,0);
@@ -73,10 +73,10 @@ public class VelocityPIDTest {
         Velocity wrongVelocity = Velocity.makeVelocityFromSpeedDirection(2,2);// new Velocity(2, 2);
 
         for(int i = 0; i < 10; i++){ //wind up the integral term
-            pid.getCorrection(velocity, wrongVelocity);
+            pid.getCorrection(velocity, wrongVelocity,0);
         }
 
-        VelocityPID.Correction correction = pid.getCorrection(velocity, wrongVelocity);
+        VelocityPID.Correction correction = pid.getCorrection(velocity, wrongVelocity,0);
 
         assertTrue(correction.speed > 0);
         assertTrue(correction.direction> 0);
@@ -94,8 +94,8 @@ public class VelocityPIDTest {
         Velocity farVelocity = Velocity.makeVelocityFromSpeedDirection(10,10);//new Velocity(10, 10);
         Velocity closeVelocity = Velocity.makeVelocityFromSpeedDirection(1.1,1.1);//new Velocity(1.1, 1.1);
 
-        pid.getCorrection(velocity, farVelocity);
-        VelocityPID.Correction correction = pid.getCorrection(velocity, closeVelocity);
+        pid.getCorrection(velocity, farVelocity,0);
+        VelocityPID.Correction correction = pid.getCorrection(velocity, closeVelocity,0);
 
         assertTrue(correction.direction < 0);
         assertTrue(correction.speed < 0);

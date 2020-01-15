@@ -49,7 +49,7 @@ import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Odometry OpMode", group="Iterative OpMode")
-@Disabled
+//@Disabled
 public class ArdennesOdomOpMode extends OpMode
 {
     //private Ardennes ardennes;
@@ -115,6 +115,9 @@ public class ArdennesOdomOpMode extends OpMode
         logger.append("y", String.valueOf(position.y));
         logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
         logger.append("speed", String.valueOf(velocity.speed()));
+        logger.append("acceleration", String.valueOf(state.acceleration));
+        logger.append("radius", String.valueOf(state.travelRadius));
+
         logger.append("imu heading", String.valueOf(imuHeading));
         logger.writeLine();
 

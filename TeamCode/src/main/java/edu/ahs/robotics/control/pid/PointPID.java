@@ -39,9 +39,9 @@ public class PointPID {
      * Gets PID corrections, also storing values for proportional and derivative math.
      * @return Correction class containing corrections in two dimensions.
      */
-    public Correction getCorrection(Point current, Point target){
-        PID.Corrections xCorrection = xPID.getCorrection(target.x - current.x);
-        PID.Corrections yCorrection = yPID.getCorrection(target.y - current.y);
+    public Correction getCorrection(Point current, Point target, long deltaTime){
+        PID.Corrections xCorrection = xPID.getCorrection(target.x - current.x, deltaTime);
+        PID.Corrections yCorrection = yPID.getCorrection(target.y - current.y, deltaTime);
 
         return new Correction(xCorrection.totalCorrection, yCorrection.totalCorrection);
     }

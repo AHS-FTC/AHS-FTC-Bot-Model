@@ -208,8 +208,14 @@ public class OdometrySystemImpl implements OdometrySystem {
             double bufferDxR = xRReading - oldxR;
             double bufferDxL = xLReading - oldxL;
 
+            double dxSum = (bufferDxR + bufferDxL);
             double arcDifference = bufferDxR - bufferDxL; // yields positive when r is big and l is small
-            radius = (distanceBetweenYWheels * (bufferDxR + bufferDxL)) / (2.0 * arcDifference);
+
+            if(dxSum == 0.0 && arcDifference == 0.0){ //check for 0/0 case
+                radius = Double.POSITIVE_INFINITY;
+            } else {
+                radius = (distanceBetweenYWheels * dxSum) / (2.0 * arcDifference);
+            }
         }
     }
 

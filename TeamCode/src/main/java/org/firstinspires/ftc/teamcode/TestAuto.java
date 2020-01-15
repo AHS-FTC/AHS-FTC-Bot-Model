@@ -70,79 +70,31 @@ public class TestAuto extends LinearOpMode {
         FTCUtilities.setParameterLookup(tuner);
         ardennes = new Ardennes();
         detector = new ArdennesSkyStoneDetector(false, true);
-        //Intake intake = ardennes.getIntake();
-        //MecanumChassis chassis = ardennes.getChassis();
+        MecanumChassis chassis = ardennes.getChassis();
         Slides slides = ardennes.getSlides();
-        //SerialServo foundationServoLeft = ardennes.getLeftFoundation();
-        //SerialServo foundationServoRight = ardennes.getRightFoundation();
-        //SerialServo gripper = ardennes.getGripper();
-        //SerialServo yslide = ardennes.getySlide();
-        //TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
-        //TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
-        //slides.resetEncoders();
-        //gripper.setPosition(0);
-        //foundationServoLeft.setPosition(0);
-        //foundationServoRight.setPosition(0);
-        //yslide.setPosition(0);
 
-        //tuner.addParam("p-pos", .000001);
-        //tuner.addParam("d-pos", .000001);
-        //tuner.addParam("p-dir", .000001);
-        //tuner.addParam("d-dir", .000001);
-        //tuner.addParam("p-arc", .00001);
-        //tuner.addParam("d-arc", .00001);
-        //tuner.start();
+        tuner.addParam("p", .000001);
+        tuner.addParam("d", .000001);
+
+        tuner.start();
         //ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(48,0));
 
         waitForStart();
 
-//        chassis.driveStraight(100, .8);
-
-//        gripper.setPosition(1);
-//        sleep(1000);
-//        slides.setTargetLevel(2);
-//        slides.runToLevel();
-//        sleep(300);
-//        yslide.setPosition(1);
-//        sleep(1500);
-//        gripper.setPosition(0);
-//        sleep(1000);
-//        yslide.setPosition(0);
-
-
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(new Point(0,0));
-//        points.add(new Point(60,0));
         //Path path = new Path(points, 12, 8, 36);
-        //chassis.startOdometrySystem();
+        Path path = new Path(points, 8, 8, 8);
 
-        //chassis.followPath(path);
+        chassis.startOdometrySystem();
 
-        //chassis.stopOdometrySystem();
+        chassis.followPath(path);
+
+        chassis.stopOdometrySystem();
 
         stop();
 
-        //ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look(false);
-        //sleep(10000);
-        //chassis.arc(90, 1000, .93, true);
-        //intake.startIntakeWaitForBlock(gripperTrigger);
-        //sleep(5000);
-        //chassis.pivot(10, .93);
-
-      /*  intake.startIntakeWaitForBlock(intakeTrigger);
-        chassis.arc(40,1450, .65, false);
-        chassis.arc(-46, 1500, .8, true);
-        chassis.driveStraight(-800,.8);
-        sleep(300);
-        chassis.pivot(-90, .7);
-        sleep(300);
-        chassis.driveStraight(-200,.8);
-        foundationServoLeft.setPosition(1);
-        foundationServoRight.setPosition(1);
-        sleep(500);
-        chassis.arc(90,80,1,true);
-        sleep(300);
-        chassis.driveStraight(-200, 1);*/
 
     }
 }

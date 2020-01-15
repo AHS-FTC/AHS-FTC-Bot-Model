@@ -42,14 +42,14 @@ public class PID {
      * @param error The amount of error to correct for. Generally measured as target - current.
      * @return PID correction to independent variable
      */
-    public Corrections getCorrection(double error) {
+    public Corrections getCorrection(double error, long deltaTime) {
         Corrections corrections = new Corrections();
 
         errorSum += error;
 
-        corrections.correctionP = error * p;
+        corrections.correctionP = error * p * deltaTime; //multiplied by deltatime to work with varying refresh rates
 
-        corrections.correctionI = errorSum * i;
+        corrections.correctionI = errorSum * i; //todo factor for deltaTime
 
         double oldError = errorBuffer.insert(error);
 

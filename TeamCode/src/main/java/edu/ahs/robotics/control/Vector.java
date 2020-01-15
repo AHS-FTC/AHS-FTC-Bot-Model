@@ -24,6 +24,26 @@ public class Vector {
     }
 
     /**
+     * Returns a 1 or -1 multiplier depending on if a point is on the left or right side of a vector.
+     * Note: Positive value means left of line. This may contradict older code.
+     * @param botPosition where the robot is, effectively an offset for the path vector.
+     */
+    public int sideOfLine(Point p, Point botPosition){
+        Point pAfterShift = new Point(p.x - botPosition.x, p.y - botPosition.y);
+
+        Vector perp = getPerpVector();
+        Vector pVector = new Vector(pAfterShift.x,pAfterShift.y);
+
+        double dp = pVector.dotProduct(perp);
+
+        return (int)Math.signum(dp);
+    }
+
+    public double dotProduct(Vector v){
+        return (x * v.x) + (y * v.y);
+    }
+
+    /**
      * Inverts this vector, effectively multiplying by -1, retaining magnitude but flipping direction.
      * @return This instance, for chaining.
      */

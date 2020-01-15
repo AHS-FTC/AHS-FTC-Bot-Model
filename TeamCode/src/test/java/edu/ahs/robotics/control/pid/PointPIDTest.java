@@ -15,7 +15,7 @@ public class PointPIDTest {
 
         PointPID pid = new PointPID(0,0,0);
 
-        PointPID.Correction correction = pid.getCorrection(p1,p2);
+        PointPID.Correction correction = pid.getCorrection(p1,p2,1);
 
         assertEquals(0,correction.x,0);
         assertEquals(0,correction.y,0);
@@ -27,7 +27,7 @@ public class PointPIDTest {
 
         PointPID pid = new PointPID(1,1,1);
 
-        PointPID.Correction correction = pid.getCorrection(p,p); // should be no correction when points are the same
+        PointPID.Correction correction = pid.getCorrection(p,p,1); // should be no correction when points are the same
 
 
         assertEquals(0,correction.x,0);
@@ -42,8 +42,8 @@ public class PointPIDTest {
 
         PointPID pid = new PointPID(1,0,0);
 
-        PointPID.Correction bigCorrection = pid.getCorrection(p,pFar);
-        PointPID.Correction smolCorrection = pid.getCorrection(p,pClose);
+        PointPID.Correction bigCorrection = pid.getCorrection(p,pFar,1);
+        PointPID.Correction smolCorrection = pid.getCorrection(p,pClose,1);
 
         assertTrue(bigCorrection.x > smolCorrection.x);
         assertTrue(bigCorrection.y > smolCorrection.y);
@@ -60,10 +60,10 @@ public class PointPIDTest {
         PointPID pid = new PointPID(0,1,0);
 
         for(int i = 0; i < 4; i ++) {
-            pid.getCorrection(p1, p2); //wind up integral
+            pid.getCorrection(p1, p2,1); //wind up integral
         }
 
-        PointPID.Correction correction = pid.getCorrection(p1,p2);
+        PointPID.Correction correction = pid.getCorrection(p1,p2,1);
 
         assertTrue(correction.x > 0);
         assertTrue(correction.y > 0);
@@ -77,9 +77,9 @@ public class PointPIDTest {
 
         PointPID pid = new PointPID(0,0,1);
 
-        pid.getCorrection(far,target);
+        pid.getCorrection(far,target,1);
 
-        PointPID.Correction correction = pid.getCorrection(close, target);
+        PointPID.Correction correction = pid.getCorrection(close, target,1);
 
         assertTrue(correction.x < 0); //derivative should be making a negative correction
         assertTrue(correction.y < 0);

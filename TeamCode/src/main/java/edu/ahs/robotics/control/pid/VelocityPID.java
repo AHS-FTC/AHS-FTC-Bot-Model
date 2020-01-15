@@ -19,9 +19,9 @@ public class VelocityPID{
      * Given current and target velocity vectors, find suitable PID adjustments.
      * @return corrections in an enclosed Correction class.
      */
-    public Correction getCorrection(Velocity currentVelocity, Velocity targetVelocity){
-        PID.Corrections speedCorrection = speedPID.getCorrection(targetVelocity.speed() - currentVelocity.speed());
-        PID.Corrections directionCorrection = directionPID.getCorrection(targetVelocity.direction() - currentVelocity.direction());
+    public Correction getCorrection(Velocity currentVelocity, Velocity targetVelocity, long deltaTime){
+        PID.Corrections speedCorrection = speedPID.getCorrection(targetVelocity.speed() - currentVelocity.speed(), deltaTime);
+        PID.Corrections directionCorrection = directionPID.getCorrection(targetVelocity.direction() - currentVelocity.direction(), deltaTime);
 
         return new Correction(speedCorrection.totalCorrection, directionCorrection.totalCorrection);
     }
