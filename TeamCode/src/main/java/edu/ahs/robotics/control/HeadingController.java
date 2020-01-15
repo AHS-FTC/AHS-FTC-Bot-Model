@@ -22,7 +22,8 @@ public class HeadingController {
 
     //Correction values
     private static final double TURN_SCALE = .01;
-    private static final double LOOK_AHEAD_TIME = 0.1; //note that this is in seconds, not millis due to speed and acceleration units.
+    private static final double LOOK_AHEAD_TIME = 0.3; //note that this is in seconds, not millis due to speed and acceleration units.
+    private static final double PID_CONSTANT_SCALAR = 0.001;// so that actual tuning values can be more fathomable to the reader
 
     public HeadingController(Path path, double maxPower) {
         this.path = path;
@@ -33,8 +34,8 @@ public class HeadingController {
         double p = lookup.getParameter("p");
         double d = lookup.getParameter("d");
 
-        speedPID = new PID(0.0001, 0.0, 0.00015, 5); // -- tuned --
-        unifiedPID = new PID(p, 0.0, d,5);
+        speedPID = new PID(0.01*PID_CONSTANT_SCALAR, 0.0, 0.015*PID_CONSTANT_SCALAR, 5); // -- tuned --
+        unifiedPID = new PID(p * PID_CONSTANT_SCALAR, 0.0, d * PID_CONSTANT_SCALAR,5);
 
         logger.startWriting();
 
@@ -91,6 +92,8 @@ public class HeadingController {
 
             logger.append("acceleration", String.valueOf(robotState.acceleration));
             logger.append("travel radius", String.valueOf(robotState.travelRadius));
+
+            logger.append("power correction", String.valueOf(unifiedCorrections.totalCorrection));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
