@@ -33,7 +33,7 @@ public class HeadingController {
         double p = lookup.getParameter("p");
         double d = lookup.getParameter("d");
 
-        speedPID = new PID(.004, 0.0, .006, 5); // -- tuned --
+        speedPID = new PID(0.0001, 0.0, 0.00015, 5); // -- tuned --
         unifiedPID = new PID(p, 0.0, d,5);
 
         logger.startWriting();
