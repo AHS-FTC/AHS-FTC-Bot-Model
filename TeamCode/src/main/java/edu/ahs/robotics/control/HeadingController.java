@@ -64,7 +64,8 @@ public class HeadingController {
             Path.Location targetLocation = path.getTargetLocation(futurePosition);
 
             //Use PID to calculate speed correction
-            PID.Corrections speedCorrections = speedPID.getCorrection(targetLocation.speed - robotState.velocity.speed(), deltaTime);
+            double futureSpeed = robotState.velocity.speed() + (robotState.acceleration * LOOK_AHEAD_TIME);
+            PID.Corrections speedCorrections = speedPID.getCorrection(targetLocation.speed - futureSpeed, deltaTime);
             double totalSpeedCorrection = speedCorrections.totalCorrection;
 
             //Use a down Amplifier to increase weight on negative speed corrections
