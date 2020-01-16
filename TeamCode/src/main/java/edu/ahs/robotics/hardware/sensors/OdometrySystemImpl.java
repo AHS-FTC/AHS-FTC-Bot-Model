@@ -37,7 +37,7 @@ public class OdometrySystemImpl implements OdometrySystem {
     private RingBuffer<Double> x1Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
     private RingBuffer<Double> x2Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
 
-    private double x1Last, x2Last, yLast;
+    private double xRLast, xLLast, yLast;
     private double yInchesPerDegree;
     private double distanceBetweenYWheels;
     private Position lastPosition;
@@ -112,8 +112,8 @@ public class OdometrySystemImpl implements OdometrySystem {
         xR.reset();
         xL.reset();
         y.reset();
-        x1Last = xR.getDistance();
-        x2Last = xL.getDistance();
+        xRLast = xR.getDistance();
+        xLLast = xL.getDistance();
         yLast = y.getDistance();
     }
 
@@ -134,14 +134,14 @@ public class OdometrySystemImpl implements OdometrySystem {
         yReading = y.getDistance();
 
         //find deltas
-        dxR = xRReading - x1Last;
-        dxL = xLReading - x2Last;
+        dxR = xRReading - xRLast;
+        dxL = xLReading - xLLast;
         dx = (dxR + dxL) / 2.0; //find the average
         dyBeforeFactorOut = yReading - yLast;
 
         //set lasts
-        x1Last = xRReading;
-        x2Last = xLReading;
+        xRLast = xRReading;
+        xLLast = xLReading;
         yLast = yReading;
 
         //find change in heading
@@ -171,10 +171,10 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         updateTravelRadius(xRReading, xLReading);
 
-        position.heading += dHeading;//apply our heading change. important to do not for heading buffer.
-
-        dxGlobal = Math.sin(position.heading) * dyLocal + Math.cos(position.heading) * dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
+        dxGlobal = -Math.sin(position.heading) * dyLocal + Math.cos(position.heading) * dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
         dyGlobal = Math.cos(position.heading) * dyLocal + Math.sin(position.heading) * dxLocal;
+
+        position.heading += dHeading;//apply our heading change.
 
         position.x += dxGlobal;
         position.y += dyGlobal;
@@ -188,10 +188,10 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         updateVelocity(currentTime);
 
-        logger.append("direction of travel", String.valueOf(velocity.direction()));
-        logger.append("x" , String.valueOf(position.x));
-        logger.append("y" , String.valueOf(position.y));
-        logger.writeLine();
+        //logger.append("direction of travel", String.valueOf(velocity.direction()));
+        //logger.append("x" , String.valueOf(position.x));
+        //logger.append("y" , String.valueOf(position.y));
+        //logger.writeLine();
     }
 
     /**
@@ -261,13 +261,13 @@ public class OdometrySystemImpl implements OdometrySystem {
     /**
      * finds delta heading with two perpendicular odometers
      *
-     * @param x1 one arc distance
-     * @param x2 the other arc distance
+     * @param xR one arc distance
+     * @param xL the other arc distance
      * @return the theta of the arcs in radians
      * math: https://www.desmos.com/calculator/1u5ynekr4d
      */
-    private double findDeltaHeading(double x1, double x2) {
-        return (x1 - x2) / distanceBetweenYWheels;//derived from double arcs
+    private double findDeltaHeading(double xR, double xL) {
+        return (xR - xL) / distanceBetweenYWheels;//derived from double arcs
     }
 
     private class OdometerThread extends Thread {

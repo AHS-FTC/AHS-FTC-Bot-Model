@@ -73,19 +73,19 @@ public class TestAuto extends LinearOpMode {
         MecanumChassis chassis = ardennes.getChassis();
         Slides slides = ardennes.getSlides();
 
-        tuner.addParam("p", .0001);
-        tuner.addParam("d", .0001);
+        tuner.addParam("p", .00002);
+        tuner.addParam("d", .00002);
 
         tuner.start();
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
-        //ArrayList<Point> points = new ArrayList<>();
-        //points.add(new Point(0,0));
-        //points.add(new Point(48,0));
+        //ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(48,0));
 
         waitForStart();
 
         //Path path = new Path(points, 12, 8, 36);
-        Path path = new Path(points, 8, 8, 8);
+        Path path = new Path(points, 8, 8, 16);
 
         chassis.startOdometrySystem();
 
@@ -94,7 +94,7 @@ public class TestAuto extends LinearOpMode {
         chassis.stopOdometrySystem();
 
         stop();
-
-
     }
+
+
 }

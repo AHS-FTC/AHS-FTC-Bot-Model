@@ -144,7 +144,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY,state.travelRadius,0.0);
+        assertEquals(0,state.travelRadius,0.0);
     }
 
     @Test
@@ -165,14 +165,14 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY,state.travelRadius,0.0);
+        assertEquals(0,state.travelRadius,0.0);
     }
 
     @Test
     public void strafe1Foot(){
         double[] x1Inputs = {0,0,0,0}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
         double[] x2Inputs = {0,0,0,0};
-        double[] yInputs = {0,2,4,12};
+        double[] yInputs = {0,-2,-4,-12};
         init(x1Inputs, x2Inputs, yInputs);
 
         for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the initial call to the resetEncoders() method
@@ -187,7 +187,7 @@ public class OdometrySystemImplTest {
     public void strafeAndDrive1Foot(){
         double[] x1Inputs = {0,2,4,12}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
         double[] x2Inputs = {0,2,4,12};
-        double[] yInputs = {0,2,4,12};
+        double[] yInputs = {0,-2,-4,-12};
         init(x1Inputs, x2Inputs, yInputs);
 
         for(int i = 0; i < x1Inputs.length - 1; i++){ //-1 accounts for the initial call to the resetEncoders() method
@@ -221,9 +221,34 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.y, .01);
 
         assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY,state.travelRadius,0.0);
+        assertEquals(0,state.travelRadius,0.0);
 
     }
+
+//    @Test //THIS TEST USES NO DY. REINSTATABLE FOR EMERGENCIES
+//    public void testFullTurn(){
+//        double distanceBetweenWheels = 12.0; //24pi id, 48pi od
+//
+//        double[] xLInputs = {0, 6*Math.PI ,  12*Math.PI, 18*Math.PI, 24*Math.PI}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
+//        double[] xRInputs = {0, 12*Math.PI , 24*Math.PI, 36*Math.PI, 48*Math.PI}; //Driving a circle of radius 2*distance between wheels on outside
+//        double[] yInputs = {0,0,0,0,0};
+//
+//        OdometerMock xR = new OdometerMock(xRInputs);
+//        OdometerMock xL = new OdometerMock(xLInputs);
+//        OdometerMock y = new OdometerMock(yInputs);
+//
+//        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(xR, xL,y, 0, distanceBetweenWheels);
+//        odometrySystem.setPosition(0,0,0);
+//
+//        for(int i = 0; i < xLInputs.length; i++){ //-1 accounts for the initial call to the resetEncoders() method
+//            odometrySystem.updatePosition();
+//        }
+//
+//        OdometrySystem.State state = odometrySystem.getState();
+//
+//        assertEquals(0, state.position.x,0.0001);
+//        assertEquals(0, state.position.y,0.0001);
+//    }
 
     @Test
     public void testVelocity(){

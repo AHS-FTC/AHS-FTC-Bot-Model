@@ -426,7 +426,7 @@ public class MecanumChassis extends Chassis {
             frontRight.setPower(powers.rightPower);
             backRight.setPower(powers.rightPower);
         }
-        while (!powers.pathFinished);
+        while (!powers.pathFinished && FTCUtilities.opModeIsActive());
 
     }
 
