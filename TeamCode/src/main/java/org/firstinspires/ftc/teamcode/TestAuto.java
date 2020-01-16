@@ -77,19 +77,21 @@ public class TestAuto extends LinearOpMode {
         tuner.addParam("d", .00002);
 
         tuner.start();
-        //ArrayList<Point> points = GCodeReader.openFile("1001.csv");
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(0,0));
-        points.add(new Point(48,0));
+        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        //ArrayList<Point> points = new ArrayList<>();
+        //points.add(new Point(0,0));
+        //points.add(new Point(48,0));
+
+        chassis.startOdometrySystem();
 
         waitForStart();
 
         //Path path = new Path(points, 12, 8, 36);
         Path path = new Path(points, 8, 8, 16);
 
-        chassis.startOdometrySystem();
-
         chassis.followPath(path);
+
+        sleep(2000);
 
         chassis.stopOdometrySystem();
 

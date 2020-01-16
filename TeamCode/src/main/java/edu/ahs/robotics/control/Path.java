@@ -64,7 +64,7 @@ public class Path {
 
         //Calculate distance to end and distance from start of path
         loc.distanceToEnd = (totalDistance - second.distanceFromStart) + loc.closestPoint.distanceTo(second);
-        loc.distanceFromStart = second.distanceFromStart - loc.closestPoint.distanceTo(second);
+        loc.distanceFromStart = first.distanceFromStart + loc.closestPoint.distanceTo(first);
 
         //Objective: Find distance to robot from path
         //Note: Positive distances are to the right of the path and negative are to the left

@@ -179,19 +179,20 @@ public class OdometrySystemImpl implements OdometrySystem {
         position.x += dxGlobal;
         position.y += dyGlobal;
 
-        //logger.append("xR", String.valueOf(x1Reading));
-        //logger.append("xL", String.valueOf(x2Reading));
-        //logger.append("y", String.valueOf(yReading));
-        //logger.append("dHeading", String.valueOf(dHeading));
-        //logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
-        //logger.append("yFactorOut", String.valueOf(dyExpected));
+        logger.append("xR", String.valueOf(xRReading));
+        logger.append("xL", String.valueOf(xLReading));
+        logger.append("yReading", String.valueOf(yReading));
+        logger.append("dHeading", String.valueOf(dHeading));
+        logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
+        logger.append("dyExpected", String.valueOf(dyExpected));
+        logger.append("dy", String.valueOf(dy));
 
         updateVelocity(currentTime);
 
         //logger.append("direction of travel", String.valueOf(velocity.direction()));
-        //logger.append("x" , String.valueOf(position.x));
-        //logger.append("y" , String.valueOf(position.y));
-        //logger.writeLine();
+        logger.append("x" , String.valueOf(position.x));
+        logger.append("y" , String.valueOf(position.y));
+        logger.writeLine();
     }
 
     /**
@@ -249,7 +250,7 @@ public class OdometrySystemImpl implements OdometrySystem {
         acceleration = dv/dt;
     }
 
-    public State getState() { //todo make synchronized?
+    public synchronized State getState() {
         return new State(position, velocity, acceleration, radius);
     }
 
