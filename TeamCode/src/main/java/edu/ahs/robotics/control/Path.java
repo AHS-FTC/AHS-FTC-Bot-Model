@@ -104,7 +104,7 @@ public class Path {
      */
     public void updateFirstBoundingPoint(Position robotPosition) {
 
-        for (int i = iFirstBoundingPoint + 1; i < pointAtDistance.size(); i++) {
+        for (int i = iFirstBoundingPoint + 1; i < pointAtDistance.size()-1; i++) {
             PointAtDistance current = getPoint(i);
             double componentToCurrent = getComponentAlongPath(robotPosition, current);
             if (componentToCurrent > 0) {

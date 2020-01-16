@@ -44,7 +44,7 @@ public class PathTest {
         //Test at farthest point
         Position robotPositionAtLastPoint = new Position(4,2,0);
         path.updateFirstBoundingPoint(robotPositionAtLastPoint);
-        assertEquals(1, path.iFirstBoundingPoint);
+        assertEquals(0, path.iFirstBoundingPoint);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class PathTest {
         //Test at farthest point
         Position robotPositionAtLastPoint = new Position(6,6,0);
         path.updateFirstBoundingPoint(robotPositionAtLastPoint);
-        assertEquals(4, path.iFirstBoundingPoint);
+        assertEquals(3, path.iFirstBoundingPoint);
     }
 
     @Test
@@ -337,6 +337,21 @@ public class PathTest {
         robotPosition = new Position(0, 5, 0);
 
         assertTrue(path.isFinished(robotPosition));
+    }
+
+    @Test
+    public void testGetTargetLocationPastEndOfPath() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 4));
+        Path path = makePath(points);
+
+        //Test location at robot position over end of path
+        Position robotPosition = new Position(0, 5, 0);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+
+        assertEquals(new Point(0 , 5), targetLocation.closestPoint);
+
     }
 
 }
