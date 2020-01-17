@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class PathTest {
 
-    @Test
+ /*   @Test
     public void testBoundingPointsWithSimplePath() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
@@ -18,32 +18,32 @@ public class PathTest {
 
         //Test at robot position 0
         Position robotPosition = new Position(0,0,0);
-        path.updateFirstBoundingPoint(robotPosition);
+        path.getFirstBoundingPoint(robotPosition);
         assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at robot position -1
         Position robotPositionBeforeStartOfPath = new Position(-1,-3,10);
-        path.updateFirstBoundingPoint(robotPositionBeforeStartOfPath);
+        path.getFirstBoundingPoint(robotPositionBeforeStartOfPath);
         assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at position between bounding points
         Position robotPositionDuringPath = new Position(2,1,0);
-        path.updateFirstBoundingPoint(robotPositionDuringPath);
+        path.getFirstBoundingPoint(robotPositionDuringPath);
         assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at left of path
         Position robotPositionLeftOfPath = new Position(3,-2,0);
-        path.updateFirstBoundingPoint(robotPositionLeftOfPath);
+        path.getFirstBoundingPoint(robotPositionLeftOfPath);
         assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at right of path
         Position robotPositionRightOfPath = new Position(3,2,0);
-        path.updateFirstBoundingPoint(robotPositionRightOfPath);
+        path.getFirstBoundingPoint(robotPositionRightOfPath);
         assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at farthest point
         Position robotPositionAtLastPoint = new Position(4,2,0);
-        path.updateFirstBoundingPoint(robotPositionAtLastPoint);
+        path.getFirstBoundingPoint(robotPositionAtLastPoint);
         assertEquals(0, path.iFirstBoundingPoint);
     }
 
@@ -59,34 +59,34 @@ public class PathTest {
 
         //Test at robot position 0
         Position robotPosition = new Position(0,0,0);
-        path.updateFirstBoundingPoint(robotPosition);
+        path.getFirstBoundingPoint(robotPosition);
         assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at robot position -1
         Position robotPositionBeforeStartOfPath = new Position(-1,-3,0);
-        path.updateFirstBoundingPoint(robotPositionBeforeStartOfPath);
+        path.getFirstBoundingPoint(robotPositionBeforeStartOfPath);
         assertEquals(0, path.iFirstBoundingPoint);
 
         //Test at position between bounding points
         Position robotPositionDuringPath = new Position(2,2,0);
-        path.updateFirstBoundingPoint(robotPositionDuringPath);
+        path.getFirstBoundingPoint(robotPositionDuringPath);
         assertEquals(1, path.iFirstBoundingPoint);
 
         //Test at left of path
         Position robotPositionLeftOfPath = new Position(3,2,0);
-        path.updateFirstBoundingPoint(robotPositionLeftOfPath);
+        path.getFirstBoundingPoint(robotPositionLeftOfPath);
         assertEquals(1, path.iFirstBoundingPoint);
 
         //Test at right of path
         Position robotPositionRightOfPath = new Position(3,4,0);
-        path.updateFirstBoundingPoint(robotPositionRightOfPath);
+        path.getFirstBoundingPoint(robotPositionRightOfPath);
         assertEquals(2, path.iFirstBoundingPoint);
 
         //Test at farthest point
         Position robotPositionAtLastPoint = new Position(6,6,0);
-        path.updateFirstBoundingPoint(robotPositionAtLastPoint);
+        path.getFirstBoundingPoint(robotPositionAtLastPoint);
         assertEquals(3, path.iFirstBoundingPoint);
-    }
+    }*/
 
     @Test
     public void testTargetLocationWithSimpleLine() {
@@ -351,7 +351,38 @@ public class PathTest {
         Path.Location targetLocation = path.getTargetLocation(robotPosition);
 
         assertEquals(new Point(0 , 5), targetLocation.closestPoint);
+    }
 
+    @Test
+    public void testPathDoesNotFinishIfItCrossesPerpendicularLine() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(4, 0));
+        points.add(new Point(4,4));
+        points.add(new Point(2,4));
+        Path path = makePath(points);
+
+        //Test location at robot position over end of path
+        Position robotPosition = new Position(4, 0, 0);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+
+        assertFalse(path.isFinished(robotPosition));
+
+        robotPosition = new Position(1, 0,0);
+
+        assertFalse(path.isFinished(robotPosition));
+
+        robotPosition = new Position(4, 4,0);
+
+        assertFalse(path.isFinished(robotPosition));
+
+        robotPosition = new Position(2, 4,0);
+
+        assertTrue(path.isFinished(robotPosition));
+
+        robotPosition = new Position(1, 4, 0);
+
+        assertTrue(path.isFinished(robotPosition));
     }
 
 }

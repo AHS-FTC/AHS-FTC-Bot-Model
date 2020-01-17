@@ -8,10 +8,11 @@ public class Path {
     private double totalDistance = 0;
 
 
-    /* Package visible for testing*/ int iFirstBoundingPoint = 0;
     private double minRampUpSpeed;
     private double minRampDownSpeed;
     private double maxVelocity;
+    private int iFutureBound = 0;
+    private int iCurrentBound = 0;
 
     public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity) {
         pointAtDistance = new ArrayList<>();
@@ -40,8 +41,13 @@ public class Path {
     }
 
     public boolean isFinished(Position robotPosition) {
-        double componentAlongPath = getComponentAlongPath(robotPosition, pointAtDistance.get(pointAtDistance.size() - 1));
-        return componentAlongPath <= 0;
+        iCurrentBound = getFirstBoundingPoint(robotPosition, iCurrentBound);
+        if (iCurrentBound < pointAtDistance.size()-2) {
+            return false;
+        } else {
+            double componentAlongPath = getComponentAlongPath(robotPosition, pointAtDistance.get(pointAtDistance.size() - 1));
+            return componentAlongPath <= 0;
+        }
     }
 
     /**
@@ -51,10 +57,10 @@ public class Path {
      */
     public Location getTargetLocation(Position robotPosition) {
         //Find the 2 closest bounding points
-        updateFirstBoundingPoint(robotPosition);
-        PointAtDistance first = getPoint(iFirstBoundingPoint);
+        iFutureBound = getFirstBoundingPoint(robotPosition, iFutureBound);
+        PointAtDistance first = getPoint(iFutureBound);
 
-        PointAtDistance second = getPoint(iFirstBoundingPoint + 1);
+        PointAtDistance second = getPoint(iFutureBound + 1);
 
         Location loc = new Location(second);
 
@@ -102,17 +108,21 @@ public class Path {
      * Finds the closest point behind the robot in direction of travel and updates the first point
      * @param robotPosition
      */
-    public void updateFirstBoundingPoint(Position robotPosition) {
+    private int getFirstBoundingPoint(Position robotPosition, int iStartSearch) {
 
-        for (int i = iFirstBoundingPoint + 1; i < pointAtDistance.size()-1; i++) {
+        int returnVal = iStartSearch;
+
+        for (int i = iStartSearch; i < pointAtDistance.size()-1; i++) {
             PointAtDistance current = getPoint(i);
             double componentToCurrent = getComponentAlongPath(robotPosition, current);
             if (componentToCurrent > 0) {
                 break;
             } else {
-                iFirstBoundingPoint = i;
+                returnVal = i;
             }
         }
+
+        return returnVal;
     }
 
     /**
