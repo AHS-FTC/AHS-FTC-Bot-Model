@@ -11,7 +11,6 @@ public class Path {
     private double minRampUpSpeed;
     private double minRampDownSpeed;
     private double maxVelocity;
-    private int iFutureBound = 0;
     private int iCurrentBound = 0;
 
     public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity) {
@@ -57,7 +56,7 @@ public class Path {
      */
     public Location getTargetLocation(Position robotPosition) {
         //Find the 2 closest bounding points
-        iFutureBound = getFirstBoundingPoint(robotPosition, iFutureBound);
+        int iFutureBound = getFirstBoundingPoint(robotPosition, iCurrentBound); // used to be iFutureBound
         PointAtDistance first = getPoint(iFutureBound);
 
         PointAtDistance second = getPoint(iFutureBound + 1);
