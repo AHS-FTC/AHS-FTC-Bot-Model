@@ -8,7 +8,7 @@ import edu.ahs.robotics.util.ParameterLookup;
 
 public class HeadingController {
     //Amplifies negative power corrections to deal with momentum while decelerating
-    private static final double DOWN_AMPLIFIER = 1.5; // -- tuned --
+    private static final double DOWN_AMPLIFIER = 1; // -- tuned --
     Path path;
     Logger logger = new Logger("TestAutoData");
     double downCorrectionScale;
@@ -21,7 +21,6 @@ public class HeadingController {
     private long lastTime;
 
     //Correction values
-    private static final double TURN_SCALE = .01;
     private static final double LOOK_AHEAD_TIME = 0.3; //note that this is in seconds, not millis due to speed and acceleration units.
     private static final double PID_CONSTANT_SCALAR = 0.001;// so that actual tuning values can be more fathomable to the reader
 
@@ -29,13 +28,13 @@ public class HeadingController {
         this.path = path;
         this.maxPower = maxPower;
 
-        ParameterLookup lookup = FTCUtilities.getParameterLookup();
+        //ParameterLookup lookup = FTCUtilities.getParameterLookup();
 
-        double p = lookup.getParameter("p");
-        double d = lookup.getParameter("d");
+        //double p = lookup.getParameter("p");
+        //double d = lookup.getParameter("d");
 
-        speedPID = new PID(0.01*PID_CONSTANT_SCALAR, 0.0, 0.015*PID_CONSTANT_SCALAR, 5); // -- tuned --
-        unifiedPID = new PID(p * PID_CONSTANT_SCALAR, 0.0, d * PID_CONSTANT_SCALAR,5);
+        speedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 4 * PID_CONSTANT_SCALAR, 3); // -- tuned --
+        unifiedPID = new PID(0.1 * PID_CONSTANT_SCALAR, 0.0, 1 * PID_CONSTANT_SCALAR,5);
 
         logger.startWriting();
 
@@ -62,10 +61,10 @@ public class HeadingController {
 
             //Find closest point on path to future point
             Path.Location targetLocation = path.getTargetLocation(futurePosition);
+            Path.Location currentLocation = path.getTargetLocation(robotPosition);
 
             //Use PID to calculate speed correction
-            double futureSpeed = robotState.velocity.speed() + (robotState.acceleration * LOOK_AHEAD_TIME);
-            PID.Corrections speedCorrections = speedPID.getCorrection(targetLocation.speed - futureSpeed, deltaTime);
+            PID.Corrections speedCorrections = speedPID.getCorrection(currentLocation.speed - robotVelocity.speed(), deltaTime);
             double totalSpeedCorrection = speedCorrections.totalCorrection;
 
             //Use a down Amplifier to increase weight on negative speed corrections
@@ -85,12 +84,17 @@ public class HeadingController {
             leftPower -= unifiedCorrections.totalCorrection;
             rightPower += unifiedCorrections.totalCorrection;
 
-            logger.append("targetSpeed", String.valueOf(targetLocation.speed));
-            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
 
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
+
+            logger.append("pSpeedCorrection", String.valueOf(speedCorrections.correctionP * 1000));
+            logger.append("dSpeedCorrection", String.valueOf(speedCorrections.correctionD * 1000));
+            logger.append("total speed correction", String.valueOf(speedCorrections.totalCorrection * 1000));
+
+            logger.append("targetSpeed", String.valueOf(currentLocation.speed));
+            logger.append("robotSpeed", String.valueOf(robotVelocity.speed()));
 
             logger.append("futureX", String.valueOf(futurePoint.x));
             logger.append("futureY", String.valueOf(futurePoint.y));
@@ -100,7 +104,7 @@ public class HeadingController {
             logger.append("acceleration", String.valueOf(robotState.acceleration));
             logger.append("travel radius", String.valueOf(robotState.travelRadius));
 
-            logger.append("power correction", String.valueOf(unifiedCorrections.totalCorrection));
+            logger.append("heading power correction", String.valueOf(unifiedCorrections.totalCorrection));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));
@@ -146,7 +150,7 @@ public class HeadingController {
      */
     /*protected for testing*/ Point getFuturePoint(OdometrySystem.State robotState, double lookAheadTime){
 
-        double distance = (robotState.velocity.speed() * lookAheadTime) + (.5) * (robotState.acceleration * (lookAheadTime * lookAheadTime)); // suvat, ut * 1/2at^2
+        double distance = (robotState.velocity.speed() * lookAheadTime); //+ (.5) * (robotState.acceleration * (lookAheadTime * lookAheadTime)); // suvat, ut * 1/2at^2
         Vector h = Vector.makeUnitVector(robotState.position.heading); //make a unit vector in the direction of heading
 
         if(robotState.travelRadius == Double.POSITIVE_INFINITY || robotState.travelRadius == Double.NEGATIVE_INFINITY){

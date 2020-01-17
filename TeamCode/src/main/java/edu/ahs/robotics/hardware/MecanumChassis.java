@@ -421,10 +421,9 @@ public class MecanumChassis extends Chassis {
             powers = headingController.getUpdatedPowers(state);
 
             frontLeft.setPower(powers.leftPower);
-            backLeft.setPower(powers.leftPower);
-
             frontRight.setPower(powers.rightPower);
             backRight.setPower(powers.rightPower);
+            backLeft.setPower(powers.leftPower);
         }
         while (!powers.pathFinished && FTCUtilities.opModeIsActive());
 

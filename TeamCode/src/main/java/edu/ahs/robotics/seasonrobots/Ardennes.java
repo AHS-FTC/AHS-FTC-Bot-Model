@@ -31,6 +31,7 @@ public class Ardennes extends Robot {
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo ySlide;
     private SerialServo capstone;
+    private SerialServo wrist;
 
 
     public Ardennes() {
@@ -45,6 +46,7 @@ public class Ardennes extends Robot {
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
+        wrist = new SerialServo("wrist", false);
     }
 
     public Intake getIntake(){
@@ -75,6 +77,8 @@ public class Ardennes extends Robot {
     public Slides getSlides() {return slides;}
 
     public SerialServo getCapstone() {return capstone;}
+
+    public SerialServo getWrist() {return wrist;}
 
     private MecanumChassis makeChassis(OdometrySystemImpl odometrySystem) {
         //Set Gear Ratio

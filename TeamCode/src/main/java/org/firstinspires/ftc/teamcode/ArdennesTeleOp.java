@@ -69,7 +69,7 @@ public class ArdennesTeleOp extends OpMode
     private Slides slides;
     private MecanumChassis chassis;
 
-    private SerialServo gripper, capstone, ySlide, leftFoundation, rightFoundation;
+    private SerialServo gripper, capstone, wrist, ySlide, leftFoundation, rightFoundation;
     //todo add Servo capstoneServo;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
@@ -85,6 +85,7 @@ public class ArdennesTeleOp extends OpMode
     private Toggle foundationToggle;
     private Toggle gripperToggle;
     private Toggle capstoneToggle;
+    private Toggle wristToggle;
     private Toggle collectionModeToggle;
     private Toggle debugToggle;
     private boolean slidesMoving = false;
@@ -116,6 +117,7 @@ public class ArdennesTeleOp extends OpMode
 
         gripper = ardennes.getGripper();
         capstone = ardennes.getCapstone();
+        wrist = ardennes.getWrist();
         ySlide = ardennes.getySlide();
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
@@ -123,7 +125,8 @@ public class ArdennesTeleOp extends OpMode
         foundationToggle = new Toggle();
         gripperToggle = new Toggle();
         capstoneToggle = new Toggle();
-        //collectionModeToggle = new Toggle();
+        wristToggle = new Toggle();
+        collectionModeToggle = new Toggle();
         debugToggle = new Toggle();
 
         intakeOutSwitch = new Switch();
@@ -132,7 +135,7 @@ public class ArdennesTeleOp extends OpMode
         slideControlSwitch = new Switch();
 
         gripperTrigger = ardennes.getGripperTrigger();
-        //intakeTrigger = ardennes.getIntakeTrigger();
+        intakeTrigger = ardennes.getIntakeTrigger();
 
         gripper.setPosition(0);
 
@@ -255,26 +258,36 @@ public class ArdennesTeleOp extends OpMode
     }
 
     private void triggers() {
-        // If the gripperTrigger sees a block, stop the intake.  But allow it to run outwards
-        if (gripperTrigger.isTriggered()) {
+
+        if (slides.atBottom()) {
+            if (gripperTrigger.isTriggered()) {
+                if (intakeMode == IntakeMode.IN) {
+                    intakeMode = IntakeMode.OFF;
+                    updateIntake();
+                }
+                // Is the gripper open and in position? Then grip the block.
+                if (!gripperToggle.isEnabled()) {
+                    gripperToggle.flip();
+                    updateGripper();
+                }
+            }
+            //Code to make sure that gripper is always open at bottom if distance sensor isn't triggered todo change so it works if distance sensor breaks
+            else {
+                if (gripperToggle.isEnabled()) {
+                    gripperToggle.flip();
+                    updateGripper();
+                }
+            }
+
+        }
+
+        // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
+        if (intakeTrigger.isTriggered() && collectionModeToggle.isEnabled()) {
             if (intakeMode == IntakeMode.IN) {
                 intakeMode = IntakeMode.OFF;
                 updateIntake();
             }
-            // Is the gripper open and in position? Then grip the block.
-            if (!gripperToggle.isEnabled() && slides.atBottom()) {
-                gripperToggle.flip();
-                updateGripper();
-            }
         }
-
-//        // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
-//        if (intakeTrigger.isTriggered() && collectionModeToggle.isEnabled()) {
-//            if (intakeMode == IntakeMode.IN) {
-//                intakeMode = IntakeMode.OFF;
-//                updateIntake();
-//            }
-//        }
     }
 
     private void driveActions() {
@@ -326,10 +339,16 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        //press b to rotate stone 90 degrees
+        //press x to drop capstone
         if (gamepad2.x) {
             capstoneToggle.flip();
             activateCapstone();
+        }
+
+        //press b to rotate wrist
+        if (gamepad2.b) {
+            wristToggle.flip();
+            activateWrist();
         }
 
         //press a to grip block
@@ -363,6 +382,14 @@ public class ArdennesTeleOp extends OpMode
             capstone.setPosition(-.5);
         } else {
             capstone.setPosition(.5);
+        }
+    }
+
+    private void activateWrist() {
+        if (wristToggle.isEnabled()) {
+            wrist.setPosition(1);
+        } else {
+            wrist.setPosition(0);
         }
     }
 

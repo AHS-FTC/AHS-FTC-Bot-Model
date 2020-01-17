@@ -31,71 +31,54 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.ArrayList;
 
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.Intake;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.SerialServo;
-import edu.ahs.robotics.hardware.Slides;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
-
-
-@Autonomous(name = "Test Auto", group = "Linear Opmode")
+@Autonomous(name = "drive straight", group = "Linear Opmode")
 //@Disabled
-public class TestAuto extends LinearOpMode {
+public class DriveStraight extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
 
     @Override
     public void runOpMode() {
+        frontLeft = hardwareMap.get(DcMotor.class, "FL");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
+        backLeft = hardwareMap.get(DcMotor.class,"BL");
+        backRight = hardwareMap.get(DcMotor.class,"BR");
 
-        FTCUtilities.setOpMode(this);
-        MotorHashService.init();
-        //tuner = new Tuner();
-        //FTCUtilities.setParameterLookup(tuner);
-        ardennes = new Ardennes();
-        detector = new ArdennesSkyStoneDetector(false, true);
-        MecanumChassis chassis = ardennes.getChassis();
-        Slides slides = ardennes.getSlides();
+        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        //tuner.addParam("p", .000002);
-        //tuner.addParam("d", .00005);
-
-        //tuner.start();
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
-        //ArrayList<Point> points = new ArrayList<>();
-        //points.add(new Point(0,0));
-        //points.add(new Point(96,0));
-
-        chassis.startOdometrySystem();
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
 
-        Path path = new Path(points, 12, 4, 36);
-        //Path path = new Path(points, 8, 8, 16);
+        runtime.reset();
 
-        chassis.followPath(path);
+        frontLeft.setPower(0.5);
+        frontRight.setPower(0.5);
+        backLeft.setPower(0.5);
+        backRight.setPower(0.5);
 
-        sleep(2000);
+        while (runtime.milliseconds() < 2000 && opModeIsActive()){
 
-        chassis.stopOdometrySystem();
+        }
 
-        stop();
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+
     }
 
 
