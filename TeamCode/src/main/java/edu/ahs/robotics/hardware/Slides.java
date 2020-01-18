@@ -57,8 +57,8 @@ public class Slides {
 
         ParameterLookup lookup = FTCUtilities.getParameterLookup();
 
-        limitSwitch = new LimitSwitch("limitSwitch");
-        limitSwitch2 = new LimitSwitch("limitSwitch2");
+        limitSwitch = new LimitSwitch("limitSwitch", true);
+        limitSwitch2 = new LimitSwitch("limitSwitch2", true);
     }
 
 
@@ -83,14 +83,8 @@ public class Slides {
      * @return true if slides are at bottom
      */
     public boolean atBottom(){
-        if (limitSwitch.isTriggered() || limitSwitch2.isTriggered()) {
-            return true;
-        } else {
-            return false;
-        }
+        return (limitSwitch.isTriggered() || limitSwitch2.isTriggered());
     }
-
-
 
     public void resetEncoders(){
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
