@@ -6,13 +6,16 @@ import edu.ahs.robotics.util.FTCUtilities;
 
 public class LimitSwitch implements Trigger {
     TouchSensor limitSwitch;
+    boolean flipped;
 
-    public LimitSwitch(String deviceName) {
+    public LimitSwitch(String deviceName, boolean flipped) {
         limitSwitch = FTCUtilities.getTouchSensor(deviceName);
+        this.flipped = flipped;
     }
 
     @Override
     public boolean isTriggered() {
-        return limitSwitch.isPressed();
+        //
+        return flipped ^ limitSwitch.isPressed();
     }
 }
