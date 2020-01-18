@@ -34,7 +34,7 @@ public class HeadingController {
         //double d = lookup.getParameter("d");
 
         speedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 4 * PID_CONSTANT_SCALAR, 3); // -- tuned --
-        unifiedPID = new PID(0.1 * PID_CONSTANT_SCALAR, 0.0, 1 * PID_CONSTANT_SCALAR,5);
+        unifiedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 7 * PID_CONSTANT_SCALAR,5);
 
         logger.startWriting();
 
@@ -89,8 +89,8 @@ public class HeadingController {
             logger.append("robotPositionY", String.valueOf(robotPosition.y));
             logger.append("robotPositionHeading", String.valueOf(robotPosition.heading));
 
-            logger.append("pSpeedCorrection", String.valueOf(speedCorrections.correctionP * 1000));
-            logger.append("dSpeedCorrection", String.valueOf(speedCorrections.correctionD * 1000));
+            //logger.append("pSpeedCorrection", String.valueOf(speedCorrections.correctionP * 1000));
+            //logger.append("dSpeedCorrection", String.valueOf(speedCorrections.correctionD * 1000));
             logger.append("total speed correction", String.valueOf(speedCorrections.totalCorrection * 1000));
 
             logger.append("targetSpeed", String.valueOf(currentLocation.speed));
@@ -98,6 +98,9 @@ public class HeadingController {
 
             logger.append("futureX", String.valueOf(futurePoint.x));
             logger.append("futureY", String.valueOf(futurePoint.y));
+
+            logger.append("p heading correction", String.valueOf(unifiedCorrections.correctionP * 1000));
+            logger.append("d heading correction", String.valueOf(unifiedCorrections.correctionD * 1000));
 
             logger.append("error", String.valueOf(error));
 
