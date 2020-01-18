@@ -83,7 +83,7 @@ public class ArdennesOdometryDebuggingOpMode extends OpMode
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        logger = new Logger("odometry");
+        logger = new Logger("odometryDebuggingOpMode", "odometryDebuggingOpMode");
         logger.startWriting();
     }
 
@@ -133,7 +133,7 @@ public class ArdennesOdometryDebuggingOpMode extends OpMode
     }
     @Override
     public void stop() {
-        logger.stopWriting();
+        Logger.stopLoggers();
         chassis.stopOdometrySystem();
     }
 

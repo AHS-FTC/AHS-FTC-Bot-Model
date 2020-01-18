@@ -67,7 +67,7 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("sensorStats");
+        logger = new Logger("odometryStats", "odometrySystem");
 
         distanceBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0.0);
         velocityTimeBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0L);//type is long
@@ -86,7 +86,6 @@ public class OdometrySystemImpl implements OdometrySystem {
     }
 
     public synchronized void stop() {
-        logger.stopWriting();
         odometerThread.end();
     }
 

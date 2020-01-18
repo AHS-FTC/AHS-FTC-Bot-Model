@@ -2,7 +2,7 @@ package edu.ahs.robotics.hardware;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
-import edu.ahs.robotics.control.HeadingController;
+import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
@@ -23,7 +23,7 @@ public class MecanumChassis extends Chassis {
     private static final double LEFT_INITIAL_SCALE = 1;
     public static final double RIGHT_AMPLIFIER = 1;
 
-    Logger logger = new Logger("Mecanum Chassis Old Code");
+    Logger logger = new Logger("Mecanum Chassis Old Code", "mecanumChassis");
 
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
@@ -273,9 +273,6 @@ public class MecanumChassis extends Chassis {
         }
     }
 
-    public void stopLogger() {
-        logger.stopWriting();
-    }
 
     public void velocityDrive(Path path, double maxSpeed){
         OdometrySystem.State initialState = getState();
@@ -414,11 +411,11 @@ public class MecanumChassis extends Chassis {
     }
 
     public void followPath(Path path) {
-        HeadingController headingController = new HeadingController(path,  1); //Max power before inversion
-        HeadingController.Powers powers;
+        PathFollower pathFollower = new PathFollower(path,  1); //Max power before inversion
+        PathFollower.Powers powers;
         do {
             OdometrySystem.State state = getState();
-            powers = headingController.getUpdatedPowers(state);
+            powers = pathFollower.getUpdatedPowers(state);
 
             frontLeft.setPower(powers.leftPower);
             frontRight.setPower(powers.rightPower);

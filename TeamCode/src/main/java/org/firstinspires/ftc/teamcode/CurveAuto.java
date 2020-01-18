@@ -51,9 +51,9 @@ import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.util.Tuner;
 
 
-@Autonomous(name = "Test Auto", group = "Linear Opmode")
+@Autonomous(name = "Curve Auto", group = "Linear Opmode")
 //@Disabled
-public class TestAuto extends LinearOpMode {
+public class CurveAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
@@ -63,40 +63,18 @@ public class TestAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
         FTCUtilities.setOpMode(this);
-        MotorHashService.init();
-        //tuner = new Tuner();
-        //FTCUtilities.setParameterLookup(tuner);
-        ardennes = new Ardennes();
-        detector = new ArdennesSkyStoneDetector(false, true);
-        MecanumChassis chassis = ardennes.getChassis();
-        Slides slides = ardennes.getSlides();
 
-        //tuner.addParam("p", .000002);
-        //tuner.addParam("d", .00005);
+        Logger logger = new Logger("pathDataCurve", "pathFollower");
 
-        //tuner.start();
         ArrayList<Point> points = GCodeReader.openFile("1001.csv");
-        //ArrayList<Point> points = new ArrayList<>();
-        //points.add(new Point(0,0));
-        //points.add(new Point(96,0));
 
-        chassis.startOdometrySystem();
+        BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
 
-        Path path = new Path(points, 12, 4, 36);
-        //Path path = new Path(points, 8, 8, 16);
-
-        chassis.followPath(path);
-
-        sleep(2000);
-
-        chassis.stopOdometrySystem();
+        base.afterStart();
 
         stop();
     }
-
-
 }

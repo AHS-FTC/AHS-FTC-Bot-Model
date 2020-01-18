@@ -51,15 +51,28 @@ public class Logger {
     private int lastLine = 0;
     private static long startTime; //shared across all loggers for synchronization
     private boolean firstLine;
+    private static HashMap<String, Logger> loggers = new HashMap<>();
 
     static {
         startTime = System.currentTimeMillis();
     }
 
-    public Logger(String fileName){
+    public Logger(String fileName, String key){
         this.fileName = fileName + ".csv";
         categories = new ArrayList<>();
         entriesByCategory = new HashMap<>();
+        loggers.put(key, this);
+    }
+
+    public static Logger getLogger(String key){
+        return loggers.get(key);
+    }
+
+    public static void stopLoggers(){
+        for (Iterator iterator = loggers.values().iterator(); iterator.hasNext(); ) {
+            Logger next =  (Logger) iterator.next();
+            next.stopWriting();
+        }
     }
 
     private FileWriter csvWriter = null;
@@ -120,7 +133,7 @@ public class Logger {
         }
     }
 
-    public void stopWriting() {
+    private void stopWriting() {
         try{
             csvWriter.close();
         } catch (IOException e) {

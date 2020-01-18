@@ -77,7 +77,7 @@ public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
         power = tuner.getParameter("power");
 
         waitForStart();
-        logger = new Logger("PowerCurve" + Math.floor(power * 100));
+        logger = new Logger("PowerCurve" + Math.floor(power * 100), "powerCurve");
         logger.startWriting();
         chassis.startOdometrySystem();
 
@@ -114,6 +114,6 @@ public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
 
         stop();
         chassis.stopOdometrySystem();
-        logger.stopWriting();
+        Logger.stopLoggers();
     }
 }

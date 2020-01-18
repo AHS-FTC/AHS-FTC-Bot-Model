@@ -10,6 +10,7 @@ import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 
 public class FullAuto {
@@ -121,7 +122,7 @@ public class FullAuto {
         FTCUtilities.sleep(1000);
         yslide.setPosition(0);
         FTCUtilities.sleep(1000);
-        chassis.stopLogger();
+        Logger.stopLoggers();
 
     }
 

@@ -12,7 +12,7 @@ import edu.ahs.robotics.util.ParameterLookup;
 
 import static org.junit.Assert.*;
 
-public class HeadingControllerTest {
+public class PathFollowerTest {
 
     @Before
     public void init() {
@@ -27,16 +27,16 @@ public class HeadingControllerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        HeadingController controller = new HeadingController(path, 1);
+        PathFollower controller = new PathFollower(path, 1);
         Position robotPosition = new Position(0, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(state);
+        PathFollower.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.leftPower > 0);
         assertTrue(powers.rightPower > 0);
 
-        HeadingController.Powers powers2 = controller.getUpdatedPowers(state);
+        PathFollower.Powers powers2 = controller.getUpdatedPowers(state);
 
         assertTrue(powers2.leftPower > powers.leftPower);
         assertTrue(powers2.rightPower > powers.rightPower);
@@ -52,11 +52,11 @@ public class HeadingControllerTest {
         points.add(new Point(0, 0));
         points.add(new Point(4, 0));
         Path path = makePath(points);
-        HeadingController controller = new HeadingController(path, 1);
+        PathFollower controller = new PathFollower(path, 1);
         Position robotPosition = new Position(0, 1, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,Double.POSITIVE_INFINITY);
-        HeadingController.Powers powers = controller.getUpdatedPowers(state);
+        PathFollower.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.leftPower > powers.rightPower);
     }
@@ -67,11 +67,11 @@ public class HeadingControllerTest {
         points.add(new Point(0, 0));
         points.add(new Point(4, 0));
         Path path = makePath(points);
-        HeadingController controller = new HeadingController(path, 1);
+        PathFollower controller = new PathFollower(path, 1);
         Position robotPosition = new Position(0, -1, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,Double.POSITIVE_INFINITY);
-        HeadingController.Powers powers = controller.getUpdatedPowers(state);
+        PathFollower.Powers powers = controller.getUpdatedPowers(state);
 
         assertTrue(powers.rightPower > powers.leftPower);
     }
@@ -82,11 +82,11 @@ public class HeadingControllerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        HeadingController controller = new HeadingController(path, 1);
+        PathFollower controller = new PathFollower(path, 1);
         Position robotPosition = new Position(0, 4, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(state);
+        PathFollower.Powers powers = controller.getUpdatedPowers(state);
         assertEquals(0, powers.leftPower, .001);
         assertEquals(0, powers.rightPower, .001);
     }
@@ -97,11 +97,11 @@ public class HeadingControllerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        HeadingController controller = new HeadingController(path, 1);
+        PathFollower controller = new PathFollower(path, 1);
         Position robotPosition = new Position(0, 5, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0);
-        HeadingController.Powers powers = controller.getUpdatedPowers(state);
+        PathFollower.Powers powers = controller.getUpdatedPowers(state);
         assertEquals(0.0, powers.leftPower, .001);
         assertEquals(0.0, powers.rightPower, .001);
     }
@@ -112,14 +112,14 @@ public class HeadingControllerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        HeadingController controller = new HeadingController(path, 1);
+        PathFollower controller = new PathFollower(path, 1);
         Position robotPosition = new Position(0, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0);
 
         double maxPower;
         do {
-            HeadingController.Powers powers = controller.getUpdatedPowers(state);
+            PathFollower.Powers powers = controller.getUpdatedPowers(state);
             maxPower = Math.max(powers.leftPower, powers.rightPower);
         } while (maxPower < 1);
         assertEquals(1, maxPower, .001);
@@ -131,7 +131,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(12,0);
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,Double.POSITIVE_INFINITY);
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -144,7 +144,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(12,0); //direction actually doesnt matter. Wrong?
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,Double.POSITIVE_INFINITY);
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -158,7 +158,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(0,0); //direction actually doesnt matter. Wrong?
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,0);
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -173,7 +173,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(2 * Math.PI,0); //direction actually doesnt matter. Wrong?
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,1);
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -187,7 +187,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(Math.PI,0); // 10pi is circumference, time of 5
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,-5); //going right
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,5);
 
@@ -202,7 +202,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(Math.PI/2,0); // 10pi is circumference, time of 5
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,-3);
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,3);
 
@@ -216,7 +216,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(Math.PI/2,0); // 10pi is circumference, time of 5
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,3);
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,3);
 
@@ -231,7 +231,7 @@ public class HeadingControllerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(0,0);
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,50);
-        HeadingController controller = new HeadingController(null, 0);
+        PathFollower controller = new PathFollower(null, 0);
 
         Point futurePoint = controller.getFuturePoint(state,50);
 
@@ -245,14 +245,14 @@ public class HeadingControllerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        HeadingController controller = new HeadingController(path, 1);
+        PathFollower controller = new PathFollower(path, 1);
         Position robotPosition = new Position(1, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0);
 
         double maxPower;
         do {
-            HeadingController.Powers powers = controller.getUpdatedPowers(state);
+            PathFollower.Powers powers = controller.getUpdatedPowers(state);
             maxPower = Math.max(Math.abs(powers.leftPower), Math.abs(powers.rightPower));
         } while (maxPower < 1);
         assertEquals(1, maxPower, .001);

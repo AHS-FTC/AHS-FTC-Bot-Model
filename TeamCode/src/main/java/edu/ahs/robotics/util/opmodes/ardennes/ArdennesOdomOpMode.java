@@ -69,7 +69,7 @@ public class ArdennesOdomOpMode extends OpMode
     public void init() {
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        logger = new Logger("odometry");
+        logger = new Logger("ardennesOdomOpMode","ardennesOdomOpMode");
 
         teleOp = new SimpleTeleOp();
         teleOp.hardwareMap = hardwareMap;
@@ -126,7 +126,7 @@ public class ArdennesOdomOpMode extends OpMode
     @Override
     public void stop() {
         teleOp.stop();
-        logger.stopWriting();
+        Logger.stopLoggers();
         chassis.stopOdometrySystem();
     }
 

@@ -6,11 +6,11 @@ import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.ParameterLookup;
 
-public class HeadingController {
+public class PathFollower {
     //Amplifies negative power corrections to deal with momentum while decelerating
     private static final double DOWN_AMPLIFIER = 1; // -- tuned --
     Path path;
-    Logger logger = new Logger("TestAutoData");
+    Logger logger;
     double downCorrectionScale;
     private PID speedPID;
     private PID unifiedPID;
@@ -21,10 +21,10 @@ public class HeadingController {
     private long lastTime;
 
     //Correction values
-    private static final double LOOK_AHEAD_TIME = 0.3; //note that this is in seconds, not millis due to speed and acceleration units.
+    private static final double LOOK_AHEAD_TIME = 0.5; //note that this is in seconds, not millis due to speed and acceleration units.
     private static final double PID_CONSTANT_SCALAR = 0.001;// so that actual tuning values can be more fathomable to the reader
 
-    public HeadingController(Path path, double maxPower) {
+    public PathFollower(Path path, double maxPower) {
         this.path = path;
         this.maxPower = maxPower;
 
@@ -34,8 +34,9 @@ public class HeadingController {
         //double d = lookup.getParameter("d");
 
         speedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 4 * PID_CONSTANT_SCALAR, 3); // -- tuned --
-        unifiedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 7 * PID_CONSTANT_SCALAR,5);
+        unifiedPID = new PID(.05 * PID_CONSTANT_SCALAR, 0.0, 12 * PID_CONSTANT_SCALAR,5);
 
+        logger = Logger.getLogger("pathFollower");
         logger.startWriting();
 
         lastTime = FTCUtilities.getCurrentTimeMillis();
@@ -135,10 +136,6 @@ public class HeadingController {
         logger.append("rightPower", String.valueOf(rightPower));
         logger.append("isFinished", String.valueOf(path.isFinished(robotPosition)));
         logger.writeLine();
-
-        if (path.isFinished(robotPosition)) {
-            logger.stopWriting();
-        }
 
         lastTime = time;
         return new Powers(leftPower, rightPower, path.isFinished(robotPosition));
