@@ -151,7 +151,7 @@ public class PathFollower {
     /*protected for testing*/ Point getFuturePoint(OdometrySystem.State robotState, double lookAheadTime){
 
         double distance = (robotState.velocity.speed() * lookAheadTime); //+ (.5) * (robotState.acceleration * (lookAheadTime * lookAheadTime)); // suvat, ut * 1/2at^2
-        Vector h = Vector.makeUnitVector(robotState.position.heading); //make a unit vector in the direction of heading
+        Vector h = Vector.makeUnitVector(robotState.directionOfTravel); //make a unit vector in the direction of heading
 
         if(robotState.travelRadius == Double.POSITIVE_INFINITY || robotState.travelRadius == Double.NEGATIVE_INFINITY){
             h.scale(distance);
