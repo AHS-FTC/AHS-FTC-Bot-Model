@@ -29,58 +29,65 @@
 
 package org.firstinspires.ftc.teamcode;
 
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name = "drive straight", group = "Linear Opmode")
+import java.util.ArrayList;
+
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.Logger;
+
+
+@Autonomous(name = "Odometry Tuner", group = "Linear Opmode")
 @Disabled
-public class DriveStraight extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-
-    private DcMotor frontLeft, frontRight, backLeft, backRight;
+public class OdometryTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backLeft = hardwareMap.get(DcMotor.class,"BL");
-        backRight = hardwareMap.get(DcMotor.class,"BR");
+        FTCUtilities.setOpMode(this);
 
-        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        Ardennes ardennes = new Ardennes();
+        MecanumChassis chassis = ardennes.getChassis();
+        IMU imu = new IMU(hardwareMap.get(BNO055IMU.class, "imu"));
 
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ArrayList<Odometer> odometers = chassis.getOdometers();
+        Odometer left = odometers.get(0);
+        Odometer right = odometers.get(1);
+        Odometer back = odometers.get(2);
 
         waitForStart();
+        double initialIMU = imu.getHeading();
+        double deltaHeading = 0;
 
-        runtime.reset();
+        while (deltaHeading < 90){
+            telemetry.addData("heading", imu.getHeading());
+            telemetry.update();
 
-        frontLeft.setPower(0.5);
-        frontRight.setPower(0.5);
-        backLeft.setPower(0.5);
-        backRight.setPower(0.5);
-
-        while (runtime.milliseconds() < 2000 && opModeIsActive()){
-
+            chassis.drive3Axis(0,0,0.3);
+            deltaHeading = imu.getHeading() - initialIMU;
         }
+        chassis.stopMotors();
 
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
+        double averageOdomMovement = (Math.abs(left.getDistance()) + Math.abs(right.getDistance()))/2;
+        double rotationProportion = deltaHeading / 360;
+        double distanceBetweenWheels = averageOdomMovement / (Math.PI * rotationProportion);
 
+        double yInchesPerDegree =  back.getDistance() / deltaHeading;
+
+        telemetry.addData("delta heading" , deltaHeading);
+        telemetry.addData("averageOdomMovement", averageOdomMovement);
+        telemetry.addData("distance between wheels", distanceBetweenWheels);
+        telemetry.addData("y inches per degree", yInchesPerDegree);
+        telemetry.update();
+        Logger.stopLoggers();
+        sleep(10000);
     }
-
-
 }

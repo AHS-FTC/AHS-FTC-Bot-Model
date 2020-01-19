@@ -21,7 +21,7 @@ public class PathFollower {
     private long lastTime;
 
     //Correction values
-    private static final double LOOK_AHEAD_TIME = 0.5; //note that this is in seconds, not millis due to speed and acceleration units.
+    private static final double LOOK_AHEAD_TIME = 0.4; //note that this is in seconds, not millis due to speed and acceleration units.
     private static final double PID_CONSTANT_SCALAR = 0.001;// so that actual tuning values can be more fathomable to the reader
 
     public PathFollower(Path path, double maxPower) {
@@ -34,7 +34,7 @@ public class PathFollower {
         //double d = lookup.getParameter("d");
 
         speedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 4 * PID_CONSTANT_SCALAR, 3); // -- tuned --
-        unifiedPID = new PID(.05 * PID_CONSTANT_SCALAR, 0.0, 12 * PID_CONSTANT_SCALAR,5);
+        unifiedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 12 * PID_CONSTANT_SCALAR,5);
 
         logger = Logger.getLogger("pathFollower");
         logger.startWriting();
