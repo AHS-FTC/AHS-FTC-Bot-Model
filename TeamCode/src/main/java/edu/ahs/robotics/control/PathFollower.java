@@ -34,7 +34,7 @@ public class PathFollower {
         //double d = lookup.getParameter("d");
 
         speedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 4 * PID_CONSTANT_SCALAR, 3); // -- tuned --
-        unifiedPID = new PID(.05 * PID_CONSTANT_SCALAR, 0.0, 12 * PID_CONSTANT_SCALAR,5);
+        unifiedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 7 * PID_CONSTANT_SCALAR,5);
 
         logger = Logger.getLogger("pathFollower");
         logger.startWriting();
