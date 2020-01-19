@@ -2,6 +2,9 @@ package edu.ahs.robotics.hardware;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.pid.PositionPID;
@@ -40,6 +43,7 @@ public class MecanumChassis extends Chassis {
 
     private Odometer leftOdometer;
     private Odometer rightOdometer;
+    private Odometer backOdometer;
 
 
     public MecanumChassis(DriveUnit.Config driveUnitConfig, OdometrySystem odometrySystem) {
@@ -52,6 +56,8 @@ public class MecanumChassis extends Chassis {
         this.odometrySystem = odometrySystem;
         leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
         rightOdometer = odometrySystem.getX1Odometer();
+        backOdometer = odometrySystem.getBackOdometer();
+
 
         logger.startWriting();
     }
@@ -271,6 +277,14 @@ public class MecanumChassis extends Chassis {
         } finally {
             setPowerAll(0);
         }
+    }
+
+    public ArrayList<Odometer> getOdometers() {
+        ArrayList<Odometer> odom = new ArrayList<>();
+        odom.add(leftOdometer);
+        odom.add(rightOdometer);
+        odom.add(backOdometer);
+        return odom;
     }
 
 

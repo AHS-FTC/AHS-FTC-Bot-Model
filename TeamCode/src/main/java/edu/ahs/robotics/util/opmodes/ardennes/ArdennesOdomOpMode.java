@@ -63,7 +63,7 @@ public class ArdennesOdomOpMode extends OpMode
 
     private double lastTime;
 
-    private OpMode teleOp;
+    //private OpMode teleOp;
 
     @Override
     public void init() {
@@ -71,10 +71,6 @@ public class ArdennesOdomOpMode extends OpMode
         ardennes = new Ardennes();
         logger = new Logger("ardennesOdomOpMode","ardennesOdomOpMode");
 
-        teleOp = new SimpleTeleOp();
-        teleOp.hardwareMap = hardwareMap;
-        teleOp.gamepad1 = gamepad1;
-        teleOp.init();
         chassis = ardennes.getChassis();
         imu = new IMU(hardwareMap.get(BNO055IMU.class, "imu"));
     }
@@ -92,7 +88,7 @@ public class ArdennesOdomOpMode extends OpMode
 
     @Override
     public void loop() {
-        teleOp.loop();
+        chassis.drive3Axis(gamepad1.left_stick_y,gamepad1.left_stick_x,gamepad1.right_stick_x);
 
         double currentTime = FTCUtilities.getCurrentTimeMillis();
         double imuHeading = imu.getHeading();
@@ -125,7 +121,7 @@ public class ArdennesOdomOpMode extends OpMode
     }
     @Override
     public void stop() {
-        teleOp.stop();
+        //teleOp.stop();
         Logger.stopLoggers();
         chassis.stopOdometrySystem();
     }

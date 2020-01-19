@@ -22,6 +22,8 @@ public interface OdometrySystem {
 
     Odometer getX2Odometer();
 
+    Odometer getBackOdometer();
+
     /**
      * Contains atomic and threadsafe information on the current state of the odometry system.
      */
