@@ -35,41 +35,29 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
-import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.Intake;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.SerialServo;
-import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
 
 
-@Autonomous(name = "Curve Auto", group = "Linear Opmode")
+@Autonomous(name = "Backwards Straight Auto", group = "Linear Opmode")
 //@Disabled
-public class CurveAuto extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+public class BackwardsStraightAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurve", "pathFollower");
+        Logger logger = new Logger("pathDataBackwardsStraight", "pathFollower");
 
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
-
-        BaseTestAuto base = new BaseTestAuto(points, true);
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(-40,0));
+        BaseTestAuto base = new BaseTestAuto(points, false);
 
         waitForStart();
 
