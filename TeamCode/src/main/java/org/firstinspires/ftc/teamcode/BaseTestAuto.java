@@ -19,14 +19,14 @@ public class BaseTestAuto {
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        path = new Path(points, 12, 4, 36);
+        path = new Path(points, 12, 4, 8);
         chassis.startOdometrySystem();
     }
 
     public void afterStart(){
         chassis.followPath(path);
 
-        FTCUtilities.sleep(250);
+        FTCUtilities.sleep(1000);
         chassis.stopOdometrySystem();
         Logger.stopLoggers();
     }

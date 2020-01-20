@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -47,7 +48,7 @@ import edu.ahs.robotics.util.Tuner;
 
 
 @Autonomous(name = "Old Code Test Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class OldCodeTestAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
