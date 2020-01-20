@@ -44,25 +44,21 @@ import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "Sigmoid Auto", group = "Linear Opmode")
+@Autonomous(name = "Straight Auto", group = "Linear Opmode")
 //@Disabled
-public class SigmoidAuto extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+public class StraightAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataSigmoid", "pathFollower");
+        Logger logger = new Logger("pathDataStraight", "pathFollower");
 
-        ArrayList<Point> points = GCodeReader.openFile("sigmoid.csv");
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(48,0));
 
-        BaseTestAuto base = new BaseTestAuto(points, true);
+        BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
 

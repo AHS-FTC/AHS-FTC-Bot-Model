@@ -32,6 +32,8 @@ public class OdometrySystemImpl implements OdometrySystem {
     private double distance = 0.0;
     private int loopCount = 0;
 
+    private double dySum = 0;
+
     private static final int ARC_BUFFER_SIZE = 10;
 
     private RingBuffer<Double> x1Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
@@ -155,8 +157,9 @@ public class OdometrySystemImpl implements OdometrySystem {
         dyExpected = Math.toDegrees(dHeading) * yInchesPerDegree;
 
         //find real dy
-        dy = dyBeforeFactorOut - dyExpected;
-        //dy = 0.0; //temporary until we get y encoder
+        dySum += dyBeforeFactorOut - dyExpected;
+        FTCUtilities.OpLogger("sum", dySum);
+        dy = 0.0; //temporary until we get y encoder
 
 
         if (dHeading != 0) {//courtesy of 11115, thanks gluten free

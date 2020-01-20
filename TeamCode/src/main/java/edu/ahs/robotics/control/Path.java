@@ -31,6 +31,7 @@ public class Path {
 
             double distanceFromPrevious = current.distanceTo(previous);
             totalDistance += distanceFromPrevious;
+
             pointAtDistance.add(new PointAtDistance(current, totalDistance, current.x - previous.x, current.y - previous.y, distanceFromPrevious));
         }
     }

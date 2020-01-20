@@ -36,6 +36,10 @@ public class SingleDriveUnit extends DriveUnit{
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior){
+        motor.setZeroPowerBehavior(behavior);
+    }
+
     public double getDistance (){
         double ticksPerRotation = MotorHashService.getTicks(config.getMotorType());
         double rotations = motor.getCurrentPosition()/ticksPerRotation;

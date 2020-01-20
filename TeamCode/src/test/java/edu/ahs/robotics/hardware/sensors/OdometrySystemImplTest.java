@@ -2,6 +2,7 @@ package edu.ahs.robotics.hardware.sensors;
 
 import org.junit.Test;
 
+import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MockClock;
@@ -225,30 +226,103 @@ public class OdometrySystemImplTest {
 
     }
 
-//    @Test //THIS TEST USES NO DY. REINSTATABLE FOR EMERGENCIES
-//    public void testFullTurn(){
-//        double distanceBetweenWheels = 12.0; //24pi id, 48pi od
-//
-//        double[] xLInputs = {0, 6*Math.PI ,  12*Math.PI, 18*Math.PI, 24*Math.PI}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
-//        double[] xRInputs = {0, 12*Math.PI , 24*Math.PI, 36*Math.PI, 48*Math.PI}; //Driving a circle of radius 2*distance between wheels on outside
-//        double[] yInputs = {0,0,0,0,0};
-//
-//        OdometerMock xR = new OdometerMock(xRInputs);
-//        OdometerMock xL = new OdometerMock(xLInputs);
-//        OdometerMock y = new OdometerMock(yInputs);
-//
-//        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(xR, xL,y, 0, distanceBetweenWheels);
-//        odometrySystem.setPosition(0,0,0);
-//
-//        for(int i = 0; i < xLInputs.length; i++){ //-1 accounts for the initial call to the resetEncoders() method
-//            odometrySystem.updatePosition();
-//        }
-//
-//        OdometrySystem.State state = odometrySystem.getState();
-//
-//        assertEquals(0, state.position.x,0.0001);
-//        assertEquals(0, state.position.y,0.0001);
-//    }
+    @Test //THIS TEST USES NO DY. REINSTATABLE FOR EMERGENCIES
+    public void testFullTurn(){
+        double distanceBetweenWheels = 12.0; //24pi id, 48pi od
+
+        double[] xLInputs = {0, 6*Math.PI ,  12*Math.PI, 18*Math.PI, 24*Math.PI}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
+        double[] xRInputs = {0, 12*Math.PI , 24*Math.PI, 36*Math.PI, 48*Math.PI}; //Driving a circle of radius 2*distance between wheels on outside
+        double[] yInputs = {0,0,0,0,0};
+
+        OdometerMock xR = new OdometerMock(xRInputs);
+        OdometerMock xL = new OdometerMock(xLInputs);
+        OdometerMock y = new OdometerMock(yInputs);
+
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(xR, xL,y, 0, distanceBetweenWheels);
+        odometrySystem.setPosition(0,0,0);
+
+        for(int i = 0; i < xLInputs.length; i++){ //-1 accounts for the initial call to the resetEncoders() method
+            odometrySystem.updatePosition();
+        }
+
+        OdometrySystem.State state = odometrySystem.getState();
+
+        assertEquals(0, state.position.x,0.0001);
+        assertEquals(0, state.position.y,0.0001);
+    }
+
+    @Test
+    public void realisticArcTest(){ //Made to emulate arc auto
+        double[] xLInputs = {0,12.93943474195, 25.8788694839,38.81830422585, 51.7577389678}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
+        double[] xRInputs = {0,18.4764917939, 36.9529835878, 55.4294753817, 73.9059671756};
+        double[] yInputs = {0,79879,0,0};
+
+        OdometerMock xR = new OdometerMock(xRInputs);
+        OdometerMock xL = new OdometerMock(xLInputs);
+        OdometerMock y = new OdometerMock(yInputs);
+
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(xR, xL,y, .114, 14.1);
+
+        for(int i = 0; i < xLInputs.length; i++){ //-1 accounts for the initial call to the resetEncoders() method
+            odometrySystem.updatePosition();
+        }
+
+        OdometrySystem.State state = odometrySystem.getState();
+
+        assertEquals(Math.PI/2, state.position.heading,0.000001);
+        assertEquals(40, state.position.x,0.000001);
+        assertEquals(40, state.position.y,0.000001);
+        //assertEquals(40, state.travelRadius,0.000001);
+    }
+
+    @Test
+    public void dynamicCircleTest(){
+        double radius = 40;
+        double distanceBetweenWheels = 14.1;
+        int segments = 15;
+        double percentOfCircle = .25;//1 is full circle
+
+        double innerArcRadius = radius - (distanceBetweenWheels/2.0);
+        double outerArcRadius = radius + (distanceBetweenWheels/2.0);
+
+        double innerArc = 2 * innerArcRadius * Math.PI * percentOfCircle;
+        double outerArc = 2 * outerArcRadius * Math.PI * percentOfCircle;
+
+        Point centerOfArc = new Point(0,0);
+
+        double[] xLInputs = new double[segments];
+        double[] xRInputs = new double[segments];
+        double[] yInputs =  new double[segments];
+
+
+        //create inputs
+        for(int i = 0; i < segments; i++){
+            xLInputs[i] = (i * innerArc)/ (double)segments; //fractions of the total arc, 1/5, 2/5, 3/5... etc
+            xRInputs[i] = (i * outerArc)/ (double)segments;
+        }
+        OdometerMock xR = new OdometerMock(xRInputs);
+        OdometerMock xL = new OdometerMock(xLInputs);
+        OdometerMock y = new OdometerMock(yInputs);
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(xR, xL,y, .114, distanceBetweenWheels);
+
+        odometrySystem.setPosition(0,-40, 0);
+        for(int i = 0; i < xLInputs.length; i++){ //-1 accounts for the initial call to the resetEncoders() method
+            odometrySystem.updatePosition();
+
+            OdometrySystem.State state = odometrySystem.getState();
+            double x2 = Math.pow(state.position.x, 2);
+            double y2 = Math.pow(state.position.y, 2);
+            double r2 = Math.pow(radius, 2);
+
+            assertEquals(r2, x2+y2, 0.001);
+
+
+           // double distanceFromCenter = centerOfArc.distanceTo(state.position);
+
+            //assertEquals(radius, distanceFromCenter, 0.000001);
+        }
+
+    }
 
     @Test
     public void testVelocity(){

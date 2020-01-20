@@ -30,9 +30,9 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
@@ -42,7 +42,6 @@ import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
 
 /**
  * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
@@ -63,8 +62,6 @@ public class ArdennesOdomOpMode extends OpMode
 
     private double lastTime;
 
-    //private OpMode teleOp;
-
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
@@ -72,6 +69,7 @@ public class ArdennesOdomOpMode extends OpMode
         logger = new Logger("ardennesOdomOpMode","ardennesOdomOpMode");
 
         chassis = ardennes.getChassis();
+        chassis.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         imu = new IMU(hardwareMap.get(BNO055IMU.class, "imu"));
     }
 
@@ -121,7 +119,6 @@ public class ArdennesOdomOpMode extends OpMode
     }
     @Override
     public void stop() {
-        //teleOp.stop();
         Logger.stopLoggers();
         chassis.stopOdometrySystem();
     }

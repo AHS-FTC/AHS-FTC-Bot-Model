@@ -1,5 +1,7 @@
 package edu.ahs.robotics.hardware;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.util.ArrayList;
@@ -127,6 +129,14 @@ public class MecanumChassis extends Chassis {
         frontLeft.setPower(motorPower);
         backRight.setPower(motorPower);
         backLeft.setPower(motorPower);
+    }
+
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior){
+        frontRight.setZeroPowerBehavior(behavior);
+        frontLeft.setZeroPowerBehavior(behavior);
+        backRight.setZeroPowerBehavior(behavior);
+        backLeft.setZeroPowerBehavior(behavior);
+
     }
 
     public void stopMotors() {

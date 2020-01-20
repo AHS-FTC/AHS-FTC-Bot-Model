@@ -51,9 +51,9 @@ import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.util.Tuner;
 
 
-@Autonomous(name = "Curve Auto", group = "Linear Opmode")
+@Autonomous(name = "Left Curve Auto", group = "Linear Opmode")
 //@Disabled
-public class CurveAuto extends LinearOpMode {
+public class LeftCurveAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
@@ -65,7 +65,7 @@ public class CurveAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurve", "pathFollower");
+        Logger logger = new Logger("pathDataCurveL", "pathFollower");
 
         ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 

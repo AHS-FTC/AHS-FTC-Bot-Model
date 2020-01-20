@@ -20,7 +20,7 @@ public class BaseTestAuto {
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        path = new Path(points, 12, 4, 36);
+        path = new Path(points, 12, 4, 8);
         chassis.startOdometrySystem();
         this.forwards = forwards;
     }
@@ -28,7 +28,7 @@ public class BaseTestAuto {
     public void afterStart(){
         chassis.followPath(path, forwards);
 
-        FTCUtilities.sleep(250);
+        FTCUtilities.sleep(1000);
         chassis.stopOdometrySystem();
         Logger.stopLoggers();
     }
