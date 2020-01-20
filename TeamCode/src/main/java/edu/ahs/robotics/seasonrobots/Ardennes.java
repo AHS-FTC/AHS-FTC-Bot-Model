@@ -35,7 +35,7 @@ public class Ardennes extends Robot {
 
 
     public Ardennes() {
-        //intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
+        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 25);
         leftFoundation = new SerialServo("FSL", false);
         rightFoundation = new SerialServo("FSR", true);

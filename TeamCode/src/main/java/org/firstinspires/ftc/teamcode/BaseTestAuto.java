@@ -14,17 +14,19 @@ public class BaseTestAuto {
     private Ardennes ardennes;
     private Path path;
     private MecanumChassis chassis;
+    private boolean forwards;
 
-    public BaseTestAuto(ArrayList<Point> points){
+    public BaseTestAuto(ArrayList<Point> points, boolean forwards){
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         path = new Path(points, 12, 4, 8);
         chassis.startOdometrySystem();
+        this.forwards = forwards;
     }
 
     public void afterStart(){
-        chassis.followPath(path);
+        chassis.followPath(path, forwards);
 
         FTCUtilities.sleep(1000);
         chassis.stopOdometrySystem();

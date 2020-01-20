@@ -29,45 +29,65 @@
 
 package org.firstinspires.ftc.teamcode;
 
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 import java.util.ArrayList;
 
-import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "Sigmoid Auto", group = "Linear Opmode")
-//@Disabled
-public class SigmoidAuto extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+@Autonomous(name = "Odometry Tuner", group = "Linear Opmode")
+@Disabled
+public class OdometryTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataSigmoid", "pathFollower");
+        Ardennes ardennes = new Ardennes();
+        MecanumChassis chassis = ardennes.getChassis();
+        IMU imu = new IMU(hardwareMap.get(BNO055IMU.class, "imu"));
 
-        ArrayList<Point> points = GCodeReader.openFile("sigmoid.csv");
-
-        BaseTestAuto base = new BaseTestAuto(points, true);
+        ArrayList<Odometer> odometers = chassis.getOdometers();
+        Odometer left = odometers.get(0);
+        Odometer right = odometers.get(1);
+        Odometer back = odometers.get(2);
 
         waitForStart();
+        double initialIMU = imu.getHeading();
+        double deltaHeading = 0;
 
-        base.afterStart();
+        while (deltaHeading < 90){
+            telemetry.addData("heading", imu.getHeading());
+            telemetry.update();
 
-        stop();
+            chassis.drive3Axis(0,0,0.3);
+            deltaHeading = imu.getHeading() - initialIMU;
+        }
+        chassis.stopMotors();
+
+        double averageOdomMovement = (Math.abs(left.getDistance()) + Math.abs(right.getDistance()))/2;
+        double rotationProportion = deltaHeading / 360;
+        double distanceBetweenWheels = averageOdomMovement / (Math.PI * rotationProportion);
+
+        double yInchesPerDegree =  back.getDistance() / deltaHeading;
+
+        telemetry.addData("delta heading" , deltaHeading);
+        telemetry.addData("averageOdomMovement", averageOdomMovement);
+        telemetry.addData("distance between wheels", distanceBetweenWheels);
+        telemetry.addData("y inches per degree", yInchesPerDegree);
+        telemetry.update();
+        Logger.stopLoggers();
+        sleep(10000);
     }
 }

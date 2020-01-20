@@ -106,6 +106,11 @@ public class OdometrySystemImpl implements OdometrySystem {
         return xL;
     }
 
+    @Override
+    public Odometer getBackOdometer(){
+        return y;
+    }
+
     /**
      * Resets encoders and sets lasts. Package Protected for testing access.
      */

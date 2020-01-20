@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.pid.PositionPID;
@@ -42,6 +45,7 @@ public class MecanumChassis extends Chassis {
 
     private Odometer leftOdometer;
     private Odometer rightOdometer;
+    private Odometer backOdometer;
 
 
     public MecanumChassis(DriveUnit.Config driveUnitConfig, OdometrySystem odometrySystem) {
@@ -54,6 +58,8 @@ public class MecanumChassis extends Chassis {
         this.odometrySystem = odometrySystem;
         leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
         rightOdometer = odometrySystem.getX1Odometer();
+        backOdometer = odometrySystem.getBackOdometer();
+
 
         logger.startWriting();
     }
@@ -283,6 +289,14 @@ public class MecanumChassis extends Chassis {
         }
     }
 
+    public ArrayList<Odometer> getOdometers() {
+        ArrayList<Odometer> odom = new ArrayList<>();
+        odom.add(leftOdometer);
+        odom.add(rightOdometer);
+        odom.add(backOdometer);
+        return odom;
+    }
+
 
     public void velocityDrive(Path path, double maxSpeed){
         OdometrySystem.State initialState = getState();
@@ -420,17 +434,27 @@ public class MecanumChassis extends Chassis {
         return Math.signum(power) * Math.pow(power, 2);
     }
 
-    public void followPath(Path path) {
+    public void followPath(Path path, boolean forwards) {
         PathFollower pathFollower = new PathFollower(path,  1); //Max power before inversion
         PathFollower.Powers powers;
         do {
             OdometrySystem.State state = getState();
             powers = pathFollower.getUpdatedPowers(state);
 
-            frontLeft.setPower(powers.leftPower);
-            frontRight.setPower(powers.rightPower);
-            backRight.setPower(powers.rightPower);
-            backLeft.setPower(powers.leftPower);
+            if (forwards) {
+                state.setDirectionOfTravel(state.position.heading);
+                frontLeft.setPower(powers.leftPower);
+                frontRight.setPower(powers.rightPower);
+                backRight.setPower(powers.rightPower);
+                backLeft.setPower(powers.leftPower);
+            } else {
+                state.setDirectionOfTravel(state.position.heading + Math.PI);
+                frontLeft.setPower(-powers.rightPower);
+                frontRight.setPower(-powers.leftPower);
+                backRight.setPower(-powers.leftPower);
+                backLeft.setPower(-powers.rightPower);
+            }
+
         }
         while (!powers.pathFinished && FTCUtilities.opModeIsActive());
 
