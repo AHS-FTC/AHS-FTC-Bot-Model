@@ -272,12 +272,12 @@ public class ArdennesTeleOp extends OpMode
                 }
             }
             //Code to make sure that gripper is always open at bottom if distance sensor isn't triggered todo change so it works if distance sensor breaks
-            else {
-                if (gripperToggle.isEnabled()) {
-                    gripperToggle.flip();
-                    updateGripper();
-                }
-            }
+//            else {
+//                if (gripperToggle.isEnabled()) {
+//                    gripperToggle.flip();
+//                    updateGripper();
+//                }
+//            }
 
         }
 
@@ -369,12 +369,12 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-//        //gamepad 1 press dpad up to enable collection mode
-//        if (gamepad1.dpad_up) {
-//            collectionModeToggle.flip();
-//            telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
-//            //telemetry.update();
-//        }
+        //gamepad 1 press dpad up to enable collection mode
+        if (gamepad1.dpad_up) {
+            collectionModeToggle.flip();
+            telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
+            //telemetry.update();
+        }
     }
 
     private void activateCapstone() {

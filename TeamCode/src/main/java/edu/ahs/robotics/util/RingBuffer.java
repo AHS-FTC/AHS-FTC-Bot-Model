@@ -39,4 +39,8 @@ public class RingBuffer<T> {
 
         return old;
     }
+
+    public List<T> getBuffer (){
+        return buffer;
+    }
 }

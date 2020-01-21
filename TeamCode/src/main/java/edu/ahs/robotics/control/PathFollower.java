@@ -149,6 +149,8 @@ public class PathFollower {
      * @return An estimation of where the robot will be lookAheadTime seconds in the future.
      */
     /*protected for testing*/ Point getFuturePoint(OdometrySystem.State robotState, double lookAheadTime){
+        double x,y;
+        double futureAngleOfTravel;
 
         double distance = (robotState.velocity.speed() * lookAheadTime); //+ (.5) * (robotState.acceleration * (lookAheadTime * lookAheadTime)); // suvat, ut * 1/2at^2
         Vector h = Vector.makeUnitVector(robotState.position.heading); //make a unit vector in the direction of heading
@@ -156,33 +158,50 @@ public class PathFollower {
         if(robotState.travelRadius == Double.POSITIVE_INFINITY || robotState.travelRadius == Double.NEGATIVE_INFINITY){
             h.scale(distance);
 
-            return new Point(robotState.position.x + h.x, robotState.position.y + h.y);
+            x = robotState.position.x + h.x;
+            y = robotState.position.y + h.y;
+
+            futureAngleOfTravel = robotState.position.heading;
         } else {
 
             Vector perp = h.getPerpVector(); // Note that this is always leftward relative to robot
             perp.scale(robotState.travelRadius); // a negative radius (aka traveling right) will invert this vector rightward.
 
-            double centerX = robotState.position.x + perp.x; //todo check w john
+            double centerX = robotState.position.x + perp.x;
             double centerY = robotState.position.y + perp.y;
 
             double dx = (robotState.position.x - centerX); //effectively the unit circle components for use to derive an angle using atan2.
             double dy = (robotState.position.y - centerY);
 
             if(dy == 0 && dx == 0){
-                return new Point(centerX, centerY);
+                x = centerX;
+                y = centerY;
+
+                futureAngleOfTravel = robotState.position.heading;
+            } else {
+
+                double angleToCurrentPos = Math.atan2(dy, dx);
+
+                double angleCurrentToTarget = distance / robotState.travelRadius;//l = theta * r. Signed radius checks out, rightward angle is globally negative when added in next line
+
+                double angleToFuturePoint = angleToCurrentPos + angleCurrentToTarget;
+
+                x = centerX + (Math.abs(robotState.travelRadius) * Math.cos(angleToFuturePoint)); //note the absolute value on the radius
+                y = centerY + (Math.abs(robotState.travelRadius) * Math.sin(angleToFuturePoint)); //since we're measuring this point relative to the center of the circle in global coords, we don't care about directionality
+
+                futureAngleOfTravel = robotState.position.heading + angleCurrentToTarget;
             }
-
-            double angleToCurrentPos = Math.atan2(dy, dx);
-
-            double angleCurrentToTarget = distance / robotState.travelRadius;//l = theta * r. Signed radius checks out, rightward angle is globally negative when added in next line
-
-            double angleToFuturePoint = angleToCurrentPos + angleCurrentToTarget;
-
-            double x = centerX + (Math.abs(robotState.travelRadius) * Math.cos(angleToFuturePoint)); //note the absolute value on the radius
-            double y = centerY + (Math.abs(robotState.travelRadius) * Math.sin(angleToFuturePoint)); //since we're measuring this point relative to the center of the circle in global coords, we don't care about directionality
-
-            return new Point(x, y);
         }
+
+        Vector futureTravel = Vector.makeUnitVector(futureAngleOfTravel);
+
+        Vector futurePerp = futureTravel.getPerpVector(); //note that this is left 90 degrees, so positive is along local y axis
+        futurePerp.scale(robotState.orthogonalVelocity * lookAheadTime); //negative velocity flips vector
+
+        x += futurePerp.x;
+        y += futurePerp.y;
+
+        return new Point(x, y);
     }
 
     /**

@@ -90,13 +90,13 @@ public class ArdennesOdomOpMode extends OpMode
         lastTime = FTCUtilities.getCurrentTimeMillis();
         logger.startWriting();
         chassis.startOdometrySystem();
-        chassis.setPosition(0,-40,0);
+        chassis.setPosition(0,0,0);
     }
 
     @Override
     public void loop() {
         //teleOp.loop();
-        //chassis.drive3Axis(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+        chassis.drive3Axis(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
         double currentTime = FTCUtilities.getCurrentTimeMillis();
         double imuHeading = imu.getHeading();
@@ -108,7 +108,8 @@ public class ArdennesOdomOpMode extends OpMode
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);
-        telemetry.addData("x^2 + y^2 sqrt", Math.sqrt(position.x * position.x + position.y * position.y));
+        telemetry.addData("dySum", state.dySum);
+        //telemetry.addData("x^2 + y^2 sqrt", Math.sqrt(position.x * position.x + position.y * position.y));
 
 //        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
 //        telemetry.addData("imu heading -deg", imuHeading);

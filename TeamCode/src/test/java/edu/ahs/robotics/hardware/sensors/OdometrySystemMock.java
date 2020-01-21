@@ -40,7 +40,7 @@ public class OdometrySystemMock implements OdometrySystem {
 
     @Override
     public State getState() {
-        return new State(getPosition(),getVelocity(),0,0);
+        return new State(getPosition(),getVelocity(),0,0,0,0);
     }
 
     @Override

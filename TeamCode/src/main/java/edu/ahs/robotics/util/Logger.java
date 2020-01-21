@@ -133,7 +133,7 @@ public class Logger {
         }
     }
 
-    private void stopWriting() {
+    public void stopWriting() {
         try{
             csvWriter.close();
         } catch (IOException e) {

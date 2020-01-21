@@ -1,5 +1,7 @@
 package edu.ahs.robotics.hardware.sensors;
 
+import java.util.List;
+
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -39,6 +41,12 @@ public class OdometrySystemImpl implements OdometrySystem {
     private RingBuffer<Double> x1Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
     private RingBuffer<Double> x2Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
 
+
+    private static final int ORTHOGONAL_BUFFER_SIZE = 5;
+    private RingBuffer<Double> dyBuffer;
+    private RingBuffer<Long> orthogonalTimeBuffer;
+    private double orthogonalVelocity;
+
     private double xRLast, xLLast, yLast;
     private double yInchesPerDegree;
     private double distanceBetweenYWheels;
@@ -76,6 +84,10 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         speedBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0.0);
         accelerationTimeBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0L);
+
+        dyBuffer = new RingBuffer<>(ORTHOGONAL_BUFFER_SIZE,0.0);
+        orthogonalTimeBuffer = new RingBuffer<>(ORTHOGONAL_BUFFER_SIZE,0L);
+
     }
 
     /**
@@ -153,8 +165,7 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         //find real dy
         dySum += dyBeforeFactorOut - dyExpected;
-        FTCUtilities.OpLogger("sum", dySum);
-        dy = 0.0; //temporary until we get y encoder
+        dy = dyBeforeFactorOut - dyExpected; //temporary until we get y encoder
 
 
         if (dHeading != 0) {//courtesy of 11115, thanks gluten free
@@ -172,6 +183,7 @@ public class OdometrySystemImpl implements OdometrySystem {
         }
 
         updateTravelRadius(xRReading, xLReading);
+        updateOrthoganalVelocity(currentTime, dy);
 
         dxGlobal = -Math.sin(position.heading) * dyLocal + Math.cos(position.heading) * dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
         dyGlobal = Math.cos(position.heading) * dyLocal + Math.sin(position.heading) * dxLocal;
@@ -188,6 +200,8 @@ public class OdometrySystemImpl implements OdometrySystem {
         logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
         logger.append("dyExpected", String.valueOf(dyExpected));
         logger.append("dy", String.valueOf(dy));
+        logger.append("orthogonal velocity", String.valueOf(orthogonalVelocity));
+
 
         updateVelocity(currentTime);
 
@@ -242,6 +256,20 @@ public class OdometrySystemImpl implements OdometrySystem {
         updateAcceleration(currentTime);
     }
 
+    private void updateOrthoganalVelocity(long currentTime, double dy){
+        dyBuffer.insert(dy);
+        long oldTime = orthogonalTimeBuffer.insert(currentTime);
+        List<Double> allDy = dyBuffer.getBuffer();
+
+        double totalDy = 0;
+        for (double aDy : allDy){ // sum up all dy, since dy values are inherently noncumulative.
+            totalDy += aDy;
+        }
+        double deltaTime = currentTime - oldTime; //deltaTime is double to prevent integer division
+
+        orthogonalVelocity = (totalDy * 1000.0)/ deltaTime; //note that velocity units are in seconds
+    }
+
     private void updateAcceleration(long currentTime){
         double oldTime = accelerationTimeBuffer.insert(currentTime);
         double oldSpeed = speedBuffer.insert(velocity.speed());
@@ -253,7 +281,7 @@ public class OdometrySystemImpl implements OdometrySystem {
     }
 
     public synchronized State getState() {
-        return new State(position, velocity, acceleration, radius);
+        return new State(position, velocity, acceleration, radius, orthogonalVelocity, dySum);
     }
 
     public boolean isRunning() {

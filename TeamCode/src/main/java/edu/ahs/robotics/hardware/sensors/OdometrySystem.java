@@ -35,12 +35,16 @@ public interface OdometrySystem {
          * For non-tank style movement the idea of travel radius will need to be elaborated on.
          */
        public double travelRadius;
+       public double orthogonalVelocity;
+       public double dySum;
 
-        public State(Position position, Velocity velocity, double acceleration, double travelRadius) {
+        public State(Position position, Velocity velocity, double acceleration, double travelRadius, double orthogonalVelocity, double dySum) {
             this.position = new Position(position);
             this.velocity = new Velocity(velocity);
             this.travelRadius = travelRadius;
             this.acceleration = acceleration;
+            this.orthogonalVelocity = orthogonalVelocity;
+            this.dySum = dySum;
         }
     }
 }
