@@ -27,7 +27,7 @@ public class PathFollowerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        PathFollower controller = new PathFollower(path, 1);
+        PathFollower controller = new PathFollower(path, 1,0, 0);
         Position robotPosition = new Position(0, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0,0,0);
@@ -52,7 +52,7 @@ public class PathFollowerTest {
         points.add(new Point(0, 0));
         points.add(new Point(4, 0));
         Path path = makePath(points);
-        PathFollower controller = new PathFollower(path, 1);
+        PathFollower controller = new PathFollower(path, 1, 0, 0 );
         Position robotPosition = new Position(0, 1, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,Double.POSITIVE_INFINITY,0,0);
@@ -67,7 +67,7 @@ public class PathFollowerTest {
         points.add(new Point(0, 0));
         points.add(new Point(4, 0));
         Path path = makePath(points);
-        PathFollower controller = new PathFollower(path, 1);
+        PathFollower controller = new PathFollower(path, 1, 0,0);
         Position robotPosition = new Position(0, -1, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,Double.POSITIVE_INFINITY,0,0);
@@ -82,7 +82,7 @@ public class PathFollowerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        PathFollower controller = new PathFollower(path, 1);
+        PathFollower controller = new PathFollower(path, 1,0,0);
         Position robotPosition = new Position(0, 4, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0,0,0);
@@ -97,7 +97,7 @@ public class PathFollowerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        PathFollower controller = new PathFollower(path, 1);
+        PathFollower controller = new PathFollower(path, 1,0,0);
         Position robotPosition = new Position(0, 5, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0,0,0);
@@ -112,7 +112,7 @@ public class PathFollowerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        PathFollower controller = new PathFollower(path, 1);
+        PathFollower controller = new PathFollower(path, 1,0,0);
         Position robotPosition = new Position(0, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0,0,0);
@@ -131,7 +131,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(12,0);
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,Double.POSITIVE_INFINITY,0,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -144,7 +144,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(12,0); //direction actually doesnt matter. Wrong?
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,Double.POSITIVE_INFINITY,0,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -158,7 +158,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(0,0); //direction actually doesnt matter. Wrong?
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,0,0,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -173,7 +173,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(2 * Math.PI,0); //direction actually doesnt matter. Wrong?
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,1,0,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -187,7 +187,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(Math.PI,0); // 10pi is circumference, time of 5
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,-5,0,0); //going right
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,5);
 
@@ -202,7 +202,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(Math.PI/2,0); // 10pi is circumference, time of 5
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,-3,0,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,3);
 
@@ -216,7 +216,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(Math.PI/2,0); // 10pi is circumference, time of 5
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,3,0,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,3);
 
@@ -230,7 +230,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(Math.PI/2,0); // 10pi is circumference, time of 5
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,3,-1,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,3);
 
@@ -245,7 +245,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(0,0);
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,50,0,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,50);
 
@@ -259,7 +259,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(0,0);
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,0,5,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -273,7 +273,7 @@ public class PathFollowerTest {
         Velocity v = Velocity.makeVelocityFromSpeedDirection(0,0);
 
         OdometrySystem.State state = new OdometrySystem.State(p,v,0.0,0,-5,0);
-        PathFollower controller = new PathFollower(null, 0);
+        PathFollower controller = new PathFollower(null, 0,0,0);
 
         Point futurePoint = controller.getFuturePoint(state,1);
 
@@ -287,7 +287,7 @@ public class PathFollowerTest {
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
         Path path = makePath(points);
-        PathFollower controller = new PathFollower(path, 1);
+        PathFollower controller = new PathFollower(path, 1,0,0);
         Position robotPosition = new Position(1, 0, 0);
         Velocity velocity = Velocity.makeVelocityFromSpeedDirection(0, 0);
         OdometrySystem.State state = new OdometrySystem.State(robotPosition, velocity, 0,0,0,0);
