@@ -50,17 +50,33 @@ public class ArdennesNewAutoTest extends LinearOpMode {
 
         Ardennes ardennes = new Ardennes();
         MecanumChassis chassis = ardennes.getChassis();
+        //chassis.setPosition();
 
         Logger logger = new Logger("newAutoData", "pathFollower");
 
-        Path firstMovement = new Path(GCodeReader.openFile(""),12,12,36);
-        Path secondMovement = new Path(GCodeReader.openFile(""),12,12,36);
-        Path thirdMovement = new Path(GCodeReader.openFile(""),12,12,36);
+        Path firstMovement = new Path(GCodeReader.openFile("Intake.csv"),12,12,36);
+        Path secondMovement = new Path(GCodeReader.openFile("BackwardsToFoundation.csv"),12,12,36);
+        Path thirdMovement = new Path(GCodeReader.openFile("backUnderBridge.csv"),12,12,36);
 
         waitForStart();
 
-        chassis.followPath(firstMovement,0.1,0.1);
-        chassis.followPath(secondMovement,0.1,0.1);
+        chassis.startOdometrySystem();
+
+        telemetry.addLine("part 1");
+        telemetry.update();
+
+        chassis.followPath(firstMovement,0.2,0.15);
+
+        telemetry.addLine("part 2");
+        telemetry.update();
+
+        chassis.followPath(secondMovement,0.15,0.25);
+
+        telemetry.addLine("part 3");
+        telemetry.update();
+
         chassis.followPath(thirdMovement,0.1,0.1);
+
+        logger.stopWriting();
     }
 }
