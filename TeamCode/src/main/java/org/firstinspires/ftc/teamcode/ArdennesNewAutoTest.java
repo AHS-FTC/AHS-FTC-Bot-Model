@@ -30,24 +30,37 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "Ardennes Auto Blue Side", group = "Linear Opmode")
-@Disabled
-public class ArdennesAutoBlue extends LinearOpMode {
+@Autonomous(name = "--- New Auto ---", group = "Linear Opmode")
+//@Disabled
+public class ArdennesNewAutoTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-        FullAuto fullAuto = new FullAuto(false);
-        fullAuto.init();
+
+        Ardennes ardennes = new Ardennes();
+        MecanumChassis chassis = ardennes.getChassis();
+
+        Logger logger = new Logger("newAutoData", "pathFollower");
+
+        Path firstMovement = new Path(GCodeReader.openFile(""),12,12,36);
+        Path secondMovement = new Path(GCodeReader.openFile(""),12,12,36);
+        Path thirdMovement = new Path(GCodeReader.openFile(""),12,12,36);
+
         waitForStart();
-        fullAuto.afterStart();
+
+        chassis.followPath(firstMovement,0.1,0.1);
+        chassis.followPath(secondMovement,0.1,0.1);
+        chassis.followPath(thirdMovement,0.1,0.1);
     }
-
-
 }

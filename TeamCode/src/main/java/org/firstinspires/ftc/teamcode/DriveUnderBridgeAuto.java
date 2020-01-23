@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.hardware.MecanumChassis;
@@ -10,7 +11,7 @@ import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
 @Autonomous(name = "Drive Under Bridge", group = "Linear Opmode")
-
+@Disabled
 public class DriveUnderBridgeAuto extends LinearOpMode {
     private Ardennes ardennes;
     private MecanumChassis chassis;

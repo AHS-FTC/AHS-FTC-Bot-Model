@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -46,7 +47,7 @@ import edu.ahs.robotics.util.MotorHashService;
 
 
 @Autonomous(name = "Ardennes Auto Red Side", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class ArdennesAutoRed extends LinearOpMode {
 
     @Override

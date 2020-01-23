@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -45,7 +46,7 @@ import edu.ahs.robotics.util.Logger;
 
 
 @Autonomous(name = "Right Curve Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class RightCurveAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -62,7 +63,7 @@ public class RightCurveAuto extends LinearOpMode {
 
         ArrayList<Point> points = GCodeReader.openFile("rightCurve.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points, true);
+        BaseTestAuto base = new BaseTestAuto(points, true, .35, .1);
 
         waitForStart();
 
