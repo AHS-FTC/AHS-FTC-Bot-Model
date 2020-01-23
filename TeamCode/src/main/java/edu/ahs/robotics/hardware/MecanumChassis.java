@@ -420,8 +420,8 @@ public class MecanumChassis extends Chassis {
         return Math.signum(power) * Math.pow(power, 2);
     }
 
-    public void followPath(Path path) {
-        PathFollower pathFollower = new PathFollower(path,  1); //Max power before inversion
+    public void followPath(Path path, double leftInitialPower, double rightInitialPower) {
+        PathFollower pathFollower = new PathFollower(path,1, leftInitialPower, rightInitialPower); //Max power before inversion
         PathFollower.Powers powers;
         do {
             OdometrySystem.State state = getState();

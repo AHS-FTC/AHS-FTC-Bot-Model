@@ -62,7 +62,7 @@ public class SigmoidAuto extends LinearOpMode {
 
         ArrayList<Point> points = GCodeReader.openFile("sigmoid.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points);
+        BaseTestAuto base = new BaseTestAuto(points, .1, .35);
 
         waitForStart();
 

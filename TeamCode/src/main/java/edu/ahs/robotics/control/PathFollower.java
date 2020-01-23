@@ -15,16 +15,16 @@ public class PathFollower {
     private PID speedPID;
     private PID unifiedPID;
     private double maxPower;
-    private double leftPower = .2;
-    private double rightPower = .2;
+    private double leftPower; //= .05;
+    private double rightPower; //= .35;
 
     private long lastTime;
 
     //Correction values
-    private static final double LOOK_AHEAD_TIME = 0.5; //note that this is in seconds, not millis due to speed and acceleration units.
+    private static final double LOOK_AHEAD_TIME = 0.25; //note that this is in seconds, not millis due to speed and acceleration units.
     private static final double PID_CONSTANT_SCALAR = 0.001;// so that actual tuning values can be more fathomable to the reader
 
-    public PathFollower(Path path, double maxPower) {
+    public PathFollower(Path path, double maxPower, double leftInitialPower, double rightInitialPower) {
         this.path = path;
         this.maxPower = maxPower;
 
@@ -33,8 +33,11 @@ public class PathFollower {
         //double p = lookup.getParameter("p");
         //double d = lookup.getParameter("d");
 
+        leftPower = leftInitialPower;
+        rightPower = rightInitialPower;
+
         speedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 4 * PID_CONSTANT_SCALAR, 3); // -- tuned --
-        unifiedPID = new PID(.05 * PID_CONSTANT_SCALAR, 0.0, 12 * PID_CONSTANT_SCALAR,5);
+        unifiedPID = new PID(.05 * PID_CONSTANT_SCALAR, 0.0, 20 * PID_CONSTANT_SCALAR,5);
 
         logger = Logger.getLogger("pathFollower");
         logger.startWriting();
@@ -105,7 +108,7 @@ public class PathFollower {
 
             logger.append("error", String.valueOf(error));
 
-            logger.append("acceleration", String.valueOf(robotState.acceleration));
+            //logger.append("acceleration", String.valueOf(robotState.acceleration));
             logger.append("travel radius", String.valueOf(robotState.travelRadius));
 
             logger.append("heading power correction", String.valueOf(unifiedCorrections.totalCorrection));
@@ -197,6 +200,8 @@ public class PathFollower {
 
         Vector futurePerp = futureTravel.getPerpVector(); //note that this is left 90 degrees, so positive is along local y axis
         futurePerp.scale(robotState.orthogonalVelocity * lookAheadTime); //negative velocity flips vector
+        logger.append("future perp x", String.valueOf(futurePerp.x));
+        logger.append("future perp y", String.valueOf(futurePerp.y));
 
         x += futurePerp.x;
         y += futurePerp.y;
