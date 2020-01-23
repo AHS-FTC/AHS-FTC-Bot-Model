@@ -69,7 +69,7 @@ public class LeftCurveAuto extends LinearOpMode {
 
         ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points);
+        BaseTestAuto base = new BaseTestAuto(points, true);
 
         waitForStart();
 

@@ -420,17 +420,26 @@ public class MecanumChassis extends Chassis {
         return Math.signum(power) * Math.pow(power, 2);
     }
 
-    public void followPath(Path path) {
+    public void followPath(Path path, boolean forwards) {
         PathFollower pathFollower = new PathFollower(path,  1); //Max power before inversion
         PathFollower.Powers powers;
         do {
             OdometrySystem.State state = getState();
             powers = pathFollower.getUpdatedPowers(state);
 
-            frontLeft.setPower(powers.leftPower);
-            frontRight.setPower(powers.rightPower);
-            backRight.setPower(powers.rightPower);
-            backLeft.setPower(powers.leftPower);
+            if (forwards) {
+                state.setDirectionOfTravel(state.position.heading);
+                frontLeft.setPower(powers.leftPower);
+                frontRight.setPower(powers.rightPower);
+                backRight.setPower(powers.rightPower);
+                backLeft.setPower(powers.leftPower);
+            } else {
+                state.setDirectionOfTravel(state.position.heading + Math.PI);
+                frontLeft.setPower(-powers.rightPower);
+                frontRight.setPower(-powers.leftPower);
+                backRight.setPower(-powers.leftPower);
+                backLeft.setPower(-powers.rightPower);
+            }
         }
         while (!powers.pathFinished && FTCUtilities.opModeIsActive());
 
