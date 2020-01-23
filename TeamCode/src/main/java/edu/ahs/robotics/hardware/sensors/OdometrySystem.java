@@ -29,6 +29,7 @@ public interface OdometrySystem {
        public Position position;
        public Velocity velocity;
        public double acceleration;
+       public double directionOfTravel = 0;
         /**
          * Measures the signed radius of travel in the x dimension.
          * Sign contains information on the directional nature of the travel. A positive radius indicates a leftward arc, while a negative radius indicates a rightward arc.
@@ -45,6 +46,10 @@ public interface OdometrySystem {
             this.acceleration = acceleration;
             this.orthogonalVelocity = orthogonalVelocity;
             this.dySum = dySum;
+        }
+
+        public void setDirectionOfTravel(double directionOfTravel) {
+            this.directionOfTravel = directionOfTravel;
         }
     }
 }

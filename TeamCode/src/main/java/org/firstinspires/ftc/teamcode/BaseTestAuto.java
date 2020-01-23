@@ -14,9 +14,11 @@ public class BaseTestAuto {
     private Ardennes ardennes;
     private Path path;
     private MecanumChassis chassis;
+    private boolean forwards;
     private double leftInitialPower, rightInitialPower;
 
-    public BaseTestAuto(ArrayList<Point> points, double leftInitialPower, double rightInitialPower){
+    public BaseTestAuto(ArrayList<Point> points, boolean forwards, double leftInitialPower, double rightInitialPower){
+        this.forwards = forwards;
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
@@ -27,7 +29,7 @@ public class BaseTestAuto {
     }
 
     public void afterStart(){
-        chassis.followPath(path, leftInitialPower, rightInitialPower);
+        chassis.followPath(path, forwards, leftInitialPower, rightInitialPower);
 
         FTCUtilities.sleep(1000);
         chassis.stopOdometrySystem();
