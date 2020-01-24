@@ -64,8 +64,8 @@ public class PathFollower {
             Position futurePosition = new Position(futurePoint,0);
 
             //Find closest point on path to future point
-            Path.Location targetLocation = path.getTargetLocation(futurePosition);
-            Path.Location currentLocation = path.getTargetLocation(robotPosition);
+            Path.Location targetLocation = path.getTargetLocation(futurePosition, 0);
+            Path.Location currentLocation = path.getTargetLocation(robotPosition, 0);
 
             //Use PID to calculate speed correction
             PID.Corrections speedCorrections = speedPID.getCorrection(currentLocation.speed - robotVelocity.speed(), deltaTime);
@@ -80,13 +80,13 @@ public class PathFollower {
             rightPower += totalSpeedCorrection;
 
             //Turn error.
-            double error = targetLocation.distanceToRobot; //signed distance where positive is robot to right of path
+            //double error = targetLocation.distanceToRobot; //signed distance where positive is robot to right of path
 
             //Create PID controller for turning error. Positive corrections mean turn left.
-            PID.Corrections unifiedCorrections = unifiedPID.getCorrection(error,deltaTime);
+            //PID.Corrections unifiedCorrections = unifiedPID.getCorrection(error,deltaTime);
 
-            leftPower -= unifiedCorrections.totalCorrection;
-            rightPower += unifiedCorrections.totalCorrection;
+            //leftPower -= unifiedCorrections.totalCorrection;
+            //rightPower += unifiedCorrections.totalCorrection;
 
 
             logger.append("robotPositionX", String.valueOf(robotPosition.x));
@@ -103,15 +103,15 @@ public class PathFollower {
             logger.append("futureX", String.valueOf(futurePoint.x));
             logger.append("futureY", String.valueOf(futurePoint.y));
 
-            logger.append("p heading correction", String.valueOf(unifiedCorrections.correctionP * 1000));
-            logger.append("d heading correction", String.valueOf(unifiedCorrections.correctionD * 1000));
+            //logger.append("p heading correction", String.valueOf(unifiedCorrections.correctionP * 1000));
+            //logger.append("d heading correction", String.valueOf(unifiedCorrections.correctionD * 1000));
 
-            logger.append("error", String.valueOf(error));
+            //logger.append("error", String.valueOf(error));
 
             //logger.append("acceleration", String.valueOf(robotState.acceleration));
             logger.append("travel radius", String.valueOf(robotState.travelRadius));
 
-            logger.append("heading power correction", String.valueOf(unifiedCorrections.totalCorrection));
+            //logger.append("heading power correction", String.valueOf(unifiedCorrections.totalCorrection));
 
             //Clip powers to maxPower by higher power
             double higherPower = Math.max(Math.abs(leftPower), Math.abs(rightPower));

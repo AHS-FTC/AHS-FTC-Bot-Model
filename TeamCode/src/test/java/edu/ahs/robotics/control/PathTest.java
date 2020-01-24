@@ -97,7 +97,7 @@ public class PathTest {
 
         //Test location at robot position 2
         Position robotPosition = new Position(2,0,0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
         double distanceFromStart = 2;
         double distanceToEnd = 2;
         double deltaX = 4;
@@ -107,7 +107,6 @@ public class PathTest {
         assertEquals(distanceToEnd, targetLocation.distanceToEnd,.001);
         assertEquals(deltaX, targetLocation.pathDeltaX, .001);
         assertEquals(deltaY, targetLocation.pathDeltaY, .001);
-        assertEquals(0, targetLocation.distanceToRobot, .001);
 
     }
 
@@ -121,22 +120,21 @@ public class PathTest {
 
         //Test lookAhead at start
         Position robotPosition = new Position(1, 1, 0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
         //Test location at robot position x=2 y=2
         robotPosition = new Position(4,0,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
         assertEquals(new Point(2,2), targetLocation.closestPoint);
         assertEquals(Math.sqrt(2), targetLocation.distanceFromStart, .001);
         assertEquals(Math.sqrt(2) + 3, targetLocation.distanceToEnd, .001);
         assertEquals(2, targetLocation.pathDeltaX, .001);
         assertEquals(2, targetLocation.pathDeltaY, .001);
-        assertEquals(Math.sqrt(8), targetLocation.distanceToRobot, .001);
         assertFalse(path.isFinished(robotPosition));
 
         robotPosition = new Position(0,4, 0);
-        targetLocation = path.getTargetLocation(robotPosition);
-        assertEquals(-(Math.sqrt(8)), targetLocation.distanceToRobot, .001);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
+        assertEquals(new Point(2,2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position over end of path
@@ -153,22 +151,24 @@ public class PathTest {
         points.add(new Point(-3,-6));
         Path path = makePath(points);
 
-        //Test lookAhead at start
+        //Test closestPoint at start
         Position robotPosition = new Position(-1, -1, 0);
-        Path.Location targetLocation;
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(new Point(-1,-1), targetLocation.closestPoint);
 
         //Test location at robot position x = -2, y = -2, left of line
         robotPosition = new Position(0,-4,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(-(Math.sqrt(8)), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(-2,-2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position x = -2, y = -2, right of line
         robotPosition = new Position(-4,0,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(Math.sqrt(8), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(-2,-2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position over end of path
@@ -188,18 +188,18 @@ public class PathTest {
         points.add(new Point(3,-3));
         Path path = makePath(points);
 
-        //Test location at robot position x = 2, y = -2, left of line
+        //Test location at path position x = 2, y = -2, left of line
         Position robotPosition = new Position(4,0,0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(-(Math.sqrt(8)), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point (2,-2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
-        //Test location at robot position x = 2, y = -2, right of line
+        //Test location at path position x = 2, y = -2, right of line
         robotPosition = new Position(0,-4,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(Math.sqrt(8), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point (2,-2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position over end of path
@@ -215,18 +215,18 @@ public class PathTest {
         points.add(new Point(-3,3));
         Path path = makePath(points);
 
-        //Test location at robot position x = 2, y = -2, left of line
+        //Test location at robot position x = -2, y = 2, left of line
         Position robotPosition = new Position(-4,0,0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(-(Math.sqrt(8)), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(-2,2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
-        //Test location at robot position x = 2, y = -2, right of line
+        //Test location at robot position x = -2, y = 2, right of line
         robotPosition = new Position(0,4,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(Math.sqrt(8), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(-2,2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position over end of path
@@ -244,16 +244,16 @@ public class PathTest {
 
         //Test location at robot position x = -2, y = 3, left of line
         Position robotPosition = new Position(-4,2,0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(-(Math.sqrt(5)), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(-2, 3), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position x = -2, y = 3, right of line
         robotPosition = new Position(0,4,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(Math.sqrt(5), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(-2, 3), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position over end of path
@@ -271,16 +271,16 @@ public class PathTest {
 
         //Test location at robot position x = 2, y = 0, left of line
         Position robotPosition = new Position(2,2,0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(-(Math.sqrt(4)), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(2,0), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position x = 2, y = 0, right of line
         robotPosition = new Position(2,-2,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(Math.sqrt(4), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(2,0), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position over end of path
@@ -298,16 +298,16 @@ public class PathTest {
 
         //Test location at robot position x = 0, y = 2, left of line
         Position robotPosition = new Position(-2,2,0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(-(Math.sqrt(4)), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(0,2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position x = 2, y = 0, right of line
         robotPosition = new Position(2,2,0);
-        targetLocation = path.getTargetLocation(robotPosition);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(Math.sqrt(4), targetLocation.distanceToRobot, .001);
+        assertEquals(new Point(0,2), targetLocation.closestPoint);
         assertFalse(path.isFinished(robotPosition));
 
         //Test location at robot position over end of path
@@ -348,7 +348,7 @@ public class PathTest {
 
         //Test location at robot position over end of path
         Position robotPosition = new Position(0, 5, 0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
         assertEquals(new Point(0 , 5), targetLocation.closestPoint);
     }
@@ -364,7 +364,7 @@ public class PathTest {
 
         //Test location at robot position over end of path
         Position robotPosition = new Position(4, 0, 0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
         assertFalse(path.isFinished(robotPosition));
 
@@ -383,6 +383,44 @@ public class PathTest {
         robotPosition = new Position(1, 4, 0);
 
         assertTrue(path.isFinished(robotPosition));
+    }
+
+    @Test
+    public void testGetFuturePointDuringPath() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 4));
+        points.add(new Point(0, 7));
+        points.add(new Point(0, 13));
+        points.add(new Point(0, 20));
+        Path path = makePath(points);
+
+        Position robotPosition = new Position(0, -1, 0);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 5);
+
+        assertEquals(new Point(0,4), targetLocation.futurePoint);
+
+        robotPosition = new Position(0, 0, 0);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(new Point(0,0), targetLocation.futurePoint);
+
+        targetLocation = path.getTargetLocation(robotPosition, 1);
+
+        assertEquals(new Point(0,1), targetLocation.futurePoint);
+
+        targetLocation = path.getTargetLocation(robotPosition, 5);
+
+        assertEquals(new Point(0,5), targetLocation.futurePoint);
+
+        targetLocation = path.getTargetLocation(robotPosition, 19);
+
+        assertEquals(new Point(0,19), targetLocation.futurePoint);
+
+        robotPosition = new Position(0, 10, 0);
+        targetLocation = path.getTargetLocation(robotPosition, 5);
+
+        assertEquals(new Point(0, 15), targetLocation.futurePoint);
     }
 
 }

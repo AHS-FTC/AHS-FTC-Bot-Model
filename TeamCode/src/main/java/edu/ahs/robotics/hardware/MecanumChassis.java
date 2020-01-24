@@ -290,7 +290,7 @@ public class MecanumChassis extends Chassis {
         Position initialPosition = initialState.position;
         /*Velocity initialVelocity = getVelocity();*/
 
-        double distanceToEnd = path.getTargetLocation(initialPosition).distanceToEnd;
+        double distanceToEnd = path.getTargetLocation(initialPosition, 0).distanceToEnd;
 
         double leftPower = 0.1, rightPower = 0.1; //initial power vals programmed in
 
@@ -315,11 +315,11 @@ public class MecanumChassis extends Chassis {
             Position currentPosition = state.position;
             Velocity currentVelocity = state.velocity;
 
-            Path.Location location = path.getTargetLocation(currentPosition);
+            Path.Location location = path.getTargetLocation(currentPosition, 0);
 
             Velocity targetVelocity = Velocity.makeVelocity(location.pathDeltaX,location.pathDeltaY);
 
-            distanceToEnd = path.getTargetLocation(currentPosition).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
+            distanceToEnd = path.getTargetLocation(currentPosition, 0).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
 
             targetSpeed = Math.min(maxSpeed, rampDownScale * Math.sqrt(distanceToEnd));
 
