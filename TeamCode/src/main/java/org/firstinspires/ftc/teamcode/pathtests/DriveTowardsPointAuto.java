@@ -27,54 +27,56 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.ArrayList;
-
-import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.SerialServo;
-import edu.ahs.robotics.hardware.Slides;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
 
 
-@Autonomous(name = "Left Curve Auto", group = "Linear Opmode")
+@Autonomous(name = "Drive Towards Point", group = "Linear Opmode")
 //@Disabled
-public class LeftCurveAuto extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+public class DriveTowardsPointAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurveL", "pathFollower");
+        Ardennes ardennes = new Ardennes();
+        MecanumChassis chassis = ardennes.getChassis();
+        chassis.setPosition(0,0,Math.PI);
 
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        Point targetPoint = new Point(60, 12);
 
-        BaseTestAuto base = new BaseTestAuto(points, true, 0.1, 0.4);
+        Logger logger = new Logger("driveTowardPointData", "driveTowardPointData");
 
-        waitForStart();
+        waitForStart(); // -----------------------------
 
-        base.afterStart();
+        chassis.startOdometrySystem();
+        logger.startWriting();
 
-        stop();
+        double distanceToPoint = targetPoint.distanceTo(chassis.getState().position);
+
+        while (distanceToPoint > 3 && opModeIsActive()){
+            OdometrySystem.State state = chassis.getState();
+
+            distanceToPoint = targetPoint.distanceTo(state.position);
+
+            chassis.driveTowardsPoint(targetPoint,0.8, 0.3, 2, Math.PI);
+
+            logger.append("x", String.valueOf(state.position.x));
+            logger.append("y", String.valueOf(state.position.y));
+            logger.append("heading", String.valueOf(state.position.heading));
+            logger.writeLine();
+        }
+
+        chassis.stopMotors();
+        logger.stopWriting();
     }
 }

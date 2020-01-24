@@ -166,18 +166,29 @@ public class MecanumChassis extends Chassis {
         backLeft.setPower(v.x + v.y - turnPower);
 
         frontRight.setPower(v.x + v.y + turnPower);
-        frontRight.setPower(v.x - v.y + turnPower);
+        backRight.setPower(v.x - v.y + turnPower);
     }
 
-    public void driveTowardsPoint(Point target, double power, double turnPower, double turnCutoff){
+    public void driveTowardsPoint(Point target, double power, double turnPower, double turnCutoff, double idealHeading){
         Position robotPosition = odometrySystem.getState().position;
 
-        DriveCommand d = getDriveTowardsPointCommands(target, power, turnPower, turnCutoff, robotPosition);
+        DriveCommand d = getDriveTowardsPointCommands(target, power, turnPower, turnCutoff, robotPosition, idealHeading);
 
         driveLocalVector(d.driveVector, d.turnOutput);
     }
 
-    /*protected for test*/ DriveCommand getDriveTowardsPointCommands(Point target, double power, double turnPower, double turnCutoff, Position robotPosition){
+    /**
+     * Simple overload, assumes ideal heading is forward
+     * @param target
+     * @param power
+     * @param turnPower
+     * @param turnCutoff
+     */
+    public void driveTowardsPoint(Point target, double power, double turnPower, double turnCutoff){
+        driveTowardsPoint(target, power, turnPower, turnCutoff, 0);
+    }
+
+    /*protected for test*/ DriveCommand getDriveTowardsPointCommands(Point target, double power, double turnPower, double turnCutoff, Position robotPosition, double idealHeading){
         double dx = target.x - robotPosition.x;
         double dy = target.y - robotPosition.y;
         double globalAngleToPoint = Math.atan2(dy, dx);
@@ -189,12 +200,12 @@ public class MecanumChassis extends Chassis {
 
         double turnOutput;
 
-        final double turnAggression = .5;
+        final double turnAggression = 1;
         double distanceToTarget = target.distanceTo(robotPosition);
         if(distanceToTarget < turnCutoff){
             turnOutput = 0.0;
         } else {
-            turnOutput = Range.clip(localAngleToPoint * turnAggression,-1,1) * turnPower; // local angle to point can be interpreted as error
+            turnOutput = Range.clip((localAngleToPoint - idealHeading)* turnAggression,-1,1) * turnPower; // local angle to point can be interpreted as error
         }
 
         return new DriveCommand(v,turnOutput);

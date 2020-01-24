@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -45,9 +45,9 @@ import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "Right Curve Auto", group = "Linear Opmode")
+@Autonomous(name = "Left Curve Auto", group = "Linear Opmode")
 @Disabled
-public class RightCurveAuto extends LinearOpMode {
+public class LeftCurveAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
@@ -59,11 +59,11 @@ public class RightCurveAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurveR", "pathFollower");
+        Logger logger = new Logger("pathDataCurveL", "pathFollower");
 
-        ArrayList<Point> points = GCodeReader.openFile("rightCurve.csv");
+        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points, true, .35, .1);
+        BaseTestAuto base = new BaseTestAuto(points, true, 0.1, 0.4);
 
         waitForStart();
 
