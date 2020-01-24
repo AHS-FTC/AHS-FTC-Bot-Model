@@ -13,6 +13,7 @@ import java.util.List;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.control.Position;
+import edu.ahs.robotics.control.Vector;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.OdometrySystemMock;
@@ -48,6 +49,49 @@ public class MecanumChassisTest {
 
         mecanumChassis = new MecanumChassis(driveConfig, odometrySystem);
         mecanumChassis.startOdometrySystem();
+    }
+
+    @Test
+    public void testDriveTowardsPointSimple(){
+        Position position = new Position(0,0,0);
+        Point targetPoint = new Point(60,0);
+        init(null,null);
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 12,position);
+
+        Vector v = command.driveVector;
+        assertEquals(1, v.x, 0.0);
+        assertEquals(0, v.y, 0.0);
+        assertEquals(0, command.turnOutput,0.0);
+    }
+
+    @Test
+    public void testDriveTowardsPointAt45(){
+        Position position = new Position(-5,0,Math.PI);
+        Point targetPoint = new Point(-8,-3);
+        init(null, null);
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position);
+
+        Vector v = command.driveVector;
+
+        assertEquals(v.x, v.y, 0.000000001);
+        System.out.println(command.turnOutput);
+        assertTrue(command.turnOutput > 0.0);
+    }
+
+    @Test
+    public void testDriveTowardsPointComplex(){
+        Position position = new Position(-3,5,Math.PI/2);
+        Point targetPoint = new Point(12,0); //use desmos to graph these points if necessary
+        init(null,null);
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position);
+
+        Vector v = command.driveVector;
+
+        assertEquals(-1.0/3.0,v.x/-v.y,0.00000001); //since vector is local, local x is global y and local y is negative global x. then do a slope calculation
+        assertTrue(command.turnOutput < 0);
     }
 
     @Test
