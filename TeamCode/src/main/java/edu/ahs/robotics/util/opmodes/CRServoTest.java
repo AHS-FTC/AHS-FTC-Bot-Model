@@ -27,56 +27,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.Logger;
-
-
-@Autonomous(name = "--- New Auto ---", group = "Linear Opmode")
+@TeleOp(name="CR Servo Test", group="Iterative OpMode")
 //@Disabled
-public class ArdennesNewAutoTest extends LinearOpMode {
+public class CRServoTest extends OpMode {
+    CRServo crServo;
 
     @Override
-    public void runOpMode() {
-        FTCUtilities.setOpMode(this);
-
-        Ardennes ardennes = new Ardennes();
-        MecanumChassis chassis = ardennes.getChassis();
-        //chassis.setPosition();
-
-        Logger logger = new Logger("newAutoData", "pathFollower");
-
-        Path firstMovement = new Path(GCodeReader.openFile("Intake.csv"),12,12,36);
-        Path secondMovement = new Path(GCodeReader.openFile("BackwardsToFoundation.csv"),12,12,36);
-        Path thirdMovement = new Path(GCodeReader.openFile("backUnderBridge.csv"),12,12,36);
-
-        waitForStart();
-
-        chassis.startOdometrySystem();
-
-        telemetry.addLine("part 1");
-        telemetry.update();
-
-        chassis.followPath(firstMovement, true,0.2,0.15);
-
-        telemetry.addLine("part 2");
-        telemetry.update();
-
-        chassis.followPath(secondMovement, false, 0.15,0.25);
-
-        telemetry.addLine("part 3");
-        telemetry.update();
-
-        chassis.followPath(thirdMovement, true,0.1,0.1);
-
-        logger.stopWriting();
+    public void init() {
+        crServo = hardwareMap.get(CRServo.class, "vexServo");
     }
+
+    @Override
+    public void init_loop() {
+
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void loop() {
+        if (gamepad1.x) {
+            crServo.setPower(.5);
+        }
+
+        if (gamepad1.y) {
+            crServo.setPower(-.5);
+        }
+
+        if (gamepad1.a) {
+            crServo.setPower(0);
+        }
+    }
+
+    @Override
+    public void stop(){
+
+    }
+
 }
