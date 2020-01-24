@@ -1,17 +1,20 @@
 package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.Vector;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.control.pid.VelocityPID;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.util.FTCMath;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.util.Logger;
@@ -52,8 +55,10 @@ public class MecanumChassis extends Chassis {
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
         this.odometrySystem = odometrySystem;
-        leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
-        rightOdometer = odometrySystem.getX1Odometer();
+        if(odometrySystem != null) {
+            leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
+            rightOdometer = odometrySystem.getX1Odometer();
+        }
 
         logger.startWriting();
     }
@@ -151,6 +156,65 @@ public class MecanumChassis extends Chassis {
         backRight.setPower(backRightPower);
 
     }
+
+    /**
+     * Drives in the direction of a vector rooted in local robot coordinates.
+     * Ensure your vector is normalized for full power, or otherwise scaled down below a magnitude of 1.
+     */
+    private void driveLocalVector(Vector v, double turnPower){
+        frontLeft.setPower(v.x - v.y - turnPower);
+        backLeft.setPower(v.x + v.y - turnPower);
+
+        frontRight.setPower(v.x + v.y + turnPower);
+        frontRight.setPower(v.x - v.y + turnPower);
+    }
+
+    public void driveTowardsPoint(Point target, double power, double turnPower, double turnCutoff){
+        Position robotPosition = odometrySystem.getState().position;
+
+        DriveCommand d = getDriveTowardsPointCommands(target, power, turnPower, turnCutoff, robotPosition);
+
+        driveLocalVector(d.driveVector, d.turnOutput);
+    }
+
+    /*protected for test*/ DriveCommand getDriveTowardsPointCommands(Point target, double power, double turnPower, double turnCutoff, Position robotPosition){
+        double dx = target.x - robotPosition.x;
+        double dy = target.y - robotPosition.y;
+        double globalAngleToPoint = Math.atan2(dy, dx);
+
+        double localAngleToPoint = FTCMath.ensureIdealAngle(globalAngleToPoint - robotPosition.heading);
+
+        Vector v = Vector.makeUnitVector(localAngleToPoint);
+        v.scale(power);
+
+        double turnOutput;
+
+        final double turnAggression = .5;
+        double distanceToTarget = target.distanceTo(robotPosition);
+        if(distanceToTarget < turnCutoff){
+            turnOutput = 0.0;
+        } else {
+            turnOutput = Range.clip(localAngleToPoint * turnAggression,-1,1) * turnPower; // local angle to point can be interpreted as error
+        }
+
+        return new DriveCommand(v,turnOutput);
+    }
+
+    /**
+     * Contains driving info for testability for driveTowardsPoint
+     * Protected for testing
+     */
+     static class DriveCommand{
+        public Vector driveVector;
+        public double turnOutput;
+
+        public DriveCommand(Vector driveVector, double turnOutput) {
+            this.driveVector = driveVector;
+            this.turnOutput = turnOutput;
+        }
+    }
+
+
 
     public void arc(double angle, double radius, double maxPower, boolean rightTurn) {
         double minRampUp = .2;
