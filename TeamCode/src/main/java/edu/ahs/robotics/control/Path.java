@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Path {
     static final double LOOK_AHEAD_DISTANCE = 6.0; /*Package visible for testing*/
+    public static final int CURVATURE_SPEED = 8;
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
 
@@ -111,14 +112,22 @@ public class Path {
 
     private double getTargetSpeed(double distanceFromStart) {
         double upScale = 2; //Todo adjust
-        double downScale = 1; //Todo adjust
+        double downScale = 2; //Todo adjust
         if (distanceFromStart > totalDistance){
             distanceFromStart = totalDistance;
         }
+        //Calculates ramp up and ramp down functions
         double distanceToEnd = totalDistance - distanceFromStart;
         double rampDown = (downScale * distanceToEnd) + minRampDownSpeed;
         double rampUp = (upScale * distanceFromStart) + minRampUpSpeed;
-        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
+
+        //Calculate curvature speed. v = sqrt(a * r) where a is max allowed acceleration and r is the radius of curvature
+        //r = g * d^2 where d is distance between points. g is a constant.
+        //Substituting, v = sqrt(a * g) * d
+        //CURVATURE_SPEED = sqrt(a * g) derived experimentally
+        double curvatureSpeed = CURVATURE_SPEED * getPoint(iCurrentBound + 1).distanceToPrevious;
+
+        return Math.min(rampDown, Math.min(rampUp, Math.min(maxVelocity, curvatureSpeed)));
     }
 
     /**
