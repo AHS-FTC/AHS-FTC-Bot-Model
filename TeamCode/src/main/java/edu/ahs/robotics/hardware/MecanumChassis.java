@@ -28,7 +28,8 @@ public class MecanumChassis extends Chassis {
     private static final double LEFT_INITIAL_SCALE = 1;
     public static final double RIGHT_AMPLIFIER = 1;
 
-    Logger logger = new Logger("Mecanum Chassis Old Code", "mecanumChassis");
+    //Logger logger = new Logger("Mecanum Chassis Old Code", "mecanumChassis");
+    private Logger logger;
 
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
@@ -59,8 +60,6 @@ public class MecanumChassis extends Chassis {
             leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
             rightOdometer = odometrySystem.getX1Odometer();
         }
-
-        logger.startWriting();
     }
 
 //    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystemImpl odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
@@ -208,6 +207,17 @@ public class MecanumChassis extends Chassis {
             turnOutput = Range.clip((localAngleToPoint - idealHeading)* turnAggression,-1,1) * turnPower; // local angle to point can be interpreted as error
         }
 
+        logger.append("x", String.valueOf(robotPosition.x));
+        logger.append("y", String.valueOf(robotPosition.y));
+        logger.append("heading", String.valueOf(robotPosition.heading));
+        logger.append("target x", String.valueOf(target.x));
+        logger.append("target y", String.valueOf(target.y));
+        logger.append("global angle to point", String.valueOf(globalAngleToPoint));
+        logger.append("local angle to point", String.valueOf(localAngleToPoint));
+
+        logger.writeLine();
+
+
         return new DriveCommand(v,turnOutput);
     }
 
@@ -344,13 +354,13 @@ public class MecanumChassis extends Chassis {
                 FTCUtilities.addData("ramp ratio", rampRatio);
                 FTCUtilities.updateOpLogger();
 
-                logger.append("rightDistance", String.valueOf(rightDistance));
-                logger.append("leftDistance", String.valueOf(leftDistance));
-                logger.append("adjustLeft", String.valueOf(adjustLeft));
-                logger.append("adjustRight", String.valueOf(adjustRight));
-                logger.append("rightPower", String.valueOf(powerRight));
-                logger.append("leftPower", String.valueOf(powerLeft));
-                logger.writeLine();
+//                logger.append("rightDistance", String.valueOf(rightDistance));
+//                logger.append("leftDistance", String.valueOf(leftDistance));
+//                logger.append("adjustLeft", String.valueOf(adjustLeft));
+//                logger.append("adjustRight", String.valueOf(adjustRight));
+//                logger.append("rightPower", String.valueOf(powerRight));
+//                logger.append("leftPower", String.valueOf(powerLeft));
+//                logger.writeLine();
 
             }
         } finally {
@@ -499,18 +509,13 @@ public class MecanumChassis extends Chassis {
         OdometrySystem.State state;
         Path.Location location;
 
-        Logger logger = Logger.getLogger("partialPursuit");
+        logger = Logger.getLogger("partialPursuit");
         logger.startWriting();
 
         do{
             state = odometrySystem.getState();
             location = path.getTargetLocation(state.position, lookAheadDistance);
-            driveTowardsPoint(location.futurePoint, .5, .4, 2, idealHeading);
-
-            logger.append("x", String.valueOf(state.position.x));
-            logger.append("y", String.valueOf(state.position.y));
-            logger.append("heading", String.valueOf(state.position.heading));
-            logger.writeLine();
+            driveTowardsPoint(location.futurePoint, .5, .4, 8, idealHeading);
 
         } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive());
     }

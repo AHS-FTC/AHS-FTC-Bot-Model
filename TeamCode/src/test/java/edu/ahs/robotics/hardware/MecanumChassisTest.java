@@ -57,7 +57,7 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(60,0);
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 12,position);
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 12,position,0);
 
         Vector v = command.driveVector;
         assertEquals(1, v.x, 0.0);
@@ -71,7 +71,7 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(-8,-3);
         init(null, null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position);
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,0);
 
         Vector v = command.driveVector;
 
@@ -86,11 +86,25 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(12,0); //use desmos to graph these points if necessary
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position);
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,0);
 
         Vector v = command.driveVector;
 
         assertEquals(-1.0/3.0,v.x/-v.y,0.00000001); //since vector is local, local x is global y and local y is negative global x. then do a slope calculation
+        assertTrue(command.turnOutput < 0);
+    }
+
+    @Test
+    public void testDriveTowardsPointInReverse(){
+        Position position = new Position(0,0,Math.PI);
+        Point targetPoint = new Point(12,3);
+        init(null,null);
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,Math.PI);
+
+        Vector v = command.driveVector;
+
+        assertEquals((1.0/4.0),v.y/v.x,0.00000001);
         assertTrue(command.turnOutput < 0);
     }
 

@@ -14,7 +14,6 @@ public class BaseTestAuto {
     private Ardennes ardennes;
     private Path path;
     private MecanumChassis chassis;
-    private boolean forwards;
 
     public BaseTestAuto(ArrayList<Point> points){
         MotorHashService.init();
