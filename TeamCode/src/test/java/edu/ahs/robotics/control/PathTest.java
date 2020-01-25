@@ -423,4 +423,36 @@ public class PathTest {
         assertEquals(new Point(0, 15), targetLocation.futurePoint);
     }
 
+    @Test
+    public void testSpeeds() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(0, 12));
+        points.add(new Point(0, 22));
+        points.add(new Point(0, 24));
+        points.add(new Point(0, 36));
+        Path path = makePath(points);
+
+        Position robotPosition = new Position(0, 0, 0);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(12, targetLocation.speed, .001);
+
+        robotPosition = new Position(0, 16, 0);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(36, targetLocation.speed, .001);
+
+        //Test curvature slow down
+        robotPosition = new Position(0, 22, 0);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(16, targetLocation.speed, .001);
+
+        robotPosition = new Position(0, 36, 0);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(4, targetLocation.speed, .001);
+
+    }
 }
