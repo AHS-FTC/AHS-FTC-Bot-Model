@@ -27,21 +27,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
 
 
@@ -59,12 +54,12 @@ public class StraightAuto extends LinearOpMode {
         points.add(new Point(0,0));
         points.add(new Point(48,0));
 
-        BaseTestAuto base = new BaseTestAuto(points, true, .2, .2);
+        BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
 
         base.afterStart();
 
-        stop();
+        logger.stopWriting();
     }
 }

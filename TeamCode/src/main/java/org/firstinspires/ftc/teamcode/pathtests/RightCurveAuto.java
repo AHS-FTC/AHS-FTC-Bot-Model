@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -63,7 +63,7 @@ public class RightCurveAuto extends LinearOpMode {
 
         ArrayList<Point> points = GCodeReader.openFile("rightCurve.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points, true, .35, .1);
+        BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
 

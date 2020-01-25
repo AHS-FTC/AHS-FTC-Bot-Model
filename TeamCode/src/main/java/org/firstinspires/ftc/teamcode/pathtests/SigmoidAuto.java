@@ -27,30 +27,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+
+import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "GCode Test", group = "Linear Opmode")
-@Disabled
-public class GCodeTest extends LinearOpMode {
+@Autonomous(name = "Sigmoid Auto", group = "Linear Opmode")
+//@Disabled
+public class SigmoidAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Ardennes ardennes;
-
+    //private Tuner tuner;
+    private ArdennesSkyStoneDetector detector;
+    private TriggerDistanceSensor intakeTrigger;
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
+
+        Logger logger = new Logger("pathDataSigmoid", "partialPursuit");
+
+        ArrayList<Point> points = GCodeReader.openFile("sigmoid.csv");
+
+        BaseTestAuto base = new BaseTestAuto(points);
+
         waitForStart();
-        GCodeReader.openFile("1001.csv");
+
+        base.afterStart();
+
+        logger.stopWriting();
     }
 }

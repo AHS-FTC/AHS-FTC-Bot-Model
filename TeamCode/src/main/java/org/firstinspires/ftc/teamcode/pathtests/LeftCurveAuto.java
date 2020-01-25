@@ -27,28 +27,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
-import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.Intake;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.SerialServo;
-import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
 
 
 @Autonomous(name = "Left Curve Auto", group = "Linear Opmode")
@@ -65,16 +59,16 @@ public class LeftCurveAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurveL", "pathFollower");
+        Logger logger = new Logger("pathDataCurveL", "partialPursuit");
 
         ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points, true, 0.1, 0.4);
+        BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
 
         base.afterStart();
 
-        stop();
+        logger.stopWriting();
     }
 }
