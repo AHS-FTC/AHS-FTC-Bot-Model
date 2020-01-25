@@ -66,17 +66,17 @@ public class ArdennesNewAutoTest extends LinearOpMode {
         telemetry.addLine("part 1");
         telemetry.update();
 
-        chassis.followPath(firstMovement, true,0.2,0.15);
+        chassis.followPath(firstMovement, 12,0);
 
         telemetry.addLine("part 2");
         telemetry.update();
 
-        chassis.followPath(secondMovement, false, 0.15,0.25);
+        chassis.followPath(secondMovement,12, 0);
 
         telemetry.addLine("part 3");
         telemetry.update();
 
-        chassis.followPath(thirdMovement, true,0.1,0.1);
+        chassis.followPath(thirdMovement, 12,0);
 
         logger.stopWriting();
     }

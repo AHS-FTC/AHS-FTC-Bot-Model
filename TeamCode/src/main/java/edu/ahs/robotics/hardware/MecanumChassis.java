@@ -200,7 +200,7 @@ public class MecanumChassis extends Chassis {
 
         double turnOutput;
 
-        final double turnAggression = 1;
+        final double turnAggression = 1.3;
         double distanceToTarget = target.distanceTo(robotPosition);
         if(distanceToTarget < turnCutoff){
             turnOutput = 0.0;
@@ -495,29 +495,24 @@ public class MecanumChassis extends Chassis {
         return Math.signum(power) * Math.pow(power, 2);
     }
 
-    public void followPath(Path path, boolean forwards, double leftInitialPower, double rightInitialPower) {
-        PathFollower pathFollower = new PathFollower(path,1, leftInitialPower, rightInitialPower); //Max power before inversion
-        PathFollower.Powers powers;
-        do {
-            OdometrySystem.State state = getState();
-            powers = pathFollower.getUpdatedPowers(state);
+    public void followPath(Path path, double lookAheadDistance, double idealHeading) {
+        OdometrySystem.State state;
+        Path.Location location;
 
-            if (forwards) {
-                state.setDirectionOfTravel(state.position.heading);
-                frontLeft.setPower(powers.leftPower);
-                frontRight.setPower(powers.rightPower);
-                backRight.setPower(powers.rightPower);
-                backLeft.setPower(powers.leftPower);
-            } else {
-                state.setDirectionOfTravel(state.position.heading + Math.PI);
-                frontLeft.setPower(-powers.rightPower);
-                frontRight.setPower(-powers.leftPower);
-                backRight.setPower(-powers.leftPower);
-                backLeft.setPower(-powers.rightPower);
-            }
-        }
-        while (!powers.pathFinished && FTCUtilities.opModeIsActive());
+        Logger logger = Logger.getLogger("partialPursuit");
+        logger.startWriting();
 
+        do{
+            state = odometrySystem.getState();
+            location = path.getTargetLocation(state.position, lookAheadDistance);
+            driveTowardsPoint(location.futurePoint, .5, .4, 2, idealHeading);
+
+            logger.append("x", String.valueOf(state.position.x));
+            logger.append("y", String.valueOf(state.position.y));
+            logger.append("heading", String.valueOf(state.position.heading));
+            logger.writeLine();
+
+        } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive());
     }
 
     /**

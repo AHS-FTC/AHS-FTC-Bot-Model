@@ -46,7 +46,7 @@ import edu.ahs.robotics.util.Logger;
 
 
 @Autonomous(name = "Left Curve Auto", group = "Linear Opmode")
-@Disabled
+//@Disabled
 public class LeftCurveAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -59,16 +59,16 @@ public class LeftCurveAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurveL", "pathFollower");
+        Logger logger = new Logger("pathDataCurveL", "partialPursuit");
 
         ArrayList<Point> points = GCodeReader.openFile("1001.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points, true, 0.1, 0.4);
+        BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
 
         base.afterStart();
 
-        stop();
+        logger.stopWriting();
     }
 }

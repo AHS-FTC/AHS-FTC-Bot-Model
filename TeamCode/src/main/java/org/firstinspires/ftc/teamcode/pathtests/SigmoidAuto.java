@@ -46,7 +46,7 @@ import edu.ahs.robotics.util.Logger;
 
 
 @Autonomous(name = "Sigmoid Auto", group = "Linear Opmode")
-@Disabled
+//@Disabled
 public class SigmoidAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -59,16 +59,16 @@ public class SigmoidAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataSigmoid", "pathFollower");
+        Logger logger = new Logger("pathDataSigmoid", "partialPursuit");
 
         ArrayList<Point> points = GCodeReader.openFile("sigmoid.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points, true, .1, .35);
+        BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
 
         base.afterStart();
 
-        stop();
+        logger.stopWriting();
     }
 }
