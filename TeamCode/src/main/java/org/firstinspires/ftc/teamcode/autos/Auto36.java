@@ -27,10 +27,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.pathtests;
+package org.firstinspires.ftc.teamcode.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.util.ArrayList;
 
@@ -39,6 +40,7 @@ import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.Chassis;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
@@ -46,9 +48,9 @@ import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 
 
-@Autonomous(name = "-- Partial Pursuit Test Auto --", group = "Linear Opmode")
+@Autonomous(name = "-- 3-6 Auto --", group = "Linear Opmode")
 //@Disabled
-public class PartialPursuitTestAuto extends LinearOpMode {
+public class Auto36 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -60,10 +62,24 @@ public class PartialPursuitTestAuto extends LinearOpMode {
         MecanumChassis chassis = ardennes.getChassis();
         Intake intake = ardennes.getIntake();
 
-        Logger logger = new Logger("pathDataCurveLReverse", "partialPursuit");
+        SerialServo leftFoundation = ardennes.getLeftFoundation();
+        SerialServo rightFoundation = ardennes.getRightFoundation();
 
-        Path quarry = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 8,6,20);
-        Path toFoundation = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,32);
+        leftFoundation.setPosition(0);
+        rightFoundation.setPosition(0);
+
+        chassis.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        Logger logger = new Logger("partialPursuitAutoData", "partialPursuit");
+        logger.startWriting();
+
+        Path quarry = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 12,12,22);
+        Path toFoundation = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,35, 9, 2, .7); //32
+        Path gripFoundation = new Path(GCodeReader.openFile("3-6-3_gripFoundation.csv"),12,12,12);
+        Path pullFoundation = new Path(GCodeReader.openFile("3-6-4_pullFoundation.csv"), 18, 18, 40, 20,2,10);
+        Path quarry6 = new Path(GCodeReader.openFile("3-6-5_block6.csv"), 12, 12, 30,12,2,1);
+
+
 
         chassis.setPosition(63,-40, Math.PI);
         chassis.startOdometrySystem();
@@ -72,9 +88,29 @@ public class PartialPursuitTestAuto extends LinearOpMode {
 
         intake.startIntakeWaitForBlock(ardennes.getGripperTrigger());
 
-        chassis.followPath(quarry, 12, 0);
+        chassis.followPath(quarry, 12, -Math.PI/4);
         chassis.followPath(toFoundation, 12, Math.PI);
+        chassis.stopMotors();
+        intake.stopMotors();
+        //FTCUtilities.sleep(2000);
+
         chassis.globalPointTurn((2*Math.PI), 0.3, 2500);
+        chassis.followPath(gripFoundation, 12, Math.PI);
+        chassis.stopMotors();
+
+        leftFoundation.setPosition(1);
+        rightFoundation.setPosition(1);
+
+        FTCUtilities.sleep(400);
+
+        chassis.followPath(pullFoundation, 12, 0);
+
+        leftFoundation.setPosition(0);
+        rightFoundation.setPosition(0);
+
+        intake.startIntakeWaitForBlock(ardennes.getGripperTrigger());
+        chassis.followPath(quarry6, 12, 0);
+        intake.stopMotors();
 
         intake.stopMotors();
 

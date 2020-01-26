@@ -541,12 +541,12 @@ public class MecanumChassis extends Chassis {
         Path.Location location;
 
         logger = Logger.getLogger("partialPursuit");
-        logger.startWriting();
 
         do{
             state = odometrySystem.getState();
             location = path.getTargetLocation(state.position, lookAheadDistance);
             double power = convertSpeedToMotorPower(location.speed);
+            logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
             driveTowardsPoint(location.futurePoint, power, 1, 8, idealHeading);
 
         } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive());
