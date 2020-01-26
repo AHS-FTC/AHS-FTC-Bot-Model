@@ -199,19 +199,22 @@ public class MecanumChassis extends Chassis {
 
         double turnOutput;
 
-        final double turnAggression = 1.3;
+        final double turnAggression = .5;
         double distanceToTarget = target.distanceTo(robotPosition);
         if(distanceToTarget < turnCutoff){
             turnOutput = 0.0;
         } else {
-            turnOutput = Range.clip((localAngleToPoint - idealHeading)* turnAggression,-1,1) * turnPower; // local angle to point can be interpreted as error
+            double angleError = FTCMath.ensureIdealAngle(localAngleToPoint - idealHeading);
+            turnOutput = Range.clip(angleError * turnAggression,-1,1) * turnPower; // local angle to point can be interpreted as error
         }
 
         logger.append("x", String.valueOf(robotPosition.x));
         logger.append("y", String.valueOf(robotPosition.y));
         logger.append("heading", String.valueOf(robotPosition.heading));
+        logger.append("power", String.valueOf(power));
         logger.append("target x", String.valueOf(target.x));
         logger.append("target y", String.valueOf(target.y));
+        logger.append("turn output", String.valueOf(turnOutput));
         logger.append("global angle to point", String.valueOf(globalAngleToPoint));
         logger.append("local angle to point", String.valueOf(localAngleToPoint));
 
@@ -368,6 +371,34 @@ public class MecanumChassis extends Chassis {
         }
     }
 
+    /**
+     * Turns from any heading to a global angle.
+     * @param targetAngle Angle in radians to turn to, not bound by 2pi, may rotate inefficient path as such.
+     * @param turnAggression Turn power is proportional to turn error by this number.
+     * @param timeOut in milliseconds
+     */
+    public void globalPointTurn(double targetAngle, double turnAggression, long timeOut){
+        final double TURN_POWER_MINIMUM = 0.3;
+
+        double turnError = Math.abs(targetAngle - getState().position.heading);
+        double startTime = FTCUtilities.getCurrentTimeMillis();
+
+        while (turnError > 0.05 && FTCUtilities.getCurrentTimeMillis() - startTime < timeOut && FTCUtilities.opModeIsActive()){
+            turnError = Math.abs(targetAngle - getState().position.heading);
+            int turnSign = (int) Math.signum(targetAngle - getState().position.heading);
+            double errorTurnPower = (turnError * turnAggression);
+
+            double turnPower = turnSign * Math.max(errorTurnPower, TURN_POWER_MINIMUM);
+
+            frontRight.setPower(turnPower);
+            backRight.setPower(turnPower);
+
+            frontLeft.setPower(-turnPower);
+            backLeft.setPower(-turnPower);
+        }
+
+    }
+
 
     public void velocityDrive(Path path, double maxSpeed){
         OdometrySystem.State initialState = getState();
@@ -515,9 +546,14 @@ public class MecanumChassis extends Chassis {
         do{
             state = odometrySystem.getState();
             location = path.getTargetLocation(state.position, lookAheadDistance);
-            driveTowardsPoint(location.futurePoint, .5, .4, 8, idealHeading);
+            double power = convertSpeedToMotorPower(location.speed);
+            driveTowardsPoint(location.futurePoint, power, 1, 8, idealHeading);
 
         } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive());
+    }
+
+    private double convertSpeedToMotorPower(double speed){
+        return Range.clip(speed/48.0, -1, 1);
     }
 
     /**

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Path {
     static final double LOOK_AHEAD_DISTANCE = 6.0; /*Package visible for testing*/
-    public static final int CURVATURE_SPEED = 8;
+    public static final int CURVATURE_SPEED = 9; //started at 8
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
 
@@ -112,7 +112,7 @@ public class Path {
 
     private double getTargetSpeed(double distanceFromStart) {
         double upScale = 2; //Todo adjust
-        double downScale = 2; //Todo adjust
+        double downScale = 1; //Todo adjust
         if (distanceFromStart > totalDistance){
             distanceFromStart = totalDistance;
         }

@@ -30,17 +30,15 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.hardware.Chassis;
+import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
@@ -48,33 +46,39 @@ import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 
 
-@Autonomous(name = "Left Curve Auto Reverse", group = "Linear Opmode")
-@Disabled
-public class LeftCurveReverseAuto extends LinearOpMode {
-
-    private Ardennes ardennes;
-    private Path path;
-    private MecanumChassis chassis;
+@Autonomous(name = "-- Partial Pursuit Test Auto --", group = "Linear Opmode")
+//@Disabled
+public class PartialPursuitTestAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
+        MotorHashService.init();
+
+        Ardennes ardennes = new Ardennes();
+
+        MecanumChassis chassis = ardennes.getChassis();
+        Intake intake = ardennes.getIntake();
 
         Logger logger = new Logger("pathDataCurveLReverse", "partialPursuit");
 
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        Path quarry = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 8,6,20);
+        Path toFoundation = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,32);
 
-        MotorHashService.init();
-        ardennes = new Ardennes();
-        chassis = ardennes.getChassis();
-        chassis.setPosition(0,0, Math.PI);
-        path = new Path(points, 12, 4, 36);
+        chassis.setPosition(63,-40, Math.PI);
         chassis.startOdometrySystem();
 
-        waitForStart();
+        waitForStart(); //-----------------------------
 
-        chassis.followPath(path, 12, Math.PI);
+        intake.startIntakeWaitForBlock(ardennes.getGripperTrigger());
 
+        chassis.followPath(quarry, 12, 0);
+        chassis.followPath(toFoundation, 12, Math.PI);
+        chassis.globalPointTurn((2*Math.PI), 0.3, 2500);
+
+        intake.stopMotors();
+
+        chassis.stopMotors();
         logger.stopWriting();
     }
 }
