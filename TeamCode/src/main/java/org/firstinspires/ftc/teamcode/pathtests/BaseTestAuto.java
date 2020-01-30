@@ -19,12 +19,12 @@ public class BaseTestAuto {
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        path = new Path(points, 12, 8, 28);//was 36
+        path = new Path(points, 12, 8, 28, false);//was 36
         chassis.startOdometrySystem();
     }
 
 
     public void afterStart(){
-        chassis.followPath(path, 12, 0);
+        chassis.followPath(path, 12, 0, null);
     }
 }

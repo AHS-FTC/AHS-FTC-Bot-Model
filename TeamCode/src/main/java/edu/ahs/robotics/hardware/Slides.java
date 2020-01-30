@@ -107,7 +107,7 @@ public class Slides {
 //        }
 //    }
 
-//    public void killThread(){
+//    public void kill(){
 //        thread.kill();
 //    }
 //
@@ -143,6 +143,19 @@ public class Slides {
             runAtPower(.5);
         }
         runAtPower(0);
+    }
+
+    /**
+     * Blocking method
+     */
+    public void goToBottom(){
+        runAtPower(-0.3);
+
+        while (!atBottom()){
+            //do nothing
+        }
+
+        stopMotors();
     }
 
     /**

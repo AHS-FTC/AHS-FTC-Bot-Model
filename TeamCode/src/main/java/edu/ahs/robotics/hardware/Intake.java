@@ -10,8 +10,8 @@ import edu.ahs.robotics.util.FTCUtilities;
 public class Intake { //todo make a one or two motor alternate to intake class
     private DcMotor leftMotor;
     private DcMotor rightMotor;
-    private IntakeMode intakeMode;
     private double motorPower;
+    private BlockMonitor blockMonitor;
 
     public Intake(double motorPower) {
         leftMotor = FTCUtilities.getMotor("intakeL");
@@ -24,13 +24,9 @@ public class Intake { //todo make a one or two motor alternate to intake class
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.motorPower = motorPower;
-        intakeMode = IntakeMode.OFF;
-    }
 
-    public enum IntakeMode {
-        OFF,
-        IN,
-        OUT
+        blockMonitor = new BlockMonitor();
+        blockMonitor.start();
     }
 
     /**
@@ -38,21 +34,12 @@ public class Intake { //todo make a one or two motor alternate to intake class
      * @param trigger the trigger which stops the intake when triggered
      */
     public void startIntakeWaitForBlock(TriggerDistanceSensor trigger) {
-        intakeMode = IntakeMode.IN;
-        runMotorsByMode();
-        BlockMonitor blockMonitor = new BlockMonitor(trigger);
-        Thread thread = new Thread(blockMonitor);
-        thread.start();
-    }
-
-    private void runMotorsByMode() {
-        if (intakeMode == IntakeMode.IN) {
-            runMotors(motorPower);
-        } else if (intakeMode == IntakeMode.OUT) {
-            runMotors(-motorPower);
-        } else if (intakeMode == IntakeMode.OFF) {
-            stopMotors();
-        }
+        runMotors(motorPower);
+        blockMonitor.setStopTrigger(trigger);
+        FTCUtilities.addData("is triggered", trigger.isTriggered());
+        FTCUtilities.updateOpLogger();
+        FTCUtilities.sleep(1000);
+        blockMonitor.makeActive();
     }
 
     public void runMotors(double motorPower) {
@@ -63,26 +50,65 @@ public class Intake { //todo make a one or two motor alternate to intake class
     public void stopMotors() {
         leftMotor.setPower(0);
         rightMotor.setPower(0);
+        blockMonitor.pause();
     }
 
-    private class BlockMonitor implements Runnable {
-        private Trigger stopTrigger;
+    public void killThread(){
+        blockMonitor.kill();
+    }
 
-        public BlockMonitor(Trigger stopTrigger) {
+    private class BlockMonitor extends Thread {
+        private Trigger stopTrigger;
+        private volatile boolean running = true;
+        private volatile boolean active = false;
+
+        public BlockMonitor() {
+        }
+
+        public void setStopTrigger(Trigger stopTrigger){
             this.stopTrigger = stopTrigger;
         }
 
-        @Override
-        public void run() {
-            while (!stopTrigger.isTriggered()) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-
-                }
-            }
-            stopMotors();
+        public synchronized void makeActive(){
+            active = true;
+            notifyAll();
         }
 
+        public void pause(){
+            active = false;
+        }
+
+        public synchronized void kill(){
+            running = false;
+            notifyAll();
+        }
+        @Override
+        public void run() {
+            while (running) {
+                if(!active){
+                    synchronized (this) {
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+                }
+                if(!running){ //break if running is flipped during sleep
+                    break;
+                }
+                if (stopTrigger.isTriggered()) {
+                    stopMotors();
+                } else {
+                    synchronized (this) {
+                        try {
+                            wait(50);
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+                }
+            }
+        }
     }
 }

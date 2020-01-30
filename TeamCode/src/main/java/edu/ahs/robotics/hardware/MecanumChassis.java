@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Vector;
+import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
@@ -536,7 +537,7 @@ public class MecanumChassis extends Chassis {
         return Math.signum(power) * Math.pow(power, 2);
     }
 
-    public void followPath(Path path, double lookAheadDistance, double idealHeading) {
+    public void followPath(Path path, double lookAheadDistance, double idealHeading, OBMCommand obmCommand) {
         OdometrySystem.State state;
         Path.Location location;
 
@@ -548,7 +549,7 @@ public class MecanumChassis extends Chassis {
             double power = convertSpeedToMotorPower(location.speed);
             logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
             driveTowardsPoint(location.futurePoint, power, 1, 8, idealHeading);
-
+            obmCommand.check(state);
         } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive());
     }
 

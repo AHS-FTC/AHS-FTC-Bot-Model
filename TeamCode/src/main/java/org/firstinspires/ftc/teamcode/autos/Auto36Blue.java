@@ -27,57 +27,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.old;
+package org.firstinspires.ftc.teamcode.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "--- New Auto ---", group = "Linear Opmode")
-@Disabled
-public class ArdennesNewAutoTest extends LinearOpMode {
+@Autonomous(name = "-- 3-6 AutoBlue --", group = "Linear Opmode")
+//@Disabled
+public class Auto36Blue extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Ardennes ardennes = new Ardennes();
-        MecanumChassis chassis = ardennes.getChassis();
-        //chassis.setPosition();
+        Path quarry = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 12,12,22, true);
+        Path toFoundation = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, true); //32
+        Path quarry2 = new Path(GCodeReader.openFile("3-6-5_block6.csv"), 12, 12, 20,6,2,1, true);
+        Path foundation2 = new Path(GCodeReader.openFile("3-6-6_delivery1.csv"), 12, 12, 44,9,2,1, true);
 
-        Logger logger = new Logger("newAutoData", "pathFollower");
 
-        Path firstMovement = new Path(GCodeReader.openFile("Intake.csv"),12,12,36, false);
-        Path secondMovement = new Path(GCodeReader.openFile("BackwardsToFoundation.csv"),12,12,36, false);
-        Path thirdMovement = new Path(GCodeReader.openFile("backUnderBridge.csv"),12,12,36, false);
+        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, true);
 
-        waitForStart();
+        waitForStart(); //-----------------------------
 
-        chassis.startOdometrySystem();
+        auto.start();
 
-        telemetry.addLine("part 1");
-        telemetry.update();
-
-        chassis.followPath(firstMovement, 12,0, null);
-
-        telemetry.addLine("part 2");
-        telemetry.update();
-
-        chassis.followPath(secondMovement,12, 0, null);
-
-        telemetry.addLine("part 3");
-        telemetry.update();
-
-        chassis.followPath(thirdMovement, 12,0, null);
-
-        logger.stopWriting();
     }
 }
