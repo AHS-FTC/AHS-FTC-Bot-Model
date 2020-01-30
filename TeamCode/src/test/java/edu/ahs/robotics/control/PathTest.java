@@ -455,4 +455,24 @@ public class PathTest {
         assertEquals(4, targetLocation.speed, .001);
 
     }
+
+    @Test
+    public void testIsFinishedBackwards() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0, 0));
+        points.add(new Point(4, 4));
+        points.add(new Point(8, 7));
+        points.add(new Point(10, 13));
+        points.add(new Point(15, 20));
+        Path path = makePath(points);
+
+        Position robotPosition = new Position(10, 17, Math.PI);
+
+        assertFalse(path.isFinished(robotPosition));
+
+        robotPosition = new Position(16, 21, Math.PI);
+
+        assertTrue(path.isFinished(robotPosition));
+    }
+
 }
