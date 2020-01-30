@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Path {
     static final double LOOK_AHEAD_DISTANCE = 6.0; /*Package visible for testing*/
-    public static final int CURVATURE_SPEED = 9; //started at 8
+    private int curvatureSpeed;
     private final ArrayList<PointAtDistance> pointAtDistance;
     private double totalDistance = 0;
 
@@ -13,14 +13,31 @@ public class Path {
     private double minRampDownSpeed;
     private double maxVelocity;
     private int iCurrentBound = 0;
+    private double rampUpScale;
+    private double rampDownScale;
 
-    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity) {
+    //Simple Constructor
+    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, boolean flipToBlue) {
+        this(points, minRampUpSpeed, minRampDownSpeed, maxVelocity, 9, 2,1, flipToBlue);
+    }
+
+    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, int curvatureSpeed, double rampUpScale, double rampDownScale, boolean flipToBlue) {
         pointAtDistance = new ArrayList<>();
         pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0, 0));
 
         this.minRampUpSpeed = minRampUpSpeed;
         this.minRampDownSpeed = minRampDownSpeed;
         this.maxVelocity = maxVelocity;
+        this.curvatureSpeed = curvatureSpeed;
+        this.rampUpScale = rampUpScale;
+        this.rampDownScale = rampDownScale;
+
+        if (flipToBlue) {
+            for (int i = 0; i < points.size(); i++) {
+                Point current = points.get(i);
+                current.x = -current.x;
+            }
+        }
 
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);
@@ -111,21 +128,20 @@ public class Path {
     }
 
     private double getTargetSpeed(double distanceFromStart) {
-        double upScale = 2; //Todo adjust
-        double downScale = 1; //Todo adjust
+
         if (distanceFromStart > totalDistance){
             distanceFromStart = totalDistance;
         }
         //Calculates ramp up and ramp down functions
         double distanceToEnd = totalDistance - distanceFromStart;
-        double rampDown = (downScale * distanceToEnd) + minRampDownSpeed;
-        double rampUp = (upScale * distanceFromStart) + minRampUpSpeed;
+        double rampDown = (rampDownScale * distanceToEnd) + minRampDownSpeed;
+        double rampUp = (rampUpScale * distanceFromStart) + minRampUpSpeed;
 
-        //Calculate curvature speed. v = sqrt(a * r) where a is max allowed acceleration and r is the radius of curvature
+        //Calculate curvatureSpeed speed. v = sqrt(a * r) where a is max allowed acceleration and r is the radius of curvatureSpeed
         //r = g * d^2 where d is distance between points. g is a constant.
         //Substituting, v = sqrt(a * g) * d
-        //CURVATURE_SPEED = sqrt(a * g) derived experimentally
-        double curvatureSpeed = CURVATURE_SPEED * getPoint(iCurrentBound + 1).distanceToPrevious;
+        //curvatureSpeed = sqrt(a * g) derived experimentally
+        double curvatureSpeed = this.curvatureSpeed * getPoint(iCurrentBound + 1).distanceToPrevious;
 
         return Math.min(rampDown, Math.min(rampUp, Math.min(maxVelocity, curvatureSpeed)));
     }

@@ -318,17 +318,19 @@ public class OdometrySystemImpl implements OdometrySystem {
 
                 if (deltaTime < SLEEP_TIME) {
                     try {
-                        Thread.sleep(SLEEP_TIME - deltaTime);
+                        synchronized (this) {
+                            this.wait(SLEEP_TIME - deltaTime);
+                        }
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
                 lastTime = FTCUtilities.getCurrentTimeMillis();
             }
         }
 
-        private void end() {
+        private synchronized void end() {
             running = false;
+            this.notifyAll();
         }
     }
 }

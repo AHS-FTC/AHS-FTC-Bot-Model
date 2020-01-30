@@ -178,7 +178,7 @@ public class PathTest {
     }
 
     private Path makePath(ArrayList<Point> points) {
-        return new Path(points, 12, 4, 36);
+        return new Path(points, 12, 4, 36, false);
     }
 
     @Test

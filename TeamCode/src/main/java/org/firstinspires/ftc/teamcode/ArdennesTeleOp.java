@@ -69,7 +69,7 @@ public class ArdennesTeleOp extends OpMode
     private Slides slides;
     private MecanumChassis chassis;
 
-    private SerialServo gripper, capstone, wrist, ySlide, leftFoundation, rightFoundation;
+    private SerialServo gripper, capstone, ySlide, leftFoundation, rightFoundation;
     //todo add Servo capstoneServo;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
@@ -85,7 +85,6 @@ public class ArdennesTeleOp extends OpMode
     private Toggle foundationToggle;
     private Toggle gripperToggle;
     private Toggle capstoneToggle;
-    private Toggle wristToggle;
     private Toggle collectionModeToggle;
     private Toggle debugToggle;
     private boolean slidesMoving = false;
@@ -117,7 +116,6 @@ public class ArdennesTeleOp extends OpMode
 
         gripper = ardennes.getGripper();
         capstone = ardennes.getCapstone();
-        wrist = ardennes.getWrist();
         ySlide = ardennes.getySlide();
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
@@ -125,7 +123,6 @@ public class ArdennesTeleOp extends OpMode
         foundationToggle = new Toggle();
         gripperToggle = new Toggle();
         capstoneToggle = new Toggle();
-        wristToggle = new Toggle();
         collectionModeToggle = new Toggle();
         debugToggle = new Toggle();
 
@@ -260,24 +257,23 @@ public class ArdennesTeleOp extends OpMode
     private void triggers() {
 
         if (slides.atBottom()) {
+            //Is the intake running but the gripper is closed? Open the gripper.
+            if (intakeMode != IntakeMode.OFF && gripperToggle.isEnabled()) {
+                gripperToggle.flip();
+                updateGripper();
+            }
+            //Is the gripper distance sensor triggered? We have a block in position, stop the intake.
             if (gripperTrigger.isTriggered()) {
                 if (intakeMode == IntakeMode.IN) {
                     intakeMode = IntakeMode.OFF;
                     updateIntake();
                 }
-                // Is the gripper open and in position? Then grip the block.
-                if (!gripperToggle.isEnabled()) {
+                // Is the gripper open and in position and is the intake not running out? Then grip the block.
+                if (!gripperToggle.isEnabled() && intakeMode != IntakeMode.OUT) {
                     gripperToggle.flip();
                     updateGripper();
                 }
             }
-            //Code to make sure that gripper is always open at bottom if distance sensor isn't triggered todo change so it works if distance sensor breaks
-//            else {
-//                if (gripperToggle.isEnabled()) {
-//                    gripperToggle.flip();
-//                    updateGripper();
-//                }
-//            }
 
         }
 
@@ -345,12 +341,6 @@ public class ArdennesTeleOp extends OpMode
             activateCapstone();
         }
 
-        //press b to rotate wrist
-        if (gamepad2.b) {
-            wristToggle.flip();
-            activateWrist();
-        }
-
         //press a to grip block
         if (gamepad2.a) {
             gripperToggle.flip();
@@ -382,14 +372,6 @@ public class ArdennesTeleOp extends OpMode
             capstone.setPosition(-.5);
         } else {
             capstone.setPosition(.5);
-        }
-    }
-
-    private void activateWrist() {
-        if (wristToggle.isEnabled()) {
-            wrist.setPosition(1);
-        } else {
-            wrist.setPosition(0);
         }
     }
 
@@ -431,7 +413,8 @@ public class ArdennesTeleOp extends OpMode
     public void stop() {
         chassis.stopMotors();
         intake.stopMotors();
-//        slides.killThread();
+        intake.killThread();
+//        slides.kill();
         slides.stopMotors();
     }
 

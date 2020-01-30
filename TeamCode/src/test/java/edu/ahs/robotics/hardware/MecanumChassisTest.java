@@ -230,7 +230,7 @@ public class MecanumChassisTest {
         points.add(new Point(0,0));
         points.add(new Point(100,0));
 
-        Path path = new Path(points, 12, 4, 36);
+        Path path = new Path(points, 12, 4, 36, false);
 
         init(positions, velocities);
 

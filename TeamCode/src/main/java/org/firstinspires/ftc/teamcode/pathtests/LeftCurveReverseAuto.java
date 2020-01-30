@@ -68,12 +68,12 @@ public class LeftCurveReverseAuto extends LinearOpMode {
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         chassis.setPosition(0,0, Math.PI);
-        path = new Path(points, 12, 4, 36);
+        path = new Path(points, 12, 4, 36, false);
         chassis.startOdometrySystem();
 
         waitForStart();
 
-        chassis.followPath(path, 12, Math.PI);
+        chassis.followPath(path, 12, Math.PI, null);
 
         logger.stopWriting();
     }

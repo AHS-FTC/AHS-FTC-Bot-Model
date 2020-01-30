@@ -27,18 +27,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.pathtests;
+package org.firstinspires.ftc.teamcode.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.control.obm.SlideCycle;
 import edu.ahs.robotics.hardware.Chassis;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
@@ -46,39 +49,25 @@ import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 
 
-@Autonomous(name = "-- Partial Pursuit Test Auto --", group = "Linear Opmode")
+@Autonomous(name = "-- 3-6 AutoRed --", group = "Linear Opmode")
 //@Disabled
-public class PartialPursuitTestAuto extends LinearOpMode {
+public class Auto36Red extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-        MotorHashService.init();
 
-        Ardennes ardennes = new Ardennes();
+        Path quarry = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 12,12,22, false);
+        Path toFoundation = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
+        Path quarry2 = new Path(GCodeReader.openFile("3-6-5_block6.csv"), 12, 12, 20,6,2,1, false);
+        Path foundation2 = new Path(GCodeReader.openFile("3-6-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
 
-        MecanumChassis chassis = ardennes.getChassis();
-        Intake intake = ardennes.getIntake();
 
-        Logger logger = new Logger("pathDataCurveLReverse", "partialPursuit");
-
-        Path quarry = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 8,6,20);
-        Path toFoundation = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,32);
-
-        chassis.setPosition(63,-40, Math.PI);
-        chassis.startOdometrySystem();
+        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, false);
 
         waitForStart(); //-----------------------------
 
-        intake.startIntakeWaitForBlock(ardennes.getGripperTrigger());
+        auto.start();
 
-        chassis.followPath(quarry, 12, 0);
-        chassis.followPath(toFoundation, 12, Math.PI);
-        chassis.globalPointTurn((2*Math.PI), 0.3, 2500);
-
-        intake.stopMotors();
-
-        chassis.stopMotors();
-        logger.stopWriting();
     }
 }
