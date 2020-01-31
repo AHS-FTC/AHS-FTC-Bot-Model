@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.ahs.robotics.hardware.ChassisMotors;
+import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.DriveUnit;
 import edu.ahs.robotics.hardware.GearRatio;
 import edu.ahs.robotics.hardware.Intake;
@@ -31,7 +32,7 @@ public class Ardennes extends Robot {
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo ySlide;
     private SerialServo capstone;
-
+    private ContinuosServo tapeMeasure;
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
@@ -45,6 +46,7 @@ public class Ardennes extends Robot {
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
+        tapeMeasure = new ContinuosServo("vexServo");
     }
 
     public Intake getIntake(){
@@ -75,6 +77,8 @@ public class Ardennes extends Robot {
     public Slides getSlides() {return slides;}
 
     public SerialServo getCapstone() {return capstone;}
+
+    public ContinuosServo getTapeMeasure() {return tapeMeasure;}
 
     private MecanumChassis makeChassis(OdometrySystemImpl odometrySystem) {
         //Set Gear Ratio

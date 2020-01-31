@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import edu.ahs.robotics.hardware.ContinuosServo;
+
 @TeleOp(name="CR Servo Test", group="Iterative OpMode")
 //@Disabled
 public class CRServoTest extends OpMode {
@@ -57,11 +59,11 @@ public class CRServoTest extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.x) {
-            crServo.setPower(.5);
+            crServo.setPower(.85);
         }
 
         if (gamepad1.y) {
-            crServo.setPower(-.5);
+            crServo.setPower(-.85);
         }
 
         if (gamepad1.a) {

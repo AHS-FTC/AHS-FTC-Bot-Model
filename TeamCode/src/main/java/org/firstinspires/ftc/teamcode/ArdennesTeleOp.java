@@ -29,17 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
-import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -65,11 +63,18 @@ public class ArdennesTeleOp extends OpMode
         OUT
     }
 
+    private enum TapeMeasureMode {
+        OFF,
+        IN,
+        OUT
+    }
+
     private Intake intake;
     private Slides slides;
     private MecanumChassis chassis;
 
     private SerialServo gripper, capstone, ySlide, leftFoundation, rightFoundation;
+    private ContinuosServo tapeMeasure;
     //todo add Servo capstoneServo;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
@@ -80,16 +85,21 @@ public class ArdennesTeleOp extends OpMode
     private static final double TRIGGER_THRESHOLD = 0.1;
     private static final double INTAKE_POWER = 1;
     private IntakeMode intakeMode = IntakeMode.OFF;
+    private TapeMeasureMode tapeMeasureMode = TapeMeasureMode.OFF;
     private static final double SLIDE_DOWN_POWER_SCALE = 0.3; //unitless multiplier to weaken slide motors when pulling down
 
     private Toggle foundationToggle;
     private Toggle gripperToggle;
     private Toggle capstoneToggle;
+
     private Toggle collectionModeToggle;
     private Toggle debugToggle;
     private boolean slidesMoving = false;
     private boolean xPressed = false;
     private boolean runToLevelMode = false;
+
+    private Switch tapeMeasureSwitchIn;
+    private Switch tapeMeasureSwitchOut;
 
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
@@ -119,6 +129,11 @@ public class ArdennesTeleOp extends OpMode
         ySlide = ardennes.getySlide();
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
+
+        tapeMeasure = ardennes.getTapeMeasure();
+
+        tapeMeasureSwitchIn = new Switch();
+        tapeMeasureSwitchOut = new Switch();
 
         foundationToggle = new Toggle();
         gripperToggle = new Toggle();
@@ -152,7 +167,7 @@ public class ArdennesTeleOp extends OpMode
     public void start() {
         time.startTime();
         lastTime = time.milliseconds();
-        capstone.setPosition(-.5);
+        capstone.setPosition(0);
     }
 
     /*
@@ -311,6 +326,30 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
+        //press x on gamepad 1 to enable tapeMeasure
+        if (gamepad1.x) {
+            if (tapeMeasureSwitchOut.flip()) {
+                if (tapeMeasureMode == TapeMeasureMode.OUT) {
+                    tapeMeasureMode = TapeMeasureMode.OFF;
+                } else {
+                    tapeMeasureMode = TapeMeasureMode.OUT;
+                }
+                updateTapeMeasure();
+            }
+        }
+
+        //press y on gamepad 1 to retract tape Measure
+        if (gamepad1.y) {
+            if (tapeMeasureSwitchIn.flip()) {
+                if (tapeMeasureMode == TapeMeasureMode.IN) {
+                    tapeMeasureMode = TapeMeasureMode.OFF;
+                } else {
+                    tapeMeasureMode = TapeMeasureMode.IN;
+                }
+                updateTapeMeasure();
+            }
+        }
+
         //press l bumper to reverse intake
         if (gamepad1.left_bumper) {
             if(intakeOutSwitch.flip()) {
@@ -365,13 +404,24 @@ public class ArdennesTeleOp extends OpMode
             telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
             //telemetry.update();
         }
+
     }
 
     private void activateCapstone() {
         if (capstoneToggle.isEnabled()) {
             capstone.setPosition(-.5);
         } else {
-            capstone.setPosition(.5);
+            capstone.setPosition(0);
+        }
+    }
+
+    private void updateTapeMeasure() {
+        if (tapeMeasureMode == tapeMeasureMode.OUT) {
+            tapeMeasure.setPower(.85);
+        } else if (tapeMeasureMode == tapeMeasureMode.OFF) {
+            tapeMeasure.setPower(0);
+        } else if (tapeMeasureMode == TapeMeasureMode.IN) {
+            tapeMeasure.setPower(-.85);
         }
     }
 
@@ -380,7 +430,7 @@ public class ArdennesTeleOp extends OpMode
             intake.runMotors(INTAKE_POWER);
         } else if (intakeMode == IntakeMode.OFF) {
             intake.stopMotors();
-        } else if(intakeMode == IntakeMode.OUT){
+        } else if (intakeMode == IntakeMode.OUT) {
             intake.runMotors(-INTAKE_POWER);
         }
     }
