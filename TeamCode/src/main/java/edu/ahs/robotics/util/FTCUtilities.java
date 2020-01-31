@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -142,9 +143,17 @@ public class FTCUtilities { //handles inaccessable objects in FTCApp. hardwareMa
         testOdometers.put(deviceName, odometer);
     }
 
-    public static Servo getServo(String deviceName){
+    public static Servo getSerialServo(String deviceName){
         if(!testMode){
             return hardwareMap.get(Servo.class, deviceName);
+        } else {
+            throw new Error("TestMode doesn't support servos yet. mock it");
+        }
+    }
+
+    public static CRServo getCRServo(String deviceName){
+        if(!testMode){
+            return hardwareMap.get(CRServo.class, deviceName);
         } else {
             throw new Error("TestMode doesn't support servos yet. mock it");
         }
