@@ -22,8 +22,7 @@ public class Path {
     }
 
     public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, int curvatureSpeed, double rampUpScale, double rampDownScale, boolean flipToBlue) {
-        pointAtDistance = new ArrayList<>();
-        pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0, 0));
+
 
         this.minRampUpSpeed = minRampUpSpeed;
         this.minRampDownSpeed = minRampDownSpeed;
@@ -35,9 +34,12 @@ public class Path {
         if (flipToBlue) {
             for (int i = 0; i < points.size(); i++) {
                 Point current = points.get(i);
-                current.x = -current.x;
+                current.x = -1.0 * current.x;
             }
         }
+
+        pointAtDistance = new ArrayList<>();
+        pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0, 0));
 
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);

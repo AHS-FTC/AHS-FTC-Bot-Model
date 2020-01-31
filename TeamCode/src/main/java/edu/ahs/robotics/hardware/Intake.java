@@ -11,7 +11,7 @@ public class Intake { //todo make a one or two motor alternate to intake class
     private DcMotor leftMotor;
     private DcMotor rightMotor;
     private double motorPower;
-    private BlockMonitor blockMonitor;
+    //private BlockMonitor blockMonitor;
 
     public Intake(double motorPower) {
         leftMotor = FTCUtilities.getMotor("intakeL");
@@ -25,8 +25,8 @@ public class Intake { //todo make a one or two motor alternate to intake class
 
         this.motorPower = motorPower;
 
-        blockMonitor = new BlockMonitor();
-        blockMonitor.start();
+        //blockMonitor = new BlockMonitor();
+        //blockMonitor.start();
     }
 
     /**
@@ -35,11 +35,11 @@ public class Intake { //todo make a one or two motor alternate to intake class
      */
     public void startIntakeWaitForBlock(TriggerDistanceSensor trigger) {
         runMotors(motorPower);
-        blockMonitor.setStopTrigger(trigger);
+        //blockMonitor.setStopTrigger(trigger);
         FTCUtilities.addData("is triggered", trigger.isTriggered());
         FTCUtilities.updateOpLogger();
         FTCUtilities.sleep(1000);
-        blockMonitor.makeActive();
+        //blockMonitor.makeActive();
     }
 
     public void runMotors(double motorPower) {
@@ -50,11 +50,11 @@ public class Intake { //todo make a one or two motor alternate to intake class
     public void stopMotors() {
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        blockMonitor.pause();
+        //blockMonitor.pause();
     }
 
     public void killThread(){
-        blockMonitor.kill();
+        //blockMonitor.kill();
     }
 
     private class BlockMonitor extends Thread {

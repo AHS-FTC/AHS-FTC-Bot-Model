@@ -178,7 +178,7 @@ public class PathTest {
     }
 
     private Path makePath(ArrayList<Point> points) {
-        return new Path(points, 12, 4, 36, false);
+        return new Path(points, 12, 4, 36, true);
     }
 
     @Test
@@ -453,6 +453,23 @@ public class PathTest {
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
         assertEquals(4, targetLocation.speed, .001);
+
+    }
+
+    @Test
+    public void testSpeedAlongBluePath() {
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(-9, -40));
+        points.add(new Point(-18.6, -40.5));
+        points.add(new Point(-28, -41.5));
+        points.add(new Point(-38, -42.5));
+        points.add(new Point(-48, -44.5));
+        Path path = makePath(points);
+
+        Position robotPosition = new Position(9, -40, 0);
+        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(12, targetLocation.speed, .001);
 
     }
 }
