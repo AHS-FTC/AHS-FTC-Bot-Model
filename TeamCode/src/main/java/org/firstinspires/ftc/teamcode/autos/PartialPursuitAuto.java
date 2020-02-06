@@ -11,6 +11,7 @@ import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
+import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
@@ -20,6 +21,7 @@ public class PartialPursuitAuto {
     private Ardennes ardennes;
     private MecanumChassis chassis;
     private Intake intake;
+    private Slides slides;
 
     private SerialServo leftFoundation, rightFoundation, xSlide, gripper;
     private ContinuosServo tapeMeasure;
@@ -39,6 +41,7 @@ public class PartialPursuitAuto {
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
+        slides = ardennes.getSlides();
 
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
@@ -152,7 +155,7 @@ public class PartialPursuitAuto {
         blockGripper.reset();
 
         intake.runMotors(1);
-        chassis.followPath(quarry3, 12, 0, slideCycle, 10000, 8);
+        chassis.followPath(quarry3, 12, 0, nullCommand, 10000, 8);
         slideCycle.reset();
         chassis.followPath(foundation3, 12, Math.PI, blockGripper, slideCycle, 10000, 8);
         chassis.stopMotors();
@@ -170,8 +173,7 @@ public class PartialPursuitAuto {
 //        chassis.stopMotors();
 //        tapeMeasure.setPower(0);
 
-        FTCUtilities.sleep(1000);
-
+        slides.stopMotors();
         chassis.stopMotors();
         intake.stopMotors();
         chassis.stopOdometrySystem();
