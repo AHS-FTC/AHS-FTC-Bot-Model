@@ -101,6 +101,7 @@ public class OdometrySystemImpl implements OdometrySystem {
 
     public synchronized void stop() {
         odometerThread.end();
+        logger.stopWriting();
     }
 
     public void setPosition(double x, double y, double heading) {
@@ -146,6 +147,8 @@ public class OdometrySystemImpl implements OdometrySystem {
         xLReading = xL.getDistance();
         yReading = y.getDistance();
 
+        FTCUtilities.OpLogger("y reading", yReading);
+
         //find deltas
         dxR = xRReading - xRLast;
         dxL = xLReading - xLLast;
@@ -165,7 +168,7 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         //find real dy
         dySum += dyBeforeFactorOut - dyExpected;
-        dy = dyBeforeFactorOut - dyExpected; //temporary until we get y encoder
+        dy = dyBeforeFactorOut - dyExpected;
 
 
         if (dHeading != 0) {//courtesy of 11115, thanks gluten free

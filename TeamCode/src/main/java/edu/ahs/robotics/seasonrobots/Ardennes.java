@@ -4,6 +4,7 @@ package edu.ahs.robotics.seasonrobots;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.hardware.ChassisMotors;
 import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.DriveUnit;
@@ -80,6 +81,12 @@ public class Ardennes extends Robot {
 
     public ContinuosServo getTapeMeasure() {return tapeMeasure;}
 
+    public void finishOBMCommand(OBMCommand obmCommand){
+        while (!obmCommand.isFinished()){
+            obmCommand.check(mecanumChassis.getState());
+        }
+    }
+
     private MecanumChassis makeChassis(OdometrySystemImpl odometrySystem) {
         //Set Gear Ratio
         GearRatio driveGearRatio = new GearRatio(1,1);
@@ -95,9 +102,9 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 2.3596,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 2.3617, true,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 2.387, false,4000);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 2.3590,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 2.3569, true,1440.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 2.3675, false,4000);
 
         OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -.103, 14.085);
         return odometrySystem;

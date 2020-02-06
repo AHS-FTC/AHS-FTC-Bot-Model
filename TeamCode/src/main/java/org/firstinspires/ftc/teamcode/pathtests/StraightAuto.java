@@ -41,22 +41,24 @@ import edu.ahs.robotics.util.Logger;
 
 
 @Autonomous(name = "Straight Auto", group = "Linear Opmode")
-@Disabled
+//@Disabled
 public class StraightAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataStraight", "pathFollower");
+        Logger logger = new Logger("pathDataStraight", "partialPursuit");
+
 
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
-        points.add(new Point(48,0));
+        points.add(new Point(72,0));
 
         BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
+        logger.startWriting();
 
         base.afterStart();
 

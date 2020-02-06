@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Vector;
+import edu.ahs.robotics.control.obm.NullCommand;
 import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
@@ -536,8 +537,12 @@ public class MecanumChassis extends Chassis {
         //   return power * Math.abs(power);
         return Math.signum(power) * Math.pow(power, 2);
     }
+    public void followPath(Path path, double lookAheadDistance, double idealHeading, OBMCommand obmCommand, long timeOut, double turnCutoff) {
+        followPath(path, lookAheadDistance, idealHeading, obmCommand, new NullCommand(), timeOut, turnCutoff);
+    }
 
-    public void followPath(Path path, double lookAheadDistance, double idealHeading, OBMCommand obmCommand) {
+        public void followPath(Path path, double lookAheadDistance, double idealHeading, OBMCommand obmCommand, OBMCommand obmCommand2, long timeOut, double turnCutoff) {
+        long startTime = FTCUtilities.getCurrentTimeMillis();
         OdometrySystem.State state;
         Path.Location location;
 
@@ -548,9 +553,10 @@ public class MecanumChassis extends Chassis {
             location = path.getTargetLocation(state.position, lookAheadDistance);
             double power = convertSpeedToMotorPower(location.speed);
             logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
-            driveTowardsPoint(location.futurePoint, power, 1, 8, idealHeading);
+            driveTowardsPoint(location.futurePoint, power, 1, turnCutoff, idealHeading);
             obmCommand.check(state);
-        } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive());
+            obmCommand2.check(state);
+        } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive() && FTCUtilities.getCurrentTimeMillis() - startTime < timeOut);
     }
 
     private double convertSpeedToMotorPower(double speed){

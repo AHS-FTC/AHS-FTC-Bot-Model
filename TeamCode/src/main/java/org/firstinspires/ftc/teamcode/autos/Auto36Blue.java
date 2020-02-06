@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.control.Path;
@@ -38,24 +39,24 @@ import edu.ahs.robotics.util.GCodeReader;
 
 
 @Autonomous(name = "-- 3-6 AutoBlue --", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class Auto36Blue extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Path quarry = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 12,12,22, true);
-        Path toFoundation = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, true); //32
-        Path quarry2 = new Path(GCodeReader.openFile("3-6-5_block6.csv"), 12, 12, 20,6,2,1, true);
-        Path foundation2 = new Path(GCodeReader.openFile("3-6-6_delivery1.csv"), 12, 12, 44,9,2,1, true);
+        Path quarry = new Path(GCodeReader.openFile("blue3-6-1_quarry.csv"), 12,12,22, false);
+        Path toFoundation = new Path(GCodeReader.openFile("blue3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
+        Path quarry2 = new Path(GCodeReader.openFile("blue3-6-5_block6.csv"), 12, 12, 20,6,2,1, false);
+        Path foundation2 = new Path(GCodeReader.openFile("blue3-6-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
 
 
-        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, true);
+       // PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, true);
 
         waitForStart(); //-----------------------------
 
-        auto.start();
+        //auto.start();
 
     }
 }

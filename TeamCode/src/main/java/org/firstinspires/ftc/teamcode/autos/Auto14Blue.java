@@ -38,23 +38,25 @@ import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 
 
-@Autonomous(name = "-- 1-4 AutoRed --", group = "Linear Opmode")
+@Autonomous(name = "-- 1-4 AutoBlue --", group = "Linear Opmode")
 @Disabled
-public class Auto14Red extends LinearOpMode {
+public class Auto14Blue extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Path quarry = new Path(GCodeReader.openFile("1-4-1_quarry.csv"), 12,12,22, 18, 2,1, false);
-        Path toFoundation = new Path(GCodeReader.openFile("1-4-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
-        Path quarry2 = new Path(GCodeReader.openFile("1-4-5_block4.csv"), 12, 12, 36,6,2,1, false);
-        Path foundation2 = new Path(GCodeReader.openFile("1-4-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
+        Path quarry = new Path(GCodeReader.openFile("blue1-4-1_quarry.csv"), 12,12,22, false);
+        Path toFoundation = new Path(GCodeReader.openFile("blue1-4-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
+        Path quarry2 = new Path(GCodeReader.openFile("blue1-4-5_block6.csv"), 12, 12, 20,6,2,1, false);
+        Path foundation2 = new Path(GCodeReader.openFile("blue1-4-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
 
-        //PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, false);
+
+        //PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, , true);
 
         waitForStart(); //-----------------------------
 
         //auto.start();
+
     }
 }

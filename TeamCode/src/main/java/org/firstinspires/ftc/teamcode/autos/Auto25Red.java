@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -45,7 +46,7 @@ import edu.ahs.robotics.util.MotorHashService;
 
 
 @Autonomous(name = "-- 2-5 AutoRed --", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class Auto25Red extends LinearOpMode {
 
     @Override
@@ -58,10 +59,10 @@ public class Auto25Red extends LinearOpMode {
         Path foundation2 = new Path(GCodeReader.openFile("2-5-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
 
 
-        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, false);
+       // PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, false);
 
         waitForStart(); //-----------------------------
 
-        auto.start();
+       // auto.start();
     }
 }

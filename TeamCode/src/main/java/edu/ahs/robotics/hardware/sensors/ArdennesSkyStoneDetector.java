@@ -63,13 +63,13 @@ public class ArdennesSkyStoneDetector {
         vuforia = new Vuforia();
         this.isImageSavingEnabled = isImageSavingEnabled;
         if(redSide){
-            stone4X = 120;
-            stone5X = 420;
-            stone6X = 725;
+            stone4X = 350;
+            stone5X = 650;
+            stone6X = 950;
         } else {
-            stone4X = 880;
-            stone5X = 580;
-            stone6X = 280;
+            stone4X = 750;
+            stone5X = 450;
+            stone6X = 150;
         }
     }
 

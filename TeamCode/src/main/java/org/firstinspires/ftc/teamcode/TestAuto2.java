@@ -34,6 +34,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.autos.PartialPursuitAuto;
+
+import java.util.ArrayList;
+
+import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.hardware.ChassisMotors;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.Odometer;
@@ -41,17 +48,19 @@ import edu.ahs.robotics.hardware.sensors.OdometerImpl;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.util.Tuner;
 
 
 @Autonomous(name = "Test Auto 2", group = "Linear Opmode")
-@Disabled
+//@Disabled
 public class TestAuto2 extends LinearOpMode {
 
     Odometer left, right, back;
 
     private Ardennes ardennes;
+    private MecanumChassis chassis;
 
 //    private ElapsedTime runtime = new ElapsedTime();
 //    private Tuner tuner;
@@ -63,45 +72,21 @@ public class TestAuto2 extends LinearOpMode {
 
         FTCUtilities.setOpMode(this);
         MotorHashService.init();
+        ardennes = new Ardennes();
+        chassis = ardennes.getChassis();
+
 //        tuner = new Tuner();
 //        FTCUtilities.setParameterLookup(tuner);
 //        detector = new ArdennesSkyStoneDetector(false, true);
 //        Intake intake = ardennes.getIntake();
 
-        double distanceFromCenter1;
-        double distanceFromCenter2;
-        double backWheelInchesPerDegree;
-        double deltaDegrees = 360.0;
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(-1,-1));
+        points.add(new Point(-3,-3));
+        points.add(new Point(-3,-6));
+        Path path = new Path(points, 12,12,12,false);
 
-        left = new OdometerImpl("intakeL", 2.3596, false, 1440); // tune these. Make sure odometers rotate forward
-        right = new OdometerImpl("intakeR", 2.3617, true, 1440); // tune these
-        back = new OdometerImpl("BR", 2.387, false, 4000); // tune these
+        chassis.followPath(path, 12, 0, null, 10000,0);
 
-        left.reset();
-        right.reset();
-        back.reset();
-
-        ardennes = new Ardennes();
-        MecanumChassis chassis = ardennes.getChassis();
-
-        waitForStart();
-
-        chassis.pivot(360.0,.75, .6, .55, 15000);
-
-            while (true) {
-
-                distanceFromCenter1 = left.getDistance()/Math.PI;
-                distanceFromCenter2 = right.getDistance()/Math.PI;
-
-                backWheelInchesPerDegree = back.getDistance() / deltaDegrees;
-
-                telemetry.addData("distance from center 1", distanceFromCenter1);
-                telemetry.addData("distance from center 2", distanceFromCenter2);
-                telemetry.addData("back wheel inches per degree", backWheelInchesPerDegree);
-                telemetry.addData("left - ins", left.getDistance());
-                telemetry.addData("right - ins", right.getDistance());
-                telemetry.addData("back - ins", back.getDistance());
-                telemetry.update();
-            }
     }
 }

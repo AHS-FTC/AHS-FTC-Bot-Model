@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.control.obm.NullCommand;
+import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -14,6 +16,7 @@ public class BaseTestAuto {
     private Ardennes ardennes;
     private Path path;
     private MecanumChassis chassis;
+    private OBMCommand nullCommand = new NullCommand();
 
     public BaseTestAuto(ArrayList<Point> points){
         MotorHashService.init();
@@ -25,6 +28,9 @@ public class BaseTestAuto {
 
 
     public void afterStart(){
-        chassis.followPath(path, 12, 0, null);
+        chassis.followPath(path, 12, 0, nullCommand,10000,0);
+        chassis.stopMotors();
+        FTCUtilities.sleep(2000);
+        chassis.stopOdometrySystem();
     }
 }

@@ -53,10 +53,6 @@ public class Intake { //todo make a one or two motor alternate to intake class
         //blockMonitor.pause();
     }
 
-    public void killThread(){
-        //blockMonitor.kill();
-    }
-
     private class BlockMonitor extends Thread {
         private Trigger stopTrigger;
         private volatile boolean running = true;

@@ -73,7 +73,7 @@ public class LeftCurveReverseAuto extends LinearOpMode {
 
         waitForStart();
 
-        chassis.followPath(path, 12, Math.PI, null);
+        chassis.followPath(path, 12, Math.PI, null,0, 0);
 
         logger.stopWriting();
     }

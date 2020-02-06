@@ -7,4 +7,14 @@ public class NullCommand implements OBMCommand {
     public void check(OdometrySystem.State state) {
         //do nothing
     }
+
+    @Override
+    public void reset() {
+        //do nothing
+    }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

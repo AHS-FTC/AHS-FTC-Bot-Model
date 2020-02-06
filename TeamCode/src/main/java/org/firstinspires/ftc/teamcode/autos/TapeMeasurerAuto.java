@@ -30,31 +30,40 @@
 package org.firstinspires.ftc.teamcode.autos;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.hardware.ContinuosServo;
+import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 
 
-@Autonomous(name = "-- 1-4 AutoRed --", group = "Linear Opmode")
-@Disabled
-public class Auto14Red extends LinearOpMode {
+@Autonomous(name = "-- Tape Park --", group = "Linear Opmode")
+//@Disabled
+public class TapeMeasurerAuto extends LinearOpMode {
+
+    ArdennesSkyStoneDetector detector;
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Path quarry = new Path(GCodeReader.openFile("1-4-1_quarry.csv"), 12,12,22, 18, 2,1, false);
-        Path toFoundation = new Path(GCodeReader.openFile("1-4-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
-        Path quarry2 = new Path(GCodeReader.openFile("1-4-5_block4.csv"), 12, 12, 36,6,2,1, false);
-        Path foundation2 = new Path(GCodeReader.openFile("1-4-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
+        Ardennes ardennes = new Ardennes();
 
-        //PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, false);
+        ContinuosServo tapeMeasure = ardennes.getTapeMeasure();
 
-        waitForStart(); //-----------------------------
+        waitForStart();
+        tapeMeasure.setPower(-0.85);
 
-        //auto.start();
+        long startTime = FTCUtilities.getCurrentTimeMillis();
+
+        while (FTCUtilities.getCurrentTimeMillis() - startTime < 2000){
+
+        }
+        tapeMeasure.setPower(0);
+
+
     }
 }

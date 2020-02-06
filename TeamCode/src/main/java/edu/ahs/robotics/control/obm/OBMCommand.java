@@ -4,4 +4,6 @@ import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 
 public interface OBMCommand {
     void check(OdometrySystem.State state);
+    void reset();
+    boolean isFinished();
 }

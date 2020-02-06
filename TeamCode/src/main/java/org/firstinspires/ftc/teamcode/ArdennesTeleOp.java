@@ -409,9 +409,9 @@ public class ArdennesTeleOp extends OpMode
 
     private void activateCapstone() {
         if (capstoneToggle.isEnabled()) {
-            capstone.setPosition(-.5);
+            capstone.setPosition(.8);
         } else {
-            capstone.setPosition(0);
+            capstone.setPosition(.2);
         }
     }
 
@@ -463,7 +463,6 @@ public class ArdennesTeleOp extends OpMode
     public void stop() {
         chassis.stopMotors();
         intake.stopMotors();
-        intake.killThread();
 //        slides.kill();
         slides.stopMotors();
     }

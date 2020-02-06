@@ -20,8 +20,6 @@ public class SlideCycle implements OBMCommand{
 
     private long startTime = 0L;
 
-
-
     private enum State{
         INITIAL,
         RAISINGZ,
@@ -48,7 +46,7 @@ public class SlideCycle implements OBMCommand{
                 break;
 
             case INITIAL:
-                if (robotState.position.y > 12) { // if we're 12 inches above the center of the field
+                if (robotState.position.y > 6) { // if we're 12 inches above the center of the field
                     state = State.RAISINGZ;
                     slides.runAtPower(UP_POWER);
                 }
@@ -62,21 +60,21 @@ public class SlideCycle implements OBMCommand{
                 }
                 break;
             case EXTENDINGX:
-                if(FTCUtilities.getCurrentTimeMillis() - startTime > 1000){
+                if(FTCUtilities.getCurrentTimeMillis() - startTime > 600){
                     state = State.DROPPINGBLOCK;
                     gripper.setPosition(0);
                     startTime = FTCUtilities.getCurrentTimeMillis();
                 }
                 break;
             case DROPPINGBLOCK:
-                if(FTCUtilities.getCurrentTimeMillis() - startTime > 250){
+                if(FTCUtilities.getCurrentTimeMillis() - startTime > 50){
                     state = State.RETRACTINGX;
                     xSlide.setPosition(0);
                     startTime = FTCUtilities.getCurrentTimeMillis();
                 }
                 break;
             case RETRACTINGX:
-                if(FTCUtilities.getCurrentTimeMillis() - startTime > 1000){
+                if(FTCUtilities.getCurrentTimeMillis() - startTime > 200){
                     state = State.LOWERINGZ;
                     slides.runAtPower(-.2);
                 }
@@ -87,5 +85,14 @@ public class SlideCycle implements OBMCommand{
                     state = State.FINISHED;
                 }
         }
+    }
+
+    @Override
+    public void reset() {
+        state = State.INITIAL;
+    }
+
+    public boolean isFinished(){
+        return state == State.FINISHED;
     }
 }
