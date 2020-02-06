@@ -8,7 +8,7 @@ import edu.ahs.robotics.util.FTCUtilities;
 
 public class SlideCycle implements OBMCommand{
 
-    private static final int CYCLE_HEIGHT = 200;
+    private int cycleHeight;
     private static final double STATIC_POWER = 0.2;
     private static final double UP_POWER = 0.6;
     private Ardennes ardennes;
@@ -31,12 +31,22 @@ public class SlideCycle implements OBMCommand{
     }
 
     public SlideCycle(Ardennes ardennes){
+        this(ardennes, 160);
+    }
+
+    public SlideCycle(Ardennes ardennes, int cycleHeight){
         this.ardennes = ardennes;
         state  = State.INITIAL;
 
         slides = ardennes.getSlides();
         xSlide = ardennes.getySlide();
         gripper = ardennes.getGripper();
+
+        this.cycleHeight = cycleHeight;
+    }
+
+    public void setCycleHeight(int cycleHeight) {
+        this.cycleHeight = cycleHeight;
     }
 
     @Override
@@ -52,7 +62,7 @@ public class SlideCycle implements OBMCommand{
                 }
                 break;
             case RAISINGZ:
-                if(slides.getCurrentPosition() > CYCLE_HEIGHT){
+                if(slides.getCurrentPosition() > cycleHeight){
                     state = State.EXTENDINGX;
                     slides.runAtPower(STATIC_POWER);
                     xSlide.setPosition(1);

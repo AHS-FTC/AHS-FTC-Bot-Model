@@ -24,7 +24,7 @@ public class PartialPursuitAuto {
     private SerialServo leftFoundation, rightFoundation, xSlide, gripper;
     private ContinuosServo tapeMeasure;
 
-    private Path quarry, toFoundation, quarry2, foundation2, quarry3;
+    private Path quarry, toFoundation, quarry2, foundation2, quarry3, foundation3;
     private Path gripFoundation, pullFoundation, scoreFoundation;
 
     private Logger logger;
@@ -35,7 +35,7 @@ public class PartialPursuitAuto {
     private int turnSign;
 
 
-    public PartialPursuitAuto(Path quarry, Path toFoundation, Path quarry2, Path foundation2, Path quarry3, boolean flipToBlue) {
+    public PartialPursuitAuto(Path quarry, Path toFoundation, Path quarry2, Path foundation2, Path quarry3, Path foundation3, boolean flipToBlue) {
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
@@ -59,6 +59,7 @@ public class PartialPursuitAuto {
         this.quarry2 = quarry2;
         this.foundation2 = foundation2;
         this.quarry3 = quarry3;
+        this.foundation3 = foundation3;
 
         slideCycle = new SlideCycle(ardennes);
         blockGripper = new BlockGripper(ardennes,500L);
@@ -142,15 +143,19 @@ public class PartialPursuitAuto {
         intake.runMotors(1);
         chassis.followPath(quarry2, 12, 0, slideCycle,10000, 8);
         slideCycle.reset();
+        slideCycle.setCycleHeight(200);
         chassis.followPath(foundation2,12, Math.PI, blockGripper, slideCycle,10000, 8);
         chassis.stopMotors();
 
         ardennes.finishOBMCommand(slideCycle);
 
+        blockGripper.reset();
+
         intake.runMotors(1);
         chassis.followPath(quarry3, 12, 0, slideCycle, 10000, 8);
-
-        intake.stopMotors();
+        slideCycle.reset();
+        chassis.followPath(foundation3, 12, Math.PI, blockGripper, slideCycle, 10000, 8);
+        chassis.stopMotors();
 
 //        chassis.followPath(scoreFoundation, 12, Math.PI, cycle2,4000);
 //        chassis.stopMotors();

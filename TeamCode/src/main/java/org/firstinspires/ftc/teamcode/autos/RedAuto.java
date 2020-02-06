@@ -55,6 +55,7 @@ public class RedAuto extends LinearOpMode {
         Path quarry236 = new Path(GCodeReader.openFile("3-6-5_block6.csv"), 12, 12, 20,6,2,1, false);
         Path foundation236 = new Path(GCodeReader.openFile("3-6-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
         Path quarry336 = new Path(GCodeReader.openFile("3-6-7_blockThree.csv"), 12, 12, 44,9,2,1, false);
+        Path foundation336 = new Path(GCodeReader.openFile("3-6-8_delivery2.csv"), 12, 12, 44,9,2,1, false);
 
         Path quarry25 = new Path(GCodeReader.openFile("2-5-1_quarry.csv"), 12,12,22, false);
         Path toFoundation25 = new Path(GCodeReader.openFile("2-5-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
@@ -65,12 +66,15 @@ public class RedAuto extends LinearOpMode {
         Path toFoundation14 = new Path(GCodeReader.openFile("1-4-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
         Path quarry214 = new Path(GCodeReader.openFile("1-4-5_block4.csv"), 12, 12, 36,6,2,1, false);
         Path foundation214 = new Path(GCodeReader.openFile("1-4-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
+        Path quarry314 = new Path(GCodeReader.openFile("1-4-7_blockThree.csv"), 12, 12, 44,9,2,1, false);
+        Path foundation314 = new Path(GCodeReader.openFile("1-4-8_delivery2.csv"), 12, 12, 44,9,2,1, false);
 
         Path quarry;
         Path toFoundation;
         Path quarry2;
         Path foundation2;
         Path quarry3;
+        Path foundation3;
 
         waitForStart(); //-----------------------------
         ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look();
@@ -80,7 +84,8 @@ public class RedAuto extends LinearOpMode {
             toFoundation = toFoundation14;
             quarry2 = quarry214;
             foundation2 = foundation214;
-            quarry3 = quarry336;
+            quarry3 = quarry314;
+            foundation3 = foundation314;
 
         } else if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE) {
             quarry = quarry25;
@@ -88,6 +93,7 @@ public class RedAuto extends LinearOpMode {
             quarry2 = quarry225;
             foundation2 = foundation225;
             quarry3 = quarry336;
+            foundation3 = foundation336;
 
         } else {
             quarry = quarry36;
@@ -95,10 +101,11 @@ public class RedAuto extends LinearOpMode {
             quarry2 = quarry236;
             foundation2 = foundation236;
             quarry3 = quarry336;
+            foundation3 = foundation336;
 
         }
 
-        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, quarry3,false);
+        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3,false);
 
         auto.start();
 

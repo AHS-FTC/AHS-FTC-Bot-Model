@@ -201,7 +201,7 @@ public class MecanumChassis extends Chassis {
 
         double turnOutput;
 
-        final double turnAggression = .5;
+        final double turnAggression = .8; //was .5
         double distanceToTarget = target.distanceTo(robotPosition);
         if(distanceToTarget < turnCutoff){
             turnOutput = 0.0;

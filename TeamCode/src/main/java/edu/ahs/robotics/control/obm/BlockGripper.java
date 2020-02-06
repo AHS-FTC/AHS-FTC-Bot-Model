@@ -1,12 +1,15 @@
 package edu.ahs.robotics.control.obm;
 
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 
 public class BlockGripper implements OBMCommand {
 
     private Ardennes ardennes;
+
+    private Trigger gripperTrigger;
 
     private long startTime;
     private long waitTime;
@@ -22,6 +25,7 @@ public class BlockGripper implements OBMCommand {
     public BlockGripper(Ardennes ardennes, long waitTime){
         this.ardennes = ardennes;
         this.waitTime = waitTime;
+        this.gripperTrigger = ardennes.getGripperTrigger();
         reset();
     }
 
@@ -35,7 +39,7 @@ public class BlockGripper implements OBMCommand {
                 state = State.WAITING;
                 break;
             case WAITING:
-                if(FTCUtilities.getCurrentTimeMillis() - startTime > waitTime){
+                if(gripperTrigger.isTriggered()){
                     ardennes.getGripper().setPosition(1);
                     ardennes.getIntake().stopMotors();
                     state = State.FINISHED;

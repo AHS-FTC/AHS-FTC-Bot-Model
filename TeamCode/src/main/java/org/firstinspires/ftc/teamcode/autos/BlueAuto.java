@@ -54,21 +54,29 @@ public class BlueAuto extends LinearOpMode {
         Path toFoundation36 = new Path(GCodeReader.openFile("blue3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
         Path quarry236 = new Path(GCodeReader.openFile("blue3-6-5_block6.csv"), 12, 12, 20,6,2,1, false);
         Path foundation236 = new Path(GCodeReader.openFile("blue3-6-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
+        Path quarry336 = new Path(GCodeReader.openFile("blue3-6-7_blockThree.csv"), 12, 12, 30,9,2,1, false);
+        Path foundation336 = new Path(GCodeReader.openFile("blue3-6-8_delivery2.csv"), 12, 12, 40,9,2,1, false);
 
         Path quarry25 = new Path(GCodeReader.openFile("blue2-5-1_quarry.csv"), 12,12,22, false);
         Path toFoundation25 = new Path(GCodeReader.openFile("blue2-5-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
         Path quarry225 = new Path(GCodeReader.openFile("blue2-5-5_block5.csv"), 12, 12, 36,6,2,1, false);
         Path foundation225 = new Path(GCodeReader.openFile("blue2-5-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
+        Path quarry325 = new Path(GCodeReader.openFile("blue2-5-7_blockThree.csv"), 12, 12, 30,9,2,1, false);
+        Path foundation325 = new Path(GCodeReader.openFile("blue2-5-8_delivery2.csv"), 12, 12, 40,9,2,1, false);
 
         Path quarry14 = new Path(GCodeReader.openFile("blue1-4-1_quarry.csv"), 12,12,22, 18, 2,1, false);
         Path toFoundation14 = new Path(GCodeReader.openFile("blue1-4-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
         Path quarry214 = new Path(GCodeReader.openFile("blue1-4-5_block4.csv"), 12, 12, 36,6,2,1, false);
         Path foundation214 = new Path(GCodeReader.openFile("blue1-4-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
+        Path quarry314 = new Path(GCodeReader.openFile("blue1-4-7_blockThree.csv"), 12, 12, 44,9,2,1, false);
+        Path foundation314 = new Path(GCodeReader.openFile("blue1-4-8_delivery2.csv"), 12, 12, 44,9,2,1, false);
 
         Path quarry;
         Path toFoundation;
         Path quarry2;
         Path foundation2;
+        Path quarry3;
+        Path foundation3;
 
         waitForStart(); //-----------------------------
         ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look();
@@ -78,24 +86,30 @@ public class BlueAuto extends LinearOpMode {
             toFoundation = toFoundation14;
             quarry2 = quarry214;
             foundation2 = foundation214;
+            quarry3 = quarry314;
+            foundation3 = foundation314;
 
         } else if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE) {
             quarry = quarry25;
             toFoundation = toFoundation25;
             quarry2 = quarry225;
             foundation2 = foundation225;
+            quarry3 = quarry325;
+            foundation3 = foundation325;
 
         } else {
             quarry = quarry36;
             toFoundation = toFoundation36;
             quarry2 = quarry236;
             foundation2 = foundation236;
+            quarry3 = quarry336;
+            foundation3 = foundation336;
 
         }
 
-        //PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, true);
+        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3, true);
 
-        //auto.start();
+        auto.start();
 
     }
 }

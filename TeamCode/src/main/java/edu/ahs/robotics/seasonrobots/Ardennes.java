@@ -46,7 +46,7 @@ public class Ardennes extends Robot {
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
-        capstone = new SerialServo("capstone", true);
+        //capstone = new SerialServo("capstone", true);
         tapeMeasure = new ContinuosServo("vexServo");
     }
 
