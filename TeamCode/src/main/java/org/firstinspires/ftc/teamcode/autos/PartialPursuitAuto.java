@@ -7,6 +7,7 @@ import edu.ahs.robotics.control.obm.BlockGripper;
 import edu.ahs.robotics.control.obm.NullCommand;
 import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.obm.SlideCycle;
+import edu.ahs.robotics.control.obm.TapeMeasureCommand;
 import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
@@ -23,21 +24,21 @@ public class PartialPursuitAuto {
     private Intake intake;
     private Slides slides;
 
-    private SerialServo leftFoundation, rightFoundation, xSlide, gripper;
-    private ContinuosServo tapeMeasure;
+    private SerialServo leftFoundation, rightFoundation, xSlide, gripper, capstone;
 
     private Path quarry, toFoundation, quarry2, foundation2, quarry3, foundation3;
-    private Path gripFoundation, pullFoundation, scoreFoundation;
+    private Path gripFoundation, pullFoundation, park;
 
     private Logger logger;
     private OBMCommand nullCommand = new NullCommand();
-    private SlideCycle slideCycle, cycle2;
-    private OBMCommand blockGripper;
+    private SlideCycle slideCycle;
+    private BlockGripper blockGripper;
+    private OBMCommand tapeMeasure;
 
     private int turnSign;
 
 
-    public PartialPursuitAuto(Path quarry, Path toFoundation, Path quarry2, Path foundation2, Path quarry3, Path foundation3, boolean flipToBlue) {
+    public PartialPursuitAuto(boolean flipToBlue) {
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
@@ -46,10 +47,10 @@ public class PartialPursuitAuto {
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
 
-        tapeMeasure = ardennes.getTapeMeasure();
-
         xSlide = ardennes.getySlide();
         gripper = ardennes.getGripper();
+
+        capstone = ardennes.getCapstone();
 
         xSlide.setPosition(0);
         gripper.setPosition(0);
@@ -57,15 +58,11 @@ public class PartialPursuitAuto {
         leftFoundation.setPosition(0);
         rightFoundation.setPosition(0);
 
-        this.quarry = quarry;
-        this.toFoundation = toFoundation;
-        this.quarry2 = quarry2;
-        this.foundation2 = foundation2;
-        this.quarry3 = quarry3;
-        this.foundation3 = foundation3;
+        capstone.setPosition(0.22);
 
         slideCycle = new SlideCycle(ardennes);
         blockGripper = new BlockGripper(ardennes,500L);
+        tapeMeasure = new TapeMeasureCommand(ardennes.getTapeMeasure());
 
         if(flipToBlue){
             turnSign = -1;
@@ -75,22 +72,21 @@ public class PartialPursuitAuto {
 
         String pullFoundationName;
         String gripFoundationName;
-        String scoreFoundationName;
+        String parkName;
 
         if (flipToBlue) {
             pullFoundationName = "blue3-6-4_pullFoundation.csv";
             gripFoundationName = "blue3-6-3_gripFoundation.csv";
-            scoreFoundationName = "blue3-6-7_scoreFoundation.csv";
+            parkName = "blue3-6-9_park.csv";
         } else {
             pullFoundationName = "3-6-4_pullFoundation.csv";
             gripFoundationName = "3-6-3_gripFoundation.csv";
-            scoreFoundationName = "3-6-7_scoreFoundation.csv";
+            parkName = "3-6-9_park.csv";
         }
 
         pullFoundation = new Path(GCodeReader.openFile(pullFoundationName), 24, 24, 48, 28,2,10, false);
         gripFoundation = new Path(GCodeReader.openFile(gripFoundationName), 12,12,12, false);
-
-        //scoreFoundation = new Path(GCodeReader.openFile(scoreFoundationName), 12,12,12, false);
+        park = new Path(GCodeReader.openFile(parkName), 12,12,12, false);
 
         chassis.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         if (flipToBlue) {
@@ -114,10 +110,19 @@ public class PartialPursuitAuto {
         chassis.startOdometrySystem();
     }
 
+    public void setPaths(Path quarry, Path toFoundation, Path quarry2, Path foundation2, Path quarry3, Path foundation3) {
+        this.quarry = quarry;
+        this.toFoundation = toFoundation;
+        this.quarry2 = quarry2;
+        this.foundation2 = foundation2;
+        this.quarry3 = quarry3;
+        this.foundation3 = foundation3;
+    }
+
     public void start(){
         intake.runMotors(1);
-        chassis.followPath(quarry, 12, (turnSign)*(-Math.PI/4), nullCommand,10000, 8);
-        chassis.followPath(toFoundation, 12, Math.PI, blockGripper,10000, 8);
+        chassis.followPath(quarry, 12, (turnSign)*(-Math.PI/4), nullCommand,4000, 8);
+        chassis.followPath(toFoundation, 12, Math.PI, blockGripper,5000, 8);
         chassis.stopMotors();
 
         double targetAngle = (2*Math.PI);
@@ -125,10 +130,10 @@ public class PartialPursuitAuto {
             targetAngle = -Math.PI;
         }
 
-        chassis.globalPointTurn(targetAngle, 0.3, 2500);
+        chassis.globalPointTurn(targetAngle, 0.3, 1500);
         chassis.stopMotors();
 
-        chassis.followPath(gripFoundation, 12, Math.PI, slideCycle,10000, 20);
+        chassis.followPath(gripFoundation, 12, Math.PI, slideCycle,3000, 20);
         chassis.stopMotors();
 
         leftFoundation.setPosition(1);
@@ -136,46 +141,42 @@ public class PartialPursuitAuto {
 
         FTCUtilities.sleep(400);
 
-        chassis.followPath(pullFoundation, 12, 0, slideCycle,10000, 4);
+        chassis.followPath(pullFoundation, 12, 0, slideCycle,3000, 4);
 
         leftFoundation.setPosition(0);
         rightFoundation.setPosition(0);
 
         blockGripper.reset();
+        blockGripper.resetWaitTime(10000L);
 
         intake.runMotors(1);
-        chassis.followPath(quarry2, 12, 0, slideCycle,10000, 8);
+        chassis.followPath(quarry2, 12, 0, slideCycle, blockGripper,3500, 8);
         slideCycle.reset();
-        slideCycle.setCycleHeight(200);
-        chassis.followPath(foundation2,12, Math.PI, blockGripper, slideCycle,10000, 8);
+        slideCycle.setCycleHeight(280);
+
+        blockGripper.resetWaitTime(500L);
+        chassis.followPath(foundation2,12, Math.PI, blockGripper, slideCycle,3000, 8);
         chassis.stopMotors();
 
         ardennes.finishOBMCommand(slideCycle);
 
         blockGripper.reset();
+        blockGripper.resetWaitTime(10000L);
 
         intake.runMotors(1);
-        chassis.followPath(quarry3, 12, 0, nullCommand, 10000, 8);
+        chassis.followPath(quarry3, 12, 0, blockGripper, 3500, 8);
         slideCycle.reset();
-        chassis.followPath(foundation3, 12, Math.PI, blockGripper, slideCycle, 10000, 8);
+        slideCycle.setCycleHeight(280);
+        blockGripper.resetWaitTime(500L);
+        chassis.followPath(foundation3, 12, Math.PI, blockGripper, slideCycle, 4000, 8);
         chassis.stopMotors();
 
-//        chassis.followPath(scoreFoundation, 12, Math.PI, cycle2,4000);
-//        chassis.stopMotors();
-//
-//        long startTime = FTCUtilities.getCurrentTimeMillis();
-//
-//        chassis.drive3Axis(1,0,0);
-//        tapeMeasure.setPower(-.85);
-//        while (FTCUtilities.getCurrentTimeMillis() - startTime < 670){
-//
-//        }
-//        chassis.stopMotors();
-//        tapeMeasure.setPower(0);
+        ardennes.finishOBMCommand(slideCycle);
 
-        slides.stopMotors();
+        chassis.followPath(park, 12, 0, tapeMeasure,3000, 8);
         chassis.stopMotors();
-        intake.stopMotors();
+        ardennes.finishOBMCommand(tapeMeasure);
+
         chassis.stopOdometrySystem();
         logger.stopWriting();
     }

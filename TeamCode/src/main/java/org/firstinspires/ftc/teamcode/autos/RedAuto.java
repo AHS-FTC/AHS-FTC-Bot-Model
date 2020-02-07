@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 
@@ -49,6 +50,7 @@ public class RedAuto extends LinearOpMode {
         FTCUtilities.setOpMode(this);
 
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, true);
+        PartialPursuitAuto auto = new PartialPursuitAuto(false);
 
         Path quarry36 = new Path(GCodeReader.openFile("3-6-1_quarry.csv"), 12,12,22, false);
         Path toFoundation36 = new Path(GCodeReader.openFile("3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
@@ -61,6 +63,8 @@ public class RedAuto extends LinearOpMode {
         Path toFoundation25 = new Path(GCodeReader.openFile("2-5-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
         Path quarry225 = new Path(GCodeReader.openFile("2-5-5_block5.csv"), 12, 12, 36,6,2,1, false);
         Path foundation225 = new Path(GCodeReader.openFile("2-5-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
+        Path quarry325 = new Path(GCodeReader.openFile("2-5-7_blockThree.csv"), 12, 12, 44,9,2,1, false);
+        Path foundation325 = new Path(GCodeReader.openFile("2-5-8_delivery2.csv"), 12, 12, 44,9,2,1, false);
 
         Path quarry14 = new Path(GCodeReader.openFile("1-4-1_quarry.csv"), 12,12,22, 18, 2,1, false);
         Path toFoundation14 = new Path(GCodeReader.openFile("1-4-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
@@ -92,8 +96,8 @@ public class RedAuto extends LinearOpMode {
             toFoundation = toFoundation25;
             quarry2 = quarry225;
             foundation2 = foundation225;
-            quarry3 = quarry336;
-            foundation3 = foundation336;
+            quarry3 = quarry325;
+            foundation3 = foundation325;
 
         } else {
             quarry = quarry36;
@@ -105,8 +109,7 @@ public class RedAuto extends LinearOpMode {
 
         }
 
-        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3,false);
-
+        auto.setPaths(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3);
         auto.start();
 
     }

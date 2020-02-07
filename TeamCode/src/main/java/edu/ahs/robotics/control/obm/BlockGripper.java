@@ -29,6 +29,11 @@ public class BlockGripper implements OBMCommand {
         reset();
     }
 
+    public void resetWaitTime(long waitTime){
+        this.waitTime = waitTime;
+        startTime = FTCUtilities.getCurrentTimeMillis();
+    }
+
     @Override
     public void check(OdometrySystem.State robotState) {
         switch(state){
@@ -39,7 +44,7 @@ public class BlockGripper implements OBMCommand {
                 state = State.WAITING;
                 break;
             case WAITING:
-                if(gripperTrigger.isTriggered() || FTCUtilities.getCurrentTimeMillis() - startTime > waitTime){
+                if(FTCUtilities.getCurrentTimeMillis() - startTime > waitTime) {// || FTCUtilities.getCurrentTimeMillis() - startTime > waitTime){ gripperTrigger.isTriggered()
                     ardennes.getGripper().setPosition(1);
                     ardennes.getIntake().stopMotors();
                     state = State.FINISHED;

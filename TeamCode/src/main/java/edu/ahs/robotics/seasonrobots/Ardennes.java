@@ -46,7 +46,7 @@ public class Ardennes extends Robot {
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
-        //capstone = new SerialServo("capstone", true);
+        capstone = new SerialServo("capstone", true);
         tapeMeasure = new ContinuosServo("vexServo");
     }
 
@@ -82,7 +82,7 @@ public class Ardennes extends Robot {
     public ContinuosServo getTapeMeasure() {return tapeMeasure;}
 
     public void finishOBMCommand(OBMCommand obmCommand){
-        while (!obmCommand.isFinished()){
+        while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){
             obmCommand.check(mecanumChassis.getState());
         }
     }

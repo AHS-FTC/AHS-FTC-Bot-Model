@@ -150,6 +150,7 @@ public class ArdennesTeleOp extends OpMode
         intakeTrigger = ardennes.getIntakeTrigger();
 
         gripper.setPosition(0);
+        capstone.setPosition(0.22);
 
     }
 
@@ -167,7 +168,6 @@ public class ArdennesTeleOp extends OpMode
     public void start() {
         time.startTime();
         lastTime = time.milliseconds();
-        capstone.setPosition(0);
     }
 
     /*
@@ -409,9 +409,9 @@ public class ArdennesTeleOp extends OpMode
 
     private void activateCapstone() {
         if (capstoneToggle.isEnabled()) {
-            capstone.setPosition(.8);
+            capstone.setPosition(1);
         } else {
-            capstone.setPosition(.2);
+            capstone.setPosition(0.22);
         }
     }
 

@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 
@@ -43,12 +44,14 @@ import edu.ahs.robotics.util.GCodeReader;
 public class BlueAuto extends LinearOpMode {
 
     ArdennesSkyStoneDetector detector;
+    Ardennes ardennes;
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, false);
+        PartialPursuitAuto auto = new PartialPursuitAuto(true);
 
         Path quarry36 = new Path(GCodeReader.openFile("blue3-6-1_quarry.csv"), 12,12,22, false);
         Path toFoundation36 = new Path(GCodeReader.openFile("blue3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
@@ -107,7 +110,7 @@ public class BlueAuto extends LinearOpMode {
 
         }
 
-        PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3, true);
+        auto.setPaths(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3);
 
         auto.start();
 
