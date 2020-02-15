@@ -27,65 +27,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.autos.PartialPursuitAuto;
 
 import java.util.ArrayList;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.ChassisMotors;
+import edu.ahs.robotics.control.obm.TargetHeadingChanger;
 import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.Odometer;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
+import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "Test Auto 2", group = "Linear Opmode")
+@Autonomous(name = "Turn Mid Path Auto", group = "Linear Opmode")
 //@Disabled
-public class TestAuto2 extends LinearOpMode {
-
-    Odometer left, right, back;
-
-    private Ardennes ardennes;
-    private MecanumChassis chassis;
-
-//    private ElapsedTime runtime = new ElapsedTime();
-//    private Tuner tuner;
-//    private ArdennesSkyStoneDetector detector;
-//    private TriggerDistanceSensor intakeTrigger;
+public class TurnMidPathAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
         FTCUtilities.setOpMode(this);
-        MotorHashService.init();
-        ardennes = new Ardennes();
-        chassis = ardennes.getChassis();
 
-//        tuner = new Tuner();
-//        FTCUtilities.setParameterLookup(tuner);
-//        detector = new ArdennesSkyStoneDetector(false, true);
-//        Intake intake = ardennes.getIntake();
+        Ardennes ardennes = new Ardennes();
+        MecanumChassis chassis = ardennes.getChassis();
+        chassis.setPosition(0,0,Math.PI/2.0);
+
+        Logger logger = new DataLogger("pathDataTurnMidPath", "partialPursuit");
 
         ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(-1,-1));
-        points.add(new Point(-3,-3));
-        points.add(new Point(-3,-6));
-        Path path = new Path(points, 12,12,12,false);
+        points.add(new Point(0,0));
+        points.add(new Point(0,80));
 
-       // chassis.followPath(path, 12, 0, null, 10000,0);
+        Path path = new Path(points, 12,12,40,false);
+
+        waitForStart(); // ------------------
+
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.obmCommand = new TargetHeadingChanger(motionConfig, Math.PI, 40);
+        motionConfig.turnCutoff = 4;
+        motionConfig.turnPower = 0.5;
+
+        chassis.startOdometrySystem();
+        chassis.followPath(path, motionConfig);
+        chassis.stopMotors();
+        chassis.stopOdometrySystem();
     }
 }

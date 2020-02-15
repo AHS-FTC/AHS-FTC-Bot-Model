@@ -33,36 +33,32 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.TextLogger;
 
 
 /**
- * OpMode that tests Logger on the phones.
- * @author Alex Appleby and Gavin Heil
+ * OpMode that tests Text Logger on the phones.
+ * @author Alex Appleby
  */
-@TeleOp(name="Logger Test", group="Iterative OpMode")
+@TeleOp(name="Text Logger Test", group="Iterative OpMode")
 @Disabled
-public class LoggerTestOpMode extends OpMode
+public class TextLoggerTestOpMode extends OpMode
 {
-    private Logger logger;
-    private int i, j, k;
+    private TextLogger logger;
+    private int i = 0;
 
     @Override
     public void init() {
-        logger = new Logger("loggerTest","loggerTest");
+        logger = new TextLogger("textLoggerTest","loggerTest");
         logger.startWriting();
     }
 
     @Override
     public void loop() {
-        logger.append("one", String.valueOf(i));
-        logger.append("two", String.valueOf(j));
-        logger.append("three", String.valueOf(k));
-        logger.writeLine();
-
+        logger.logLine("this is a super cool line of really epic text. Its line #" + i);
         i++;
-        j+=2;
-        k+=3;
     }
 
     @Override

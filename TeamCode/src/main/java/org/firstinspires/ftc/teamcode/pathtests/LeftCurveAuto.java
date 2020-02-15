@@ -41,13 +41,14 @@ import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
 
 
 @Autonomous(name = "Left Curve Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class LeftCurveAuto extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -60,7 +61,7 @@ public class LeftCurveAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurveL", "partialPursuit");
+        Logger logger = new DataLogger("pathDataCurveL", "partialPursuit");
 
         List<List<Point>> points = GCodeReader.openFile("1001.csv");
 

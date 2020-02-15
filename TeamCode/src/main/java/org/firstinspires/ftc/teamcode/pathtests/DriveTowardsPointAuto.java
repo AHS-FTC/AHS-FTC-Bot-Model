@@ -32,10 +32,12 @@ package org.firstinspires.ftc.teamcode.pathtests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 
@@ -54,7 +56,7 @@ public class DriveTowardsPointAuto extends LinearOpMode {
 
         Point targetPoint = new Point(60, 12);
 
-        Logger logger = new Logger("driveTowardPointData", "driveTowardPointData");
+        DataLogger logger = new DataLogger("driveTowardPointData", "driveTowardPointData");
 
         waitForStart(); // -----------------------------
 
@@ -68,7 +70,9 @@ public class DriveTowardsPointAuto extends LinearOpMode {
 
             distanceToPoint = targetPoint.distanceTo(state.position);
 
-            chassis.driveTowardsPoint(targetPoint,0.8, 0.3, 2, Math.PI);
+            MotionConfig motionConfig = new MotionConfig();
+
+            chassis.driveTowardsPoint(targetPoint,0.8, motionConfig);
 
             logger.append("x", String.valueOf(state.position.x));
             logger.append("y", String.valueOf(state.position.y));

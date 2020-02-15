@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.pathtests;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.control.obm.NullCommand;
@@ -29,7 +30,9 @@ public class BaseTestAuto {
 
 
     public void afterStart(){
-        chassis.followPath(path, 12, 0, nullCommand,10000,0);
+        MotionConfig pathConfig = new MotionConfig();
+
+        chassis.followPath(path, pathConfig);
         chassis.stopMotors();
         FTCUtilities.sleep(2000);
         chassis.stopOdometrySystem();

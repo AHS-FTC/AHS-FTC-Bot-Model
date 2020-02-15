@@ -43,6 +43,7 @@ import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
@@ -61,7 +62,7 @@ public class LeftCurveReverseAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurveLReverse", "partialPursuit");
+        Logger logger = new DataLogger("pathDataCurveLReverse", "partialPursuit");
 
         List<List<Point>> points = GCodeReader.openFile("1001.csv");
 
@@ -74,7 +75,7 @@ public class LeftCurveReverseAuto extends LinearOpMode {
 
         waitForStart();
 
-        chassis.followPath(path, 12, Math.PI, null,0, 0);
+        //chassis.followPath(path, 12, Math.PI, null,0, 0);
 
         logger.stopWriting();
     }

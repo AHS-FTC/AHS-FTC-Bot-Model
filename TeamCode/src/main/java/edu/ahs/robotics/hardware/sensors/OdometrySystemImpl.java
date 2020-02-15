@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.RingBuffer;
@@ -54,7 +55,7 @@ public class OdometrySystemImpl implements OdometrySystem {
 
     private OdometerThread odometerThread;
 
-    private Logger logger;
+    private DataLogger logger;
 
     /**
      * @param xR               The 'first' odometer measuring in the X direction. Should be on the right side of the robot.
@@ -77,7 +78,7 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         odometerThread = new OdometerThread();
 
-        logger = new Logger("odometryStats", "odometrySystem");
+        logger = new DataLogger("odometryStats", "odometrySystem");
 
         distanceBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0.0);
         velocityTimeBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0L);//type is long
@@ -97,6 +98,7 @@ public class OdometrySystemImpl implements OdometrySystem {
         logger.startWriting();
         resetEncoders();
         odometerThread.start();
+        logger.startWriting();
     }
 
     public synchronized void stop() {

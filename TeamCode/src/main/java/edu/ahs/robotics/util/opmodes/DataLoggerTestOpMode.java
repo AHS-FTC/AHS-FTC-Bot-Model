@@ -27,50 +27,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.pathtests;
+package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
 
 
-@Autonomous(name = "Sigmoid Auto", group = "Linear Opmode")
+/**
+ * OpMode that tests Logger on the phones.
+ * @author Alex Appleby and Gavin Heil
+ */
+@TeleOp(name="Data Logger Test", group="Iterative OpMode")
 @Disabled
-public class SigmoidAuto extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+public class DataLoggerTestOpMode extends OpMode
+{
+    private DataLogger logger;
+    private int i, j, k;
 
     @Override
-    public void runOpMode() {
-        FTCUtilities.setOpMode(this);
-
-        Logger logger = new DataLogger("pathDataSigmoid", "partialPursuit");
-
-        List<List<Point>> points = GCodeReader.openFile("sigmoid.csv");
-
-        BaseTestAuto base = new BaseTestAuto(points.get(0));
-
-        waitForStart();
-
-        base.afterStart();
-
-        logger.stopWriting();
+    public void init() {
+        logger = new DataLogger("dataLoggerTest","loggerTest");
+        logger.startWriting();
     }
+
+    @Override
+    public void loop() {
+        logger.append("one", String.valueOf(i));
+        logger.append("two", String.valueOf(j));
+        logger.append("three", String.valueOf(k));
+        logger.writeLine();
+
+        i++;
+        j+=2;
+        k+=3;
+    }
+
+    @Override
+    public void stop(){
+        Logger.stopLoggers();
+    }
+
 }

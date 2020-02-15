@@ -2,6 +2,7 @@ package edu.ahs.robotics.control;
 
 import edu.ahs.robotics.control.pid.PID;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.ParameterLookup;
@@ -10,7 +11,7 @@ public class PathFollower {
     //Amplifies negative power corrections to deal with momentum while decelerating
     private static final double DOWN_AMPLIFIER = 1; // -- tuned --
     Path path;
-    Logger logger;
+    DataLogger logger;
     double downCorrectionScale;
     private PID speedPID;
     private PID unifiedPID;
@@ -39,7 +40,7 @@ public class PathFollower {
         speedPID = new PID(.03 * PID_CONSTANT_SCALAR, 0.0, 4 * PID_CONSTANT_SCALAR, 3); // -- tuned --
         unifiedPID = new PID(.05 * PID_CONSTANT_SCALAR, 0.0, 20 * PID_CONSTANT_SCALAR,5);
 
-        logger = Logger.getLogger("pathFollower");
+        logger = (DataLogger)Logger.getLogger("pathFollower");
         logger.startWriting();
 
         lastTime = FTCUtilities.getCurrentTimeMillis();

@@ -41,6 +41,7 @@ import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.Logger;
@@ -60,7 +61,7 @@ public class RightCurveAuto extends LinearOpMode {
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataCurveR", "pathFollower");
+        Logger logger = new DataLogger("pathDataCurveR", "pathFollower");
 
         List<List<Point>> points = GCodeReader.openFile("rightCurve.csv");
 
