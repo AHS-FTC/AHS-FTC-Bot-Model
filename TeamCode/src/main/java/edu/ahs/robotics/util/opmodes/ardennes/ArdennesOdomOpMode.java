@@ -41,6 +41,7 @@ import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
@@ -70,7 +71,7 @@ public class ArdennesOdomOpMode extends OpMode
     public void init() {
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        logger = new Logger("ardennesOdomOpMode","ardennesOdomOpMode");
+        logger = new DataLogger("ardennesOdomOpMode","ardennesOdomOpMode");
 
         //teleOp = new SimpleTeleOp();
         //teleOp.hardwareMap = hardwareMap;

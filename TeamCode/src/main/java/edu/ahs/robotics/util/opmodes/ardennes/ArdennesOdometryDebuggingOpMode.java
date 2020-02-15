@@ -39,6 +39,7 @@ import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
@@ -54,7 +55,7 @@ public class ArdennesOdometryDebuggingOpMode extends OpMode
     private Position position;
     private Velocity velocity;
     private double startTime = 0;
-    private Logger logger;
+    private DataLogger logger;
     private Ardennes ardennes;
     private MecanumChassis chassis;
 
@@ -83,7 +84,7 @@ public class ArdennesOdometryDebuggingOpMode extends OpMode
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        logger = new Logger("odometryDebuggingOpMode", "odometryDebuggingOpMode");
+        logger = new DataLogger("odometryDebuggingOpMode", "odometryDebuggingOpMode");
         logger.startWriting();
     }
 

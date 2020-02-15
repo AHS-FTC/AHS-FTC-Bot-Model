@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 
+import com.vuforia.ImageTargetBuilder;
+
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 
@@ -86,10 +88,10 @@ public class ArdennesSkyStoneDetector {
         Bitmap stone6 = Bitmap.createBitmap(vuBitmap, stone6X, Y_COORD, STONE_WIDTH, STONE_HEIGHT);
 
         if (isImageSavingEnabled) {
-            Logger.saveImage(vuBitmap);
-            Logger.saveImage(stone4);
-            Logger.saveImage(stone5);
-            Logger.saveImage(stone6);
+            FTCUtilities.saveImage(vuBitmap);
+            FTCUtilities.saveImage(stone4);
+            FTCUtilities.saveImage(stone5);
+            FTCUtilities.saveImage(stone6);
         }
         //Ratio is measured blackness to yellowness. higher ratio is more likeliness to be a skystone.
 

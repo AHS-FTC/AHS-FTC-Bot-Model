@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Vector;
@@ -16,6 +17,7 @@ import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.control.pid.VelocityPID;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCMath;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.control.Point;
@@ -31,7 +33,7 @@ public class MecanumChassis extends Chassis {
     public static final double RIGHT_AMPLIFIER = 1;
 
     //Logger logger = new Logger("Mecanum Chassis Old Code", "mecanumChassis");
-    private Logger logger;
+    private DataLogger logger;
 
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
@@ -170,26 +172,18 @@ public class MecanumChassis extends Chassis {
         backRight.setPower(v.x - v.y + turnPower);
     }
 
-    public void driveTowardsPoint(Point target, double power, double turnPower, double turnCutoff, double idealHeading){
+    public void driveTowardsPoint(Point target, double power, MotionConfig motionConfig){
         Position robotPosition = odometrySystem.getState().position;
 
-        DriveCommand d = getDriveTowardsPointCommands(target, power, turnPower, turnCutoff, robotPosition, idealHeading);
+        DriveCommand d = getDriveTowardsPointCommands(target, power, robotPosition, motionConfig);
 
         driveLocalVector(d.driveVector, d.turnOutput);
     }
 
     /**
-     * Simple overload, assumes ideal heading is forward
-     * @param target
-     * @param power
-     * @param turnPower
-     * @param turnCutoff
+     * Does actual work for driveTowardsPoint
      */
-    public void driveTowardsPoint(Point target, double power, double turnPower, double turnCutoff){
-        driveTowardsPoint(target, power, turnPower, turnCutoff, 0);
-    }
-
-    /*protected for test*/ DriveCommand getDriveTowardsPointCommands(Point target, double power, double turnPower, double turnCutoff, Position robotPosition, double idealHeading){
+    /*protected for test*/ DriveCommand getDriveTowardsPointCommands(Point target, double power, Position robotPosition, MotionConfig motionConfig){
         double dx = target.x - robotPosition.x;
         double dy = target.y - robotPosition.y;
         double globalAngleToPoint = Math.atan2(dy, dx);
@@ -201,13 +195,12 @@ public class MecanumChassis extends Chassis {
 
         double turnOutput;
 
-        final double turnAggression = .8; //was .5
         double distanceToTarget = target.distanceTo(robotPosition);
-        if(distanceToTarget < turnCutoff){
+        if(distanceToTarget < motionConfig.turnCutoff){
             turnOutput = 0.0;
         } else {
-            double angleError = FTCMath.ensureIdealAngle(localAngleToPoint - idealHeading);
-            turnOutput = Range.clip(angleError * turnAggression,-1,1) * turnPower; // local angle to point can be interpreted as error
+            double angleError = FTCMath.ensureIdealAngle(localAngleToPoint - motionConfig.idealHeading);
+            turnOutput = Range.clip(angleError * motionConfig.turnAggression,-1,1) * motionConfig.turnPower; // local angle to point can be interpreted as error
         }
 
         logger.append("x", String.valueOf(robotPosition.x));
@@ -537,26 +530,29 @@ public class MecanumChassis extends Chassis {
         //   return power * Math.abs(power);
         return Math.signum(power) * Math.pow(power, 2);
     }
-    public void followPath(Path path, double lookAheadDistance, double idealHeading, OBMCommand obmCommand, long timeOut, double turnCutoff) {
-        followPath(path, lookAheadDistance, idealHeading, obmCommand, new NullCommand(), timeOut, turnCutoff);
-    }
 
-        public void followPath(Path path, double lookAheadDistance, double idealHeading, OBMCommand obmCommand, OBMCommand obmCommand2, long timeOut, double turnCutoff) {
+    public void followPath(Path path, MotionConfig motionConfig) {
         long startTime = FTCUtilities.getCurrentTimeMillis();
         OdometrySystem.State state;
         Path.Location location;
 
-        logger = Logger.getLogger("partialPursuit");
+        logger = (DataLogger)Logger.getLogger("partialPursuit");
+
+        logger.startWriting();
 
         do{
             state = odometrySystem.getState();
-            location = path.getTargetLocation(state.position, lookAheadDistance);
+            location = path.getTargetLocation(state.position, motionConfig.lookAheadDistance);
+
             double power = convertSpeedToMotorPower(location.speed);
+
             logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
-            driveTowardsPoint(location.futurePoint, power, 1, turnCutoff, idealHeading);
-            obmCommand.check(state);
-            obmCommand2.check(state);
-        } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive() && FTCUtilities.getCurrentTimeMillis() - startTime < timeOut);
+
+            driveTowardsPoint(location.futurePoint, power, motionConfig);
+
+            motionConfig.obmCommand.check(state);
+            motionConfig.obmCommand2.check(state);
+        } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive() && FTCUtilities.getCurrentTimeMillis() - startTime < motionConfig.timeOut);
     }
 
     private double convertSpeedToMotorPower(double speed){

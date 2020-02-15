@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.Tuner;
@@ -62,7 +63,7 @@ public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
     Tuner tuner = new Tuner();
     private double power;
     private double maxAcceleration = 0;
-    private Logger logger;
+    private DataLogger logger;
     private long currentTime = 0;
     private long previousTime = FTCUtilities.getCurrentTimeMillis();
 
@@ -77,7 +78,7 @@ public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
         power = tuner.getParameter("power");
 
         waitForStart();
-        logger = new Logger("PowerCurve" + Math.floor(power * 100), "powerCurve");
+        logger = new DataLogger("PowerCurve" + Math.floor(power * 100), "powerCurve");
         logger.startWriting();
         chassis.startOdometrySystem();
 

@@ -36,19 +36,20 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.Logger;
 
 
 @Autonomous(name = "Straight Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class StraightAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new Logger("pathDataStraight", "partialPursuit");
+        Logger logger = new DataLogger("pathDataStraight", "partialPursuit");
 
 
         ArrayList<Point> points = new ArrayList<>();

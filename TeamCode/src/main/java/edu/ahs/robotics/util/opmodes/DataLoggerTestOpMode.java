@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.Logger;
 
 
@@ -40,16 +41,16 @@ import edu.ahs.robotics.util.Logger;
  * OpMode that tests Logger on the phones.
  * @author Alex Appleby and Gavin Heil
  */
-@TeleOp(name="Logger Test", group="Iterative OpMode")
+@TeleOp(name="Data Logger Test", group="Iterative OpMode")
 @Disabled
-public class LoggerTestOpMode extends OpMode
+public class DataLoggerTestOpMode extends OpMode
 {
-    private Logger logger;
+    private DataLogger logger;
     private int i, j, k;
 
     @Override
     public void init() {
-        logger = new Logger("loggerTest","loggerTest");
+        logger = new DataLogger("dataLoggerTest","loggerTest");
         logger.startWriting();
     }
 

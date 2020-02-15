@@ -27,57 +27,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.old;
+package edu.ahs.robotics.util.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.TextLogger;
 
 
-@Autonomous(name = "--- New Auto ---", group = "Linear Opmode")
+/**
+ * OpMode that tests Text Logger on the phones.
+ * @author Alex Appleby
+ */
+@TeleOp(name="Text Logger Test", group="Iterative OpMode")
 @Disabled
-public class ArdennesNewAutoTest extends LinearOpMode {
+public class TextLoggerTestOpMode extends OpMode
+{
+    private TextLogger logger;
+    private int i = 0;
 
     @Override
-    public void runOpMode() {
-        FTCUtilities.setOpMode(this);
-
-        Ardennes ardennes = new Ardennes();
-        MecanumChassis chassis = ardennes.getChassis();
-        //chassis.setPosition();
-
-        Logger logger = new Logger("newAutoData", "pathFollower");
-
-        Path firstMovement = new Path(GCodeReader.openFile("Intake.csv"),12,12,36, false);
-        Path secondMovement = new Path(GCodeReader.openFile("BackwardsToFoundation.csv"),12,12,36, false);
-        Path thirdMovement = new Path(GCodeReader.openFile("backUnderBridge.csv"),12,12,36, false);
-
-        waitForStart();
-
-        chassis.startOdometrySystem();
-
-        telemetry.addLine("part 1");
-        telemetry.update();
-
-        chassis.followPath(firstMovement, 12,0, null,0, 0);
-
-        telemetry.addLine("part 2");
-        telemetry.update();
-
-        chassis.followPath(secondMovement,12, 0, null,0,0);
-
-        telemetry.addLine("part 3");
-        telemetry.update();
-
-        chassis.followPath(thirdMovement, 12,0, null,0,0);
-
-        logger.stopWriting();
+    public void init() {
+        logger = new TextLogger("textLoggerTest","loggerTest");
+        logger.startWriting();
     }
+
+    @Override
+    public void loop() {
+        logger.logLine("this is a super cool line of really epic text. Its line #" + i);
+        i++;
+    }
+
+    @Override
+    public void stop(){
+        Logger.stopLoggers();
+    }
+
 }
