@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
@@ -18,7 +19,7 @@ public class BaseTestAuto {
     private MecanumChassis chassis;
     private OBMCommand nullCommand = new NullCommand();
 
-    public BaseTestAuto(ArrayList<Point> points){
+    public BaseTestAuto(List<Point> points){
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();

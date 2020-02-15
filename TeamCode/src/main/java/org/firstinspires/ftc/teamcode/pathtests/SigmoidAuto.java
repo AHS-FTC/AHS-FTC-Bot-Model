@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
@@ -61,9 +62,9 @@ public class SigmoidAuto extends LinearOpMode {
 
         Logger logger = new Logger("pathDataSigmoid", "partialPursuit");
 
-        ArrayList<Point> points = GCodeReader.openFile("sigmoid.csv");
+        List<List<Point>> points = GCodeReader.openFile("sigmoid.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points);
+        BaseTestAuto base = new BaseTestAuto(points.get(0));
 
         waitForStart();
 

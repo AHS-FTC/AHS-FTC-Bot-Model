@@ -32,7 +32,10 @@ package org.firstinspires.ftc.teamcode.autos;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import java.util.List;
+
 import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -53,26 +56,30 @@ public class BlueAuto extends LinearOpMode {
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, false);
         PartialPursuitAuto auto = new PartialPursuitAuto(true);
 
-        Path quarry36 = new Path(GCodeReader.openFile("blue3-6-1_quarry.csv"), 12,12,22, false);
-        Path toFoundation36 = new Path(GCodeReader.openFile("blue3-6-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
-        Path quarry236 = new Path(GCodeReader.openFile("blue3-6-5_block6.csv"), 12, 12, 20,6,2,1, false);
-        Path foundation236 = new Path(GCodeReader.openFile("blue3-6-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
-        Path quarry336 = new Path(GCodeReader.openFile("blue3-6-7_blockThree.csv"), 12, 12, 30,9,2,1, false);
-        Path foundation336 = new Path(GCodeReader.openFile("blue3-6-8_delivery2.csv"), 12, 12, 40,9,2,1, false);
+        List<List<Point>> route36 = GCodeReader.openFile("foo");
+        List<List<Point>> route25 = GCodeReader.openFile("foo");
+        List<List<Point>> route14 = GCodeReader.openFile("foo");
 
-        Path quarry25 = new Path(GCodeReader.openFile("blue2-5-1_quarry.csv"), 12,12,22, false);
-        Path toFoundation25 = new Path(GCodeReader.openFile("blue2-5-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
-        Path quarry225 = new Path(GCodeReader.openFile("blue2-5-5_block5.csv"), 12, 12, 36,6,2,1, false);
-        Path foundation225 = new Path(GCodeReader.openFile("blue2-5-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
-        Path quarry325 = new Path(GCodeReader.openFile("blue2-5-7_blockThree.csv"), 12, 12, 30,9,2,1, false);
-        Path foundation325 = new Path(GCodeReader.openFile("blue2-5-8_delivery2.csv"), 12, 12, 40,9,2,1, false);
+        Path quarry36 = new Path(route36.get(0), 12,12,22, false);
+        Path toFoundation36 = new Path(route36.get(1), 8,4,35, 9, 2, 1, false); //32
+        Path quarry236 = new Path(route36.get(2), 12, 12, 20,6,2,1, false);
+        Path foundation236 = new Path(route36.get(3), 12, 12, 44,9,2,1, false);
+        Path quarry336 = new Path(route36.get(4), 12, 12, 30,9,2,1, false);
+        Path foundation336 = new Path(route36.get(5), 12, 12, 40,9,2,1, false);
 
-        Path quarry14 = new Path(GCodeReader.openFile("blue1-4-1_quarry.csv"), 12,12,22, 18, 2,1, false);
-        Path toFoundation14 = new Path(GCodeReader.openFile("blue1-4-2_foundation.csv"), 8,4,35, 9, 2, 1, false); //32
-        Path quarry214 = new Path(GCodeReader.openFile("blue1-4-5_block4.csv"), 12, 12, 36,6,2,1, false);
-        Path foundation214 = new Path(GCodeReader.openFile("blue1-4-6_delivery1.csv"), 12, 12, 44,9,2,1, false);
-        Path quarry314 = new Path(GCodeReader.openFile("blue1-4-7_blockThree.csv"), 12, 12, 44,9,2,1, false);
-        Path foundation314 = new Path(GCodeReader.openFile("blue1-4-8_delivery2.csv"), 12, 12, 44,9,2,1, false);
+        Path quarry25 = new Path(route25.get(0), 12,12,22, false);
+        Path toFoundation25 = new Path(route25.get(1), 8,4,35, 9, 2, 1, false); //32
+        Path quarry225 = new Path(route25.get(2), 12, 12, 36,6,2,1, false);
+        Path foundation225 = new Path(route25.get(3), 12, 12, 44,9,2,1, false);
+        Path quarry325 = new Path(route25.get(4), 12, 12, 30,9,2,1, false);
+        Path foundation325 = new Path(route25.get(5), 12, 12, 40,9,2,1, false);
+
+        Path quarry14 = new Path(route14.get(0), 12,12,22, 18, 2,1, false);
+        Path toFoundation14 = new Path(route14.get(1), 8,4,35, 9, 2, 1, false); //32
+        Path quarry214 = new Path(route14.get(2), 12, 12, 36,6,2,1, false);
+        Path foundation214 = new Path(route14.get(3), 12, 12, 44,9,2,1, false);
+        Path quarry314 = new Path(route14.get(4), 12, 12, 44,9,2,1, false);
+        Path foundation314 = new Path(route14.get(5), 12, 12, 44,9,2,1, false);
 
         Path quarry;
         Path toFoundation;

@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
@@ -62,13 +63,13 @@ public class LeftCurveReverseAuto extends LinearOpMode {
 
         Logger logger = new Logger("pathDataCurveLReverse", "partialPursuit");
 
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        List<List<Point>> points = GCodeReader.openFile("1001.csv");
 
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         chassis.setPosition(0,0, Math.PI);
-        path = new Path(points, 12, 4, 36, false);
+        path = new Path(points.get(0), 12, 4, 36, false);
         chassis.startOdometrySystem();
 
         waitForStart();

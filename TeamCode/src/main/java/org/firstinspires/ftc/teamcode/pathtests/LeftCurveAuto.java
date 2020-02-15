@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
@@ -61,9 +62,9 @@ public class LeftCurveAuto extends LinearOpMode {
 
         Logger logger = new Logger("pathDataCurveL", "partialPursuit");
 
-        ArrayList<Point> points = GCodeReader.openFile("1001.csv");
+        List<List<Point>> points = GCodeReader.openFile("1001.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points);
+        BaseTestAuto base = new BaseTestAuto(points.get(0));
 
         waitForStart();
 

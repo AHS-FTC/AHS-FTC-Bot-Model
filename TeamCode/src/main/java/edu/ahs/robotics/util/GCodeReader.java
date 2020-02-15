@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
+
 import edu.ahs.robotics.control.Point;
 
 import static java.lang.Double.valueOf;
@@ -18,16 +20,16 @@ import static java.lang.Double.valueOf;
 public class GCodeReader {
     private static GCodeReader instance;
 
-    public static ArrayList<ArrayList<Point>> openFile(String name){
+    public static List<List<Point>> openFile(String name){
         BufferedReader fr;
         String fileName = FTCUtilities.getLogDirectory() + "/" + name;
-        ArrayList<ArrayList<Point>> arrayOfPoints = new ArrayList<>();
+        List<List<Point>> arrayOfPoints = new ArrayList<>();
 
         try {
             fr = new BufferedReader(new FileReader(fileName));
             String line;
             boolean inPath = false;
-            ArrayList<Point> points = null;
+            List<Point> points = null;
             while ((line = fr.readLine()) != null){
                 String[] stringCoords = line.split(";");
                 if (valueOf(stringCoords[2]) == 0.0) {

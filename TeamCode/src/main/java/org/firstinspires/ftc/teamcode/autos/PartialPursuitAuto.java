@@ -74,19 +74,19 @@ public class PartialPursuitAuto {
         String gripFoundationName;
         String parkName;
 
-        if (flipToBlue) {
-            pullFoundationName = "blue3-6-4_pullFoundation.csv";
-            gripFoundationName = "blue3-6-3_gripFoundation.csv";
-            parkName = "blue3-6-9_park.csv";
-        } else {
-            pullFoundationName = "3-6-4_pullFoundation.csv";
-            gripFoundationName = "3-6-3_gripFoundation.csv";
-            parkName = "3-6-9_park.csv";
-        }
-
-        pullFoundation = new Path(GCodeReader.openFile(pullFoundationName), 24, 24, 48, 28,2,10, false);
-        gripFoundation = new Path(GCodeReader.openFile(gripFoundationName), 12,12,12, false);
-        park = new Path(GCodeReader.openFile(parkName), 12,12,12, false);
+//        if (flipToBlue) {
+//            pullFoundationName = "blue3-6-4_pullFoundation.csv";
+//            gripFoundationName = "blue3-6-3_gripFoundation.csv";
+//            parkName = "blue3-6-9_park.csv";
+//        } else {
+//            pullFoundationName = "3-6-4_pullFoundation.csv";
+//            gripFoundationName = "3-6-3_gripFoundation.csv";
+//            parkName = "3-6-9_park.csv";
+//        }
+//
+//        pullFoundation = new Path(GCodeReader.openFile(pullFoundationName), 24, 24, 48, 28,2,10, false);
+//        gripFoundation = new Path(GCodeReader.openFile(gripFoundationName), 12,12,12, false);
+//        park = new Path(GCodeReader.openFile(parkName), 12,12,12, false);
 
         chassis.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         if (flipToBlue) {

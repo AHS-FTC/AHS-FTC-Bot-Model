@@ -1,6 +1,7 @@
 package edu.ahs.robotics.control;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Path {
     static final double LOOK_AHEAD_DISTANCE = 6.0; /*Package visible for testing*/
@@ -17,11 +18,11 @@ public class Path {
     private double rampDownScale;
 
     //Simple Constructor
-    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, boolean flipToBlue) {
+    public Path(List<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, boolean flipToBlue) {
         this(points, minRampUpSpeed, minRampDownSpeed, maxVelocity, 9, 2,1, flipToBlue);
     }
 
-    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, int curvatureSpeed, double rampUpScale, double rampDownScale, boolean flipToBlue) {
+    public Path(List<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, int curvatureSpeed, double rampUpScale, double rampDownScale, boolean flipToBlue) {
 
 
         this.minRampUpSpeed = minRampUpSpeed;
