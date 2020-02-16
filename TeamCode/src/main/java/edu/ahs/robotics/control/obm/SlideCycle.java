@@ -50,7 +50,7 @@ public class SlideCycle implements OBMCommand{
     }
 
     @Override
-    public void check(OdometrySystem.State robotState){
+    public boolean check(OdometrySystem.State robotState){
         switch (state){
             case FINISHED:
                 break;
@@ -95,6 +95,7 @@ public class SlideCycle implements OBMCommand{
                     state = State.FINISHED;
                 }
         }
+        return false;
     }
 
     @Override

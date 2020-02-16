@@ -5,6 +5,10 @@ import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 
+/**
+ * Command to synchronously run the Ardennes Tape Measurer
+ * @author Alex Appleby and Andrew Seybold
+ */
 public class TapeMeasureCommand implements OBMCommand {
 
     private State state = State.INITIAL;
@@ -24,7 +28,7 @@ public class TapeMeasureCommand implements OBMCommand {
     }
 
     @Override
-    public void check(OdometrySystem.State robotState) {
+    public boolean check(OdometrySystem.State robotState) {
         switch (state){
             case FINISHED:
                 break;
@@ -42,6 +46,7 @@ public class TapeMeasureCommand implements OBMCommand {
                 }
                 break;
         }
+        return false;
     }
 
     @Override

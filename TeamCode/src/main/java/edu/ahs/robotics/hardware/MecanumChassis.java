@@ -15,8 +15,10 @@ import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.control.pid.VelocityPID;
+import edu.ahs.robotics.hardware.sensors.DistanceSensor;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
+import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.util.DataLogger;
 import edu.ahs.robotics.util.FTCMath;
 import edu.ahs.robotics.util.FTCUtilities;
@@ -39,6 +41,8 @@ public class MecanumChassis extends Chassis {
     private SingleDriveUnit frontRight;
     private SingleDriveUnit backLeft;
     private SingleDriveUnit backRight;
+
+    private Trigger triggerBoi; //todo remove
 
     // Motor shortcuts
     private ChassisMotors.Mecanum FRONT_LEFT = ChassisMotors.Mecanum.FRONTLEFT;
@@ -525,6 +529,10 @@ public class MecanumChassis extends Chassis {
     public void setPosition(double x, double y, double heading){
         odometrySystem.setPosition(x, y, heading);
     }
+    //TEMPORARY
+    public void setTriggerBoi(Trigger triggerBoi){
+        this.triggerBoi = triggerBoi;
+    }
 
     private double inversePower(double power) {
         //   return power * Math.abs(power);
@@ -538,20 +546,28 @@ public class MecanumChassis extends Chassis {
 
         logger = (DataLogger)Logger.getLogger("partialPursuit");
 
-        logger.startWriting();
+        if(!logger.isWriting()) {
+            logger.startWriting();
+        }
 
         do{
             state = odometrySystem.getState();
             location = path.getTargetLocation(state.position, motionConfig.lookAheadDistance);
 
-            double power = convertSpeedToMotorPower(location.speed);
+            double power = convertSpeedToMotorPower(location.speed); //todo ditch
 
             logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
+            logger.append("triggerBoi", String.valueOf(triggerBoi.isTriggered()));
+            DistanceSensor d = (DistanceSensor)triggerBoi;
+
+            logger.append("distance", String.valueOf(d.getDist()));
 
             driveTowardsPoint(location.futurePoint, power, motionConfig);
 
-            motionConfig.obmCommand.check(state);
-            motionConfig.obmCommand2.check(state);
+            if (motionConfig.checkOBMCommands(state)){ //OBMCommands can break the loop. also checks all obmCommands.
+                break;
+            }
+
         } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive() && FTCUtilities.getCurrentTimeMillis() - startTime < motionConfig.timeOut);
     }
 

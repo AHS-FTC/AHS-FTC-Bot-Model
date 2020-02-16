@@ -21,13 +21,14 @@ public class TargetHeadingChanger implements OBMCommand {
     }
 
     @Override
-    public void check(OdometrySystem.State robotState) {
+    public boolean check(OdometrySystem.State robotState) {
         if(!finished){
             if(robotState.position.y > turnY){ //kind of static logic, can be changed if need be
                 motionConfig.idealHeading = idealHeading;
                 finished = true;
             }
         }
+        return false;
     }
 
     @Override

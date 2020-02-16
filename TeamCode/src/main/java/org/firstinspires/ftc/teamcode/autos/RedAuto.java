@@ -55,9 +55,9 @@ public class RedAuto extends LinearOpMode {
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, true);
         PartialPursuitAuto auto = new PartialPursuitAuto(false);
 
-        List<List<Point>> route36 = GCodeReader.openFile("foo");
-        List<List<Point>> route25 = GCodeReader.openFile("foo");
-        List<List<Point>> route14 = GCodeReader.openFile("foo");
+        List<List<Point>> route36 = GCodeReader.openFile("red36.csv");
+        List<List<Point>> route25 = GCodeReader.openFile("red36.csv");
+        List<List<Point>> route14 = GCodeReader.openFile("red36.csv");
 
         Path quarry36 = new Path(route36.get(0), 12,12,22, false);
         Path toFoundation36 = new Path(route36.get(1), 8,4,35, 9, 2, 1, false); //32
