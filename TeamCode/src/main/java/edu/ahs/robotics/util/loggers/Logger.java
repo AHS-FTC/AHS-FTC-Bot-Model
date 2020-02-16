@@ -1,4 +1,4 @@
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.loggers;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.io.File;
@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import edu.ahs.robotics.util.FTCUtilities;
 
 public abstract class Logger {
     private String fileName;

@@ -40,9 +40,9 @@ import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.control.obm.TargetHeadingChanger;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 
 @Autonomous(name = "Turn Mid Path Auto", group = "Linear Opmode")

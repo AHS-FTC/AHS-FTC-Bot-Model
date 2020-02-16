@@ -39,10 +39,9 @@ import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
+import edu.ahs.robotics.util.loggers.Logger;
 
 /**
  * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.

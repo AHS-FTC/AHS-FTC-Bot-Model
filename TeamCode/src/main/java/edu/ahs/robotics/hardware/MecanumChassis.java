@@ -6,11 +6,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.control.MotionConfig;
-import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Vector;
-import edu.ahs.robotics.control.obm.NullCommand;
-import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
@@ -19,11 +16,11 @@ import edu.ahs.robotics.hardware.sensors.DistanceSensor;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.Trigger;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCMath;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 public class MecanumChassis extends Chassis {
 
@@ -544,7 +541,7 @@ public class MecanumChassis extends Chassis {
         OdometrySystem.State state;
         Path.Location location;
 
-        logger = (DataLogger)Logger.getLogger("partialPursuit");
+        setDataLogger("partialPursuit");
 
         if(!logger.isWriting()) {
             logger.startWriting();
@@ -569,6 +566,13 @@ public class MecanumChassis extends Chassis {
             }
 
         } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive() && FTCUtilities.getCurrentTimeMillis() - startTime < motionConfig.timeOut);
+    }
+
+    /**
+     * Allows for injection of mockLogger for tests
+     */
+    public void setDataLogger(String key){
+        logger = (DataLogger)Logger.getLogger(key);
     }
 
     private double convertSpeedToMotorPower(double speed){

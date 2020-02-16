@@ -4,10 +4,11 @@ import java.util.List;
 
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.RingBuffer;
+import edu.ahs.robotics.util.loggers.Logger;
+import edu.ahs.robotics.util.loggers.MockDataLogger;
 
 
 /**
@@ -78,7 +79,10 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         odometerThread = new OdometerThread();
 
-        logger = new DataLogger("odometryStats", "odometrySystem");
+        logger = (DataLogger) Logger.getLogger("odometrySystem");
+        if(logger == null){ //create a mock/empty logger if one hasn't been created higher up, so as to not have null pointers. this way we don't log unless specified.
+            logger = new MockDataLogger("odometrySystem");
+        }
 
         distanceBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0.0);
         velocityTimeBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0L);//type is long

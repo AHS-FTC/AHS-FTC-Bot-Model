@@ -2,12 +2,11 @@ package edu.ahs.robotics.control;
 
 import edu.ahs.robotics.control.pid.PID;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.ParameterLookup;
+import edu.ahs.robotics.util.loggers.Logger;
 
-public class PathFollower {
+public class PathFollower {//todo take out the trash
     //Amplifies negative power corrections to deal with momentum while decelerating
     private static final double DOWN_AMPLIFIER = 1; // -- tuned --
     Path path;

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.ahs.robotics.control.MotionConfig;
@@ -11,7 +10,6 @@ import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
 import edu.ahs.robotics.util.MotorHashService;
 
 public class BaseTestAuto {

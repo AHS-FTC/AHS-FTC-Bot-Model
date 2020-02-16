@@ -36,9 +36,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 
 @Autonomous(name = "Straight Auto", group = "Linear Opmode")

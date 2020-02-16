@@ -33,8 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import edu.ahs.robotics.util.DataLogger;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.loggers.DataLogger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 
 /**

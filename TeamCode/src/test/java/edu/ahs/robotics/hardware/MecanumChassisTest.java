@@ -1,7 +1,5 @@
 package edu.ahs.robotics.hardware;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-
 import static org.junit.Assert.*;
 
 import org.junit.Ignore;
@@ -10,6 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.control.Position;
@@ -20,6 +19,7 @@ import edu.ahs.robotics.hardware.sensors.OdometrySystemMock;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MockClock;
 import edu.ahs.robotics.util.MotorHashService;
+import edu.ahs.robotics.util.loggers.MockDataLogger;
 
 public class MecanumChassisTest {
 
@@ -48,6 +48,9 @@ public class MecanumChassisTest {
         FTCUtilities.addTestMotor(backRight, "BR");
 
         mecanumChassis = new MecanumChassis(driveConfig, odometrySystem);
+
+        new MockDataLogger("test"); //create a fake ass logger
+        mecanumChassis.setDataLogger("test"); //inject that fake ass logger into mecanumChassis
         mecanumChassis.startOdometrySystem();
     }
 
@@ -57,7 +60,12 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(60,0);
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 12,position,0);
+
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 12;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,position,motionConfig);
 
         Vector v = command.driveVector;
         assertEquals(1, v.x, 0.0);
@@ -71,7 +79,12 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(-8,-3);
         init(null, null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,0);
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 1;
+        motionConfig.turnCutoff = 0;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1, position, motionConfig);
 
         Vector v = command.driveVector;
 
@@ -86,7 +99,11 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(12,0); //use desmos to graph these points if necessary
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,0);
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 1;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,position,motionConfig);
 
         Vector v = command.driveVector;
 
@@ -100,12 +117,17 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(12,3);
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,Math.PI);
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 1;
+        motionConfig.idealHeading = Math.PI;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1, position, motionConfig);
 
         Vector v = command.driveVector;
 
         assertEquals((1.0/4.0),v.y/v.x,0.00000001);
-        assertTrue(command.turnOutput < 0);
+        assertTrue(command.turnOutput > 0);
     }
 
     @Test

@@ -9,16 +9,14 @@ import edu.ahs.robotics.control.obm.NullCommand;
 import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.obm.SlideCycle;
 import edu.ahs.robotics.control.obm.TapeMeasureCommand;
-import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 public class PartialPursuitAuto {
     private Ardennes ardennes;
@@ -110,6 +108,8 @@ public class PartialPursuitAuto {
 
         logger = new DataLogger(fileName, "partialPursuit");
         logger.startWriting();
+
+        Logger odometryLogger = new DataLogger("odometryStats","odometrySystem"); //this bad boy is grabbed in OdometrySystemImpl
 
         chassis.startOdometrySystem();
     }
