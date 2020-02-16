@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import edu.ahs.robotics.control.PathFollowerTest;
 import edu.ahs.robotics.control.Point;
 
 import static org.junit.Assert.*;

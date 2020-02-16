@@ -226,55 +226,6 @@ public class MecanumChassisTest {
 
     }
 
-
-    @Test
-    @Ignore
-    public void testVelocityDrive(){ // standard setup that can kinda be messed around with
-        double maxSpeed = 10;
-
-        ArrayList<Velocity> velocities = new ArrayList<>();
-        ArrayList<Position> positions = new ArrayList<>();
-
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0)); //6 - 1
-
-        positions.add(new Position(0,0,0));
-        positions.add(new Position(20,0,0));
-        positions.add(new Position(40,0,0));
-        positions.add(new Position(60,0,0));
-        positions.add(new Position(80,0,0));
-        positions.add(new Position(100,0,0)); //6: calls for initial position, but not initial velocity.
-
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(0,0));
-        points.add(new Point(100,0));
-
-        Path path = new Path(points, 12, 4, 36, false);
-
-        init(positions, velocities);
-
-        mecanumChassis.velocityDrive(path, maxSpeed);
-
-        FTCUtilities.OpLogger("FL", frontLeft.powerList);
-        FTCUtilities.OpLogger("FR", frontRight.powerList);
-        FTCUtilities.OpLogger("BL", backLeft.powerList);
-        FTCUtilities.OpLogger("BR", backRight.powerList);
-
-        assertEquals(5,frontLeft.powerList.size()); // 5 because of initial state check
-        assertEquals(5,frontRight.powerList.size());
-        assertEquals(5,backLeft.powerList.size());
-        assertEquals(5,backRight.powerList.size());
-
-        fillPowerLists();
-
-        assertArrayEquals(frontLeftPowers,backLeftPowers); // in this case all arrays should be equal
-        assertArrayEquals(frontRightPowers,backRightPowers);
-        assertArrayEquals(frontRightPowers, frontLeftPowers);
-    }
-
     private OdometrySystem makeOdometrySystemMock(List<Position> positions, List<Velocity> velocities){
         return new OdometrySystemMock(positions,velocities);
     }

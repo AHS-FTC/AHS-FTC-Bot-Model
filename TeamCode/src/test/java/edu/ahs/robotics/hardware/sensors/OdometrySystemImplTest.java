@@ -60,8 +60,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.heading, Math.PI/2);
         assertEquals(0, state.position.x, 0.0);
 
-        assertEquals(0, state.velocity.speed(),0.0);
-        assertEquals(0,state.travelRadius,0.0);
+        //assertEquals(0, state.velocity.speed(),0.0);
     }
 
     @Test
@@ -81,9 +80,8 @@ public class OdometrySystemImplTest {
         assertEquals(Math.PI/2, state.position.heading, .01);
         assertEquals(0, state.position.x, .01);
 
-        assertTrue(state.velocity.speed() > 0);
-        assertEquals(state.velocity.direction(), Math.PI / 2,0.001);
-        assertEquals(0,state.travelRadius,0.0);
+        //assertTrue(state.velocity.speed() > 0);
+        //assertEquals(state.velocity.direction(), Math.PI / 2,0.001);
     }
 
     @Test
@@ -113,7 +111,6 @@ public class OdometrySystemImplTest {
 
         assertEquals(12,state.position.y,0.1);
         assertEquals(0,state.position.x,0.1);
-        assertEquals(0,state.travelRadius,0.5);
     }
 
     @Test
@@ -151,8 +148,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, .01);
         assertEquals(0, state.position.y, .01);
 
-        assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(0,state.travelRadius,0.0);
+        //assertEquals(0,state.velocity.speed(), 0.01);
     }
 
     @Test
@@ -172,8 +168,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, .01);
         assertEquals(0, state.position.y, .01);
 
-        assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(0,state.travelRadius,0.0);
+        //assertEquals(0,state.velocity.speed(), 0.01);
     }
 
     @Test
@@ -188,7 +183,6 @@ public class OdometrySystemImplTest {
         }
 
         assertEquals(12, odometrySystem.getState().position.x, .01);
-        assertEquals(0,odometrySystem.getState().travelRadius,0.5);
     }
 
     @Test
@@ -207,8 +201,7 @@ public class OdometrySystemImplTest {
         assertEquals(12, state.position.x, .01);
         assertEquals(12, state.position.y, .01);
       
-        assertEquals(Math.PI/4, state.velocity.direction(),0.001);
-        assertEquals(0,state.travelRadius,0.0);
+        //assertEquals(Math.PI/4, state.velocity.direction(),0.001);
     }
 
     @Test
@@ -228,9 +221,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, .01);
         assertEquals(0, state.position.y, .01);
 
-        assertEquals(0,state.velocity.speed(), 0.01);
-        assertEquals(0,state.travelRadius,0.0);
-
+        //assertEquals(0,state.velocity.speed(), 0.01);
     }
 
     @Test //THIS TEST USES NO DY. REINSTATABLE FOR EMERGENCIES
@@ -331,40 +322,42 @@ public class OdometrySystemImplTest {
 
     }
 
-    @Test
-    public void testVelocity(){
-        double[] x1Inputs = {0,2,4,6,8,10,12,14,16,18,20,22,24}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
-        double[] x2Inputs = {0,2,4,6,8,10,12,14,16,18,20,22,24};
-        double[] yInputs = {0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-        //---------------- custom init
-        FTCUtilities.startTestMode();
-        MockClock clock = new MockClock(MockClock.Mode.CUSTOM_TIME_STEP);
-        clock.setTimeStep(1000); //advance by a second to make velocity calculations easier
-        FTCUtilities.setMockClock(clock);
-
-        OdometerMock x1 = new OdometerMock(x1Inputs);
-        OdometerMock x2 = new OdometerMock(x2Inputs);
-        OdometerMock y = new OdometerMock(yInputs);
-
-        odometrySystem = new OdometrySystemImpl(x1, x2, y, .1, 12);
-        odometrySystem.setPosition(0,0,0); // note different heading
-        odometrySystem.resetEncoders();
-
-        FTCUtilities.getCurrentTimeMillis();
-
-        Velocity velocity;
-        //---------------- custom init
-
-        for(int i = 0; i < x1Inputs.length - 1; i++){
-            odometrySystem.updatePosition();
-            velocity = odometrySystem.getState().velocity;
-
-            assertEquals(2,velocity.speed(), 0.0001);
-            assertEquals(0,velocity.direction(), 0.0001);
-        }
-
-    }
+//    @Test
+//    public void testVelocity(){
+//        double[] x1Inputs = {0,2,4,6,8,10,12,14,16,18,20,22,24}; //OdometrySystemImpl references once upon init - starting with zero is a good idea
+//        double[] x2Inputs = {0,2,4,6,8,10,12,14,16,18,20,22,24};
+//        double[] yInputs = {0,0,0,0,0,0,0,0,0,0,0,0,0};
+//
+//        //---------------- custom init
+//        FTCUtilities.startTestMode();
+//        MockClock clock = new MockClock(MockClock.Mode.CUSTOM_TIME_STEP);
+//        clock.setTimeStep(1000); //advance by a second to make velocity calculations easier
+//        FTCUtilities.setMockClock(clock);
+//
+//        OdometerMock x1 = new OdometerMock(x1Inputs);
+//        OdometerMock x2 = new OdometerMock(x2Inputs);
+//        OdometerMock y = new OdometerMock(yInputs);
+//
+//        odometrySystem = new OdometrySystemImpl(x1, x2, y, .1, 12);
+//        odometrySystem.setPosition(0,0,0); // note different heading
+//        odometrySystem.resetEncoders();
+//
+//        FTCUtilities.getCurrentTimeMillis();
+//
+//        Velocity velocity;
+//        //---------------- custom init
+//
+//        for(int i = 0; i < x1Inputs.length - 1; i++){
+//            odometrySystem.updatePosition();
+//
+//
+//            velocity = odometrySystem.getState().velocity;
+//
+//            assertEquals(2,velocity.speed(), 0.0001);
+//            assertEquals(0,velocity.direction(), 0.0001);
+//        }
+//
+//    }
 
 
 //    @Test

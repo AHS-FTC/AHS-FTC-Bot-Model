@@ -103,11 +103,9 @@ public class ArdennesOdomOpMode extends OpMode
         OdometrySystem.State state = chassis.getState();
 
         position = state.position;
-        velocity = state.velocity;
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);
-        telemetry.addData("dySum", state.dySum);
         //telemetry.addData("x^2 + y^2 sqrt", Math.sqrt(position.x * position.x + position.y * position.y));
 
 //        telemetry.addData("heading -deg", Math.toDegrees(position.heading));

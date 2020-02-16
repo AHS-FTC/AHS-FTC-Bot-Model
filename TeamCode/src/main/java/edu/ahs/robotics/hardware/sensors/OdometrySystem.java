@@ -24,32 +24,20 @@ public interface OdometrySystem {
 
     /**
      * Contains atomic and threadsafe information on the current state of the odometry system.
+     * <b>Currently Stripped down to only contain Position information.</b>
+     * Ideal for containing any other info that could be determined by the OdometrySystem
      */
     class State {
        public Position position;
-       public Velocity velocity;
-       public double acceleration;
-       public double directionOfTravel = 0;
-        /**
-         * Measures the signed radius of travel in the x dimension.
-         * Sign contains information on the directional nature of the travel. A positive radius indicates a leftward arc, while a negative radius indicates a rightward arc.
-         * For non-tank style movement the idea of travel radius will need to be elaborated on.
-         */
-       public double travelRadius;
-       public double orthogonalVelocity;
-       public double dySum;
+       //public Velocity velocity;
+       //public double acceleration;
 
-        public State(Position position, Velocity velocity, double acceleration, double travelRadius, double orthogonalVelocity, double dySum) {
+
+        public State(Position position) {
             this.position = new Position(position);
-            this.velocity = new Velocity(velocity);
-            this.travelRadius = travelRadius;
-            this.acceleration = acceleration;
-            this.orthogonalVelocity = orthogonalVelocity;
-            this.dySum = dySum;
-        }
 
-        public void setDirectionOfTravel(double directionOfTravel) {
-            this.directionOfTravel = directionOfTravel;
+            //this.acceleration = acceleration;
+            //this.velocity = new Velocity(velocity);
         }
     }
 }

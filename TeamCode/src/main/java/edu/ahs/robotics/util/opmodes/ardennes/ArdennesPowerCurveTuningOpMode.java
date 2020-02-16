@@ -89,7 +89,6 @@ public class ArdennesPowerCurveTuningOpMode extends LinearOpMode {
 
         while (opModeIsActive()) {
             currentTime = FTCUtilities.getCurrentTimeMillis();
-            velocity = chassis.getState().velocity;
 
             long deltaTime = currentTime - previousTime;
             double acceleration = (velocity.speed() - previousSpeed) / deltaTime;

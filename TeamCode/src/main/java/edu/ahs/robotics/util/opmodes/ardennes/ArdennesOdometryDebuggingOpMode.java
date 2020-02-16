@@ -118,7 +118,6 @@ public class ArdennesOdometryDebuggingOpMode extends OpMode
         OdometrySystem.State state = chassis.getState();
 
         position = state.position;
-        velocity = state.velocity;
 
         FTCUtilities.addData("x", String.valueOf(position.x));
         FTCUtilities.addData("y", String.valueOf(position.y));
