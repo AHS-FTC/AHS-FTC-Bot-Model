@@ -436,23 +436,23 @@ public class PathTest {
         Position robotPosition = new Position(0, 0, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(12, targetLocation.speed, .001);
+        assertEquals(12, targetLocation.power, .001);
 
         robotPosition = new Position(0, 16, 0);
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(36, targetLocation.speed, .001);
+        assertEquals(36, targetLocation.power, .001);
 
         //Test curvature slow down
         robotPosition = new Position(0, 22, 0);
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(16, targetLocation.speed, .001);
+        assertEquals(16, targetLocation.power, .001);
 
         robotPosition = new Position(0, 36, 0);
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(4, targetLocation.speed, .001);
+        assertEquals(4, targetLocation.power, .001);
 
     }
 
@@ -469,7 +469,7 @@ public class PathTest {
         Position robotPosition = new Position(9, -40, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(12, targetLocation.speed, .001);
+        assertEquals(12, targetLocation.power, .001);
 
     }
 

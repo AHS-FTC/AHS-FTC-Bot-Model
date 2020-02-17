@@ -8,7 +8,7 @@ public class Velocity {
     public double dx;
     public double dy;
 
-    //public double speed;
+    //public double power;
     //public double direction;
 
 
@@ -50,7 +50,7 @@ public class Velocity {
     }
 
     /**
-     * Sets the velocity vector from speed and direction.
+     * Sets the velocity vector from power and direction.
      * @param speed Magnitude measured in inches/second.
      * @param direction Direction of velocity in radians following standard field conventions.
      */

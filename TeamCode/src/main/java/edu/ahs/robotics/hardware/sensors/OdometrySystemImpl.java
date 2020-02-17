@@ -230,10 +230,10 @@ public class OdometrySystemImpl implements OdometrySystem {
 //        double deltaDistance = distance - oldDistance;
 //        long deltaTime = currentTime - oldTime;
 //
-//        double speed = deltaDistance * 1000 / (double) deltaTime;
+//        double power = deltaDistance * 1000 / (double) deltaTime;
 //
 //        double direction = lastPosition.angleTo(position);
-//        velocity.setVelocityFromSpeedDirection(speed, direction);
+//        velocity.setVelocityFromSpeedDirection(power, direction);
 //
 //        lastPosition.copyFrom(position);
 //
@@ -242,9 +242,9 @@ public class OdometrySystemImpl implements OdometrySystem {
 //
 //    private void updateAcceleration(long currentTime){
 //        double oldTime = accelerationTimeBuffer.insert(currentTime);
-//        double oldSpeed = speedBuffer.insert(velocity.speed());
+//        double oldSpeed = speedBuffer.insert(velocity.power());
 //
-//        double dv = velocity.speed() - oldSpeed;
+//        double dv = velocity.power() - oldSpeed;
 //        double dt = currentTime - oldTime;
 //
 //        acceleration = dv/dt;

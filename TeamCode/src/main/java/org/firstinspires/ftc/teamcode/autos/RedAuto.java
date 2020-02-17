@@ -59,8 +59,8 @@ public class RedAuto extends LinearOpMode {
         List<List<Point>> route25 = GCodeReader.openFile("red36.csv");
         List<List<Point>> route14 = GCodeReader.openFile("red36.csv");
 
-        Path quarry36 = new Path(route36.get(0), 12,12,22, false);
-        Path toFoundation36 = new Path(route36.get(1), 8,4,35, 9, 2, 1, false); //32
+        Path quarry36 = new Path(route36.get(0), false, 0.5, new double[][]{{10, .7}, {22, .7}});
+        Path toFoundation36 = new Path(route36.get(1), false, new double[][]{{0, .5}, {12, 1}, {12, 1}}); //32
         Path pullFoundation36 = new Path(route36.get(2), 24, 24, 48, 28,2,10, false);
         Path quarry236 = new Path(route36.get(3), 12, 12, 20,6,2,1, false);
         Path foundation236 = new Path(route36.get(4), 12, 12, 44,9,2,1, false);
