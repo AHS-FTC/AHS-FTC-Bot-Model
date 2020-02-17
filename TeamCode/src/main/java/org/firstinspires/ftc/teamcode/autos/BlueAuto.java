@@ -117,7 +117,7 @@ public class BlueAuto extends LinearOpMode {
 
         }
 
-        auto.setPaths(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3);
+        auto.setPaths(quarry, toFoundation, null, quarry2, foundation2, quarry3, foundation3);
 
         auto.start();
 
