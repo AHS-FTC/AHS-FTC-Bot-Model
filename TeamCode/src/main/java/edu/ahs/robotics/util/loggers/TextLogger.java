@@ -1,10 +1,8 @@
-package edu.ahs.robotics.util;
-
-import android.view.ViewDebug;
+package edu.ahs.robotics.util.loggers;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
-import java.io.IOException;
+import edu.ahs.robotics.util.FTCUtilities;
 
 public class TextLogger extends Logger {
     public TextLogger(String fileName, String key) {

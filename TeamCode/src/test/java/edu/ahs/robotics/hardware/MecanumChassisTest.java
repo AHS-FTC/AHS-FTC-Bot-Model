@@ -1,7 +1,5 @@
 package edu.ahs.robotics.hardware;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-
 import static org.junit.Assert.*;
 
 import org.junit.Ignore;
@@ -10,6 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.control.Position;
@@ -20,6 +19,7 @@ import edu.ahs.robotics.hardware.sensors.OdometrySystemMock;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.MockClock;
 import edu.ahs.robotics.util.MotorHashService;
+import edu.ahs.robotics.util.loggers.MockDataLogger;
 
 public class MecanumChassisTest {
 
@@ -48,6 +48,9 @@ public class MecanumChassisTest {
         FTCUtilities.addTestMotor(backRight, "BR");
 
         mecanumChassis = new MecanumChassis(driveConfig, odometrySystem);
+
+        new MockDataLogger("test"); //create a fake ass logger
+        mecanumChassis.setDataLogger("test"); //inject that fake ass logger into mecanumChassis
         mecanumChassis.startOdometrySystem();
     }
 
@@ -57,7 +60,12 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(60,0);
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 12,position,0);
+
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 12;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,position,motionConfig);
 
         Vector v = command.driveVector;
         assertEquals(1, v.x, 0.0);
@@ -71,7 +79,12 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(-8,-3);
         init(null, null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,0);
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 1;
+        motionConfig.turnCutoff = 0;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1, position, motionConfig);
 
         Vector v = command.driveVector;
 
@@ -86,7 +99,11 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(12,0); //use desmos to graph these points if necessary
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,0);
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 1;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,position,motionConfig);
 
         Vector v = command.driveVector;
 
@@ -100,12 +117,17 @@ public class MecanumChassisTest {
         Point targetPoint = new Point(12,3);
         init(null,null);
 
-        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1,.5, 1,position,Math.PI);
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.turnPower = .5;
+        motionConfig.lookAheadDistance = 1;
+        motionConfig.idealHeading = Math.PI;
+
+        MecanumChassis.DriveCommand command = mecanumChassis.getDriveTowardsPointCommands(targetPoint,1, position, motionConfig);
 
         Vector v = command.driveVector;
 
         assertEquals((1.0/4.0),v.y/v.x,0.00000001);
-        assertTrue(command.turnOutput < 0);
+        assertTrue(command.turnOutput > 0);
     }
 
     @Test
@@ -202,55 +224,6 @@ public class MecanumChassisTest {
 
         //FTCUtilities.OpLogger("FL", frontLeftPowers);
 
-    }
-
-
-    @Test
-    @Ignore
-    public void testVelocityDrive(){ // standard setup that can kinda be messed around with
-        double maxSpeed = 10;
-
-        ArrayList<Velocity> velocities = new ArrayList<>();
-        ArrayList<Position> positions = new ArrayList<>();
-
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0));
-        velocities.add(Velocity.makeVelocityFromSpeedDirection(maxSpeed,0)); //6 - 1
-
-        positions.add(new Position(0,0,0));
-        positions.add(new Position(20,0,0));
-        positions.add(new Position(40,0,0));
-        positions.add(new Position(60,0,0));
-        positions.add(new Position(80,0,0));
-        positions.add(new Position(100,0,0)); //6: calls for initial position, but not initial velocity.
-
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(0,0));
-        points.add(new Point(100,0));
-
-        Path path = new Path(points, 12, 4, 36, false);
-
-        init(positions, velocities);
-
-        mecanumChassis.velocityDrive(path, maxSpeed);
-
-        FTCUtilities.OpLogger("FL", frontLeft.powerList);
-        FTCUtilities.OpLogger("FR", frontRight.powerList);
-        FTCUtilities.OpLogger("BL", backLeft.powerList);
-        FTCUtilities.OpLogger("BR", backRight.powerList);
-
-        assertEquals(5,frontLeft.powerList.size()); // 5 because of initial state check
-        assertEquals(5,frontRight.powerList.size());
-        assertEquals(5,backLeft.powerList.size());
-        assertEquals(5,backRight.powerList.size());
-
-        fillPowerLists();
-
-        assertArrayEquals(frontLeftPowers,backLeftPowers); // in this case all arrays should be equal
-        assertArrayEquals(frontRightPowers,backRightPowers);
-        assertArrayEquals(frontRightPowers, frontLeftPowers);
     }
 
     private OdometrySystem makeOdometrySystemMock(List<Position> positions, List<Velocity> velocities){

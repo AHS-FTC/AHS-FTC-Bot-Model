@@ -1,13 +1,13 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import java.util.List;
+import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.RingBuffer;
+import edu.ahs.robotics.util.loggers.Logger;
+import edu.ahs.robotics.util.loggers.MockDataLogger;
 
 
 /**
@@ -19,34 +19,22 @@ import edu.ahs.robotics.util.RingBuffer;
 public class OdometrySystemImpl implements OdometrySystem {
     private Position position;
     private Velocity velocity;
-    private double acceleration;
-    private double radius = 0; // only measured in x
+    //private double acceleration;
+    //private double radius = 0; // only measured in x
 
     private Odometer xR, xL, y;
 
     private static final int DISTANCE_TIME_BUFFER_SIZE = 10;
-    private RingBuffer<Double> distanceBuffer;
-    private RingBuffer<Long> velocityTimeBuffer;
+    //private RingBuffer<Double> distanceBuffer;
+    //private RingBuffer<Long> velocityTimeBuffer;
 
-    private static final int SPEED_TIME_BUFFER_SIZE = 10;
-    private RingBuffer<Double> speedBuffer;
-    private RingBuffer<Long> accelerationTimeBuffer;
+    //private static final int SPEED_TIME_BUFFER_SIZE = 10;
+    //private RingBuffer<Double> speedBuffer;
+    //private RingBuffer<Long> accelerationTimeBuffer;
 
-    private double distance = 0.0;
-    private int loopCount = 0;
+    //private double distance = 0.0;
 
     private double dySum = 0;
-
-    private static final int ARC_BUFFER_SIZE = 10;
-
-    private RingBuffer<Double> x1Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
-    private RingBuffer<Double> x2Buffer = new RingBuffer<>(ARC_BUFFER_SIZE, 0.0);
-
-
-    private static final int ORTHOGONAL_BUFFER_SIZE = 5;
-    private RingBuffer<Double> dyBuffer;
-    private RingBuffer<Long> orthogonalTimeBuffer;
-    private double orthogonalVelocity;
 
     private double xRLast, xLLast, yLast;
     private double yInchesPerDegree;
@@ -78,17 +66,16 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         odometerThread = new OdometerThread();
 
-        logger = new DataLogger("odometryStats", "odometrySystem");
+        logger = (DataLogger) Logger.getLogger("odometrySystem");
+        if(logger == null){ //create a mock/empty logger if one hasn't been created higher up, so as to not have null pointers. this way we don't log unless specified.
+            logger = new MockDataLogger("odometrySystem");
+        }
 
-        distanceBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0.0);
-        velocityTimeBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0L);//type is long
-
-        speedBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0.0);
-        accelerationTimeBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0L);
-
-        dyBuffer = new RingBuffer<>(ORTHOGONAL_BUFFER_SIZE,0.0);
-        orthogonalTimeBuffer = new RingBuffer<>(ORTHOGONAL_BUFFER_SIZE,0L);
-
+//        distanceBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0.0);
+//        velocityTimeBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0L);//type is long
+//
+//        speedBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0.0);
+//        accelerationTimeBuffer = new RingBuffer<>(SPEED_TIME_BUFFER_SIZE, 0L);
     }
 
     /**
@@ -142,7 +129,6 @@ public class OdometrySystemImpl implements OdometrySystem {
         double dxLocal, dyLocal, dyGlobal, dxGlobal;
         double dHeading;
 
-        long currentTime = FTCUtilities.getCurrentTimeMillis();
 
         //set readings from odom
         xRReading = xR.getDistance();
@@ -187,9 +173,6 @@ public class OdometrySystemImpl implements OdometrySystem {
             dyLocal = dy;
         }
 
-        updateTravelRadius(xRReading, xLReading);
-        updateOrthoganalVelocity(currentTime, dy);
-
         dxGlobal = -Math.sin(position.heading) * dyLocal + Math.cos(position.heading) * dxLocal; //convert to global coords. Recall that 0 rads is in direction of y axis
         dyGlobal = Math.cos(position.heading) * dyLocal + Math.sin(position.heading) * dxLocal;
 
@@ -205,10 +188,6 @@ public class OdometrySystemImpl implements OdometrySystem {
         logger.append("dyBeforeFactorOut", String.valueOf(dyBeforeFactorOut));
         logger.append("dyExpected", String.valueOf(dyExpected));
         logger.append("dy", String.valueOf(dy));
-        logger.append("orthogonal velocity", String.valueOf(orthogonalVelocity));
-
-
-        updateVelocity(currentTime);
 
         //logger.append("direction of travel", String.valueOf(velocity.direction()));
         logger.append("x" , String.valueOf(position.x));
@@ -216,77 +195,63 @@ public class OdometrySystemImpl implements OdometrySystem {
         logger.writeLine();
     }
 
-    /**
-     * Calculates and updates a signed travel radius. Sign conveys orthoganal direction of travel. Curvature to the left is positive.
-     * <a href = "https://math.stackexchange.com/questions/1216990/find-radius-of-two-concentric-arcs">Math</a>
-     */
-    private void updateTravelRadius(double xRReading, double xLReading) {
-        double oldxR = x1Buffer.insert(xRReading);
-        double oldxL = x2Buffer.insert(xLReading);
+//    /**
+//     * Calculates and updates a signed travel radius. Sign conveys orthoganal direction of travel. Curvature to the left is positive.
+//     * <a href = "https://math.stackexchange.com/questions/1216990/find-radius-of-two-concentric-arcs">Math</a>
+//     */
+//    private void updateTravelRadius(double xRReading, double xLReading) {
+//        double oldxR = x1Buffer.insert(xRReading);
+//        double oldxL = x2Buffer.insert(xLReading);
+//
+//        if (loopCount++ < ARC_BUFFER_SIZE) {
+//            radius = 0.0;
+//        } else {
+//            double bufferDxR = xRReading - oldxR;
+//            double bufferDxL = xLReading - oldxL;
+//
+//            double dxSum = (bufferDxR + bufferDxL);
+//            double arcDifference = bufferDxR - bufferDxL; // yields positive when r is big and l is small
+//
+//            if(dxSum == 0.0 && arcDifference == 0.0){ //check for 0/0 case
+//                radius = Double.POSITIVE_INFINITY;
+//            } else {
+//                radius = (distanceBetweenYWheels * dxSum) / (2.0 * arcDifference);
+//            }
+//        }
+//    }
 
-        if (loopCount++ < ARC_BUFFER_SIZE) {
-            radius = 0.0;
-        } else {
-            double bufferDxR = xRReading - oldxR;
-            double bufferDxL = xLReading - oldxL;
-
-            double dxSum = (bufferDxR + bufferDxL);
-            double arcDifference = bufferDxR - bufferDxL; // yields positive when r is big and l is small
-
-            if(dxSum == 0.0 && arcDifference == 0.0){ //check for 0/0 case
-                radius = Double.POSITIVE_INFINITY;
-            } else {
-                radius = (distanceBetweenYWheels * dxSum) / (2.0 * arcDifference);
-            }
-        }
-    }
-
-    private void updateVelocity(long currentTime) {
-        double distanceTraveled = position.distanceTo(lastPosition); //distance travelled between last point and this point
-        distance += distanceTraveled; // running sum of distances
-
-        double oldDistance = distanceBuffer.insert(distance);
-        long oldTime = velocityTimeBuffer.insert(currentTime);
-
-        double deltaDistance = distance - oldDistance;
-        long deltaTime = currentTime - oldTime;
-
-        double speed = deltaDistance * 1000 / (double) deltaTime;
-
-        double direction = lastPosition.angleTo(position);
-        velocity.setVelocityFromSpeedDirection(speed, direction);
-
-        lastPosition.copyFrom(position);
-
-        updateAcceleration(currentTime);
-    }
-
-    private void updateOrthoganalVelocity(long currentTime, double dy){
-        dyBuffer.insert(dy);
-        long oldTime = orthogonalTimeBuffer.insert(currentTime);
-        List<Double> allDy = dyBuffer.getBuffer();
-
-        double totalDy = 0;
-        for (double aDy : allDy){ // sum up all dy, since dy values are inherently noncumulative.
-            totalDy += aDy;
-        }
-        double deltaTime = currentTime - oldTime; //deltaTime is double to prevent integer division
-
-        orthogonalVelocity = (totalDy * 1000.0)/ deltaTime; //note that velocity units are in seconds
-    }
-
-    private void updateAcceleration(long currentTime){
-        double oldTime = accelerationTimeBuffer.insert(currentTime);
-        double oldSpeed = speedBuffer.insert(velocity.speed());
-
-        double dv = velocity.speed() - oldSpeed;
-        double dt = currentTime - oldTime;
-
-        acceleration = dv/dt;
-    }
+//    private void updateVelocity(long currentTime) {
+//        double distanceTraveled = position.distanceTo(lastPosition); //distance travelled between last point and this point
+//        distance += distanceTraveled; // running sum of distances
+//
+//        double oldDistance = distanceBuffer.insert(distance);
+//        long oldTime = velocityTimeBuffer.insert(currentTime);
+//
+//        double deltaDistance = distance - oldDistance;
+//        long deltaTime = currentTime - oldTime;
+//
+//        double speed = deltaDistance * 1000 / (double) deltaTime;
+//
+//        double direction = lastPosition.angleTo(position);
+//        velocity.setVelocityFromSpeedDirection(speed, direction);
+//
+//        lastPosition.copyFrom(position);
+//
+//        updateAcceleration(currentTime);
+//    }
+//
+//    private void updateAcceleration(long currentTime){
+//        double oldTime = accelerationTimeBuffer.insert(currentTime);
+//        double oldSpeed = speedBuffer.insert(velocity.speed());
+//
+//        double dv = velocity.speed() - oldSpeed;
+//        double dt = currentTime - oldTime;
+//
+//        acceleration = dv/dt;
+//    }
 
     public synchronized State getState() {
-        return new State(position, velocity, acceleration, radius, orthogonalVelocity, dySum);
+        return new State(position);
     }
 
     public boolean isRunning() {
@@ -327,6 +292,7 @@ public class OdometrySystemImpl implements OdometrySystem {
                             this.wait(SLEEP_TIME - deltaTime);
                         }
                     } catch (InterruptedException e) {
+                        throw new Warning(e.getMessage()); //transpose error
                     }
                 }
                 lastTime = FTCUtilities.getCurrentTimeMillis();

@@ -1,4 +1,4 @@
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.loggers;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.io.File;
@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import edu.ahs.robotics.util.FTCUtilities;
+
 public abstract class Logger {
     private String fileName;
     protected static long startTime; //shared across all loggers for synchronization
     protected boolean firstLine;
+    private boolean writing = false;
     private static HashMap<String, Logger> loggers = new HashMap<>();
+    protected FileWriter fileWriter = null;
 
     static {
         startTime = System.currentTimeMillis();
@@ -33,9 +37,9 @@ public abstract class Logger {
         }
     }
 
-    protected FileWriter fileWriter = null;
 
     public void startWriting() {
+        writing = true;
         firstLine = true;
         try {
             File file = new File(FTCUtilities.getLogDirectory(), fileName);
@@ -51,7 +55,12 @@ public abstract class Logger {
         }
     }
 
+    public boolean isWriting(){
+        return writing;
+    }
+
     public void stopWriting() {
+        writing = false;
         try{
             fileWriter.close();
         } catch (IOException e) {

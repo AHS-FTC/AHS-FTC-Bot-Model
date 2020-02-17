@@ -6,22 +6,21 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import edu.ahs.robotics.control.MotionConfig;
-import edu.ahs.robotics.control.PathFollower;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Vector;
-import edu.ahs.robotics.control.obm.NullCommand;
-import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.control.pid.VelocityPID;
+import edu.ahs.robotics.hardware.sensors.DistanceSensor;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.hardware.sensors.Trigger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCMath;
 import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 public class MecanumChassis extends Chassis {
 
@@ -39,6 +38,8 @@ public class MecanumChassis extends Chassis {
     private SingleDriveUnit frontRight;
     private SingleDriveUnit backLeft;
     private SingleDriveUnit backRight;
+
+    private Trigger triggerBoi; //todo remove
 
     // Motor shortcuts
     private ChassisMotors.Mecanum FRONT_LEFT = ChassisMotors.Mecanum.FRONTLEFT;
@@ -394,70 +395,6 @@ public class MecanumChassis extends Chassis {
 
     }
 
-
-    public void velocityDrive(Path path, double maxSpeed){
-        OdometrySystem.State initialState = getState();
-
-        Position initialPosition = initialState.position;
-        /*Velocity initialVelocity = getVelocity();*/
-
-        double distanceToEnd = path.getTargetLocation(initialPosition, 0).distanceToEnd;
-
-        double leftPower = 0.1, rightPower = 0.1; //initial power vals programmed in
-
-        double rampDownScale = 3; //scales the sqrt graph for ramp down. Because all parabolas are similar, this is the only possible scale factor.
-
-        VelocityPID.Config config = new VelocityPID.Config();
-        config.setSpeedParams(0.01, 0.0005,  -0.001);
-        config.setDirectionParams(0.01,0.0005,-0.001);
-
-        VelocityPID pid = new VelocityPID(config);
-        VelocityPID.Correction correction;
-
-        if(!odometrySystem.isRunning()){
-            throw new Warning("tried to do a velocityDrive without the odometrySystem running");
-        }
-
-        while (distanceToEnd > 0.05) { //0.05 is quite arbitrary
-            double targetSpeed;
-
-            OdometrySystem.State state = getState();
-
-            Position currentPosition = state.position;
-            Velocity currentVelocity = state.velocity;
-
-            Path.Location location = path.getTargetLocation(currentPosition, 0);
-
-            Velocity targetVelocity = Velocity.makeVelocity(location.pathDeltaX,location.pathDeltaY);
-
-            distanceToEnd = path.getTargetLocation(currentPosition, 0).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
-
-            targetSpeed = Math.min(maxSpeed, rampDownScale * Math.sqrt(distanceToEnd));
-
-            // target speed math: https://www.desmos.com/calculator/31kvlxmlhn
-
-            targetVelocity.scaleMagnitude(targetSpeed); //scale the velocity vector
-
-            correction = pid.getCorrection(currentVelocity,targetVelocity, 0L); //get the corrections todo add deltatime
-
-            leftPower += correction.speed; //speed up all motors
-            rightPower += correction.speed;
-
-            leftPower -= correction.direction; // make direction adjustment
-            rightPower += correction.direction;
-
-            frontLeft.setPower(leftPower); //set powers
-            backLeft.setPower(leftPower);
-
-            frontRight.setPower(rightPower);
-            backRight.setPower(rightPower);
-
-            //FTCUtilities.addData("leftPower", leftPower);
-            //FTCUtilities.addData("rightPower", rightPower);
-            //FTCUtilities.updateOpLogger();
-        }
-    }
-
     /**
      * Uses XYHeading PID to navigate/adjust position to a point on the field.
      * @param point A cartesian point on the field that the method will navigate to.
@@ -525,6 +462,10 @@ public class MecanumChassis extends Chassis {
     public void setPosition(double x, double y, double heading){
         odometrySystem.setPosition(x, y, heading);
     }
+    //TEMPORARY
+    public void setTriggerBoi(Trigger triggerBoi){
+        this.triggerBoi = triggerBoi;
+    }
 
     private double inversePower(double power) {
         //   return power * Math.abs(power);
@@ -536,23 +477,38 @@ public class MecanumChassis extends Chassis {
         OdometrySystem.State state;
         Path.Location location;
 
-        logger = (DataLogger)Logger.getLogger("partialPursuit");
+        setDataLogger("partialPursuit");
 
-        logger.startWriting();
+        if(!logger.isWriting()) {
+            logger.startWriting();
+        }
 
         do{
             state = odometrySystem.getState();
             location = path.getTargetLocation(state.position, motionConfig.lookAheadDistance);
 
-            double power = convertSpeedToMotorPower(location.speed);
+            double power = convertSpeedToMotorPower(location.speed); //todo ditch
 
             logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
+            logger.append("triggerBoi", String.valueOf(triggerBoi.isTriggered()));
+            DistanceSensor d = (DistanceSensor)triggerBoi;
+
+            logger.append("distance", String.valueOf(d.getDist()));
 
             driveTowardsPoint(location.futurePoint, power, motionConfig);
 
-            motionConfig.obmCommand.check(state);
-            motionConfig.obmCommand2.check(state);
+            if (motionConfig.checkOBMCommands(state)){ //OBMCommands can break the loop. also checks all obmCommands.
+                break;
+            }
+
         } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive() && FTCUtilities.getCurrentTimeMillis() - startTime < motionConfig.timeOut);
+    }
+
+    /**
+     * Allows for injection of mockLogger for tests
+     */
+    public void setDataLogger(String key){
+        logger = (DataLogger)Logger.getLogger(key);
     }
 
     private double convertSpeedToMotorPower(double speed){

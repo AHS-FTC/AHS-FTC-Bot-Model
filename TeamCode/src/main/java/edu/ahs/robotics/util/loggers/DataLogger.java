@@ -1,4 +1,4 @@
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.loggers;
 
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 

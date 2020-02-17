@@ -5,6 +5,10 @@ import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.FTCUtilities;
 
+/**
+ * OBMCommand for gripping the blocks with delay or upon triggering of distanceSensor.
+ * @author Alex Appleby
+ */
 public class BlockGripper implements OBMCommand {
 
     private Ardennes ardennes;
@@ -35,7 +39,7 @@ public class BlockGripper implements OBMCommand {
     }
 
     @Override
-    public void check(OdometrySystem.State robotState) {
+    public boolean check(OdometrySystem.State robotState) {
         switch(state){
             case FINISHED:
                 break;
@@ -51,6 +55,7 @@ public class BlockGripper implements OBMCommand {
                 }
                 break;
         }
+        return false;
     }
 
     public void reset(){

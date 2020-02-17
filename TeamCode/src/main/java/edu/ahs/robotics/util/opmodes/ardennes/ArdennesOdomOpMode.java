@@ -30,7 +30,6 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -41,10 +40,9 @@ import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.DataLogger;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.Logger;
-import edu.ahs.robotics.util.opmodes.SimpleTeleOp;
+import edu.ahs.robotics.util.loggers.Logger;
 
 /**
  * Test OpMode for logging and debugging the Ardennes OdometrySystemImpl.
@@ -105,11 +103,9 @@ public class ArdennesOdomOpMode extends OpMode
         OdometrySystem.State state = chassis.getState();
 
         position = state.position;
-        velocity = state.velocity;
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);
-        telemetry.addData("dySum", state.dySum);
         //telemetry.addData("x^2 + y^2 sqrt", Math.sqrt(position.x * position.x + position.y * position.y));
 
 //        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
