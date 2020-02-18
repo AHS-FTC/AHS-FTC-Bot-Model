@@ -50,7 +50,7 @@ public class BlueAutoMirrored extends LinearOpMode {
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-
+/*
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, false);
 
         List<List<Point>> route36 = GCodeReader.openFile("foo");
@@ -103,6 +103,6 @@ public class BlueAutoMirrored extends LinearOpMode {
         //PartialPursuitAuto auto = new PartialPursuitAuto(quarry, toFoundation, quarry2, foundation2, true);
 
         //auto.start();
-
+*/
     }
 }

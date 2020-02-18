@@ -13,7 +13,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
         points.add(new Point(4,2));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
 
         //Test at robot position 0
@@ -55,7 +55,7 @@ public class PathTest {
         points.add(new Point(3,3));
         points.add(new Point(5,3));
         points.add(new Point(6,6));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test at robot position 0
         Position robotPosition = new Position(0,0,0);
@@ -88,12 +88,16 @@ public class PathTest {
         assertEquals(3, path.iFirstBoundingPoint);
     }*/
 
+    private Path makePath(ArrayList<Point> points, double initialPower, double[][] powers) {
+        return new Path(points, false, initialPower, powers);
+    }
+
     @Test
     public void testTargetLocationWithSimpleLine() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
         points.add(new Point(4,0));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position 2
         Position robotPosition = new Position(2,0,0);
@@ -116,7 +120,7 @@ public class PathTest {
         points.add(new Point(1,1));
         points.add(new Point(3,3));
         points.add(new Point(6,3));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test lookAhead at start
         Position robotPosition = new Position(1, 1, 0);
@@ -149,7 +153,7 @@ public class PathTest {
         points.add(new Point(-1,-1));
         points.add(new Point(-3,-3));
         points.add(new Point(-3,-6));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test closestPoint at start
         Position robotPosition = new Position(-1, -1, 0);
@@ -177,16 +181,12 @@ public class PathTest {
         assertTrue(path.isFinished(robotPosition));
     }
 
-    private Path makePath(ArrayList<Point> points) {
-        return new Path(points, 12, 4, 36, true);
-    }
-
     @Test
     public void testGetDistanceToRobotBottomRightQuadrant() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(1,-1));
         points.add(new Point(3,-3));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at path position x = 2, y = -2, left of line
         Position robotPosition = new Position(4,0,0);
@@ -213,7 +213,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(-1,1));
         points.add(new Point(-3,3));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position x = -2, y = 2, left of line
         Position robotPosition = new Position(-4,0,0);
@@ -240,7 +240,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(-1,1));
         points.add(new Point(-3,5));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position x = -2, y = 3, left of line
         Position robotPosition = new Position(-4,2,0);
@@ -267,7 +267,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(-1,0));
         points.add(new Point(3,0));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position x = 2, y = 0, left of line
         Position robotPosition = new Position(2,2,0);
@@ -294,7 +294,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,-1));
         points.add(new Point(0,3));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position x = 0, y = 2, left of line
         Position robotPosition = new Position(-2,2,0);
@@ -321,7 +321,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position during path
         Position robotPosition = new Position(0, 2, 0);
@@ -344,7 +344,7 @@ public class PathTest {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
         points.add(new Point(0, 4));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position over end of path
         Position robotPosition = new Position(0, 5, 0);
@@ -360,7 +360,7 @@ public class PathTest {
         points.add(new Point(4, 0));
         points.add(new Point(4,4));
         points.add(new Point(2,4));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         //Test location at robot position over end of path
         Position robotPosition = new Position(4, 0, 0);
@@ -393,7 +393,7 @@ public class PathTest {
         points.add(new Point(0, 7));
         points.add(new Point(0, 13));
         points.add(new Point(0, 20));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         Position robotPosition = new Position(0, -1, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition, 5);
@@ -427,53 +427,67 @@ public class PathTest {
     public void testSpeeds() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
+        points.add(new Point(0, 2));
+        points.add(new Point(0, 4));
         points.add(new Point(0, 12));
-        points.add(new Point(0, 22));
-        points.add(new Point(0, 24));
-        points.add(new Point(0, 36));
-        Path path = makePath(points);
+        points.add(new Point(0, 20));
+
+        Path path = makePath(points, 0.5, new double[][]{{2,.7}, {4,.5}, {8,.5}, {12,0}, {16,.4}, {20,.8}});
 
         Position robotPosition = new Position(0, 0, 0);
         Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(12, targetLocation.power, .001);
+        assertEquals(.5 , targetLocation.power, .001);
 
-        robotPosition = new Position(0, 16, 0);
+        robotPosition = new Position(0, 3, 0);
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(36, targetLocation.power, .001);
+        assertEquals(.6, targetLocation.power, .001);
 
-        //Test curvature slow down
-        robotPosition = new Position(0, 22, 0);
+        robotPosition = new Position(0, 6, 0);
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(16, targetLocation.power, .001);
+        assertEquals(.5, targetLocation.power, .001);
 
-        robotPosition = new Position(0, 36, 0);
+        robotPosition = new Position(0, 12, 0);
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
-        assertEquals(4, targetLocation.power, .001);
+        assertEquals(0, targetLocation.power, .001);
+
+        robotPosition = new Position(0, 18, 0);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(.6, targetLocation.power, .001);
+
+        robotPosition = new Position(0, 20, 0);
+        targetLocation = path.getTargetLocation(robotPosition, 0);
+
+        assertEquals(.8, targetLocation.power, .001);
 
     }
 
+
     @Test
-    public void testSpeedAlongBluePath() {
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(-9, -40));
-        points.add(new Point(-18.6, -40.5));
-        points.add(new Point(-28, -41.5));
-        points.add(new Point(-38, -42.5));
-        points.add(new Point(-48, -44.5));
-        Path path = makePath(points);
-
-        Position robotPosition = new Position(9, -40, 0);
-        Path.Location targetLocation = path.getTargetLocation(robotPosition, 0);
-
-        assertEquals(12, targetLocation.power, .001);
+    public void testPowerArguments() {
+        try {
+            ArrayList<Point> points = new ArrayList<>();
+            points.add(new Point(0, 0));
+            points.add(new Point(0, 2));
+            // Make a path with illegal constructor args
+            Path path = makePath(points, 1,  new double[][]{{4,.6,.8},{3,.5}});
+            fail("Should have thrown IllegalArgumentException");
+        } catch (Throwable t) {
+            // Do nothing; what we expected
+            if (!(t instanceof IllegalArgumentException)) {
+                fail("We got " + t.toString() + " instead of IllegalArgumentException");
+            }
+        }
 
     }
 
-    @Test
+
+
+        @Test
     public void testIsFinishedBackwards() {
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0, 0));
@@ -481,7 +495,7 @@ public class PathTest {
         points.add(new Point(8, 7));
         points.add(new Point(10, 13));
         points.add(new Point(15, 20));
-        Path path = makePath(points);
+        Path path = makePath(points, 0, new double[][]{});
 
         Position robotPosition = new Position(10, 17, Math.PI);
 

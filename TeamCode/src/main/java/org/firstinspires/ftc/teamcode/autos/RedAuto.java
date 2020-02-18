@@ -51,7 +51,7 @@ public class RedAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-
+/*
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, true);
         PartialPursuitAuto auto = new PartialPursuitAuto(false);
 
@@ -123,6 +123,6 @@ public class RedAuto extends LinearOpMode {
 
         auto.setPaths(quarry, toFoundation, pullFoundation, quarry2, foundation2, quarry3, foundation3);
         auto.start();
-
+*/
     }
 }

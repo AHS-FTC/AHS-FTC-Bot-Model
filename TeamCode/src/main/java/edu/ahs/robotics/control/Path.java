@@ -24,7 +24,7 @@ public class Path {
             }
             previousDistanceAtPower = currentDistAtPower;
 
-            if (powers.length != 2) {
+            if (powers[i].length != 2) {
                 throw new IllegalArgumentException("Length of powers array was not equal to 2");
             }
         }
@@ -129,16 +129,40 @@ public class Path {
 
     private double getTargetPower(double distanceFromStart) {
 
-        double currentPower = initialPower;
-        for (int i = 1; i < powers.length; i++) {
+        double interpolatedPower = initialPower;
+        double currentPower;
+        for (int i = 0; i < powers.length; i++) {
             if (powers[i][0] > distanceFromStart) {
                 break;
             } else {
                 currentPower = powers[i][1];
             }
+            double nextPower;
+            double nextDistance;
+            //Check if we are at end
+            if (i == powers.length-1) {
+                nextPower = powers[i][1];
+                nextDistance = powers[i][0];
+            } else {
+                nextPower = powers[i+1][1];
+                nextDistance = powers[i+1][0];
+            }
+            double powerDifference = nextPower - currentPower;
+
+            double currentDistance = distanceFromStart - powers[i][0];
+
+            double distanceDifference = nextDistance - powers[i][0];
+            double distanceRatio;
+            if (distanceDifference == 0) {
+                distanceRatio = 0;
+            } else {
+                distanceRatio = currentDistance/distanceDifference;
+            }
+
+            interpolatedPower = currentPower + (powerDifference * distanceRatio);
         }
 
-        return currentPower;
+        return interpolatedPower;
     }
 
     /**
