@@ -15,7 +15,7 @@ import java.util.Map;
 public class Tuner implements ParameterLookup {
     private HashMap<String,Double> tuningParams; // the actual output mapped to a val enum
     private  boolean running = false;
-    //private static final double SPEED_CONSTANT = 0.000001; // the speed at which values change
+    //private static final double SPEED_CONSTANT = 0.000001; // the power at which values change
     Map<String, Double> params = new HashMap();
     List<String> paramNames = new ArrayList();
 

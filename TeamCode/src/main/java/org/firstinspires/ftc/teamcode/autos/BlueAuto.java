@@ -52,7 +52,7 @@ public class BlueAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-
+/*
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, false);
         PartialPursuitAuto auto = new PartialPursuitAuto(true);
 
@@ -117,9 +117,10 @@ public class BlueAuto extends LinearOpMode {
 
         }
 
-        auto.setPaths(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3);
+        auto.setPaths(quarry, toFoundation, null, quarry2, foundation2, quarry3, foundation3);
 
         auto.start();
-
+*/
     }
+
 }

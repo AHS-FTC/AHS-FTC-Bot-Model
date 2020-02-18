@@ -60,7 +60,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.heading, Math.PI/2);
         assertEquals(0, state.position.x, 0.0);
 
-        //assertEquals(0, state.velocity.speed(),0.0);
+        //assertEquals(0, state.velocity.power(),0.0);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class OdometrySystemImplTest {
         assertEquals(Math.PI/2, state.position.heading, .01);
         assertEquals(0, state.position.x, .01);
 
-        //assertTrue(state.velocity.speed() > 0);
+        //assertTrue(state.velocity.power() > 0);
         //assertEquals(state.velocity.direction(), Math.PI / 2,0.001);
     }
 
@@ -148,7 +148,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, .01);
         assertEquals(0, state.position.y, .01);
 
-        //assertEquals(0,state.velocity.speed(), 0.01);
+        //assertEquals(0,state.velocity.power(), 0.01);
     }
 
     @Test
@@ -168,7 +168,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, .01);
         assertEquals(0, state.position.y, .01);
 
-        //assertEquals(0,state.velocity.speed(), 0.01);
+        //assertEquals(0,state.velocity.power(), 0.01);
     }
 
     @Test
@@ -221,7 +221,7 @@ public class OdometrySystemImplTest {
         assertEquals(0, state.position.x, .01);
         assertEquals(0, state.position.y, .01);
 
-        //assertEquals(0,state.velocity.speed(), 0.01);
+        //assertEquals(0,state.velocity.power(), 0.01);
     }
 
     @Test //THIS TEST USES NO DY. REINSTATABLE FOR EMERGENCIES
@@ -353,7 +353,7 @@ public class OdometrySystemImplTest {
 //
 //            velocity = odometrySystem.getState().velocity;
 //
-//            assertEquals(2,velocity.speed(), 0.0001);
+//            assertEquals(2,velocity.power(), 0.0001);
 //            assertEquals(0,velocity.direction(), 0.0001);
 //        }
 //

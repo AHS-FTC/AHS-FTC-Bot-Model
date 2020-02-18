@@ -51,7 +51,7 @@ public class RedAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-
+/*
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, true);
         PartialPursuitAuto auto = new PartialPursuitAuto(false);
 
@@ -59,12 +59,13 @@ public class RedAuto extends LinearOpMode {
         List<List<Point>> route25 = GCodeReader.openFile("red36.csv");
         List<List<Point>> route14 = GCodeReader.openFile("red36.csv");
 
-        Path quarry36 = new Path(route36.get(0), 12,12,22, false);
-        Path toFoundation36 = new Path(route36.get(1), 8,4,35, 9, 2, 1, false); //32
-        Path quarry236 = new Path(route36.get(2), 12, 12, 20,6,2,1, false);
-        Path foundation236 = new Path(route36.get(3), 12, 12, 44,9,2,1, false);
-        Path quarry336 = new Path(route36.get(4), 12, 12, 44,9,2,1, false);
-        Path foundation336 = new Path(route36.get(5), 12, 12, 44,9,2,1, false);
+        Path quarry36 = new Path(route36.get(0), false, 0.5, new double[][]{{10, .7}, {22, .7}});
+        Path toFoundation36 = new Path(route36.get(1), false, new double[][]{{0, .5}, {12, 1}, {12, 1}}); //32
+        Path pullFoundation36 = new Path(route36.get(2), 24, 24, 48, 28,2,10, false);
+        Path quarry236 = new Path(route36.get(3), 12, 12, 20,6,2,1, false);
+        Path foundation236 = new Path(route36.get(4), 12, 12, 44,9,2,1, false);
+        Path quarry336 = new Path(route36.get(5), 12, 12, 44,9,2,1, false);
+        Path foundation336 = new Path(route36.get(6), 12, 12, 44,9,2,1, false);
 
         Path quarry25 = new Path(route25.get(0), 12,12,22, false);
         Path toFoundation25 = new Path(route25.get(1), 8,4,35, 9, 2, 1, false); //32
@@ -82,6 +83,7 @@ public class RedAuto extends LinearOpMode {
 
         Path quarry;
         Path toFoundation;
+        Path pullFoundation;
         Path quarry2;
         Path foundation2;
         Path quarry3;
@@ -93,6 +95,7 @@ public class RedAuto extends LinearOpMode {
         if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR) {
             quarry = quarry14;
             toFoundation = toFoundation14;
+            pullFoundation = pullFoundation36;
             quarry2 = quarry214;
             foundation2 = foundation214;
             quarry3 = quarry314;
@@ -101,6 +104,7 @@ public class RedAuto extends LinearOpMode {
         } else if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE) {
             quarry = quarry25;
             toFoundation = toFoundation25;
+            pullFoundation = pullFoundation36;
             quarry2 = quarry225;
             foundation2 = foundation225;
             quarry3 = quarry325;
@@ -109,6 +113,7 @@ public class RedAuto extends LinearOpMode {
         } else {
             quarry = quarry36;
             toFoundation = toFoundation36;
+            pullFoundation = pullFoundation36;
             quarry2 = quarry236;
             foundation2 = foundation236;
             quarry3 = quarry336;
@@ -116,8 +121,8 @@ public class RedAuto extends LinearOpMode {
 
         }
 
-        auto.setPaths(quarry, toFoundation, quarry2, foundation2, quarry3, foundation3);
+        auto.setPaths(quarry, toFoundation, pullFoundation, quarry2, foundation2, quarry3, foundation3);
         auto.start();
-
+*/
     }
 }

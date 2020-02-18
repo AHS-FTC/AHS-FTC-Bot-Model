@@ -5,32 +5,29 @@ import java.util.List;
 
 public class Path {
     static final double LOOK_AHEAD_DISTANCE = 6.0; /*Package visible for testing*/
-    private int curvatureSpeed;
     private final ArrayList<PointAtDistance> pointAtDistance;
+    private final double[][] powers;
     private double totalDistance = 0;
 
-
-    private double minRampUpSpeed;
-    private double minRampDownSpeed;
-    private double maxVelocity;
     private int iCurrentBound = 0;
-    private double rampUpScale;
-    private double rampDownScale;
+    private double initialPower;
 
-    //Simple Constructor
-    public Path(List<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, boolean flipToBlue) {
-        this(points, minRampUpSpeed, minRampDownSpeed, maxVelocity, 9, 2,1, flipToBlue);
-    }
+    public Path(List<Point> points, boolean flipToBlue, double initialPower, double[][] powers) {
+        this.powers = powers;
+        this.initialPower = initialPower;
 
-    public Path(List<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity, int curvatureSpeed, double rampUpScale, double rampDownScale, boolean flipToBlue) {
+        double previousDistanceAtPower = powers[0][0];
+        for (int i = 0; i < powers.length; i++) {
+            double currentDistAtPower = powers[i][0];
+            if (currentDistAtPower < previousDistanceAtPower){
+                throw new IllegalArgumentException("Powers supplied to path must be in increasing order. Previous was "+ previousDistanceAtPower +" Current is "+currentDistAtPower);
+            }
+            previousDistanceAtPower = currentDistAtPower;
 
-
-        this.minRampUpSpeed = minRampUpSpeed;
-        this.minRampDownSpeed = minRampDownSpeed;
-        this.maxVelocity = maxVelocity;
-        this.curvatureSpeed = curvatureSpeed;
-        this.rampUpScale = rampUpScale;
-        this.rampDownScale = rampDownScale;
+            if (powers[i].length != 2) {
+                throw new IllegalArgumentException("Length of powers array was not equal to 2");
+            }
+        }
 
         if (flipToBlue) {
             for (int i = 0; i < points.size(); i++) {
@@ -96,8 +93,8 @@ public class Path {
         loc.distanceToEnd = (totalDistance - second.distanceFromStart) + distanceToSecond;
         loc.distanceFromStart = first.distanceFromStart + loc.closestPoint.distanceTo(first);
 
-        //Calculate speed at location
-        loc.speed = getTargetSpeed(loc.distanceFromStart);
+        //Calculate power at location
+        loc.power = getTargetPower(loc.distanceFromStart);
 
         //Calculate a future point given a look ahead distance
         loc.futurePoint = getFuturePoint(distanceToSecond, lookAheadDistance);
@@ -130,23 +127,42 @@ public class Path {
         return new Point(futureBound.x - (ratio * futureBound.pathDeltaX), futureBound.y - (ratio * futureBound.pathDeltaY));
     }
 
-    private double getTargetSpeed(double distanceFromStart) {
+    private double getTargetPower(double distanceFromStart) {
 
-        if (distanceFromStart > totalDistance){
-            distanceFromStart = totalDistance;
+        double interpolatedPower = initialPower;
+        double currentPower;
+        for (int i = 0; i < powers.length; i++) {
+            if (powers[i][0] > distanceFromStart) {
+                break;
+            } else {
+                currentPower = powers[i][1];
+            }
+            double nextPower;
+            double nextDistance;
+            //Check if we are at end
+            if (i == powers.length-1) {
+                nextPower = powers[i][1];
+                nextDistance = powers[i][0];
+            } else {
+                nextPower = powers[i+1][1];
+                nextDistance = powers[i+1][0];
+            }
+            double powerDifference = nextPower - currentPower;
+
+            double currentDistance = distanceFromStart - powers[i][0];
+
+            double distanceDifference = nextDistance - powers[i][0];
+            double distanceRatio;
+            if (distanceDifference == 0) {
+                distanceRatio = 0;
+            } else {
+                distanceRatio = currentDistance/distanceDifference;
+            }
+
+            interpolatedPower = currentPower + (powerDifference * distanceRatio);
         }
-        //Calculates ramp up and ramp down functions
-        double distanceToEnd = totalDistance - distanceFromStart;
-        double rampDown = (rampDownScale * distanceToEnd) + minRampDownSpeed;
-        double rampUp = (rampUpScale * distanceFromStart) + minRampUpSpeed;
 
-        //Calculate curvatureSpeed speed. v = sqrt(a * r) where a is max allowed acceleration and r is the radius of curvatureSpeed
-        //r = g * d^2 where d is distance between points. g is a constant.
-        //Substituting, v = sqrt(a * g) * d
-        //curvatureSpeed = sqrt(a * g) derived experimentally
-        double curvatureSpeed = this.curvatureSpeed * getPoint(iCurrentBound + 1).distanceToPrevious;
-
-        return Math.min(rampDown, Math.min(rampUp, Math.min(maxVelocity, curvatureSpeed)));
+        return interpolatedPower;
     }
 
     /**
@@ -207,7 +223,7 @@ public class Path {
         public double distanceToEnd;
         public double distanceFromStart;
         public double pathSegmentLength;
-        public double speed;
+        public double power;
         public Point futurePoint;
 
         public Location(PointAtDistance pointAtDistance) {

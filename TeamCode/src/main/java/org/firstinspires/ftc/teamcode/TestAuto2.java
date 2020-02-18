@@ -80,12 +80,6 @@ public class TestAuto2 extends LinearOpMode {
 //        detector = new ArdennesSkyStoneDetector(false, true);
 //        Intake intake = ardennes.getIntake();
 
-        ArrayList<Point> points = new ArrayList<>();
-        points.add(new Point(-1,-1));
-        points.add(new Point(-3,-3));
-        points.add(new Point(-3,-6));
-        Path path = new Path(points, 12,12,12,false);
-
        // chassis.followPath(path, 12, 0, null, 10000,0);
     }
 }

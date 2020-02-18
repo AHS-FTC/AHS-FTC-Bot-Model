@@ -110,7 +110,7 @@ public class ArdennesOdomOpMode extends OpMode
 
 //        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
 //        telemetry.addData("imu heading -deg", imuHeading);
-//        telemetry.addData("speed -in/s", velocity.speed());
+//        telemetry.addData("power -in/s", velocity.power());
 //        telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction()));
 //        telemetry.addData("delta time -millis", currentTime - lastTime);
         telemetry.update();
@@ -118,7 +118,7 @@ public class ArdennesOdomOpMode extends OpMode
 //        logger.append("x", String.valueOf(position.x));
 //        logger.append("y", String.valueOf(position.y));
 //        logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
-//        logger.append("speed", String.valueOf(velocity.speed()));
+//        logger.append("power", String.valueOf(velocity.power()));
 //        logger.append("acceleration", String.valueOf(state.acceleration));
 //        logger.append("radius", String.valueOf(state.travelRadius));
 //

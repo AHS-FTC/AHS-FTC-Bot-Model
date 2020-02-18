@@ -56,6 +56,7 @@ public class LeftCurveReverseAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        /*
         FTCUtilities.setOpMode(this);
 
         Logger logger = new DataLogger("pathDataCurveLReverse", "partialPursuit");
@@ -74,5 +75,6 @@ public class LeftCurveReverseAuto extends LinearOpMode {
         //chassis.followPath(path, 12, Math.PI, null,0, 0);
 
         logger.stopWriting();
+        */
     }
 }

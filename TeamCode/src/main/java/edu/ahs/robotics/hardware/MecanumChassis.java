@@ -10,8 +10,6 @@ import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Vector;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
-import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.control.pid.VelocityPID;
 import edu.ahs.robotics.hardware.sensors.DistanceSensor;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
@@ -487,7 +485,7 @@ public class MecanumChassis extends Chassis {
             state = odometrySystem.getState();
             location = path.getTargetLocation(state.position, motionConfig.lookAheadDistance);
 
-            double power = convertSpeedToMotorPower(location.speed); //todo ditch
+            double power = location.power;
 
             logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
             logger.append("triggerBoi", String.valueOf(triggerBoi.isTriggered()));

@@ -22,7 +22,7 @@ public class BaseTestAuto {
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        path = new Path(points, 12, 8, 28, false);//was 36
+        path = new Path(points, false, .5, new double[][]{});//was 36
         chassis.startOdometrySystem();
     }
 
