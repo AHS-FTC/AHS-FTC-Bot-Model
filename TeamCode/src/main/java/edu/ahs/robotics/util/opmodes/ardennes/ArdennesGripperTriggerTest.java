@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.old;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -45,9 +45,9 @@ import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.util.Tuner;
 
 
-@Autonomous(name = "Distance Sensor Test", group = "Linear Opmode")
+@Autonomous(name = "Gripper Trigger Test", group = "Linear Opmode")
 //@Disabled
-public class DistanceSensorTestAuto extends LinearOpMode {
+public class ArdennesGripperTriggerTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -55,11 +55,13 @@ public class DistanceSensorTestAuto extends LinearOpMode {
 
         Ardennes ardennes = new Ardennes();
         Trigger gripperTrigger = ardennes.getGripperTrigger();
+        DistanceSensor distanceSensor = (DistanceSensor)gripperTrigger;
 
         waitForStart();
 
         while (opModeIsActive()) {
             telemetry.addData("gripperTrigger status", gripperTrigger.isTriggered());
+            telemetry.addData("distance", distanceSensor.getDist());
             telemetry.update();
         }
     }

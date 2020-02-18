@@ -55,6 +55,13 @@ public abstract class Logger {
         }
     }
 
+    /**
+     * @return the name of the file that this Logger is logging to
+     */
+    public String getOutputFile(){
+        return fileName;
+    }
+
     public boolean isWriting(){
         return writing;
     }
