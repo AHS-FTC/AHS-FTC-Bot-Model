@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autos;
+package org.firstinspires.ftc.teamcode.live;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -19,7 +19,7 @@ import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.loggers.Logger;
 
-public class PartialPursuitAuto {
+public class BaseAuto {
     private Ardennes ardennes;
     private MecanumChassis chassis;
     private Intake intake;
@@ -39,7 +39,7 @@ public class PartialPursuitAuto {
     private int turnSign;
 
 
-    public PartialPursuitAuto(boolean flipToBlue) {
+    public BaseAuto(boolean flipToBlue) {
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
