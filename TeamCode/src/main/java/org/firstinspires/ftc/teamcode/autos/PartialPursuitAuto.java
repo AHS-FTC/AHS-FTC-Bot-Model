@@ -21,6 +21,7 @@ import edu.ahs.robotics.util.FTCUtilities;
 import edu.ahs.robotics.util.loggers.Logger;
 
 public class PartialPursuitAuto {
+    public static final double MOTOR_POWER = .5;
     private Ardennes ardennes;
     private MecanumChassis chassis;
     private Intake intake;
@@ -127,7 +128,7 @@ public class PartialPursuitAuto {
     }
 
     public void start(){
-        intake.runMotors(1);
+        intake.runMotors(MOTOR_POWER);
 
         MotionConfig quarryConfig = new MotionConfig();
         quarryConfig.idealHeading =  (turnSign)*(-Math.PI/4);
@@ -139,10 +140,10 @@ public class PartialPursuitAuto {
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.idealHeading = Math.PI;
         toFoundationConfig.timeOut = 5000;
-        toFoundationConfig.addOBMCommand(blockGripper);
+        //toFoundationConfig.addOBMCommand(blockGripper);
         changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 0);
         toFoundationConfig.addOBMCommand (changeTargetHeading);
-        toFoundationConfig.turnCutoff = 10.0;
+        toFoundationConfig.turnCutoff = 7;
 
         chassis.followPath(toFoundation, toFoundationConfig);
 
@@ -183,11 +184,11 @@ public class PartialPursuitAuto {
         blockGripper.reset();
         blockGripper.resetWaitTime(10000L);
 
-        intake.runMotors(1);
+        intake.runMotors(MOTOR_POWER);
 
         MotionConfig quarry2Config = new MotionConfig();
         //quarry2Config.addOBMCommand(slideCycle);
-        quarry2Config.addOBMCommand(blockGripper);
+        //quarry2Config.addOBMCommand(blockGripper);
         quarry2Config.timeOut = 3500;
 
         chassis.followPath(quarry2, quarry2Config);
@@ -198,7 +199,7 @@ public class PartialPursuitAuto {
 
         MotionConfig foundation2Config = new MotionConfig();
         foundation2Config.idealHeading = Math.PI;
-        foundation2Config.addOBMCommand(blockGripper);
+        //foundation2Config.addOBMCommand(blockGripper);
         //foundation2Config.addOBMCommand(slideCycle);
         foundation2Config.timeOut = 3000;
 
@@ -210,7 +211,7 @@ public class PartialPursuitAuto {
         blockGripper.reset();
         blockGripper.resetWaitTime(10000L);
 
-        intake.runMotors(1);
+        intake.runMotors(MOTOR_POWER);
 
         MotionConfig quarry3Config = new MotionConfig();
         quarry3Config.addOBMCommand(blockGripper);
@@ -224,7 +225,7 @@ public class PartialPursuitAuto {
 
         MotionConfig foundation3Config = new MotionConfig();
         foundation3Config.idealHeading = Math.PI;
-        foundation3Config.addOBMCommand(blockGripper);
+        //foundation3Config.addOBMCommand(blockGripper);
         //foundation3Config.addOBMCommand(slideCycle);
         foundation3Config.timeOut = 4000;
 

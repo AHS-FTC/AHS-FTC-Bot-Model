@@ -83,7 +83,7 @@ public class ArdennesTeleOp extends OpMode
     private double yServoPosition = 0;
 
     private static final double TRIGGER_THRESHOLD = 0.1;
-    private static final double INTAKE_POWER = 1;
+    private static final double INTAKE_POWER = .5;
     private IntakeMode intakeMode = IntakeMode.OFF;
     private TapeMeasureMode tapeMeasureMode = TapeMeasureMode.OFF;
     private static final double SLIDE_DOWN_POWER_SCALE = 0.3; //unitless multiplier to weaken slide motors when pulling down

@@ -63,7 +63,7 @@ public class TurnMidPathAuto extends LinearOpMode {
         points.add(new Point(0,0));
         points.add(new Point(0,80));
 
-        Path path = new Path(points, false, .5, new double[][]{{40,.8},{80, 0}});
+        Path path = new Path(points, false, .5, 0, new double[][]{{40,.8},{80, 0}});
 
         waitForStart(); // ------------------
 

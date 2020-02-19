@@ -12,22 +12,10 @@ public class Path {
     private int iCurrentBound = 0;
     private double initialPower;
 
-    public Path(List<Point> points, boolean flipToBlue, double initialPower, double[][] powers) {
-        this.powers = powers;
+    public Path(List<Point> points, boolean flipToBlue, double initialPower, double finalPower, double[][] powers) {
+        int finalPowerIndex = powers.length;
+        this.powers = new double[finalPowerIndex + 1][2];
         this.initialPower = initialPower;
-
-        double previousDistanceAtPower = powers[0][0];
-        for (int i = 0; i < powers.length; i++) {
-            double currentDistAtPower = powers[i][0];
-            if (currentDistAtPower < previousDistanceAtPower){
-                throw new IllegalArgumentException("Powers supplied to path must be in increasing order. Previous was "+ previousDistanceAtPower +" Current is "+currentDistAtPower);
-            }
-            previousDistanceAtPower = currentDistAtPower;
-
-            if (powers[i].length != 2) {
-                throw new IllegalArgumentException("Length of powers array was not equal to 2");
-            }
-        }
 
         if (flipToBlue) {
             for (int i = 0; i < points.size(); i++) {
@@ -51,6 +39,26 @@ public class Path {
             totalDistance += distanceFromPrevious;
 
             pointAtDistance.add(new PointAtDistance(current, totalDistance, current.x - previous.x, current.y - previous.y, distanceFromPrevious));
+        }
+
+        //Add final power to the end of the powers array
+        for (int i = 0; i < powers.length; i++) {
+            if (powers[i].length != 2) {
+                throw new IllegalArgumentException("Length of powers array was not equal to 2");
+            }
+            this.powers[i] = powers[i];
+        }
+        this.powers[finalPowerIndex][0] = totalDistance;
+        this.powers[finalPowerIndex][1] = finalPower;
+
+        //Check that the distances go in increasing order
+        double previousDistanceAtPower = powers[0][0];
+        for (int i = 1; i < powers.length; i++) {
+            double currentDistAtPower = powers[i][0];
+            if (currentDistAtPower < previousDistanceAtPower){
+                throw new IllegalArgumentException("Powers supplied to path must be in increasing order. Previous was "+ previousDistanceAtPower +" Current is "+currentDistAtPower);
+            }
+            previousDistanceAtPower = currentDistAtPower;
         }
     }
 
