@@ -139,7 +139,7 @@ public class BaseAuto {
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.idealHeading = Math.PI;
         toFoundationConfig.timeOut = 5000;
-        //toFoundationConfig.addOBMCommand(blockGripper);
+        toFoundationConfig.addOBMCommand(blockGripper);
         changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 0);
         toFoundationConfig.addOBMCommand (changeTargetHeading);
         toFoundationConfig.turnCutoff = 7;
@@ -187,7 +187,7 @@ public class BaseAuto {
 
         MotionConfig quarry2Config = new MotionConfig();
         //quarry2Config.addOBMCommand(slideCycle);
-        //quarry2Config.addOBMCommand(blockGripper);
+        quarry2Config.addOBMCommand(blockGripper);
         quarry2Config.timeOut = 3500;
 
         chassis.followPath(quarry2, quarry2Config);
@@ -198,7 +198,7 @@ public class BaseAuto {
 
         MotionConfig foundation2Config = new MotionConfig();
         foundation2Config.idealHeading = Math.PI;
-        //foundation2Config.addOBMCommand(blockGripper);
+        foundation2Config.addOBMCommand(blockGripper);
         //foundation2Config.addOBMCommand(slideCycle);
         foundation2Config.timeOut = 3000;
 
@@ -224,7 +224,7 @@ public class BaseAuto {
 
         MotionConfig foundation3Config = new MotionConfig();
         foundation3Config.idealHeading = Math.PI;
-        //foundation3Config.addOBMCommand(blockGripper);
+        foundation3Config.addOBMCommand(blockGripper);
         //foundation3Config.addOBMCommand(slideCycle);
         foundation3Config.timeOut = 4000;
 

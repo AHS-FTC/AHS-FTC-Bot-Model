@@ -32,7 +32,12 @@ package org.firstinspires.ftc.teamcode.live;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import java.util.List;
+
+import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 

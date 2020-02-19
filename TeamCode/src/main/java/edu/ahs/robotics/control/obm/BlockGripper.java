@@ -42,7 +42,7 @@ public class BlockGripper implements OBMCommand {
     public boolean check(OdometrySystem.State robotState) {
         switch(state){
             case FINISHED:
-                break;
+                return true;
             case INITIAL:
                 startTime = FTCUtilities.getCurrentTimeMillis();
                 state = State.WAITING;
