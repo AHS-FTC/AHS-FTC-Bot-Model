@@ -27,23 +27,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import edu.ahs.robotics.util.FTCUtilities;
+import org.firstinspires.ftc.teamcode.old.FullAuto;
+
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
-@Autonomous(name = "Ardennes Auto Blue Side", group = "Linear Opmode")
+@Autonomous(name = "Ardennes Auto Red Side", group = "Linear Opmode")
 @Disabled
-public class ArdennesAutoBlue extends LinearOpMode {
+public class ArdennesAutoRed extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-        FullAuto fullAuto = new FullAuto(false);
+        FullAuto fullAuto = new FullAuto(true);
         fullAuto.init();
         waitForStart();
         fullAuto.afterStart();

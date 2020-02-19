@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import edu.ahs.robotics.control.pid.PID;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.ParameterLookup;
 
 /**

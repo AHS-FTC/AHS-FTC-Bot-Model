@@ -27,60 +27,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import edu.ahs.robotics.hardware.sensors.DistanceSensor;
+import edu.ahs.robotics.hardware.sensors.Trigger;
+import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
-@Autonomous(name = "drive straight", group = "Linear Opmode")
-@Disabled
-public class DriveStraight extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-
-    private DcMotor frontLeft, frontRight, backLeft, backRight;
+@Autonomous(name = "Gripper Trigger Test", group = "Linear Opmode")
+//@Disabled
+public class ArdennesGripperTriggerTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backLeft = hardwareMap.get(DcMotor.class,"BL");
-        backRight = hardwareMap.get(DcMotor.class,"BR");
+        FTCUtilities.setOpMode(this);
 
-        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Ardennes ardennes = new Ardennes();
+        Trigger gripperTrigger = ardennes.getGripperTrigger();
+        DistanceSensor distanceSensor = (DistanceSensor)gripperTrigger;
 
         waitForStart();
 
-        runtime.reset();
-
-        frontLeft.setPower(0.5);
-        frontRight.setPower(0.5);
-        backLeft.setPower(0.5);
-        backRight.setPower(0.5);
-
-        while (runtime.milliseconds() < 2000 && opModeIsActive()){
-
+        while (opModeIsActive()) {
+            telemetry.addData("gripperTrigger status", gripperTrigger.isTriggered());
+            telemetry.addData("distance", distanceSensor.getDist());
+            telemetry.update();
         }
-
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
-
     }
-
-
 }

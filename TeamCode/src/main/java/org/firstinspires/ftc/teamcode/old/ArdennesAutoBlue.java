@@ -27,43 +27,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.autos;
+package org.firstinspires.ftc.teamcode.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.hardware.ContinuosServo;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
+import org.firstinspires.ftc.teamcode.old.FullAuto;
+
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
-@Autonomous(name = "-- Tape Park --", group = "Linear Opmode")
-//@Disabled
-public class TapeMeasurerAuto extends LinearOpMode {
-
-    ArdennesSkyStoneDetector detector;
+@Autonomous(name = "Ardennes Auto Blue Side", group = "Linear Opmode")
+@Disabled
+public class ArdennesAutoBlue extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         FTCUtilities.setOpMode(this);
-
-        Ardennes ardennes = new Ardennes();
-
-        ContinuosServo tapeMeasure = ardennes.getTapeMeasure();
-
+        FullAuto fullAuto = new FullAuto(false);
+        fullAuto.init();
         waitForStart();
-        tapeMeasure.setPower(-0.85);
-
-        long startTime = FTCUtilities.getCurrentTimeMillis();
-
-        while (FTCUtilities.getCurrentTimeMillis() - startTime < 2000){
-
-        }
-        tapeMeasure.setPower(0);
-
-
+        fullAuto.afterStart();
     }
+
+
 }

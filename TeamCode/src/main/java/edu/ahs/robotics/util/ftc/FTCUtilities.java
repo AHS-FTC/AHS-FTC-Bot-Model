@@ -1,4 +1,4 @@
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.ftc;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
@@ -23,6 +23,8 @@ import java.util.Map;
 
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.util.MockClock;
+import edu.ahs.robotics.util.ParameterLookup;
 
 /**
  * General Utilities class to manage the crappy FTC classes

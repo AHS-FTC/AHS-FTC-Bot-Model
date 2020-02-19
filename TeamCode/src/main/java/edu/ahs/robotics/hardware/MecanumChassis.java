@@ -15,8 +15,8 @@ import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCMath;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCMath;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.util.loggers.Logger;
 

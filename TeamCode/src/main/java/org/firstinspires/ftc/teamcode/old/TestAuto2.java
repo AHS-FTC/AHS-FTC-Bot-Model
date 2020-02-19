@@ -27,37 +27,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import edu.ahs.robotics.hardware.SerialServo;
-import edu.ahs.robotics.hardware.Slides;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.LimitSwitch;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.hardware.sensors.Odometer;
+import edu.ahs.robotics.seasonrobots.Ardennes;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
 
-@Autonomous(name = "Ardennes Auto Red Side", group = "Linear Opmode")
-@Disabled
-public class ArdennesAutoRed extends LinearOpMode {
+@Autonomous(name = "Test Auto 2", group = "Linear Opmode")
+//@Disabled
+public class TestAuto2 extends LinearOpMode {
+
+    Odometer left, right, back;
+
+    private Ardennes ardennes;
+    private MecanumChassis chassis;
+
+//    private ElapsedTime runtime = new ElapsedTime();
+//    private Tuner tuner;
+//    private ArdennesSkyStoneDetector detector;
+//    private TriggerDistanceSensor intakeTrigger;
 
     @Override
     public void runOpMode() {
+
         FTCUtilities.setOpMode(this);
-        FullAuto fullAuto = new FullAuto(true);
-        fullAuto.init();
-        waitForStart();
-        fullAuto.afterStart();
+        MotorHashService.init();
+        ardennes = new Ardennes();
+        chassis = ardennes.getChassis();
+
+//        tuner = new Tuner();
+//        FTCUtilities.setParameterLookup(tuner);
+//        detector = new ArdennesSkyStoneDetector(false, true);
+//        Intake intake = ardennes.getIntake();
+
+       // chassis.followPath(path, 12, 0, null, 10000,0);
     }
-
-
 }

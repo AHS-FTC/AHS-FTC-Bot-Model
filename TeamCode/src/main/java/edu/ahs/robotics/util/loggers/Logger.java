@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 public abstract class Logger {
     private String fileName;
@@ -53,6 +53,13 @@ public abstract class Logger {
          } catch (IOException e) {
             throw new Warning(e.getMessage());
         }
+    }
+
+    /**
+     * @return the name of the file that this Logger is logging to
+     */
+    public String getOutputFile(){
+        return fileName;
     }
 
     public boolean isWriting(){

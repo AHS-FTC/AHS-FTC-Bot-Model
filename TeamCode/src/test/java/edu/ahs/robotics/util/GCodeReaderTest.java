@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.List;
 
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 import static org.junit.Assert.*;
 

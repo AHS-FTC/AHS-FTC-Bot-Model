@@ -2,8 +2,7 @@ package edu.ahs.robotics.control.obm;
 
 import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 /**
  * Command to synchronously run the Ardennes Tape Measurer

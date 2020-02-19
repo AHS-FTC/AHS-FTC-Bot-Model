@@ -27,19 +27,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.autos;
+package org.firstinspires.ftc.teamcode.live;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.util.List;
-
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 @Autonomous(name = "-- AutoRed --", group = "Linear Opmode")
@@ -53,7 +47,7 @@ public class RedAuto extends LinearOpMode {
         FTCUtilities.setOpMode(this);
 
         ArdennesSkyStoneDetector detector = new ArdennesSkyStoneDetector(false, true);
-        PartialPursuitAuto auto = new PartialPursuitAuto(false);
+        BaseAuto auto = new BaseAuto(false);
 
         List<List<Point>> route36 = GCodeReader.openFile("red36.csv");
         List<List<Point>> route25 = GCodeReader.openFile("red36.csv");

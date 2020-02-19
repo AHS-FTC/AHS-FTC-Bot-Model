@@ -27,40 +27,60 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.old;
+package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.DistanceSensor;
-import edu.ahs.robotics.hardware.sensors.Trigger;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
 
+@Autonomous(name = "drive straight", group = "Linear Opmode")
+@Disabled
+public class DriveStraight extends LinearOpMode {
 
-@Autonomous(name = "Distance Sensor Test", group = "Linear Opmode")
-//@Disabled
-public class DistanceSensorTestAuto extends LinearOpMode {
+    private ElapsedTime runtime = new ElapsedTime();
+
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
 
     @Override
     public void runOpMode() {
-        FTCUtilities.setOpMode(this);
+        frontLeft = hardwareMap.get(DcMotor.class, "FL");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
+        backLeft = hardwareMap.get(DcMotor.class,"BL");
+        backRight = hardwareMap.get(DcMotor.class,"BR");
 
-        Ardennes ardennes = new Ardennes();
-        Trigger gripperTrigger = ardennes.getGripperTrigger();
+        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
 
-        while (opModeIsActive()) {
-            telemetry.addData("gripperTrigger status", gripperTrigger.isTriggered());
-            telemetry.update();
+        runtime.reset();
+
+        frontLeft.setPower(0.5);
+        frontRight.setPower(0.5);
+        backLeft.setPower(0.5);
+        backRight.setPower(0.5);
+
+        while (runtime.milliseconds() < 2000 && opModeIsActive()){
+
         }
+
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+
     }
+
+
 }

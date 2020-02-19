@@ -27,59 +27,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.live;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.autos.PartialPursuitAuto;
-
-import java.util.ArrayList;
-
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.ChassisMotors;
-import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.Odometer;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
-@Autonomous(name = "Test Auto 2", group = "Linear Opmode")
+@Autonomous(name = "-- Tape Park --", group = "Linear Opmode")
 //@Disabled
-public class TestAuto2 extends LinearOpMode {
+public class TapeMeasurerAuto extends LinearOpMode {
 
-    Odometer left, right, back;
-
-    private Ardennes ardennes;
-    private MecanumChassis chassis;
-
-//    private ElapsedTime runtime = new ElapsedTime();
-//    private Tuner tuner;
-//    private ArdennesSkyStoneDetector detector;
-//    private TriggerDistanceSensor intakeTrigger;
+    ArdennesSkyStoneDetector detector;
 
     @Override
     public void runOpMode() {
-
         FTCUtilities.setOpMode(this);
-        MotorHashService.init();
-        ardennes = new Ardennes();
-        chassis = ardennes.getChassis();
 
-//        tuner = new Tuner();
-//        FTCUtilities.setParameterLookup(tuner);
-//        detector = new ArdennesSkyStoneDetector(false, true);
-//        Intake intake = ardennes.getIntake();
+        Ardennes ardennes = new Ardennes();
 
-       // chassis.followPath(path, 12, 0, null, 10000,0);
+        ContinuosServo tapeMeasure = ardennes.getTapeMeasure();
+
+        waitForStart();
+        tapeMeasure.setPower(-0.85);
+
+        long startTime = FTCUtilities.getCurrentTimeMillis();
+
+        while (FTCUtilities.getCurrentTimeMillis() - startTime < 2000){
+
+        }
+        tapeMeasure.setPower(0);
+
+
     }
 }
