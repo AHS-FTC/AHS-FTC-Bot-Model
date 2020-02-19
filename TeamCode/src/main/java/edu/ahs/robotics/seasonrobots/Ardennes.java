@@ -17,7 +17,7 @@ import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.hardware.Slides;
 

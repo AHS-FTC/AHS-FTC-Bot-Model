@@ -2,7 +2,7 @@ package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 public class SerialServo {
     private Servo servo;

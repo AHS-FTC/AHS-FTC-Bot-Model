@@ -9,7 +9,7 @@ import edu.ahs.robotics.control.obm.NullCommand;
 import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 
 public class BaseTestAuto {

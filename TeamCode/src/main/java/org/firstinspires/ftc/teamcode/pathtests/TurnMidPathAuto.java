@@ -41,7 +41,7 @@ import edu.ahs.robotics.control.obm.TargetHeadingChanger;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.loggers.Logger;
 
 

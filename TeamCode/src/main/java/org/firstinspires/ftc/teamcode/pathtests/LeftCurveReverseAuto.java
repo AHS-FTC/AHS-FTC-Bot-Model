@@ -33,17 +33,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.util.List;
-
 import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
-import edu.ahs.robotics.util.loggers.Logger;
-import edu.ahs.robotics.util.MotorHashService;
 
 
 @Autonomous(name = "Left Curve Auto Reverse", group = "Linear Opmode")

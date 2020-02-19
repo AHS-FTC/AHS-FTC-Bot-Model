@@ -4,8 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.MockClock;
 
 import static org.junit.Assert.*;

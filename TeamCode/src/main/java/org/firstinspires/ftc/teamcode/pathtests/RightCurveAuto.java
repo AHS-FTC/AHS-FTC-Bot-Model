@@ -41,7 +41,7 @@ import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.loggers.Logger;
 

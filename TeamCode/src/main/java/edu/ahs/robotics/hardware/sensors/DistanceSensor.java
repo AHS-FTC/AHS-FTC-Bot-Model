@@ -4,7 +4,7 @@ import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 public class DistanceSensor {
     Rev2mDistanceSensor distanceSensor;

@@ -1,8 +1,5 @@
 package edu.ahs.robotics.util;
 
-import android.os.Environment;
-
-import org.firstinspires.ftc.robotcontroller.internal.FtcOpModeRegister;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.io.*;
@@ -10,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 import static java.lang.Double.valueOf;
 

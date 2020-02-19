@@ -1,9 +1,9 @@
-package edu.ahs.robotics.util.opmodes;
+package edu.ahs.robotics.util.opmodes.bfr;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import edu.ahs.robotics.util.ErrorStealer;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.ErrorStealer;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.loggers.TextLogger;
 
 

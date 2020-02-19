@@ -2,8 +2,6 @@ package edu.ahs.robotics.control;
 
 import org.junit.Test;
 
-import edu.ahs.robotics.util.FTCUtilities;
-
 import static org.junit.Assert.*;
 
 public class LineTest {

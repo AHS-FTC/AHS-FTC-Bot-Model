@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 public class Intake { //todo make a one or two motor alternate to intake class
     private DcMotor leftMotor;

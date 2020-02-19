@@ -27,59 +27,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.live;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.old.FullAuto;
+
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
-@Autonomous(name = "drive straight", group = "Linear Opmode")
+@Autonomous(name = "Ardennes Auto Red Side", group = "Linear Opmode")
 @Disabled
-public class DriveStraight extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-
-    private DcMotor frontLeft, frontRight, backLeft, backRight;
+public class ArdennesAutoRed extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backLeft = hardwareMap.get(DcMotor.class,"BL");
-        backRight = hardwareMap.get(DcMotor.class,"BR");
-
-        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        FTCUtilities.setOpMode(this);
+        FullAuto fullAuto = new FullAuto(true);
+        fullAuto.init();
         waitForStart();
-
-        runtime.reset();
-
-        frontLeft.setPower(0.5);
-        frontRight.setPower(0.5);
-        backLeft.setPower(0.5);
-        backRight.setPower(0.5);
-
-        while (runtime.milliseconds() < 2000 && opModeIsActive()){
-
-        }
-
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
-
+        fullAuto.afterStart();
     }
 
 

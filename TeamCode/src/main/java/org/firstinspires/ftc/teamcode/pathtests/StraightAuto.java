@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.loggers.Logger;
 
 

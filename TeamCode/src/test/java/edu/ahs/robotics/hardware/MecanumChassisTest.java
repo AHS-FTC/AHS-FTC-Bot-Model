@@ -9,14 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ahs.robotics.control.MotionConfig;
-import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Vector;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.OdometrySystemMock;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.MockClock;
 import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.util.loggers.MockDataLogger;

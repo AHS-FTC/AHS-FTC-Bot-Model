@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.pathtests;
+package edu.ahs.robotics.util.opmodes.bfr;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import edu.ahs.robotics.util.opmodes.LinearOpMode16896;
+import edu.ahs.robotics.util.opmodes.bfr.LinearOpMode16896;
 
 @Autonomous(name = "Test 16896 LinearOpMode", group = "Linear Opmode")
 @Disabled

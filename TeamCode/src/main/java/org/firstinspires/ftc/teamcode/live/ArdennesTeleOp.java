@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.live;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -40,7 +40,7 @@ import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.hardware.Intake;
 
 //Written by Alex Appleby of team 16896

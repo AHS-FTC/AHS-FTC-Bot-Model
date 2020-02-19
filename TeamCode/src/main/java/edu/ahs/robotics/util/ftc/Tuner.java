@@ -1,4 +1,4 @@
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.ftc;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.ahs.robotics.util.ParameterLookup;
 
 
 /**

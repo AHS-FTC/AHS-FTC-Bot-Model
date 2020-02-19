@@ -3,7 +3,7 @@ package edu.ahs.robotics.control.obm;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 /**
  * OBMCommand for gripping the blocks with delay or upon triggering of distanceSensor.

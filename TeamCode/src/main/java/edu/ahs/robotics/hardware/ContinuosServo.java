@@ -1,6 +1,6 @@
 package edu.ahs.robotics.hardware;
 
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 public class ContinuosServo {
     private com.qualcomm.robotcore.hardware.CRServo servo;

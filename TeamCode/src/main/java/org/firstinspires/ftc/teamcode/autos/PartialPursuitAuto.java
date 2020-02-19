@@ -10,14 +10,13 @@ import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.obm.SlideCycle;
 import edu.ahs.robotics.control.obm.TapeMeasureCommand;
 import edu.ahs.robotics.control.obm.TargetHeadingChanger;
-import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.loggers.Logger;
 
 public class PartialPursuitAuto {

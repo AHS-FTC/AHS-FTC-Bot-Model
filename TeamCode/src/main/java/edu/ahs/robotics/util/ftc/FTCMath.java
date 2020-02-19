@@ -1,4 +1,4 @@
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.ftc;
 
 import java.util.List;
 import static java.lang.Math.*; //we need lots of these

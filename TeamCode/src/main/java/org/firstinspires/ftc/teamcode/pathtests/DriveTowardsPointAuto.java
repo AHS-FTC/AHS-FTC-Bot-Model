@@ -38,7 +38,7 @@ import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 @Autonomous(name = "Drive Towards Point", group = "Linear Opmode")

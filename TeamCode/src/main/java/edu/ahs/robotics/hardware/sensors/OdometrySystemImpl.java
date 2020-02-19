@@ -5,7 +5,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 import edu.ahs.robotics.control.Position;
 import edu.ahs.robotics.control.Velocity;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.loggers.Logger;
 import edu.ahs.robotics.util.loggers.MockDataLogger;
 

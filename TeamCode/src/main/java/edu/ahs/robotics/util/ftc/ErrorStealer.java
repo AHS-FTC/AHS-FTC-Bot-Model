@@ -1,4 +1,4 @@
-package edu.ahs.robotics.util;
+package edu.ahs.robotics.util.ftc;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 

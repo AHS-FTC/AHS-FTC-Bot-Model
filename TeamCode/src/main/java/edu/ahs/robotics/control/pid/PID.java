@@ -1,8 +1,6 @@
 package edu.ahs.robotics.control.pid;
 
-import java.util.Arrays;
-
-import edu.ahs.robotics.util.RingBuffer;
+import edu.ahs.robotics.util.ftc.RingBuffer;
 
 /**
  * General PID class applicable for whatever the  h e c k  you want.

@@ -32,14 +32,9 @@ package org.firstinspires.ftc.teamcode.autos;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.util.List;
-
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 @Autonomous(name = "-- AutoBlue --", group = "Linear Opmode")

@@ -4,13 +4,14 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.io.IOException;
 
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
+import edu.ahs.robotics.util.opmodes.bfr.LinearOpMode16896;
 
 /**
  * Logger class that logs bulk string information to a .txt file. Logs are timestamped with program runtime.
  * TextLogger automatically starts itself, calling Logger's startWriting() in the constructor.
  * 16896 OpModes incorporate a 'main logger' for general use
- * @see edu.ahs.robotics.util.opmodes.LinearOpMode16896
+ * @see LinearOpMode16896
  * @author Alex Appleby
  */
 public class TextLogger extends Logger {

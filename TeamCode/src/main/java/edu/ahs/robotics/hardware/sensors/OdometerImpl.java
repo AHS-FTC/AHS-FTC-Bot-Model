@@ -2,7 +2,7 @@ package edu.ahs.robotics.hardware.sensors;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 /**
  * Non-Mock implementation of the Odometer interface that runs on the robot. Reads encoder values, tracks, and returns distance based on wheel diameter.

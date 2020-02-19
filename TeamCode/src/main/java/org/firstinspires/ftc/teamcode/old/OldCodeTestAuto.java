@@ -34,17 +34,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.ArrayList;
-
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
+import edu.ahs.robotics.util.ftc.Tuner;
 
 
 @Autonomous(name = "Old Code Test Auto", group = "Linear Opmode")

@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 /**
  * Detector class that uses the Vuforia engine to grab a bitmap from the phone camera and detect the location of the Skystone.

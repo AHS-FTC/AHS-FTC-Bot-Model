@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.pathtests;
+package edu.ahs.robotics.util.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import edu.ahs.robotics.hardware.sensors.DistanceSensor;
-import edu.ahs.robotics.util.FTCMath;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.RingBuffer;
-import edu.ahs.robotics.util.opmodes.LinearOpMode16896;
+import edu.ahs.robotics.util.ftc.FTCMath;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
+import edu.ahs.robotics.util.ftc.RingBuffer;
+import edu.ahs.robotics.util.opmodes.bfr.LinearOpMode16896;
 
 @TeleOp(name = "Distance Sensor thingee", group = "Linear Opmode")
 //@Disabled
@@ -22,9 +22,9 @@ public class DistanceSensorOpMode extends LinearOpMode16896 {
 
         waitForStart();
 
-        while (opModeIsActive()){
-            long lastTime = FTCUtilities.getCurrentTimeMillis();
+        long lastTime = FTCUtilities.getCurrentTimeMillis();
 
+        while (opModeIsActive()){
             double leftReading = leftDistanceSensor.getDist();
             double rightReading = rightDistanceSensor.getDist();
 
@@ -38,6 +38,8 @@ public class DistanceSensorOpMode extends LinearOpMode16896 {
             telemetry.addData("leftStandardDev", FTCMath.ringBufferStandardDeviation(leftDistanceSensorReadings));
             telemetry.addData("rightStandardDev", FTCMath.ringBufferStandardDeviation(rightDistanceSensorReadings));
 
+            telemetry.addData("deltaTime", FTCUtilities.getCurrentTimeMillis() - lastTime);
+
             if(leftReading > rightReading){
                 telemetry.addLine("go left");
             } else {
@@ -45,6 +47,8 @@ public class DistanceSensorOpMode extends LinearOpMode16896 {
             }
 
             telemetry.update();
+
+            lastTime = FTCUtilities.getCurrentTimeMillis();
         }
 
     }

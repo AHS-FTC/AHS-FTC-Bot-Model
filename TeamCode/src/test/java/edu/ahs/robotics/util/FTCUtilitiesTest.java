@@ -2,6 +2,8 @@ package edu.ahs.robotics.util;
 
 import org.junit.Test;
 
+import edu.ahs.robotics.util.ftc.FTCMath;
+
 import static org.junit.Assert.*;
 
 public class FTCUtilitiesTest {

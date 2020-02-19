@@ -30,19 +30,12 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.DistanceSensor;
 import edu.ahs.robotics.hardware.sensors.Trigger;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
-import edu.ahs.robotics.util.MotorHashService;
-import edu.ahs.robotics.util.Tuner;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 @Autonomous(name = "Gripper Trigger Test", group = "Linear Opmode")

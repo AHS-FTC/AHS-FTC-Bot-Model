@@ -29,14 +29,13 @@
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 /**
  * Test OpMode that tests the capstone servo using a controller.
