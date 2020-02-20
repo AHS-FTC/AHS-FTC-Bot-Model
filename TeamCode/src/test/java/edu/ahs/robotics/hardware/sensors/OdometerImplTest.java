@@ -3,7 +3,7 @@ package edu.ahs.robotics.hardware.sensors;
 import org.junit.Test;
 
 import edu.ahs.robotics.hardware.DcMotorMockEncoder;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 import static org.junit.Assert.*;
 

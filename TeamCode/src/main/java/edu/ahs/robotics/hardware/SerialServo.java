@@ -2,15 +2,13 @@ package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
-
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 public class SerialServo {
     private Servo servo;
 
     public SerialServo(String deviceName, boolean reverse) {
-        servo = FTCUtilities.getServo(deviceName);
+        servo = FTCUtilities.getSerialServo(deviceName);
         if(reverse){
             servo.setDirection(Servo.Direction.REVERSE);
         } else {
@@ -21,4 +19,5 @@ public class SerialServo {
     public void setPosition(double position){
         servo.setPosition(position);
     }
+
 }

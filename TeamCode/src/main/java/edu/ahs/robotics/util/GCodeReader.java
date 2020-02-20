@@ -1,13 +1,13 @@
 package edu.ahs.robotics.util;
 
-import android.os.Environment;
-
-import org.firstinspires.ftc.robotcontroller.internal.FtcOpModeRegister;
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
+
 import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 import static java.lang.Double.valueOf;
 
@@ -18,23 +18,36 @@ import static java.lang.Double.valueOf;
 public class GCodeReader {
     private static GCodeReader instance;
 
-    public static ArrayList<Point> openFile(String name){
+    public static List<List<Point>> openFile(String name){
         BufferedReader fr;
         String fileName = FTCUtilities.getLogDirectory() + "/" + name;
-        ArrayList<Point> points = new ArrayList<>();
+        List<List<Point>> arrayOfPoints = new ArrayList<>();
 
         try {
             fr = new BufferedReader(new FileReader(fileName));
             String line;
+            boolean inPath = false;
+            List<Point> points = null;
             while ((line = fr.readLine()) != null){
-                String[] stringCoords =line.split(";");
-                Point p = new Point(valueOf(stringCoords[0]), valueOf(stringCoords[1]));
-                points.add(p);
+                String[] stringCoords = line.split(";");
+                if (valueOf(stringCoords[2]) == 0.0) {
+                    if (!inPath) {
+                        points = new ArrayList<>();
+                        inPath = true;
+                    }
+                    Point p = new Point(valueOf(stringCoords[0]), valueOf(stringCoords[1]));
+                    points.add(p);
+                } else {
+                    if (inPath){
+                        arrayOfPoints.add(points);
+                        inPath = false;
+                    }
+                }
             }
         } catch (IOException e){
             throw new Warning("Looking for path "+name+" threw exception"+e.getMessage());
         }
-        return points;
+        return arrayOfPoints;
     }
 
 }

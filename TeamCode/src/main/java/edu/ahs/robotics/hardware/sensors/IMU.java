@@ -7,8 +7,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import edu.ahs.robotics.util.FTCUtilities;
-
 /**
  * Wrapper class to manage the FTC BNO055IMU class and facilitate mocking in the future
  * @author Alex Appleby

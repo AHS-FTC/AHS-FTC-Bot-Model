@@ -32,15 +32,15 @@ public class OdometrySystemMock implements OdometrySystem {
         return position;
     }
 
-    private Velocity getVelocity() {
-        Velocity velocity = velocities.get(velocityIndex);
-        velocityIndex ++;
-        return velocity;
-    }
+//    private Velocity getVelocity() {
+//        Velocity velocity = velocities.get(velocityIndex);
+//        velocityIndex ++;
+//        return velocity;
+//    }
 
     @Override
     public State getState() {
-        return new State(getPosition(),getVelocity(),0,0);
+        return new State(getPosition());
     }
 
     @Override

@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometerImpl;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 /**

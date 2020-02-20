@@ -1,7 +1,5 @@
 package edu.ahs.robotics.hardware.sensors;
 
-import edu.ahs.robotics.util.FTCUtilities;
-
 public class TriggerDistanceSensor extends DistanceSensor implements Trigger {
     private double threshold;
 

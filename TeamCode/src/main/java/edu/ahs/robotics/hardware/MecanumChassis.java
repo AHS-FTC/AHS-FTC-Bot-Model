@@ -1,18 +1,24 @@
 package edu.ahs.robotics.hardware;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.internal.android.dx.util.Warning;
 
-import edu.ahs.robotics.control.PathFollower;
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Path;
+import edu.ahs.robotics.control.Vector;
 import edu.ahs.robotics.control.pid.PositionPID;
 import edu.ahs.robotics.control.Position;
-import edu.ahs.robotics.control.Velocity;
-import edu.ahs.robotics.control.pid.VelocityPID;
+import edu.ahs.robotics.hardware.sensors.DistanceSensor;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.hardware.sensors.Trigger;
+import edu.ahs.robotics.util.loggers.DataLogger;
+import edu.ahs.robotics.util.ftc.FTCMath;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.util.Logger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 public class MecanumChassis extends Chassis {
 
@@ -23,12 +29,15 @@ public class MecanumChassis extends Chassis {
     private static final double LEFT_INITIAL_SCALE = 1;
     public static final double RIGHT_AMPLIFIER = 1;
 
-    Logger logger = new Logger("Mecanum Chassis Old Code", "mecanumChassis");
+    //Logger logger = new Logger("Mecanum Chassis Old Code", "mecanumChassis");
+    private DataLogger logger;
 
     private SingleDriveUnit frontLeft;
     private SingleDriveUnit frontRight;
     private SingleDriveUnit backLeft;
     private SingleDriveUnit backRight;
+
+    private Trigger triggerBoi; //todo remove
 
     // Motor shortcuts
     private ChassisMotors.Mecanum FRONT_LEFT = ChassisMotors.Mecanum.FRONTLEFT;
@@ -50,10 +59,10 @@ public class MecanumChassis extends Chassis {
         backRight = new SingleDriveUnit(BACK_RIGHT.getDeviceName(), driveUnitConfig, true);
 
         this.odometrySystem = odometrySystem;
-        leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
-        rightOdometer = odometrySystem.getX1Odometer();
-
-        logger.startWriting();
+        if(odometrySystem != null) {
+            leftOdometer = odometrySystem.getX2Odometer(); // this can easily change based on the definition of the x1 odometer
+            rightOdometer = odometrySystem.getX1Odometer();
+        }
     }
 
 //    public MecanumChassis(DriveUnit.Config driveUnitConfig, IMU imu, OdometrySystemImpl odometrySystem, String xMotorName, String yMotorName, double odometryWheelDiameter) {
@@ -123,6 +132,14 @@ public class MecanumChassis extends Chassis {
         backLeft.setPower(motorPower);
     }
 
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior){
+        frontRight.setZeroPowerBehavior(behavior);
+        frontLeft.setZeroPowerBehavior(behavior);
+        backRight.setZeroPowerBehavior(behavior);
+        backLeft.setZeroPowerBehavior(behavior);
+
+    }
+
     public void stopMotors() {
         setPowerAll(0);
     }
@@ -141,6 +158,81 @@ public class MecanumChassis extends Chassis {
         backRight.setPower(backRightPower);
 
     }
+
+    /**
+     * Drives in the direction of a vector rooted in local robot coordinates.
+     * Ensure your vector is normalized for full power, or otherwise scaled down below a magnitude of 1.
+     */
+    private void driveLocalVector(Vector v, double turnPower){
+        frontLeft.setPower(v.x - v.y - turnPower);
+        backLeft.setPower(v.x + v.y - turnPower);
+
+        frontRight.setPower(v.x + v.y + turnPower);
+        backRight.setPower(v.x - v.y + turnPower);
+    }
+
+    public void driveTowardsPoint(Point target, double power, MotionConfig motionConfig){
+        Position robotPosition = odometrySystem.getState().position;
+
+        DriveCommand d = getDriveTowardsPointCommands(target, power, robotPosition, motionConfig);
+
+        driveLocalVector(d.driveVector, d.turnOutput);
+    }
+
+    /**
+     * Does actual work for driveTowardsPoint
+     */
+    /*protected for test*/ DriveCommand getDriveTowardsPointCommands(Point target, double power, Position robotPosition, MotionConfig motionConfig){
+        double dx = target.x - robotPosition.x;
+        double dy = target.y - robotPosition.y;
+        double globalAngleToPoint = Math.atan2(dy, dx);
+
+        double localAngleToPoint = FTCMath.ensureIdealAngle(globalAngleToPoint - robotPosition.heading);
+
+        Vector v = Vector.makeUnitVector(localAngleToPoint);
+        v.scale(power);
+
+        double turnOutput;
+
+        double distanceToTarget = target.distanceTo(robotPosition);
+        if(distanceToTarget < motionConfig.turnCutoff){
+            turnOutput = 0.0;
+        } else {
+            double angleError = FTCMath.ensureIdealAngle(localAngleToPoint - motionConfig.idealHeading);
+            turnOutput = Range.clip(angleError * motionConfig.turnAggression,-1,1) * motionConfig.turnPower; // local angle to point can be interpreted as error
+        }
+
+        logger.append("x", String.valueOf(robotPosition.x));
+        logger.append("y", String.valueOf(robotPosition.y));
+        logger.append("heading", String.valueOf(robotPosition.heading));
+        logger.append("power", String.valueOf(power));
+        logger.append("target x", String.valueOf(target.x));
+        logger.append("target y", String.valueOf(target.y));
+        logger.append("turn output", String.valueOf(turnOutput));
+        logger.append("global angle to point", String.valueOf(globalAngleToPoint));
+        logger.append("local angle to point", String.valueOf(localAngleToPoint));
+
+        logger.writeLine();
+
+
+        return new DriveCommand(v,turnOutput);
+    }
+
+    /**
+     * Contains driving info for testability for driveTowardsPoint
+     * Protected for testing
+     */
+     static class DriveCommand{
+        public Vector driveVector;
+        public double turnOutput;
+
+        public DriveCommand(Vector driveVector, double turnOutput) {
+            this.driveVector = driveVector;
+            this.turnOutput = turnOutput;
+        }
+    }
+
+
 
     public void arc(double angle, double radius, double maxPower, boolean rightTurn) {
         double minRampUp = .2;
@@ -259,13 +351,13 @@ public class MecanumChassis extends Chassis {
                 FTCUtilities.addData("ramp ratio", rampRatio);
                 FTCUtilities.updateOpLogger();
 
-                logger.append("rightDistance", String.valueOf(rightDistance));
-                logger.append("leftDistance", String.valueOf(leftDistance));
-                logger.append("adjustLeft", String.valueOf(adjustLeft));
-                logger.append("adjustRight", String.valueOf(adjustRight));
-                logger.append("rightPower", String.valueOf(powerRight));
-                logger.append("leftPower", String.valueOf(powerLeft));
-                logger.writeLine();
+//                logger.append("rightDistance", String.valueOf(rightDistance));
+//                logger.append("leftDistance", String.valueOf(leftDistance));
+//                logger.append("adjustLeft", String.valueOf(adjustLeft));
+//                logger.append("adjustRight", String.valueOf(adjustRight));
+//                logger.append("rightPower", String.valueOf(powerRight));
+//                logger.append("leftPower", String.valueOf(powerLeft));
+//                logger.writeLine();
 
             }
         } finally {
@@ -273,68 +365,32 @@ public class MecanumChassis extends Chassis {
         }
     }
 
+    /**
+     * Turns from any heading to a global angle.
+     * @param targetAngle Angle in radians to turn to, not bound by 2pi, may rotate inefficient path as such.
+     * @param turnAggression Turn power is proportional to turn error by this number.
+     * @param timeOut in milliseconds
+     */
+    public void globalPointTurn(double targetAngle, double turnAggression, long timeOut){
+        final double TURN_POWER_MINIMUM = 0.3;
 
-    public void velocityDrive(Path path, double maxSpeed){
-        OdometrySystem.State initialState = getState();
+        double turnError = Math.abs(targetAngle - getState().position.heading);
+        double startTime = FTCUtilities.getCurrentTimeMillis();
 
-        Position initialPosition = initialState.position;
-        /*Velocity initialVelocity = getVelocity();*/
+        while (turnError > 0.05 && FTCUtilities.getCurrentTimeMillis() - startTime < timeOut && FTCUtilities.opModeIsActive()){
+            turnError = Math.abs(targetAngle - getState().position.heading);
+            int turnSign = (int) Math.signum(targetAngle - getState().position.heading);
+            double errorTurnPower = (turnError * turnAggression);
 
-        double distanceToEnd = path.getTargetLocation(initialPosition).distanceToEnd;
+            double turnPower = turnSign * Math.max(errorTurnPower, TURN_POWER_MINIMUM);
 
-        double leftPower = 0.1, rightPower = 0.1; //initial power vals programmed in
+            frontRight.setPower(turnPower);
+            backRight.setPower(turnPower);
 
-        double rampDownScale = 3; //scales the sqrt graph for ramp down. Because all parabolas are similar, this is the only possible scale factor.
-
-        VelocityPID.Config config = new VelocityPID.Config();
-        config.setSpeedParams(0.01, 0.0005,  -0.001);
-        config.setDirectionParams(0.01,0.0005,-0.001);
-
-        VelocityPID pid = new VelocityPID(config);
-        VelocityPID.Correction correction;
-
-        if(!odometrySystem.isRunning()){
-            throw new Warning("tried to do a velocityDrive without the odometrySystem running");
+            frontLeft.setPower(-turnPower);
+            backLeft.setPower(-turnPower);
         }
 
-        while (distanceToEnd > 0.05) { //0.05 is quite arbitrary
-            double targetSpeed;
-
-            OdometrySystem.State state = getState();
-
-            Position currentPosition = state.position;
-            Velocity currentVelocity = state.velocity;
-
-            Path.Location location = path.getTargetLocation(currentPosition);
-
-            Velocity targetVelocity = Velocity.makeVelocity(location.pathDeltaX,location.pathDeltaY);
-
-            distanceToEnd = path.getTargetLocation(currentPosition).distanceToEnd; //this approaches zero, effectively 'flipping' ramp down along y axis
-
-            targetSpeed = Math.min(maxSpeed, rampDownScale * Math.sqrt(distanceToEnd));
-
-            // target speed math: https://www.desmos.com/calculator/31kvlxmlhn
-
-            targetVelocity.scaleMagnitude(targetSpeed); //scale the velocity vector
-
-            correction = pid.getCorrection(currentVelocity,targetVelocity, 0L); //get the corrections todo add deltatime
-
-            leftPower += correction.speed; //speed up all motors
-            rightPower += correction.speed;
-
-            leftPower -= correction.direction; // make direction adjustment
-            rightPower += correction.direction;
-
-            frontLeft.setPower(leftPower); //set powers
-            backLeft.setPower(leftPower);
-
-            frontRight.setPower(rightPower);
-            backRight.setPower(rightPower);
-
-            //FTCUtilities.addData("leftPower", leftPower);
-            //FTCUtilities.addData("rightPower", rightPower);
-            //FTCUtilities.updateOpLogger();
-        }
     }
 
     /**
@@ -404,26 +460,57 @@ public class MecanumChassis extends Chassis {
     public void setPosition(double x, double y, double heading){
         odometrySystem.setPosition(x, y, heading);
     }
+    //TEMPORARY
+    public void setTriggerBoi(Trigger triggerBoi){
+        this.triggerBoi = triggerBoi;
+    }
 
     private double inversePower(double power) {
         //   return power * Math.abs(power);
         return Math.signum(power) * Math.pow(power, 2);
     }
 
-    public void followPath(Path path) {
-        PathFollower pathFollower = new PathFollower(path,  1); //Max power before inversion
-        PathFollower.Powers powers;
-        do {
-            OdometrySystem.State state = getState();
-            powers = pathFollower.getUpdatedPowers(state);
+    public void followPath(Path path, MotionConfig motionConfig) {
+        long startTime = FTCUtilities.getCurrentTimeMillis();
+        OdometrySystem.State state;
+        Path.Location location;
 
-            frontLeft.setPower(powers.leftPower);
-            frontRight.setPower(powers.rightPower);
-            backRight.setPower(powers.rightPower);
-            backLeft.setPower(powers.leftPower);
+        setDataLogger("partialPursuit");
+
+        if(!logger.isWriting()) {
+            logger.startWriting();
         }
-        while (!powers.pathFinished && FTCUtilities.opModeIsActive());
 
+        do{
+            state = odometrySystem.getState();
+            location = path.getTargetLocation(state.position, motionConfig.lookAheadDistance);
+
+            double power = location.power;
+
+            logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
+            logger.append("triggerBoi", String.valueOf(triggerBoi.isTriggered()));
+            DistanceSensor d = (DistanceSensor)triggerBoi;
+
+            logger.append("distance", String.valueOf(d.getDist()));
+
+            driveTowardsPoint(location.futurePoint, power, motionConfig);
+
+            if (motionConfig.checkOBMCommands(state)){ //OBMCommands can break the loop. also checks all obmCommands.
+                break;
+            }
+
+        } while (!path.isFinished(state.position) && FTCUtilities.opModeIsActive() && FTCUtilities.getCurrentTimeMillis() - startTime < motionConfig.timeOut);
+    }
+
+    /**
+     * Allows for injection of mockLogger for tests
+     */
+    public void setDataLogger(String key){
+        logger = (DataLogger)Logger.getLogger(key);
+    }
+
+    private double convertSpeedToMotorPower(double speed){
+        return Range.clip(speed/48.0, -1, 1);
     }
 
     /**

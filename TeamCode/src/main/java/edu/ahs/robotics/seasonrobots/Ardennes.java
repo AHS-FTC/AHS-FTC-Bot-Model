@@ -4,7 +4,9 @@ package edu.ahs.robotics.seasonrobots;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.hardware.ChassisMotors;
+import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.DriveUnit;
 import edu.ahs.robotics.hardware.GearRatio;
 import edu.ahs.robotics.hardware.Intake;
@@ -15,7 +17,7 @@ import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.Odometer;
 import edu.ahs.robotics.hardware.sensors.OdometrySystemImpl;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.util.FTCUtilities;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.MotorHashService;
 import edu.ahs.robotics.hardware.Slides;
 
@@ -31,12 +33,11 @@ public class Ardennes extends Robot {
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo ySlide;
     private SerialServo capstone;
-    private SerialServo wrist;
-
+    private ContinuosServo tapeMeasure;
 
     public Ardennes() {
-        //intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
-        gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 25);
+        intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
+        gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 35);
         leftFoundation = new SerialServo("FSL", false);
         rightFoundation = new SerialServo("FSR", true);
         intake = new Intake(1);
@@ -46,7 +47,7 @@ public class Ardennes extends Robot {
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
-        wrist = new SerialServo("wrist", false);
+        tapeMeasure = new ContinuosServo("vexServo");
     }
 
     public Intake getIntake(){
@@ -78,7 +79,13 @@ public class Ardennes extends Robot {
 
     public SerialServo getCapstone() {return capstone;}
 
-    public SerialServo getWrist() {return wrist;}
+    public ContinuosServo getTapeMeasure() {return tapeMeasure;}
+
+    public void finishOBMCommand(OBMCommand obmCommand){
+        while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){
+            obmCommand.check(mecanumChassis.getState());
+        }
+    }
 
     private MecanumChassis makeChassis(OdometrySystemImpl odometrySystem) {
         //Set Gear Ratio
@@ -95,11 +102,11 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 2.3596,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 2.3617, true,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 2.387, true,4000);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 2.3590,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 2.3569, true,1440.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 2.3675, false,4000);
 
-        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, .1144, 14.1);
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -.103, 14.085);
         return odometrySystem;
     }
 

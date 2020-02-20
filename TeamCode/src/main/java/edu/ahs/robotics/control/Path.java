@@ -1,25 +1,31 @@
 package edu.ahs.robotics.control;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Path {
     static final double LOOK_AHEAD_DISTANCE = 6.0; /*Package visible for testing*/
     private final ArrayList<PointAtDistance> pointAtDistance;
+    private final double[][] powers;
     private double totalDistance = 0;
 
-
-    private double minRampUpSpeed;
-    private double minRampDownSpeed;
-    private double maxVelocity;
     private int iCurrentBound = 0;
+    private double initialPower;
 
-    public Path(ArrayList<Point> points, double minRampUpSpeed, double minRampDownSpeed, double maxVelocity) {
+    public Path(List<Point> points, boolean flipToBlue, double initialPower, double finalPower, double[][] powers) {
+        int finalPowerIndex = powers.length;
+        this.powers = new double[finalPowerIndex + 1][2];
+        this.initialPower = initialPower;
+
+        if (flipToBlue) {
+            for (int i = 0; i < points.size(); i++) {
+                Point current = points.get(i);
+                current.x = -1.0 * current.x;
+            }
+        }
+
         pointAtDistance = new ArrayList<>();
         pointAtDistance.add(new PointAtDistance(points.get(0), 0, 0, 0, 0));
-
-        this.minRampUpSpeed = minRampUpSpeed;
-        this.minRampDownSpeed = minRampDownSpeed;
-        this.maxVelocity = maxVelocity;
 
         for (int i = 1; i < points.size(); i++) {
             Point current = points.get(i);
@@ -31,7 +37,28 @@ public class Path {
 
             double distanceFromPrevious = current.distanceTo(previous);
             totalDistance += distanceFromPrevious;
+
             pointAtDistance.add(new PointAtDistance(current, totalDistance, current.x - previous.x, current.y - previous.y, distanceFromPrevious));
+        }
+
+        //Add final power to the end of the powers array
+        for (int i = 0; i < powers.length; i++) {
+            if (powers[i].length != 2) {
+                throw new IllegalArgumentException("Length of powers array was not equal to 2");
+            }
+            this.powers[i] = powers[i];
+        }
+        this.powers[finalPowerIndex][0] = totalDistance;
+        this.powers[finalPowerIndex][1] = finalPower;
+
+        //Check that the distances go in increasing order
+        double previousDistanceAtPower = powers[0][0];
+        for (int i = 1; i < powers.length; i++) {
+            double currentDistAtPower = powers[i][0];
+            if (currentDistAtPower < previousDistanceAtPower){
+                throw new IllegalArgumentException("Powers supplied to path must be in increasing order. Previous was "+ previousDistanceAtPower +" Current is "+currentDistAtPower);
+            }
+            previousDistanceAtPower = currentDistAtPower;
         }
     }
 
@@ -40,7 +67,7 @@ public class Path {
     }
 
     public boolean isFinished(Position robotPosition) {
-        iCurrentBound = getFirstBoundingPoint(robotPosition, iCurrentBound);
+        updateFirstBoundingPoint(robotPosition);
         if (iCurrentBound < pointAtDistance.size()-2) {
             return false;
         } else {
@@ -54,12 +81,14 @@ public class Path {
      * @param robotPosition
      * @return Returns a location
      */
-    public Location getTargetLocation(Position robotPosition) {
-        //Find the 2 closest bounding points
-        int iFutureBound = getFirstBoundingPoint(robotPosition, iCurrentBound); // used to be iFutureBound
-        PointAtDistance first = getPoint(iFutureBound);
+    public Location getTargetLocation(Position robotPosition, double lookAheadDistance) {
+        //Find closest bounding point behind robot
+        updateFirstBoundingPoint(robotPosition);
 
-        PointAtDistance second = getPoint(iFutureBound + 1);
+        //Find the 2 closest bounding points
+        PointAtDistance first = getPoint(iCurrentBound);
+
+        PointAtDistance second = getPoint(iCurrentBound + 1);
 
         Location loc = new Location(second);
 
@@ -68,60 +97,97 @@ public class Path {
         loc.closestPoint = pathLine.getClosestPointOnLine(robotPosition);
 
         //Calculate distance to end and distance from start of path
-        loc.distanceToEnd = (totalDistance - second.distanceFromStart) + loc.closestPoint.distanceTo(second);
+        double distanceToSecond = loc.closestPoint.distanceTo(second);
+        loc.distanceToEnd = (totalDistance - second.distanceFromStart) + distanceToSecond;
         loc.distanceFromStart = first.distanceFromStart + loc.closestPoint.distanceTo(first);
 
-        //Objective: Find distance to robot from path
-        //Note: Positive distances are to the right of the path and negative are to the left
-        //Step 1: Find perpendicular vector p to the heading
-        double pX = loc.pathDeltaY;
-        double pY = -loc.pathDeltaX;
+        //Calculate power at location
+        loc.power = getTargetPower(loc.distanceFromStart);
 
-        //Step 2: Calculate Robot vector
-        double robotDeltaX = robotPosition.x - loc.closestPoint.x;
-        double robotDeltaY = robotPosition.y - loc.closestPoint.y;
-
-        //Step 3: Calculate dot product of p and robotVector normalised by length of path vector
-        double pathVectorLength = Math.sqrt(Math.pow(loc.pathDeltaX, 2) + Math.pow(loc.pathDeltaY, 2));
-        loc.distanceToRobot = ((pX * robotDeltaX) + (pY * robotDeltaY)) / pathVectorLength;
-
-        //Calculate speed at location
-        loc.speed = getTargetSpeed(loc.distanceFromStart);
+        //Calculate a future point given a look ahead distance
+        loc.futurePoint = getFuturePoint(distanceToSecond, lookAheadDistance);
 
         return loc;
     }
 
-    private double getTargetSpeed(double distanceFromStart) {
-        double upScale = 2; //Todo adjust
-        double downScale = 1; //Todo adjust
-        if (distanceFromStart > totalDistance){
-            distanceFromStart = totalDistance;
+    private Point getFuturePoint(double distanceToSecond, double lookAheadDistance){
+        double totalDistance = distanceToSecond;
+        int iFutureBound = iCurrentBound + 1;
+
+
+        // Look for a point on the path that is at least lookAheadDistance from the robot position
+        while (totalDistance < lookAheadDistance && iFutureBound < pointAtDistance.size()-1) {
+            iFutureBound ++;
+            PointAtDistance current = getPoint(iFutureBound);
+            totalDistance += current.distanceToPrevious;
         }
-        double distanceToEnd = totalDistance - distanceFromStart;
-        double rampDown = (downScale * distanceToEnd) + minRampDownSpeed;
-        double rampUp = (upScale * distanceFromStart) + minRampUpSpeed;
-        return Math.min(rampDown, Math.min(rampUp, maxVelocity));
+
+        // If we ran out of points, return the last point in the path
+        if (totalDistance < lookAheadDistance) {
+            return getPoint(iFutureBound);
+        }
+
+        // Otherwise, interpolate a point before iFutureBound
+        PointAtDistance futureBound = getPoint(iFutureBound);
+        double distanceBack = totalDistance - lookAheadDistance;
+        double ratio = distanceBack/futureBound.distanceToPrevious;
+
+        return new Point(futureBound.x - (ratio * futureBound.pathDeltaX), futureBound.y - (ratio * futureBound.pathDeltaY));
+    }
+
+    private double getTargetPower(double distanceFromStart) {
+
+        double interpolatedPower = initialPower;
+        double currentPower;
+        for (int i = 0; i < powers.length; i++) {
+            if (powers[i][0] > distanceFromStart) {
+                break;
+            } else {
+                currentPower = powers[i][1];
+            }
+            double nextPower;
+            double nextDistance;
+            //Check if we are at end
+            if (i == powers.length-1) {
+                nextPower = powers[i][1];
+                nextDistance = powers[i][0];
+            } else {
+                nextPower = powers[i+1][1];
+                nextDistance = powers[i+1][0];
+            }
+            double powerDifference = nextPower - currentPower;
+
+            double currentDistance = distanceFromStart - powers[i][0];
+
+            double distanceDifference = nextDistance - powers[i][0];
+            double distanceRatio;
+            if (distanceDifference == 0) {
+                distanceRatio = 0;
+            } else {
+                distanceRatio = currentDistance/distanceDifference;
+            }
+
+            interpolatedPower = currentPower + (powerDifference * distanceRatio);
+        }
+
+        return interpolatedPower;
     }
 
     /**
      * Finds the closest point behind the robot in direction of travel and updates the first point
      * @param robotPosition
      */
-    private int getFirstBoundingPoint(Position robotPosition, int iStartSearch) {
+    private void updateFirstBoundingPoint(Position robotPosition) {
 
-        int returnVal = iStartSearch;
-
-        for (int i = iStartSearch; i < pointAtDistance.size()-1; i++) {
+        for (int i = iCurrentBound; i < pointAtDistance.size()-1; i++) {
             PointAtDistance current = getPoint(i);
             double componentToCurrent = getComponentAlongPath(robotPosition, current);
             if (componentToCurrent > 0) {
                 break;
             } else {
-                returnVal = i;
+                iCurrentBound = i;
             }
         }
-
-        return returnVal;
     }
 
     /**
@@ -164,9 +230,9 @@ public class Path {
         public double pathDeltaY;
         public double distanceToEnd;
         public double distanceFromStart;
-        public double distanceToRobot;
         public double pathSegmentLength;
-        public double speed;
+        public double power;
+        public Point futurePoint;
 
         public Location(PointAtDistance pointAtDistance) {
             pathDeltaX = pointAtDistance.pathDeltaX;

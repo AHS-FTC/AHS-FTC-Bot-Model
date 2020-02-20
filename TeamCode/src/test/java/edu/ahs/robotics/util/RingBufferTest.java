@@ -1,10 +1,8 @@
 package edu.ahs.robotics.util;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ahs.robotics.hardware.Chassis;
-import edu.ahs.robotics.hardware.MecanumChassis;
+import edu.ahs.robotics.util.ftc.RingBuffer;
 
 import static org.junit.Assert.*;
 
