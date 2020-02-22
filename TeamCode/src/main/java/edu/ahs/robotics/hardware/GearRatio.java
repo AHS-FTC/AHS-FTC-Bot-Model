@@ -21,7 +21,7 @@ public class GearRatio {
         return outputTeeth;
     }
 
-//    public void flip() {
+//    public void canFlip() {
 //        int inputTeeth2 = inputTeeth;
 //        int outputTeeth2 = outputTeeth;
 //        inputTeeth = outputTeeth2;

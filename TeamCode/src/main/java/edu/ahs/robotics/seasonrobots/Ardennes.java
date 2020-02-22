@@ -93,7 +93,7 @@ public class Ardennes extends Robot {
         //Set Wheel Diameter in inches and Motor Type. These traits are shared by all chassis drive units
         DriveUnit.Config config = new DriveUnit.Config(driveGearRatio, 3.94, MotorHashService.MotorTypes.AM_20);
 
-        //Make a HashMap that maps motors to their flip status. True indicates the motor runs reverse.
+        //Make a HashMap that maps motors to their canFlip status. True indicates the motor runs reverse.
         Map<ChassisMotors.Mecanum, Boolean> driveFlips  = new HashMap<>();
 
         //OdometrySystemImpl odometrySystem = makeOdometrySystem(imu);
