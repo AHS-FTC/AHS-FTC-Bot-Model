@@ -135,7 +135,10 @@ public class OdometrySystemImpl implements OdometrySystem {
         xLReading = xL.getDistance();
         yReading = y.getDistance();
 
-        FTCUtilities.OpLogger("y reading", yReading);
+        FTCUtilities.addData("xR", xRReading);
+        FTCUtilities.addData("xL", xLReading);
+        FTCUtilities.updateOpLogger();
+
 
         //find deltas
         dxR = xRReading - xRLast;

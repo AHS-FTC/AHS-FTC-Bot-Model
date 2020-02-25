@@ -24,7 +24,7 @@ public class LineTest {
     }
 
     @Test
-    public void testFlippedPoints(){ // if you flip the points on input you should receive the same line
+    public void testFlippedPoints(){ // if you canFlip the points on input you should receive the same line
         Point p1 = new Point(3, -4);
         Point p2 = new Point(5, 6);
 

@@ -33,7 +33,6 @@ public class Ardennes extends Robot {
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo xSlide;
     private SerialServo capstone;
-    private ContinuosServo tapeMeasure;
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
@@ -90,7 +89,7 @@ public class Ardennes extends Robot {
         //Set Wheel Diameter in inches and Motor Type. These traits are shared by all chassis drive units
         DriveUnit.Config config = new DriveUnit.Config(driveGearRatio, 3.94, MotorHashService.MotorTypes.AM_20);
 
-        //Make a HashMap that maps motors to their flip status. True indicates the motor runs reverse.
+        //Make a HashMap that maps motors to their canFlip status. True indicates the motor runs reverse.
         Map<ChassisMotors.Mecanum, Boolean> driveFlips  = new HashMap<>();
 
         //OdometrySystemImpl odometrySystem = makeOdometrySystem(imu);
@@ -99,9 +98,9 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 2.3590,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 2.3569, true,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 2.3675, false,4000);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.86882911,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.86882911, true,1440.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, false,1440);
 
         OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -.103, 14.085);
         return odometrySystem;

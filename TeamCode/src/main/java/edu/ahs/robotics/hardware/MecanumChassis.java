@@ -318,7 +318,7 @@ public class MecanumChassis extends Chassis {
                 double maxDistance = Math.abs(leftDistance) > Math.abs(rightDistance) ? Math.abs(leftDistance) : Math.abs(rightDistance);
                 double maxRemaining = maxTarget - maxDistance;
                 double rampUp = (upScale * maxDistance) + minRampUp;
-                double rampDown = (downScale * maxRemaining) + minRampDown; //distanceTo accounts for flip across y axis and x offset
+                double rampDown = (downScale * maxRemaining) + minRampDown; //distanceTo accounts for canFlip across y axis and x offset
 
                 double targetPower = Math.min(rampUp, Math.min(rampDown, maxPower));
 

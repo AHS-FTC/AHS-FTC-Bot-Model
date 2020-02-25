@@ -32,7 +32,6 @@ public class BaseAuto {
     private OBMCommand nullCommand = new NullCommand();
     private SlideCycle slideCycle;
     private BlockGripper blockGripper;
-    private OBMCommand tapeMeasure;
     private OBMCommand changeTargetHeading;
 
     private int turnSign;

@@ -41,6 +41,9 @@ import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.hardware.Intake;
+import edu.ahs.robotics.util.ftc.Switch;
+import edu.ahs.robotics.util.ftc.Toggle;
+
 
 //Written by Alex Appleby of team 16896
 //It really do be like that
@@ -95,9 +98,6 @@ public class ArdennesTeleOp extends OpMode
     private boolean slidesMoving = false;
     private boolean xPressed = false;
     private boolean runToLevelMode = false;
-
-    private Switch tapeMeasureSwitchIn;
-    private Switch tapeMeasureSwitchOut;
 
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
@@ -191,14 +191,14 @@ public class ArdennesTeleOp extends OpMode
 //        //}
 //
 //        if(gamepad2.y){
-//            if(slideControlSwitch.flip()){
+//            if(slideControlSwitch.canFlip()){
 //                targetLevel++;
 //                slides.setTargetLevel(targetLevel);
 //                slides.startAutoControl();
 //            }
 //        }
 //        if(gamepad2.x){
-//            if(slideControlSwitch.flip()){
+//            if(slideControlSwitch.canFlip()){
 //                targetLevel--;
 //                slides.setTargetLevel(targetLevel);
 //                slides.startAutoControl();
@@ -249,11 +249,11 @@ public class ArdennesTeleOp extends OpMode
 //        //press right bumper to reset slides to original position
 //        if (gamepad2.right_bumper) {
 //            if(gripperToggle.isEnabled()) {
-//                gripperToggle.flip();
+//                gripperToggle.canFlip();
 //                updateGripper();
 //            }
 //            if (capstoneToggle.isEnabled()) {
-//                capstoneToggle.flip();
+//                capstoneToggle.canFlip();
 //                activateWrist();
 //            }
 //            yServoPosition = 0;
@@ -270,7 +270,7 @@ public class ArdennesTeleOp extends OpMode
         if (slides.atBottom()) {
             //Is the intake running but the gripper is closed? Open the gripper.
             if (intakeMode != IntakeMode.OFF && gripperToggle.isEnabled()) {
-                gripperToggle.flip();
+                gripperToggle.canFlip();
                 updateGripper();
             }
             //Is the gripper distance sensor triggered? We have a block in position, stop the intake.
@@ -281,7 +281,7 @@ public class ArdennesTeleOp extends OpMode
                 }
                 // Is the gripper open and in position and is the intake not running out? Then grip the block.
                 if (!gripperToggle.isEnabled() && intakeMode != IntakeMode.OUT) {
-                    gripperToggle.flip();
+                    gripperToggle.canFlip();
                     updateGripper();
                 }
             }
@@ -308,7 +308,7 @@ public class ArdennesTeleOp extends OpMode
     private void buttonActions() {
         //press dpad down to enable debug logs
         if (gamepad1.dpad_down) {
-            debugToggle.flip();
+            debugToggle.canFlip();
             if (debugToggle.isEnabled()) {
                 //telemetry.addData("deltaTime",lastTime-time.milliseconds());
                 //lastTime = time.milliseconds();
@@ -324,7 +324,7 @@ public class ArdennesTeleOp extends OpMode
 
         //press l bumper to reverse intake
         if (gamepad1.left_bumper) {
-            if(intakeOutSwitch.flip()) {
+            if(intakeOutSwitch.canFlip()) {
                 if (intakeMode == IntakeMode.OUT) {
                     intakeMode = IntakeMode.OFF;
                 } else {
@@ -336,7 +336,7 @@ public class ArdennesTeleOp extends OpMode
 
         //press r bumper to enable intake
         if (gamepad1.right_bumper) {
-            if (intakeInSwitch.flip()) {
+            if (intakeInSwitch.canFlip()) {
                 if (intakeMode == IntakeMode.IN) {
                     intakeMode = IntakeMode.OFF;
                 } else {
@@ -348,19 +348,19 @@ public class ArdennesTeleOp extends OpMode
 
         //press x to drop capstone
         if (gamepad2.x) {
-            capstoneToggle.flip();
+            capstoneToggle.canFlip();
             activateCapstone();
         }
 
         //press a to grip block
         if (gamepad2.a) {
-            gripperToggle.flip();
+            gripperToggle.canFlip();
             updateGripper();
         }
 
         //press a to grip foundation
         if (gamepad1.a) {
-            foundationToggle.flip();
+            foundationToggle.canFlip();
             if (foundationToggle.isEnabled()) {
                 leftFoundation.setPosition(1);
                 rightFoundation.setPosition(1);
@@ -372,7 +372,7 @@ public class ArdennesTeleOp extends OpMode
 
         //gamepad 1 press dpad up to enable collection mode
         if (gamepad1.dpad_up) {
-            collectionModeToggle.flip();
+            collectionModeToggle.canFlip();
             telemetry.addData("Collection Mode?", collectionModeToggle.isEnabled());
             //telemetry.update();
         }
@@ -403,7 +403,7 @@ public class ArdennesTeleOp extends OpMode
         } else {
             gripper.setPosition(0);
         }
-        telemetry.addData("Gripper Toggled?", gripperToggle.enabled);
+        telemetry.addData("Gripper Toggled?", gripperToggle.isEnabled());
         //telemetry.update();
     }
 
@@ -427,46 +427,5 @@ public class ArdennesTeleOp extends OpMode
         intake.stopMotors();
 //        slides.kill();
         slides.stopMotors();
-    }
-
-    private class Switch {
-        private final static double BUTTON_THRESHOLD = 300; //in millis - time between presses
-        protected double lastPress;
-
-        public Switch() {
-            lastPress = time.milliseconds();
-        }
-
-        public boolean flip() {
-            if(time.milliseconds() - lastPress > BUTTON_THRESHOLD) {
-                lastPress = time.milliseconds();
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private class Toggle extends Switch {
-        private boolean enabled = false;
-
-        public Toggle() {
-            super();
-        }
-
-        public boolean flip() {
-            if (super.flip()) {
-                enabled = !enabled;
-                return true;
-            }
-            return false;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
     }
 }
