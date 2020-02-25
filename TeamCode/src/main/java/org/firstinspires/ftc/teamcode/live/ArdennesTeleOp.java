@@ -128,9 +128,6 @@ public class ArdennesTeleOp extends OpMode
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
 
-        tapeMeasureSwitchIn = new Switch();
-        tapeMeasureSwitchOut = new Switch();
-
         foundationToggle = new Toggle();
         gripperToggle = new Toggle();
         capstoneToggle = new Toggle();
