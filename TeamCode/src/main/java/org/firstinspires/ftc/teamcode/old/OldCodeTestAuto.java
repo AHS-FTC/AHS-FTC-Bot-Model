@@ -68,7 +68,7 @@ public class OldCodeTestAuto extends LinearOpMode {
         SerialServo foundationServoLeft = ardennes.getLeftFoundation();
         SerialServo foundationServoRight = ardennes.getRightFoundation();
         SerialServo gripper = ardennes.getGripper();
-        SerialServo yslide = ardennes.getySlide();
+        SerialServo yslide = ardennes.getxSlide();
         TriggerDistanceSensor gripperTrigger = ardennes.getGripperTrigger();
         TriggerDistanceSensor intakeTrigger = ardennes.getIntakeTrigger();
         slides.resetEncoders();

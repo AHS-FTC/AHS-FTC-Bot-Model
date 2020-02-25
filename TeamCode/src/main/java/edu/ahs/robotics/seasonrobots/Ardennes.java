@@ -31,7 +31,7 @@ public class Ardennes extends Robot {
     private ArdennesSkyStoneDetector detector;
     private Slides slides;
     private SerialServo leftFoundation, rightFoundation;
-    private SerialServo ySlide;
+    private SerialServo xSlide;
     private SerialServo capstone;
     private ContinuosServo tapeMeasure;
 
@@ -45,9 +45,8 @@ public class Ardennes extends Robot {
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
-        ySlide = new SerialServo("slideServo", false);
+        xSlide = new SerialServo("slideServo", true);
         capstone = new SerialServo("capstone", true);
-        tapeMeasure = new ContinuosServo("vexServo");
     }
 
     public Intake getIntake(){
@@ -73,13 +72,11 @@ public class Ardennes extends Robot {
     public SerialServo getLeftFoundation() {return leftFoundation;}
     public SerialServo getRightFoundation() {return rightFoundation;}
 
-    public SerialServo getySlide() {return ySlide;}
+    public SerialServo getxSlide() {return xSlide;}
 
     public Slides getSlides() {return slides;}
 
     public SerialServo getCapstone() {return capstone;}
-
-    public ContinuosServo getTapeMeasure() {return tapeMeasure;}
 
     public void finishOBMCommand(OBMCommand obmCommand){
         while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){

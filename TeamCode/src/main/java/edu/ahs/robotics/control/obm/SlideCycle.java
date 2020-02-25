@@ -39,7 +39,7 @@ public class SlideCycle implements OBMCommand{
         state  = State.INITIAL;
 
         slides = ardennes.getSlides();
-        xSlide = ardennes.getySlide();
+        xSlide = ardennes.getxSlide();
         gripper = ardennes.getGripper();
 
         this.cycleHeight = cycleHeight;

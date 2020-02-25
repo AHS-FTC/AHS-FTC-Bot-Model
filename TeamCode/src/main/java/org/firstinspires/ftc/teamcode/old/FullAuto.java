@@ -46,7 +46,7 @@ public class FullAuto {
         foundationServoLeft = ardennes.getLeftFoundation();
         foundationServoRight = ardennes.getRightFoundation();
         gripper = ardennes.getGripper();
-        yslide = ardennes.getySlide();
+        yslide = ardennes.getxSlide();
         capstone = ardennes.getCapstone();
         gripperTrigger = ardennes.getGripperTrigger();
         //intakeTrigger = ardennes.getIntakeTrigger();

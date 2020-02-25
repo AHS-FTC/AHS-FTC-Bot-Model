@@ -8,7 +8,6 @@ import edu.ahs.robotics.control.obm.BlockGripper;
 import edu.ahs.robotics.control.obm.NullCommand;
 import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.obm.SlideCycle;
-import edu.ahs.robotics.control.obm.TapeMeasureCommand;
 import edu.ahs.robotics.control.obm.TargetHeadingChanger;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
@@ -16,7 +15,6 @@ import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.loggers.Logger;
 
 public class BaseAuto {
@@ -49,7 +47,7 @@ public class BaseAuto {
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
 
-        xSlide = ardennes.getySlide();
+        xSlide = ardennes.getxSlide();
         gripper = ardennes.getGripper();
 
         capstone = ardennes.getCapstone();
@@ -64,7 +62,6 @@ public class BaseAuto {
 
         slideCycle = new SlideCycle(ardennes);
         blockGripper = new BlockGripper(ardennes,500L);
-        tapeMeasure = new TapeMeasureCommand(ardennes.getTapeMeasure());
 
         if(flipToBlue){
             turnSign = -1;
@@ -132,14 +129,14 @@ public class BaseAuto {
         MotionConfig quarryConfig = new MotionConfig();
         quarryConfig.idealHeading =  (turnSign)*(-Math.PI/4);
         quarryConfig.timeOut = 4000;
-
+        quarryConfig.addOBMCommand(blockGripper);
 
         chassis.followPath(quarry,quarryConfig);
 
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.idealHeading = Math.PI;
         toFoundationConfig.timeOut = 5000;
-        toFoundationConfig.addOBMCommand(blockGripper);
+        //toFoundationConfig.addOBMCommand(blockGripper);
         changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 0);
         toFoundationConfig.addOBMCommand (changeTargetHeading);
         toFoundationConfig.turnCutoff = 7;
@@ -147,7 +144,7 @@ public class BaseAuto {
         chassis.followPath(toFoundation, toFoundationConfig);
 
         chassis.stopMotors();
-
+/*
         double targetAngle = (2*Math.PI);
         if(turnSign == -1){
             targetAngle = -Math.PI;
@@ -242,7 +239,7 @@ public class BaseAuto {
         //ardennes.finishOBMCommand(tapeMeasure);
 
         chassis.stopOdometrySystem();
-        logger.stopWriting();
+        logger.stopWriting();*/
     }
 
 }
