@@ -33,7 +33,6 @@ public class Ardennes extends Robot {
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo ySlide;
     private SerialServo capstone;
-    private ContinuosServo tapeMeasure;
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
@@ -47,7 +46,6 @@ public class Ardennes extends Robot {
         slides = new Slides();
         ySlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
-        tapeMeasure = new ContinuosServo("vexServo");
     }
 
     public Intake getIntake(){
@@ -79,8 +77,6 @@ public class Ardennes extends Robot {
 
     public SerialServo getCapstone() {return capstone;}
 
-    public ContinuosServo getTapeMeasure() {return tapeMeasure;}
-
     public void finishOBMCommand(OBMCommand obmCommand){
         while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){
             obmCommand.check(mecanumChassis.getState());
@@ -102,9 +98,9 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 2.3590,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 2.3569, true,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 2.3675, false,4000);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.86882911,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.86882911, true,1440.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, false,1440);
 
         OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -.103, 14.085);
         return odometrySystem;
