@@ -55,30 +55,32 @@ public class RedAuto extends LinearOpMode {
         BaseAuto auto = new BaseAuto(false);
 
         List<List<Point>> route36 = GCodeReader.openFile("red36.csv");
-        List<List<Point>> route25 = GCodeReader.openFile("red36.csv");
-        List<List<Point>> route14 = GCodeReader.openFile("red36.csv");
+        List<List<Point>> route25 = GCodeReader.openFile("red25.csv");
+        List<List<Point>> route14 = GCodeReader.openFile("red14.csv");
 
         Path quarry36 = new Path(route36.get(0), false, 0.4, 0.2, new double[][]{{10, .3}, {22, .3}});
         Path toFoundation36 = new Path(route36.get(1), false, .3, 0, new double[][]{{18, .5}, {26, 1}, {40, .8}}); //32
         Path pullFoundation36 = new Path(route36.get(2), false, .7, 1, new double[][]{{12, .8}, {14, 1}});
-        Path quarry236 = new Path(route36.get(3), false, 1, 0, new double[][]{{12, .7}, {20, .5}});
-        Path foundation236 = new Path(route36.get(4), false, .5, 0, new double[][]{{12, .7}, {16, 1}, {40, .3}});
-        Path quarry336 = new Path(route36.get(5), false, 1, 0, new double[][]{{12, .7}, {20, .5}});
+        Path quarry236 = new Path(route36.get(3), false, 1, 0, new double[][]{{12, .7}, {20, .3}});
+        Path foundation236 = new Path(route36.get(4), false, .2, 0, new double[][]{{12, .7}, {16, 1}, {40, .3}});
+        Path quarry336 = new Path(route36.get(5), false, 1, 0, new double[][]{{12, .7}, {20, .3}});
         Path foundation336 = new Path(route36.get(6), false, .5, 0, new double[][]{{12, .7}, {16, 1}, {35, .3}});
 
-//        Path quarry25 = new Path(route25.get(0), 12,12,22, false);
-//        Path toFoundation25 = new Path(route25.get(1), 8,4,35, 9, 2, 1, false); //32
-//        Path quarry225 = new Path(route25.get(2), 12, 12, 36,6,2,1, false);
-//        Path foundation225 = new Path(route25.get(3), 12, 12, 44,9,2,1, false);
-//        Path quarry325 = new Path(route25.get(4), 12, 12, 44,9,2,1, false);
-//        Path foundation325 = new Path(route25.get(5), 12, 12, 44,9,2,1, false);
-//
-//        Path quarry14 = new Path(route14.get(0), 12,12,22, 18, 2,1, false);
-//        Path toFoundation14 = new Path(route14.get(1), 8,4,35, 9, 2, 1, false); //32
-//        Path quarry214 = new Path(route14.get(2), 12, 12, 36,6,2,1, false);
-//        Path foundation214 = new Path(route14.get(3), 12, 12, 44,9,2,1, false);
-//        Path quarry314 = new Path(route14.get(4), 12, 12, 44,9,2,1, false);
-//        Path foundation314 = new Path(route14.get(5), 12, 12, 44,9,2,1, false);
+        Path quarry25 = new Path(route25.get(0), false, 0.4, 0.2, new double[][]{{10, .3}, {22, .3}});
+        Path toFoundation25 = new Path(route25.get(1), false, .3, 0, new double[][]{{18, .5}, {26, 1}, {40, .8}}); //32
+        Path pullFoundation25 = new Path(route25.get(2), false, .7, 1, new double[][]{{12, .8}, {14, 1}});
+        Path quarry225 = new Path(route25.get(2), false, 1, 0, new double[][]{{12, .7}, {20, .3}});
+        Path foundation225 = new Path(route25.get(3), false, .2, 0, new double[][]{{12, .4}, {22, 1}, {40, .3}});
+        Path quarry325 = new Path(route25.get(4), false, 1, 0, new double[][]{{12, .7}, {20, .3}});
+        Path foundation325 = new Path(route25.get(5), false);
+
+        Path quarry14 = new Path(route14.get(0), false);
+        Path toFoundation14 = new Path(route14.get(1), false); //32
+        Path pullFoundation14 = new Path(route14.get(2), false, .7, 1, new double[][]{{12, .8}, {14, 1}});
+        Path quarry214 = new Path(route14.get(2),  false);
+        Path foundation214 = new Path(route14.get(3), false);
+        Path quarry314 = new Path(route14.get(4), false);
+        Path foundation314 = new Path(route14.get(5), false);
 
         Path quarry;
         Path toFoundation;
@@ -91,25 +93,25 @@ public class RedAuto extends LinearOpMode {
         waitForStart(); //-----------------------------
         ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look();
 
-//        if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR) {
-//            quarry = quarry14;
-//            toFoundation = toFoundation14;
-//            pullFoundation = pullFoundation36;
-//            quarry2 = quarry214;
-//            foundation2 = foundation214;
-//            quarry3 = quarry314;
-//            foundation3 = foundation314;
-//
-//        } else if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE) {
-//            quarry = quarry25;
-//            toFoundation = toFoundation25;
-//            pullFoundation = pullFoundation36;
-//            quarry2 = quarry225;
-//            foundation2 = foundation225;
-//            quarry3 = quarry325;
-//            foundation3 = foundation325;
-//
-//        } else {
+        if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR) {
+            quarry = quarry14;
+            toFoundation = toFoundation14;
+            pullFoundation = pullFoundation14;
+            quarry2 = quarry214;
+            foundation2 = foundation214;
+            quarry3 = quarry314;
+            foundation3 = foundation314;
+
+        } else if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE) {
+            quarry = quarry25;
+            toFoundation = toFoundation25;
+            pullFoundation = pullFoundation25;
+            quarry2 = quarry225;
+            foundation2 = foundation225;
+            quarry3 = quarry325;
+            foundation3 = foundation325;
+
+        } else {
             quarry = quarry36;
             toFoundation = toFoundation36;
             pullFoundation = pullFoundation36;
