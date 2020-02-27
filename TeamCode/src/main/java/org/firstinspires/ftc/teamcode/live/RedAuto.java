@@ -72,15 +72,15 @@ public class RedAuto extends LinearOpMode {
         Path quarry225 = new Path(route25.get(2), false, 1, 0, new double[][]{{12, .7}, {20, .3}});
         Path foundation225 = new Path(route25.get(3), false, .2, 0, new double[][]{{12, .4}, {22, 1}, {40, .3}});
         Path quarry325 = new Path(route25.get(4), false, 1, 0, new double[][]{{12, .7}, {20, .3}});
-        Path foundation325 = new Path(route25.get(5), false);
+        Path foundation325 = new Path(route25.get(5), false, .5, 0, new double[][]{{12, .7}, {16, 1}, {35, .3}});
 
-        Path quarry14 = new Path(route14.get(0), false);
-        Path toFoundation14 = new Path(route14.get(1), false); //32
-        Path pullFoundation14 = new Path(route14.get(2), false, .7, 1, new double[][]{{12, .8}, {14, 1}});
-        Path quarry214 = new Path(route14.get(2),  false);
-        Path foundation214 = new Path(route14.get(3), false);
-        Path quarry314 = new Path(route14.get(4), false);
-        Path foundation314 = new Path(route14.get(5), false);
+//        Path quarry14 = new Path(route14.get(0), false);
+//        Path toFoundation14 = new Path(route14.get(1), false); //32
+//        Path pullFoundation14 = new Path(route14.get(2), false, .7, 1, new double[][]{{12, .8}, {14, 1}});
+//        Path quarry214 = new Path(route14.get(2),  false);
+//        Path foundation214 = new Path(route14.get(3), false);
+//        Path quarry314 = new Path(route14.get(4), false);
+//        Path foundation314 = new Path(route14.get(5), false);
 
         Path quarry;
         Path toFoundation;
@@ -93,37 +93,37 @@ public class RedAuto extends LinearOpMode {
         waitForStart(); //-----------------------------
         ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look();
 
-        if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR) {
-            quarry = quarry14;
-            toFoundation = toFoundation14;
-            pullFoundation = pullFoundation14;
-            quarry2 = quarry214;
-            foundation2 = foundation214;
-            quarry3 = quarry314;
-            foundation3 = foundation314;
+//        if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.ONE_FOUR) {
+//            quarry = quarry14;
+//            toFoundation = toFoundation14;
+//            pullFoundation = pullFoundation14;
+//            quarry2 = quarry214;
+//            foundation2 = foundation214;
+//            quarry3 = quarry314;
+//            foundation3 = foundation314;
+//
+//        } else if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE) {
+//            quarry = quarry25;
+//            toFoundation = toFoundation25;
+//            pullFoundation = pullFoundation25;
+//            quarry2 = quarry225;
+//            foundation2 = foundation225;
+//            quarry3 = quarry325;
+//            foundation3 = foundation325;
+//
+//        } else {
+//            quarry = quarry36;
+//            toFoundation = toFoundation36;
+//            pullFoundation = pullFoundation36;
+//            quarry2 = quarry236;
+//            foundation2 = foundation236;
+//            quarry3 = quarry336;
+//            foundation3 = foundation336;
+//
+//        }
 
-        } else if (stoneConfiguration == ArdennesSkyStoneDetector.SkyStoneConfigurations.TWO_FIVE) {
-            quarry = quarry25;
-            toFoundation = toFoundation25;
-            pullFoundation = pullFoundation25;
-            quarry2 = quarry225;
-            foundation2 = foundation225;
-            quarry3 = quarry325;
-            foundation3 = foundation325;
-
-        } else {
-            quarry = quarry36;
-            toFoundation = toFoundation36;
-            pullFoundation = pullFoundation36;
-            quarry2 = quarry236;
-            foundation2 = foundation236;
-            quarry3 = quarry336;
-            foundation3 = foundation336;
-
-        //}
-
-        auto.setPaths(quarry, toFoundation, pullFoundation, quarry2, foundation2, quarry3, foundation3);
-        auto.start();
+//        auto.setPaths(quarry, toFoundation, pullFoundation, quarry2, foundation2, quarry3, foundation3);
+//        auto.start();
 
     }
 }
