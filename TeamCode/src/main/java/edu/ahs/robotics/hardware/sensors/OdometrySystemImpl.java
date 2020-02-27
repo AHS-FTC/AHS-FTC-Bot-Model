@@ -135,11 +135,6 @@ public class OdometrySystemImpl implements OdometrySystem {
         xLReading = xL.getDistance();
         yReading = y.getDistance();
 
-        FTCUtilities.addData("xR", xRReading);
-        FTCUtilities.addData("xL", xLReading);
-        FTCUtilities.updateOpLogger();
-
-
         //find deltas
         dxR = xRReading - xRLast;
         dxL = xLReading - xLLast;
@@ -183,6 +178,11 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+
+        FTCUtilities.addData("back wheel", yReading);
+        FTCUtilities.addData("heading", position.heading);
+        FTCUtilities.updateOpLogger();
+
 
         logger.append("xR", String.valueOf(xRReading));
         logger.append("xL", String.valueOf(xLReading));

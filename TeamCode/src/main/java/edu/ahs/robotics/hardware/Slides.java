@@ -28,8 +28,11 @@ public class Slides {
     /**
      * 'P' terms used for holding slide position. Separated to account for gravitational bias. Will require tuning.
      */
-    private static final double UP_CORRECTION = 0.015; //todo tune
-    private static final double DOWN_CORRECTION = 0.01;
+    //private static final double UP_CORRECTION = 0.015; //todo tune
+    //private static final double DOWN_CORRECTION = 0.01;
+
+    private double upCorrection = 0.015;
+    private double downCorrection = 0.01;
 
     /**
      * Power that slides return with using auto retraction
@@ -180,11 +183,10 @@ public class Slides {
         int error = targetTick - currentTick; //positive = below and correcting up
 
         if(Math.signum(error) == 1){
-            autoControlPower += UP_CORRECTION * error;
+            autoControlPower += (upCorrection * error);
         } else {
-            autoControlPower += DOWN_CORRECTION * error;
+            autoControlPower += (downCorrection * error);
         }
-
     }
 
     /**
@@ -214,6 +216,7 @@ public class Slides {
      * Nonblocking, use in an iterative context.
      */
     public void gamepadControl(){
+
         checkInputs();
         switch (state){
             case AT_BOTTOM:
@@ -235,6 +238,21 @@ public class Slides {
             case USER_CONTROLLED:
                 runAtPower(gamepad.right_trigger - gamepad.left_trigger);
                 break;
+        }
+    }
+
+    /**
+     * Allows you to directly tune the slide corrections. Comment this out when you're done.
+     */
+    public void tuningPIDControl(double upCorrection, double downCorrection){
+        this.upCorrection = upCorrection;
+        this.downCorrection = downCorrection;
+
+        calculateAutoControlPower(1000);
+        if (gamepad.x){
+            stopMotors();
+        } else {
+            setPower(autoControlPower);
         }
     }
 
