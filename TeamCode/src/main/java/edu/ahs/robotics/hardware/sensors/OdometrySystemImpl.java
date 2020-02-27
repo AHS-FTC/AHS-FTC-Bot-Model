@@ -179,9 +179,9 @@ public class OdometrySystemImpl implements OdometrySystem {
         position.x += dxGlobal;
         position.y += dyGlobal;
 
-        FTCUtilities.addData("back wheel", yReading);
-        FTCUtilities.addData("heading", position.heading);
-        FTCUtilities.updateOpLogger();
+//        FTCUtilities.addData("back wheel", yReading);
+//        FTCUtilities.addData("heading", position.heading);
+//        FTCUtilities.updateOpLogger();
 
 
         logger.append("xR", String.valueOf(xRReading));
