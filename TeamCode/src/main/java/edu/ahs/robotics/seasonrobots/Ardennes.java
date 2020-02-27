@@ -31,7 +31,7 @@ public class Ardennes extends Robot {
     private ArdennesSkyStoneDetector detector;
     private Slides slides;
     private SerialServo leftFoundation, rightFoundation;
-    private SerialServo ySlide;
+    private SerialServo xSlide;
     private SerialServo capstone;
 
     public Ardennes() {
@@ -44,7 +44,7 @@ public class Ardennes extends Robot {
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
-        ySlide = new SerialServo("slideServo", false);
+        xSlide = new SerialServo("slideServo", true);
         capstone = new SerialServo("capstone", true);
     }
 
@@ -71,7 +71,7 @@ public class Ardennes extends Robot {
     public SerialServo getLeftFoundation() {return leftFoundation;}
     public SerialServo getRightFoundation() {return rightFoundation;}
 
-    public SerialServo getySlide() {return ySlide;}
+    public SerialServo getxSlide() {return xSlide;}
 
     public Slides getSlides() {return slides;}
 
@@ -98,11 +98,11 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.86882911,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.86882911, true,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, false,1440);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.86882911,false,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.86882911, false,1440.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, true,1440);
 
-        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -.103, 14.085);
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.129086111, 14.4218256);
         return odometrySystem;
     }
 

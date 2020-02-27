@@ -34,7 +34,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
@@ -77,7 +76,6 @@ public class ArdennesTeleOp extends OpMode
     private MecanumChassis chassis;
 
     private SerialServo gripper, capstone, ySlide, leftFoundation, rightFoundation;
-    private ContinuosServo tapeMeasure;
     //todo add Servo capstoneServo;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
@@ -100,9 +98,6 @@ public class ArdennesTeleOp extends OpMode
     private boolean slidesMoving = false;
     private boolean xPressed = false;
     private boolean runToLevelMode = false;
-
-    private Switch tapeMeasureSwitchIn;
-    private Switch tapeMeasureSwitchOut;
 
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
@@ -129,12 +124,9 @@ public class ArdennesTeleOp extends OpMode
 
         gripper = ardennes.getGripper();
         capstone = ardennes.getCapstone();
-        ySlide = ardennes.getySlide();
+        ySlide = ardennes.getxSlide();
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
-
-        tapeMeasureSwitchIn = new Switch();
-        tapeMeasureSwitchOut = new Switch();
 
         foundationToggle = new Toggle();
         gripperToggle = new Toggle();
@@ -327,30 +319,6 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        //press x on gamepad 1 to enable tapeMeasure
-        if (gamepad1.x) {
-            if (tapeMeasureSwitchOut.canFlip()) {
-                if (tapeMeasureMode == TapeMeasureMode.OUT) {
-                    tapeMeasureMode = TapeMeasureMode.OFF;
-                } else {
-                    tapeMeasureMode = TapeMeasureMode.OUT;
-                }
-                updateTapeMeasure();
-            }
-        }
-
-        //press y on gamepad 1 to retract tape Measure
-        if (gamepad1.y) {
-            if (tapeMeasureSwitchIn.canFlip()) {
-                if (tapeMeasureMode == TapeMeasureMode.IN) {
-                    tapeMeasureMode = TapeMeasureMode.OFF;
-                } else {
-                    tapeMeasureMode = TapeMeasureMode.IN;
-                }
-                updateTapeMeasure();
-            }
-        }
-
         //press l bumper to reverse intake
         if (gamepad1.left_bumper) {
             if(intakeOutSwitch.canFlip()) {
@@ -413,16 +381,6 @@ public class ArdennesTeleOp extends OpMode
             capstone.setPosition(1);
         } else {
             capstone.setPosition(0.22);
-        }
-    }
-
-    private void updateTapeMeasure() {
-        if (tapeMeasureMode == tapeMeasureMode.OUT) {
-            tapeMeasure.setPower(.85);
-        } else if (tapeMeasureMode == tapeMeasureMode.OFF) {
-            tapeMeasure.setPower(0);
-        } else if (tapeMeasureMode == TapeMeasureMode.IN) {
-            tapeMeasure.setPower(-.85);
         }
     }
 

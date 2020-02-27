@@ -48,7 +48,7 @@ public class BlockGripper implements OBMCommand {
                 state = State.WAITING;
                 break;
             case WAITING:
-                if(FTCUtilities.getCurrentTimeMillis() - startTime > waitTime) {// || FTCUtilities.getCurrentTimeMillis() - startTime > waitTime){ gripperTrigger.isTriggered()
+                if(gripperTrigger.isTriggered()) {// || FTCUtilities.getCurrentTimeMillis() - startTime > waitTime){ gripperTrigger.isTriggered()
                     ardennes.getGripper().setPosition(1);
                     ardennes.getIntake().stopMotors();
                     state = State.FINISHED;
