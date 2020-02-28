@@ -56,12 +56,12 @@ public class StraightAuto extends LinearOpMode {
         points.add(new Point(0,0));
         points.add(new Point(72,0));
 
-        BaseTestAuto base = new BaseTestAuto(points);
+        //BaseTestAuto base = new BaseTestAuto(points);
 
         waitForStart();
         logger.startWriting();
 
-        base.afterStart();
+        //base.afterStart();
 
         logger.stopWriting();
     }

@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.control.MotionConfig;
@@ -42,7 +43,7 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 @Autonomous(name = "Drive Towards Point", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class DriveTowardsPointAuto extends LinearOpMode {
 
     @Override

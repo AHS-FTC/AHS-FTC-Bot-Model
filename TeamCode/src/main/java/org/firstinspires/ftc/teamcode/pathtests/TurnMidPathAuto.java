@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ import edu.ahs.robotics.util.loggers.Logger;
 
 
 @Autonomous(name = "Turn Mid Path Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class TurnMidPathAuto extends LinearOpMode {
 
     @Override

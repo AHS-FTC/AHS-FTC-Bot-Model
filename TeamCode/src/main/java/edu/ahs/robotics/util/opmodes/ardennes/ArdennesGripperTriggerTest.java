@@ -30,6 +30,7 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import edu.ahs.robotics.hardware.sensors.DistanceSensor;
@@ -39,7 +40,7 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 @Autonomous(name = "Gripper Trigger Test", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class ArdennesGripperTriggerTest extends LinearOpMode {
 
     @Override

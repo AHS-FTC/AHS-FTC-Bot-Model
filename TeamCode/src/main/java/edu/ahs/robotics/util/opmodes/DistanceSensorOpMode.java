@@ -1,5 +1,6 @@
 package edu.ahs.robotics.util.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import edu.ahs.robotics.hardware.sensors.DistanceSensor;
@@ -9,7 +10,7 @@ import edu.ahs.robotics.util.ftc.RingBuffer;
 import edu.ahs.robotics.util.opmodes.bfr.LinearOpMode16896;
 
 @TeleOp(name = "Distance Sensor thingee", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class DistanceSensorOpMode extends LinearOpMode16896 {
 
     @Override

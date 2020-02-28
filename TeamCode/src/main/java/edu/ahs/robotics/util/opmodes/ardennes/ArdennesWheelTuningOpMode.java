@@ -29,6 +29,7 @@
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -49,7 +50,7 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
  * @author Alex Appleby
  */
 @TeleOp(name = "Ardennes Odometery Wheel Tuner", group = "Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesWheelTuningOpMode extends OpMode {
 
     private Ardennes ardennes;

@@ -35,7 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp(name="Limit Switch Test", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class LimitSwitchTest extends OpMode {
     TouchSensor limitSwitch;
 

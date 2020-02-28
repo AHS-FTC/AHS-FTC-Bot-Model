@@ -29,6 +29,7 @@
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -48,7 +49,7 @@ import edu.ahs.robotics.util.loggers.Logger;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Odometery Debugging OpMode", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesOdometryDebuggingOpMode extends OpMode
 {
     private Position position;

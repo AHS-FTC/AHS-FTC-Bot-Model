@@ -29,6 +29,7 @@
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -42,7 +43,7 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Test Capstone", group="Iterative OpMode")
-//@Disabled
+@Disabled
 public class ArdennesTestCapstone extends OpMode
 {
     private Ardennes ardennes;
