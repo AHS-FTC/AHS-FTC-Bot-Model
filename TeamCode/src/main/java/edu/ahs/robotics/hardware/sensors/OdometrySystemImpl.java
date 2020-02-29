@@ -153,7 +153,7 @@ public class OdometrySystemImpl implements OdometrySystem {
         dyExpected = Math.toDegrees(dHeading) * yInchesPerDegree;
 
         //find real dy
-        dySum += dyBeforeFactorOut - dyExpected;
+        dySum += (dyBeforeFactorOut - dyExpected);
         dy = dyBeforeFactorOut - dyExpected;
 
 
@@ -179,9 +179,10 @@ public class OdometrySystemImpl implements OdometrySystem {
         position.x += dxGlobal;
         position.y += dyGlobal;
 
-//        FTCUtilities.addData("back wheel", yReading);
-//        FTCUtilities.addData("heading", position.heading);
-//        FTCUtilities.updateOpLogger();
+        FTCUtilities.addData("dySum", dySum);
+        FTCUtilities.addData("heading", position.heading);
+        FTCUtilities.addData("YWheelRaw", yReading);
+        FTCUtilities.updateOpLogger();
 
 
         logger.append("xR", String.valueOf(xRReading));
