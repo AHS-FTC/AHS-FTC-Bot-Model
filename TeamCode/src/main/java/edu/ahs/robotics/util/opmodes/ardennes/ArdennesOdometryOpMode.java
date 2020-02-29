@@ -50,7 +50,7 @@ import edu.ahs.robotics.util.loggers.Logger;
  * @author Alex Appleby
  */
 @TeleOp(name="Ardennes Odometry OpMode", group="Iterative OpMode")
-@Disabled
+//@Disabled
 public class ArdennesOdometryOpMode extends OpMode
 {
     private Position position;

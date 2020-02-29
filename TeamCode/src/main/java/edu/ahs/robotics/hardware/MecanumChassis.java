@@ -37,8 +37,6 @@ public class MecanumChassis extends Chassis {
     private SingleDriveUnit backLeft;
     private SingleDriveUnit backRight;
 
-    private Trigger triggerBoi; //todo remove
-
     // Motor shortcuts
     private ChassisMotors.Mecanum FRONT_LEFT = ChassisMotors.Mecanum.FRONTLEFT;
     private ChassisMotors.Mecanum FRONT_RIGHT = ChassisMotors.Mecanum.FRONTRIGHT;
@@ -460,11 +458,6 @@ public class MecanumChassis extends Chassis {
     public void setPosition(double x, double y, double heading){
         odometrySystem.setPosition(x, y, heading);
     }
-    //TEMPORARY
-    public void setTriggerBoi(Trigger triggerBoi){
-        this.triggerBoi = triggerBoi;
-    }
-
     private double inversePower(double power) {
         //   return power * Math.abs(power);
         return Math.signum(power) * Math.pow(power, 2);
@@ -488,10 +481,6 @@ public class MecanumChassis extends Chassis {
             double power = location.power;
 
             logger.append("isFinished", String.valueOf(path.isFinished(state.position)));
-            logger.append("triggerBoi", String.valueOf(triggerBoi.isTriggered()));
-            DistanceSensor d = (DistanceSensor)triggerBoi;
-
-            logger.append("distance", String.valueOf(d.getDist()));
 
             driveTowardsPoint(location.futurePoint, power, motionConfig);
 

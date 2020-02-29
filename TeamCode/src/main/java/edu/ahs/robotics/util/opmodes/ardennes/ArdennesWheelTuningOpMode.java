@@ -50,7 +50,7 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
  * @author Alex Appleby
  */
 @TeleOp(name = "Ardennes Odometery Wheel Tuner", group = "Iterative OpMode")
-@Disabled
+//@Disabled
 public class ArdennesWheelTuningOpMode extends OpMode {
 
     private Ardennes ardennes;

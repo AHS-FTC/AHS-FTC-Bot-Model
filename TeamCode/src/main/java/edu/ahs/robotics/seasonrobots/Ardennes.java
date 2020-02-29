@@ -39,7 +39,7 @@ public class Ardennes extends Robot {
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 35);
         leftFoundation = new SerialServo("FSL", false);
         rightFoundation = new SerialServo("FSR", true);
-        intake = new Intake(1);
+        intake = new Intake(.5);
         gripper = new SerialServo("gripper", false);
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
@@ -102,7 +102,7 @@ public class Ardennes extends Robot {
         Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.86882911, false,1440.0); //2.3617
         Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, false,1440);
 
-        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.129086111, 14.4218256);
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.1025, 14.4218256);
         return odometrySystem;
     }
 
