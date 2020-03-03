@@ -33,15 +33,21 @@ public class Slides {
 
     private double upCorrection = 0.015;
     private double downCorrection = 0.01;
+    private double dCorrection = 0.0025;
+    private double lastError = 0.0;
 
     /**
      * Power that slides return with using auto retraction
      */
-    private static final double RETURN_POWER = -.3;
+    private static final double DOWN_POWER = -.3;
+    private static final double UP_POWER = .7;
+    private static final double HOLD_POWER = .2;
+
 
     private double gamepadControlPower = 0.0;
     private Gamepad gamepad;
     private State state;
+    private AutoControlState autoControlState = AutoControlState.DRIVING_UP_TO_TARGET; //todo remove
 
     private Switch returnSwitch, autoControlSwitch, levelSwitch;
     private double autoControlPower = 0.0;
@@ -96,6 +102,15 @@ public class Slides {
          * Sitting at bottom waiting for inputs
          */
         AT_BOTTOM
+    }
+
+    /**
+     * For small state machine that controls drive to height
+     */
+    private enum AutoControlState{
+        OFF,
+        DRIVING_UP_TO_TARGET,
+        HOLDING
     }
 
     public Slides (){
@@ -174,19 +189,37 @@ public class Slides {
     }
 
     /**
-     * Calculates the power from auto control. Does proportional corrections.
+     * Updates the power from auto control. Does proportional corrections.
      * @param targetTick The target height of the slides.
      */
-    private void calculateAutoControlPower(int targetTick){
+    private void updateAutoControlPower(int targetTick){
+
+        if (autoControlState == AutoControlState.OFF){
+            return;
+        }
+
         int currentTick = getCurrentPosition();
 
         int error = targetTick - currentTick; //positive = below and correcting up
 
-        if(Math.signum(error) == 1){
-            autoControlPower += (upCorrection * error);
-        } else {
-            autoControlPower += (downCorrection * error);
+        switch (autoControlState){
+            case DRIVING_UP_TO_TARGET: //note: designed only to drive up.
+                if(error <= 0.0){
+                    autoControlState = AutoControlState.HOLDING;
+                    resetAutoControlPower();
+                }
+            case HOLDING:
+                if(Math.signum(error) == 1){
+                    autoControlPower += (upCorrection * error); //proportional correction
+                } else {
+                    autoControlPower += (downCorrection * error);
+                }
+
+                autoControlPower += ((error - lastError) * dCorrection);
+
+                lastError = error;
         }
+
     }
 
     /**
@@ -222,7 +255,7 @@ public class Slides {
             case AT_BOTTOM:
                 break;
             case AUTO_CONTROLLED:
-                calculateAutoControlPower(levelHeights[targetLevel]);
+                updateAutoControlPower(levelHeights[targetLevel]);
                 runAtPower(autoControlPower);
                 break;
             case RUNNING_TO_BOTTOM:
@@ -232,7 +265,7 @@ public class Slides {
                 }
                 break;
             case FROZEN:
-                calculateAutoControlPower(freezePosition);
+                updateAutoControlPower(freezePosition);
                 runAtPower(autoControlPower);
                 break;
             case USER_CONTROLLED:
@@ -248,7 +281,7 @@ public class Slides {
         this.upCorrection = upCorrection;
         this.downCorrection = downCorrection;
 
-        calculateAutoControlPower(1000);
+        updateAutoControlPower(1000);
         if (gamepad.x){
             stopMotors();
         } else {
@@ -264,10 +297,10 @@ public class Slides {
     }
 
     /**
-     * Resets auto control power, throwing away old corrections.
+     * Resets auto control power, throwing away old corrections and setting it to the default hold power.
      */
     private void resetAutoControlPower(){
-        autoControlPower = 0.0;
+        autoControlPower = HOLD_POWER;
     }
 
     private void raiseTargetLevel(){
@@ -294,18 +327,22 @@ public class Slides {
         } else if (gamepad.y && returnSwitch.canFlip()){
 
             state = State.RUNNING_TO_BOTTOM;
-            runAtPower(RETURN_POWER);
+            runAtPower(DOWN_POWER);
 
         } else if (gamepad.b && autoControlSwitch.canFlip()){
 
             state = State.AUTO_CONTROLLED;
             raiseTargetLevel();
+            runAtPower(UP_POWER);
             resetAutoControlPower();
 
         } else if (state == State.USER_CONTROLLED){ //if there are no inputs and the state is user controlled, freeze slides
+
             freezePosition = getCurrentPosition();
             state = State.FROZEN;
+            autoControlState = AutoControlState.HOLDING;
             resetAutoControlPower();
+
         } //if none of these things are true, maintain state.
 
         if (gamepad.dpad_up && levelSwitch.canFlip()){ //check up / down level controls

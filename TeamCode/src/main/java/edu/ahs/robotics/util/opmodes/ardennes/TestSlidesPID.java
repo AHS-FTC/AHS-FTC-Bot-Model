@@ -3,7 +3,6 @@ package edu.ahs.robotics.util.opmodes.ardennes;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.vuforia.ar.pl.Camera1_Preview;
 
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.seasonrobots.Ardennes;
@@ -22,9 +21,11 @@ public class TestSlidesPID extends LinearOpMode {
         Slides slides = ardennes.getSlides();
         slides.setGamepad(gamepad1);
 
-        double upCorrection = 0.15 * CONSTANT_MULTIPLIER, downCorrection = 0.1 * CONSTANT_MULTIPLIER;
+        double upCorrection = 0.25 * CONSTANT_MULTIPLIER, downCorrection = 0.13 * CONSTANT_MULTIPLIER;
 
         waitForStart();
+
+        slides.runAtPower(.7);
 
         while (opModeIsActive()) {
             upCorrection +=    (gamepad1.left_stick_y * 0.001 * CONSTANT_MULTIPLIER);
