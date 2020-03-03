@@ -18,12 +18,12 @@
  * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED. INSLOW NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER INSLOW CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING INSLOW ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -61,8 +61,9 @@ public class ArdennesTeleOp extends OpMode
 
     private enum IntakeMode{
         OFF,
-        IN,
-        OUT
+        INSLOW,
+        OUT,
+        INFAST,
     }
 
     private enum TapeMeasureMode {
@@ -87,7 +88,7 @@ public class ArdennesTeleOp extends OpMode
     private static final double INTAKE_POWER = .5;
     private IntakeMode intakeMode = IntakeMode.OFF;
     private TapeMeasureMode tapeMeasureMode = TapeMeasureMode.OFF;
-    private static final double SLIDE_DOWN_POWER_SCALE = .7; //unitless multiplier to weaken slide motors when pulling down
+    private static final double SLIDE_DOWN_POWER_SCALE = .8; //unitless multiplier to weaken slide motors when pulling down
 
     private Toggle foundationToggle;
     private Toggle gripperToggle;
@@ -144,7 +145,7 @@ public class ArdennesTeleOp extends OpMode
 
         gripper.setPosition(0);
         capstone.setPosition(0.22);
-
+        ySlide.mapPosition(.3,.75);
     }
 
     /*
@@ -272,7 +273,7 @@ public class ArdennesTeleOp extends OpMode
             }
             //Is the gripper distance sensor triggered? We have a block in position, stop the intake.
             if (gripperTrigger.isTriggered()) {
-                if (intakeMode == IntakeMode.IN) {
+                if (intakeMode == IntakeMode.INSLOW) {
                     intakeMode = IntakeMode.OFF;
                     updateIntake();
                 }
@@ -287,7 +288,7 @@ public class ArdennesTeleOp extends OpMode
 
         // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
         if (intakeTrigger.isTriggered() && collectionModeToggle.isEnabled()) {
-            if (intakeMode == IntakeMode.IN) {
+            if (intakeMode == IntakeMode.INSLOW) {
                 intakeMode = IntakeMode.OFF;
                 updateIntake();
             }
@@ -331,17 +332,29 @@ public class ArdennesTeleOp extends OpMode
             }
         }
 
-        //press r bumper to enable intake
+        //press r bumper to enable slow intake
         if (gamepad1.right_bumper) {
             if (intakeInSwitch.canFlip()) {
-                if (intakeMode == IntakeMode.IN) {
+                if (intakeMode == IntakeMode.INSLOW) {
                     intakeMode = IntakeMode.OFF;
                 } else {
-                    intakeMode = IntakeMode.IN;
+                    intakeMode = IntakeMode.INSLOW;
                 }
                 updateIntake();
             }
         }
+
+        //use trigger to speed up intake
+        if(gamepad1.right_trigger != 0) {
+            intakeMode = IntakeMode.INFAST;
+            updateIntake();
+        } else {
+            if (intakeMode == IntakeMode.INFAST) {
+                intakeMode = IntakeMode.INSLOW;
+                updateIntake();
+            }
+        }
+
 
         //press x to drop capstone
         if (gamepad2.x) {
@@ -385,12 +398,15 @@ public class ArdennesTeleOp extends OpMode
     }
 
     private void updateIntake() {
-        if(intakeMode == IntakeMode.IN){
+        if(intakeMode == IntakeMode.INSLOW){
             intake.runMotors(INTAKE_POWER);
         } else if (intakeMode == IntakeMode.OFF) {
             intake.stopMotors();
         } else if (intakeMode == IntakeMode.OUT) {
             intake.runMotors(-INTAKE_POWER);
+        } else if (intakeMode == IntakeMode.INFAST) {
+            double fastPower = Range.clip((gamepad1.right_trigger + .5), .5, 1);
+            intake.runMotors(fastPower);
         }
     }
 

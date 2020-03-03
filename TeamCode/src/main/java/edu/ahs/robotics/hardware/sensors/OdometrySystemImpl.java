@@ -182,6 +182,10 @@ public class OdometrySystemImpl implements OdometrySystem {
         FTCUtilities.addData("dySum", dySum);
         FTCUtilities.addData("heading", position.heading);
         FTCUtilities.addData("YWheelRaw", yReading);
+        FTCUtilities.addData("XWheelLRaw", xLReading);
+        FTCUtilities.addData("XWheelRRaw", xRReading);
+
+
         FTCUtilities.updateOpLogger();
 
 
