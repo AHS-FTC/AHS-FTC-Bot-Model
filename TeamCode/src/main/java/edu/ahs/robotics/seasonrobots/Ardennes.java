@@ -26,8 +26,8 @@ public class Ardennes extends Robot {
     private MecanumChassis mecanumChassis;
     private OdometrySystemImpl odometrySystem;
     private Intake intake;
-    private SerialServo gripper;//todo add other serbos
-    private TriggerDistanceSensor intakeTrigger, gripperTrigger;
+    private SerialServo gripper;
+    private TriggerDistanceSensor intakeTrigger, gripperTrigger, foundationTriggerRight, foundationTriggerLeft;
     private ArdennesSkyStoneDetector detector;
     private Slides slides;
     private SerialServo leftFoundation, rightFoundation;
@@ -37,6 +37,8 @@ public class Ardennes extends Robot {
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 35);
+        foundationTriggerRight = new TriggerDistanceSensor("foundationTriggerR", 100);
+        foundationTriggerLeft = new TriggerDistanceSensor("foundationTriggerL", 100);
         leftFoundation = new SerialServo("FSL", false);
         rightFoundation = new SerialServo("FSR", true);
         intake = new Intake(.5);
@@ -63,6 +65,10 @@ public class Ardennes extends Robot {
     public TriggerDistanceSensor getGripperTrigger() {
         return gripperTrigger;
     }
+
+    public TriggerDistanceSensor getFoundationTriggerRight(){return foundationTriggerRight;}
+
+    public TriggerDistanceSensor getFoundationTriggerLeft(){return foundationTriggerLeft;}
 
     public SerialServo getGripper(){
         return gripper;
