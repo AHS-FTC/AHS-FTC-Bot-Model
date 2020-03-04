@@ -11,7 +11,6 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
 @TeleOp(name = "Slides PID Test", group = "Iterative OpMode")
 //@Disabled
 public class TestSlidesPID extends LinearOpMode {
-    private static final double CONSTANT_MULTIPLIER = 0.001;
 
     @Override
     public void runOpMode(){
@@ -19,24 +18,12 @@ public class TestSlidesPID extends LinearOpMode {
 
         Ardennes ardennes = new Ardennes();
         Slides slides = ardennes.getSlides();
-        slides.setGamepad(gamepad1);
-
-        double upCorrection = 0.25 * CONSTANT_MULTIPLIER, downCorrection = 0.13 * CONSTANT_MULTIPLIER;
+        slides.setGamepad(gamepad2);
 
         waitForStart();
 
-        slides.runAtPower(.7);
-
         while (opModeIsActive()) {
-            upCorrection +=    (gamepad1.left_stick_y * 0.001 * CONSTANT_MULTIPLIER);
-            downCorrection += (gamepad1.right_stick_y * 0.001 * CONSTANT_MULTIPLIER);
-
-            slides.tuningPIDControl(upCorrection, downCorrection);
-
-            telemetry.addData("slide height", slides.getCurrentPosition());
-            telemetry.addData("up correction", upCorrection / CONSTANT_MULTIPLIER);
-            telemetry.addData("down correction", downCorrection / CONSTANT_MULTIPLIER);
-            telemetry.update();
+            slides.gamepadControl();
         }
     }
 }

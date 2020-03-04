@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -109,6 +110,13 @@ public class FTCUtilities { //handles inaccessable objects in FTCApp. hardwareMa
             return testMotors.get(deviceName);
         }
         return hardwareMap.get(DcMotor.class, deviceName);
+    }
+
+    public static DcMotorEx getMotorEx(String deviceName){
+        if(testMode){
+            return (DcMotorEx)testMotors.get(deviceName);
+        }
+        return hardwareMap.get(DcMotorEx.class, deviceName);
     }
 
     public static BNO055IMU getIMU (String imuName){
