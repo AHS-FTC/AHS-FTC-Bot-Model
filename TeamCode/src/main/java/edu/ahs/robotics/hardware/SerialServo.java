@@ -20,4 +20,8 @@ public class SerialServo {
         servo.setPosition(position);
     }
 
+    public void mapPosition(double min, double max){
+        servo.scaleRange(min, max);
+    }
+
 }

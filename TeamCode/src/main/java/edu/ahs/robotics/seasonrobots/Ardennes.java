@@ -44,7 +44,7 @@ public class Ardennes extends Robot {
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
-        xSlide = new SerialServo("slideServo", true);
+        xSlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
     }
 
@@ -100,7 +100,7 @@ public class Ardennes extends Robot {
     private OdometrySystemImpl makeOdometrySystem(){
         Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.86882911,false,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
         Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.86882911, false,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, false,1440);
+        Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, false,1440.0);
 
         OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.1025, 14.4218256);
         return odometrySystem;
