@@ -1,6 +1,7 @@
 package edu.ahs.robotics.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
@@ -14,8 +15,8 @@ import edu.ahs.robotics.util.ftc.Switch;
  */
 public class Slides {
 
-    private DcMotor leftMotor;
-    private DcMotor rightMotor;
+    private DcMotorEx leftMotor;
+    private DcMotorEx rightMotor;
     private LimitSwitch limitSwitch;
     private LimitSwitch limitSwitch2;
 
@@ -26,31 +27,14 @@ public class Slides {
     private static final int MAX_LEVEL = 10;
 
     /**
-     * 'P' terms used for holding slide position. Separated to account for gravitational bias. Will require tuning.
-     */
-    //private static final double UP_CORRECTION = 0.015; //todo tune
-    //private static final double DOWN_CORRECTION = 0.01;
-
-    private double upCorrection = 0.015;
-    private double downCorrection = 0.01;
-    private double dCorrection = 0.0025;
-    private double lastError = 0.0;
-
-    /**
      * Power that slides return with using auto retraction
      */
     private static final double DOWN_POWER = -.3;
-    private static final double UP_POWER = .7;
-    private static final double HOLD_POWER = .2;
 
-
-    private double gamepadControlPower = 0.0;
     private Gamepad gamepad;
     private State state;
-    private AutoControlState autoControlState = AutoControlState.DRIVING_UP_TO_TARGET; //todo remove
 
     private Switch returnSwitch, autoControlSwitch, levelSwitch;
-    private double autoControlPower = 0.0;
 
     private int freezePosition = 0;
 
@@ -59,21 +43,21 @@ public class Slides {
      */
     private static int[] levelHeights = { //todo tune
             0,   //0
-            100, //1
-            200, //2
-            300, //3
-            400, //4
-            500, //5
-            600, //6
-            700, //7
-            800, //8
-            900, //9
-            1000, //10
-            1100, //11
-            1200, //12
-            1300, //13
-            1400, //14
-            1500, //15
+            500, //1
+            1000, //2
+            1500, //3
+            2000, //4
+            2500, //5
+            3000, //6
+            3500, //7
+            4000, //8
+            4500, //9
+            5000, //10
+            5500, //11
+            6000, //12
+            6500, //13
+            7000, //14
+            7500, //15
     };
 
     private enum State {
@@ -107,18 +91,13 @@ public class Slides {
     /**
      * For small state machine that controls drive to height
      */
-    private enum AutoControlState{
-        OFF,
-        DRIVING_UP_TO_TARGET,
-        HOLDING
-    }
 
     public Slides (){
-        leftMotor = FTCUtilities.getMotor("slideL");
-        rightMotor = FTCUtilities.getMotor("slideR");
+        leftMotor = FTCUtilities.getMotorEx("slideL");
+        rightMotor = FTCUtilities.getMotorEx("slideR");
 
-        leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -143,12 +122,16 @@ public class Slides {
      * @param slidesPower Value between -1 and 1 to move slides
      */
     public void runAtPower(double slidesPower) {
+        if(leftMotor.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER){
+            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+
         if (getCurrentPosition() >= SLIDES_MAX) {
             slidesPower = Range.clip(slidesPower, -1, 0);
         } else if (atBottom()) {
             slidesPower = Range.clip(slidesPower, 0, 1);
         }
-
         setPower(slidesPower);
     }
 
@@ -180,47 +163,6 @@ public class Slides {
         }
     }
 
-    public void runToLevel (){
-        double targetLevelTicks = targetLevel * ENCODER_TICKS_PER_LEVEL;
-        while (getCurrentPosition() < targetLevelTicks) {
-            runAtPower(.5);
-        }
-        runAtPower(0);
-    }
-
-    /**
-     * Updates the power from auto control. Does proportional corrections.
-     * @param targetTick The target height of the slides.
-     */
-    private void updateAutoControlPower(int targetTick){
-
-        if (autoControlState == AutoControlState.OFF){
-            return;
-        }
-
-        int currentTick = getCurrentPosition();
-
-        int error = targetTick - currentTick; //positive = below and correcting up
-
-        switch (autoControlState){
-            case DRIVING_UP_TO_TARGET: //note: designed only to drive up.
-                if(error <= 0.0){
-                    autoControlState = AutoControlState.HOLDING;
-                    resetAutoControlPower();
-                }
-            case HOLDING:
-                if(Math.signum(error) == 1){
-                    autoControlPower += (upCorrection * error); //proportional correction
-                } else {
-                    autoControlPower += (downCorrection * error);
-                }
-
-                autoControlPower += ((error - lastError) * dCorrection);
-
-                lastError = error;
-        }
-
-    }
 
     /**
      * Runs slide PID when auto control is enabled.
@@ -249,14 +191,15 @@ public class Slides {
      * Nonblocking, use in an iterative context.
      */
     public void gamepadControl(){
+        FTCUtilities.addData("mode", state);
+        FTCUtilities.updateOpLogger();
 
         checkInputs();
         switch (state){
-            case AT_BOTTOM:
+            case AT_BOTTOM: //todo change this state
                 break;
             case AUTO_CONTROLLED:
-                updateAutoControlPower(levelHeights[targetLevel]);
-                runAtPower(autoControlPower);
+                autoControl(levelHeights[targetLevel]);
                 break;
             case RUNNING_TO_BOTTOM:
                 if(atBottom()){
@@ -265,27 +208,11 @@ public class Slides {
                 }
                 break;
             case FROZEN:
-                updateAutoControlPower(freezePosition);
-                runAtPower(autoControlPower);
+                autoControl(freezePosition);
                 break;
             case USER_CONTROLLED:
                 runAtPower(gamepad.right_trigger - gamepad.left_trigger);
                 break;
-        }
-    }
-
-    /**
-     * Allows you to directly tune the slide corrections. Comment this out when you're done.
-     */
-    public void tuningPIDControl(double upCorrection, double downCorrection){
-        this.upCorrection = upCorrection;
-        this.downCorrection = downCorrection;
-
-        updateAutoControlPower(1000);
-        if (gamepad.x){
-            stopMotors();
-        } else {
-            setPower(autoControlPower);
         }
     }
 
@@ -296,23 +223,35 @@ public class Slides {
         this.gamepad = gamepad;
     }
 
-    /**
-     * Resets auto control power, throwing away old corrections and setting it to the default hold power.
-     */
-    private void resetAutoControlPower(){
-        autoControlPower = HOLD_POWER;
-    }
-
     private void raiseTargetLevel(){
         if(targetLevel < levelHeights.length){
             targetLevel++;
         }
     }
 
+    private void autoControl(int targetPosition){
+        if(leftMotor.getMode() != DcMotor.RunMode.RUN_TO_POSITION){
+            leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        if(leftMotor.getTargetPosition() != targetPosition){
+            setTargetPositions(targetPosition);
+        }
+
+        leftMotor.setPower(.7);
+        rightMotor.setPower(.7);
+    }
+
     private void lowerTargetLevel(){
         if(targetLevel > 0){
             targetLevel--;
         }
+    }
+
+    private void setTargetPositions(int position){
+        leftMotor.setTargetPosition(position);
+        rightMotor.setTargetPosition(position);
     }
 
     /**
@@ -324,24 +263,20 @@ public class Slides {
             //if there's any trigger control, escape any automation and go into user control
             state = State.USER_CONTROLLED;
 
-        } else if (gamepad.y && returnSwitch.canFlip()){
+        } else if (gamepad.b && returnSwitch.canFlip()){
 
             state = State.RUNNING_TO_BOTTOM;
             runAtPower(DOWN_POWER);
 
-        } else if (gamepad.b && autoControlSwitch.canFlip()){
+        } else if (gamepad.y && autoControlSwitch.canFlip()){
 
             state = State.AUTO_CONTROLLED;
             raiseTargetLevel();
-            runAtPower(UP_POWER);
-            resetAutoControlPower();
 
         } else if (state == State.USER_CONTROLLED){ //if there are no inputs and the state is user controlled, freeze slides
 
             freezePosition = getCurrentPosition();
             state = State.FROZEN;
-            autoControlState = AutoControlState.HOLDING;
-            resetAutoControlPower();
 
         } //if none of these things are true, maintain state.
 
