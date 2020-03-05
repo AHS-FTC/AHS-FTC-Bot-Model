@@ -30,7 +30,7 @@
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -43,24 +43,19 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
 /**
  * An opmode for logging various sensors. Adjust to your will.
  */
-@TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
+@TeleOp(name="Ardennes Blinkin", group="Iterative Opmode")
 //@Disabled
-public class ArdennesSensorLoggerOpMode extends OpMode
+public class ArdennesBlinkinTest extends OpMode
 {
-    BNO055IMU bnoIMU;
-    IMU imu;
-    TouchSensor limitSwitch;
     Ardennes ardennes;
-    TriggerDistanceSensor foundationLeft;
-    TriggerDistanceSensor foundationRight;
+    RevBlinkinLedDriver blinkinLedDriver;
+    RevBlinkinLedDriver.BlinkinPattern pattern;
 
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        foundationLeft = ardennes.getFoundationTriggerLeft();
-        foundationRight = ardennes.getFoundationTriggerRight();
-        ardennes.getFoundationTriggerRight();
+        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
     }
 
     @Override
@@ -73,11 +68,17 @@ public class ArdennesSensorLoggerOpMode extends OpMode
 
     @Override
     public void loop() {
-        FTCUtilities.addData("left pressed?", foundationLeft.isTriggered());
-        FTCUtilities.addData("left dist", foundationLeft.getDist());
-        FTCUtilities.addData("right pressed?", foundationRight.isTriggered());
-        FTCUtilities.addData("right dist", foundationRight.getDist());
-        FTCUtilities.updateOpLogger();
+        if (gamepad1.x) {
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+        }
+
+        if (gamepad1.y) {
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        }
+
+        if (gamepad1.a) {
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+        }
     }
 
     @Override
