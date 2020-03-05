@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode.live;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -39,24 +38,19 @@ import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.util.ftc.Switch;
 import edu.ahs.robotics.util.ftc.Toggle;
+import edu.ahs.robotics.util.opmodes.bfr.IterativeOpMode16896;
 
 
-//Written by Alex Appleby of team 16896
-//It really do be like that
-//max at 4150 ticks
-//first at 340
-//min at 100
-
-//Then edited by Andrew Seybold
-//It really really do be like dat
-
+/**
+ * Main TeleOp for Ardennes 2019-2020
+ * @author Alex Appleby and Andrew Seybold
+ */
 @TeleOp(name="Ardennes TeleOp", group="Iterative Opmode")
 //@Disabled
-public class ArdennesTeleOp extends OpMode
+public class ArdennesTeleOp extends IterativeOpMode16896
 {
 
     private enum IntakeMode{
@@ -84,11 +78,9 @@ public class ArdennesTeleOp extends OpMode
     //from zero to one
     private double yServoPosition = 0;
 
-    private static final double TRIGGER_THRESHOLD = 0.1;
     private static final double INTAKE_POWER = .5;
     private IntakeMode intakeMode = IntakeMode.OFF;
     private TapeMeasureMode tapeMeasureMode = TapeMeasureMode.OFF;
-    private static final double SLIDE_DOWN_POWER_SCALE = .8; //unitless multiplier to weaken slide motors when pulling down
 
     private Toggle foundationToggle;
     private Toggle gripperToggle;
@@ -96,13 +88,9 @@ public class ArdennesTeleOp extends OpMode
 
     private Toggle collectionModeToggle;
     private Toggle debugToggle;
-    private boolean slidesMoving = false;
-    private boolean xPressed = false;
-    private boolean runToLevelMode = false;
 
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
-    private int targetLevel = 0; //todo consider initializing
 
     private Switch slideControlSwitch;
 
@@ -111,9 +99,7 @@ public class ArdennesTeleOp extends OpMode
     private double lastTime;
 
     @Override
-    public void init() {
-
-        FTCUtilities.setOpMode(this);
+    public void initialize() {
         time = new ElapsedTime();
 
         Ardennes ardennes = new Ardennes();
@@ -149,28 +135,18 @@ public class ArdennesTeleOp extends OpMode
         ySlide.mapPosition(.3,.75);
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
     @Override
-    public void init_loop() {
+    public void repeatAfterInit() {
     }
 
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
     @Override
-    public void start() {
+    public void begin() {
         time.startTime();
         lastTime = time.milliseconds();
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
-
     @Override
-    public void loop() {
+    public void iterate() {
         buttonActions();
         driveActions();
         slideActions();
@@ -352,14 +328,10 @@ public class ArdennesTeleOp extends OpMode
         }
     }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
     @Override
-    public void stop() {
+    public void teardown() {
         chassis.stopMotors();
         intake.stopMotors();
-//        slides.kill();
         slides.stopMotors();
     }
 }

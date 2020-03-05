@@ -22,7 +22,6 @@ public class Slides {
 
     private int targetLevel = 0;
 
-    private static final int ENCODER_TICKS_PER_LEVEL = 420;
     private static final int SLIDES_MAX = 4000; // maximum encoder val of slides
     private static final int MAX_LEVEL = 10;
 
@@ -41,23 +40,21 @@ public class Slides {
     /**
      * Target encoder height for each level
      */
-    private static int[] levelHeights = { //todo tune
-            0,   //0
-            500, //1
-            1000, //2
-            1500, //3
-            2000, //4
-            2500, //5
-            3000, //6
-            3500, //7
-            4000, //8
-            4500, //9
-            5000, //10
-            5500, //11
-            6000, //12
-            6500, //13
-            7000, //14
-            7500, //15
+    private static int[] levelHeights = { //tuned
+            0,    //0
+            275,  //1
+            550,  //2
+            865,  //3
+            1170, //4
+            1495, //5
+            1775, //6
+            2065, //7
+            2365, //8
+            2665, //9
+            2935, //10
+            3255, //11
+            3540, //12
+            3860  //13
     };
 
     private enum State {
@@ -192,6 +189,12 @@ public class Slides {
      */
     public void gamepadControl(){
         FTCUtilities.addData("mode", state);
+        FTCUtilities.addData("encoder reading", getCurrentPosition());
+        FTCUtilities.addData("encoder reading L", leftMotor.getCurrentPosition());
+        FTCUtilities.addData("encoder reading R", rightMotor.getCurrentPosition());
+        FTCUtilities.addData("target level", targetLevel);
+
+
         FTCUtilities.updateOpLogger();
 
         checkInputs();
@@ -230,13 +233,13 @@ public class Slides {
     }
 
     private void autoControl(int targetPosition){
+        if(leftMotor.getTargetPosition() != targetPosition){
+            setTargetPositions(targetPosition);
+        }
+
         if(leftMotor.getMode() != DcMotor.RunMode.RUN_TO_POSITION){
             leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-
-        if(leftMotor.getTargetPosition() != targetPosition){
-            setTargetPositions(targetPosition);
         }
 
         leftMotor.setPower(.7);
