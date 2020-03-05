@@ -16,6 +16,14 @@ public class FoundationFinder implements OBMCommand {
     private Ardennes ardennes;
     private TriggerDistanceSensor foundationTrigger;
 
+    private State state = State.INITIAL;
+
+    private enum State{
+        INITIAL,
+        LOOKING,
+        FINISHED
+    }
+
     public FoundationFinder(Ardennes ardennes, double startLookingY, boolean redSide) {
         this.startLookingY = startLookingY;
         this.ardennes = ardennes;
@@ -27,17 +35,9 @@ public class FoundationFinder implements OBMCommand {
         }
     }
 
-    private State state;
-
-    private enum State{
-        INITIAL,
-        LOOKING,
-        FINISHED
-    }
-
     @Override
     public boolean check(OdometrySystem.State robotState) {
-        switch (state) {
+        switch(state){
             case FINISHED:
                 return true;
             case INITIAL:

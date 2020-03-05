@@ -36,23 +36,29 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 
 
 @TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
-@Disabled
+//@Disabled
 public class ArdennesSensorLoggerOpMode extends OpMode
 {
     BNO055IMU bnoIMU;
     IMU imu;
     TouchSensor limitSwitch;
+    Ardennes ardennes;
+    TriggerDistanceSensor foundationLeft;
+    TriggerDistanceSensor foundationRight;
 
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
-        bnoIMU = FTCUtilities.getIMU("imu");
-        imu = new IMU(bnoIMU);
-        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
+        ardennes = new Ardennes();
+        foundationLeft = ardennes.getFoundationTriggerLeft();
+        foundationRight = ardennes.getFoundationTriggerRight();
+        ardennes.getFoundationTriggerRight();
     }
 
     @Override
@@ -65,10 +71,13 @@ public class ArdennesSensorLoggerOpMode extends OpMode
 
     @Override
     public void loop() {
-        FTCUtilities.addData("IMU",imu.getHeading());
-        FTCUtilities.addData("pressed?", limitSwitch.isPressed());
+        FTCUtilities.addData("left pressed?", foundationLeft.isTriggered());
+        FTCUtilities.addData("left dist", foundationLeft.getDist());
+        FTCUtilities.addData("right pressed?", foundationRight.isTriggered());
+        FTCUtilities.addData("right dist", foundationRight.getDist());
         FTCUtilities.updateOpLogger();
     }
+
     @Override
     public void stop() {
     }
