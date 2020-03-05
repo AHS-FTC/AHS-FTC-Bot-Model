@@ -33,7 +33,7 @@ public class FoundationLookTest extends LinearOpMode {
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        FoundationFinder foundationFinder = new FoundationFinder(ardennes, 10, true);
+        FoundationFinder foundationFinder = new FoundationFinder(ardennes, 0, true);
 
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
