@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode.live;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -70,13 +71,10 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private Slides slides;
     private MecanumChassis chassis;
 
-    private SerialServo gripper, capstone, ySlide, leftFoundation, rightFoundation;
+    private SerialServo gripper, capstone, xSlide, leftFoundation, rightFoundation;
     //todo add Servo capstoneServo;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
-
-    //from zero to one
-    private double yServoPosition = 0;
 
     private static final double INTAKE_POWER = .5;
     private IntakeMode intakeMode = IntakeMode.OFF;
@@ -92,7 +90,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
 
-    private Switch slideControlSwitch;
+    private Switch xSlideSwitch;
 
     private ElapsedTime time;
 
@@ -112,7 +110,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
         gripper = ardennes.getGripper();
         capstone = ardennes.getCapstone();
-        ySlide = ardennes.getxSlide();
+        xSlide = ardennes.getxSlide();
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
 
@@ -125,18 +123,20 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         intakeOutSwitch = new Switch();
         intakeInSwitch = new Switch();
 
-        slideControlSwitch = new Switch();
+        xSlideSwitch = new Switch();
 
         gripperTrigger = ardennes.getGripperTrigger();
         intakeTrigger = ardennes.getIntakeTrigger();
 
         gripper.setPosition(0);
         capstone.setPosition(0.22);
-        ySlide.mapPosition(.3,.75);
+        xSlide.mapPosition(.3,.75);
+        xSlide.setTimeControlDuration(500);
     }
 
     @Override
     public void repeatAfterInit() {
+        //do nothing
     }
 
     @Override
@@ -154,10 +154,21 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     }
 
     private void slideActions() {
-        slides.gamepadControl();
+        slides.gamepadControl(); //big boi slides
 
-        yServoPosition = Range.clip(yServoPosition + gamepad2.right_stick_y, 0, 1);
-        ySlide.setPosition(yServoPosition);
+        if(xSlideSwitch.canFlip()){
+            if(gamepad2.right_stick_y > .9) {
+                xSlide.setPosition(0);
+                //xSlide.setTimeControlTarget(0);
+                //xSlide.restartTimeControl();
+            } else if (gamepad2.right_stick_y <  -.9){
+                xSlide.setPosition(1);
+                //xSlide.setTimeControlTarget(1);
+               // xSlide.restartTimeControl();
+            }
+        }
+
+       // xSlide.runWithTimeControl();
     }
 
     private void triggers() {
@@ -207,7 +218,6 @@ public class ArdennesTeleOp extends IterativeOpMode16896
             if (debugToggle.isEnabled()) {
                 //telemetry.addData("deltaTime",lastTime-time.milliseconds());
                 //lastTime = time.milliseconds();
-                telemetry.addData("y servo position", yServoPosition);
                 telemetry.addData("limit switch triggered?", slides.atBottom());
                 //telemetry.addData("intake trigger", intakeTrigger.isTriggered());
                 //telemetry.addData("intake trigger distance", intakeTrigger.getDist());

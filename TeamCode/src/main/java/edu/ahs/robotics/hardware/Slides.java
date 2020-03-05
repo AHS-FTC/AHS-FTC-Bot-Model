@@ -42,9 +42,9 @@ public class Slides {
      */
     private static int[] levelHeights = { //tuned
             0,    //0
-            275,  //1
-            550,  //2
-            865,  //3
+            300,  //1
+            580,  //2
+            895,  //3
             1170, //4
             1495, //5
             1775, //6
@@ -188,14 +188,13 @@ public class Slides {
      * Nonblocking, use in an iterative context.
      */
     public void gamepadControl(){
-        FTCUtilities.addData("mode", state);
-        FTCUtilities.addData("encoder reading", getCurrentPosition());
-        FTCUtilities.addData("encoder reading L", leftMotor.getCurrentPosition());
-        FTCUtilities.addData("encoder reading R", rightMotor.getCurrentPosition());
-        FTCUtilities.addData("target level", targetLevel);
-
-
-        FTCUtilities.updateOpLogger();
+//        FTCUtilities.addData("mode", state);
+//        FTCUtilities.addData("encoder reading", getCurrentPosition());
+//        FTCUtilities.addData("encoder reading L", leftMotor.getCurrentPosition());
+//        FTCUtilities.addData("encoder reading R", rightMotor.getCurrentPosition());
+//        FTCUtilities.addData("target level", targetLevel);
+//
+//        FTCUtilities.updateOpLogger();
 
         checkInputs();
         switch (state){
