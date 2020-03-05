@@ -52,6 +52,7 @@ public class BlockGripper implements OBMCommand {
                     ardennes.getGripper().setPosition(1);
                     ardennes.getIntake().stopMotors();
                     state = State.FINISHED;
+                    return true;
                 }
                 break;
         }
