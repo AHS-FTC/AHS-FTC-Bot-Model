@@ -9,13 +9,22 @@ import edu.ahs.robotics.util.opmodes.bfr.LinearOpMode16896;
 @Disabled
 public class LinearOpMode16896Test extends LinearOpMode16896 {
 
+
     @Override
-    protected void runProgram() {
+    protected void initialize() {
         telemetry.addLine("in init");
         telemetry.update();
+    }
 
-        waitForStart();
+    @Override
+    protected void runProgram() {
+
+        telemetry.addLine("in start");
+        telemetry.update();
+
+        sleep(1000);
 
         throw new Error("that one error");
     }
+
 }
