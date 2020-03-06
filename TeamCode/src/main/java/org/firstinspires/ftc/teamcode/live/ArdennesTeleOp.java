@@ -163,12 +163,12 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         slides.gamepadControl(); //big boi slides
 
         if(xSlideSwitch.canFlip()){
-            if(gamepad2.right_stick_y > .9) {
-                xSlide.setPosition(0);
+            if(gamepad2.right_stick_y > .5) {
+                xSlide.setPosition(1);
                 //xSlide.setTimeControlTarget(0);
                 //xSlide.restartTimeControl();
-            } else if (gamepad2.right_stick_y <  -.9){
-                xSlide.setPosition(1);
+            } else if (gamepad2.right_stick_y <  -.5){
+                xSlide.setPosition(0);
                 //xSlide.setTimeControlTarget(1);
                // xSlide.restartTimeControl();
             }
@@ -310,7 +310,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     }
 
     private void updateBlinkin() {
-        if (((gripperToggle.isEnabled() && slides.atBottom()) && yServoPosition <.2)){
+        if (((gripperToggle.isEnabled() && slides.atBottom()))){
             blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
             return;
         } else if (gripperTrigger.isTriggered() || intakeTrigger.isTriggered()){
