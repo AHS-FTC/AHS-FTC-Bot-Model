@@ -5,6 +5,7 @@ import android.os.Environment;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -131,6 +132,14 @@ public class FTCUtilities { //handles inaccessable objects in FTCApp. hardwareMa
             throw new UnsupportedOperationException("TestMode doesn't support touch sensors yet. mock it");
         } else {
             return hardwareMap.get(TouchSensor.class, sensorName);
+        }
+    }
+
+    public static RevBlinkinLedDriver getBlinkin (String deviceName){
+        if(testMode){
+            throw new UnsupportedOperationException("TestMode doesn't support Blinkin yet. mock it");
+        } else {
+            return hardwareMap.get(RevBlinkinLedDriver.class, deviceName);
         }
     }
 

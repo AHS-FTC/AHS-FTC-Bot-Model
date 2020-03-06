@@ -1,10 +1,13 @@
 package edu.ahs.robotics.seasonrobots;
 
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.ahs.robotics.control.obm.OBMCommand;
+import edu.ahs.robotics.hardware.Blinkin;
 import edu.ahs.robotics.hardware.ChassisMotors;
 import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.DriveUnit;
@@ -33,6 +36,7 @@ public class Ardennes extends Robot {
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo xSlide;
     private SerialServo capstone;
+    private Blinkin blinkin;
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
@@ -48,6 +52,7 @@ public class Ardennes extends Robot {
         slides = new Slides();
         xSlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
+        blinkin = new Blinkin("blinkin");
     }
 
     public Intake getIntake(){
@@ -82,6 +87,8 @@ public class Ardennes extends Robot {
     public Slides getSlides() {return slides;}
 
     public SerialServo getCapstone() {return capstone;}
+
+    public Blinkin getBlinkin() {return blinkin;}
 
     public void finishOBMCommand(OBMCommand obmCommand){
         while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){

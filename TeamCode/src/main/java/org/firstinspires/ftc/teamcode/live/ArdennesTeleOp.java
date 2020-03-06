@@ -29,10 +29,12 @@
 
 package org.firstinspires.ftc.teamcode.live;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import edu.ahs.robotics.hardware.Blinkin;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
@@ -72,6 +74,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
     private SerialServo gripper, capstone, ySlide, leftFoundation, rightFoundation;
     //todo add Servo capstoneServo;
+
+    private Blinkin blinkin;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
 
@@ -130,6 +134,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         gripperTrigger = ardennes.getGripperTrigger();
         intakeTrigger = ardennes.getIntakeTrigger();
 
+        blinkin = ardennes.getBlinkin();
+
         gripper.setPosition(0);
         capstone.setPosition(0.22);
         ySlide.mapPosition(.3,.75);
@@ -151,6 +157,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         driveActions();
         slideActions();
         triggers();
+        updateBlinkin();
     }
 
     private void slideActions() {
@@ -170,7 +177,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
             }
             //Is the gripper distance sensor triggered? We have a block in position, stop the intake.
             if (gripperTrigger.isTriggered()) {
-                if (intakeMode == IntakeMode.INSLOW) {
+                if (intakeMode == IntakeMode.INSLOW || intakeMode == IntakeMode.INFAST) {
                     intakeMode = IntakeMode.OFF;
                     updateIntake();
                 }
@@ -180,7 +187,6 @@ public class ArdennesTeleOp extends IterativeOpMode16896
                     updateGripper();
                 }
             }
-
         }
 
         // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
@@ -294,6 +300,26 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         }
     }
 
+    private void updateBlinkin() {
+        if (((gripperToggle.isEnabled() && slides.atBottom()) && yServoPosition <.2)){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            return;
+        } else if (gripperTrigger.isTriggered() || intakeTrigger.isTriggered()){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+            return;
+        } else if ((intakeMode == IntakeMode.INFAST || intakeMode == IntakeMode.INSLOW)){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+            return;
+        } else if (collectionModeToggle.isEnabled()){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            return;
+        } else{
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+            return;
+        }
+
+    }
+
     private void updateIntake() {
         if(intakeMode == IntakeMode.INSLOW){
             intake.runMotors(INTAKE_POWER);
@@ -310,6 +336,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private void updateGripper() {
         if(gripperToggle.isEnabled()){
             gripper.setPosition(1);
+            updateBlinkin();
         } else {
             gripper.setPosition(0);
         }

@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import edu.ahs.robotics.hardware.Blinkin;
 import edu.ahs.robotics.hardware.sensors.IMU;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
@@ -48,14 +49,14 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
 public class ArdennesBlinkinTest extends OpMode
 {
     Ardennes ardennes;
-    RevBlinkinLedDriver blinkinLedDriver;
+    Blinkin blinkinLedDriver;
     RevBlinkinLedDriver.BlinkinPattern pattern;
 
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
         ardennes = new Ardennes();
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        blinkinLedDriver = ardennes.getBlinkin();
     }
 
     @Override
