@@ -172,6 +172,11 @@ public class Slides {
         rightMotor.setPower(power);
     }
 
+    //THIS A PUBLIC METHOD FOR OVERRIDE IN TELEOP
+    public void runSlidesOverrided(double power){
+        setPower(power);
+    }
+
     public void stopMotors() {
         setPower(0);
     }

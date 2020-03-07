@@ -164,7 +164,13 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
         if (!overrideToggle.isEnabled()) {
             triggers();
+        } else {
+            overrideSlides();
         }
+    }
+
+    private void overrideSlides(){
+        slides.runSlidesOverrided(gamepad2.right_trigger - gamepad2.left_trigger);
     }
 
     private void slideActions() {
