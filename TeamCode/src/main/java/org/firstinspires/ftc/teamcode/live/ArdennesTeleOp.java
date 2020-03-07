@@ -159,11 +159,12 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     public void iterate() {
         buttonActions();
         driveActions();
-        slideActions();
         updateBlinkin();
+        xSlideActions();
 
         if (!overrideToggle.isEnabled()) {
             triggers();
+            slideActions();
         } else {
             overrideSlides();
         }
@@ -176,19 +177,21 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private void slideActions() {
         slides.gamepadControl(); //big boi slides
 
+        // xSlide.runWithTimeControl();
+    }
+
+    private void xSlideActions() {
         if(xSlideSwitch.canFlip()){
-            if(gamepad2.right_stick_y > .5) {
+            if(gamepad2.right_stick_y > .3) {
                 xSlide.setPosition(1);
                 //xSlide.setTimeControlTarget(0);
                 //xSlide.restartTimeControl();
-            } else if (gamepad2.right_stick_y <  -.5){
+            } else if (gamepad2.right_stick_y <  -.3){
                 xSlide.setPosition(0);
                 //xSlide.setTimeControlTarget(1);
                // xSlide.restartTimeControl();
             }
         }
-
-       // xSlide.runWithTimeControl();
     }
 
     private void triggers() {

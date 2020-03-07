@@ -119,10 +119,7 @@ public class Slides {
      * @param slidesPower Value between -1 and 1 to move slides
      */
     public void runAtPower(double slidesPower) {
-        if(leftMotor.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER){
-            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
+        resetSlidesMode();
 
         if (getCurrentPosition() >= SLIDES_MAX) {
             slidesPower = Range.clip(slidesPower, -1, 0);
@@ -130,6 +127,13 @@ public class Slides {
             slidesPower = Range.clip(slidesPower, 0, 1);
         }
         setPower(slidesPower);
+    }
+
+    private void resetSlidesMode() {
+        if(leftMotor.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER){
+            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 
     /**
@@ -174,6 +178,7 @@ public class Slides {
 
     //THIS A PUBLIC METHOD FOR OVERRIDE IN TELEOP
     public void runSlidesOverrided(double power){
+        resetSlidesMode();
         setPower(power);
     }
 
