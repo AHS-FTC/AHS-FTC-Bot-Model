@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.loggers.Logger;
 
 @Autonomous(name = "Foundation Look Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class FoundationLookTest extends LinearOpMode {
 
     Ardennes ardennes;

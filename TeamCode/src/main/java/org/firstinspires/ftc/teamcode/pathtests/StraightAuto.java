@@ -43,7 +43,7 @@ import edu.ahs.robotics.util.loggers.Logger;
 
 
 @Autonomous(name = "Straight Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class StraightAuto extends LinearOpMode {
 
     @Override

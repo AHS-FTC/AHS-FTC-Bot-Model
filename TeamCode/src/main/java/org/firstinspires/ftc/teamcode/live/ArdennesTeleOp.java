@@ -99,6 +99,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
     private double lastTime;
 
+    private Toggle overrideToggle;
+
     @Override
     public void initialize() {
         time = new ElapsedTime();
@@ -122,6 +124,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         capstoneToggle = new Toggle();
         collectionModeToggle = new Toggle();
         debugToggle = new Toggle();
+        overrideToggle = new Toggle();
+        overrideToggle.setEnabled(false);
 
         intakeOutSwitch = new Switch();
         intakeInSwitch = new Switch();
@@ -137,6 +141,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         capstone.setPosition(0.22);
         xSlide.mapPosition(.3,.75);
         xSlide.setTimeControlDuration(500);
+        xSlide.setPosition(0);
     }
 
     @Override
@@ -155,8 +160,11 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         buttonActions();
         driveActions();
         slideActions();
-        triggers();
         updateBlinkin();
+
+        if (!overrideToggle.isEnabled()) {
+            triggers();
+        }
     }
 
     private void slideActions() {
@@ -217,6 +225,11 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     }
 
     private void buttonActions() {
+
+        if (gamepad2.dpad_right) {
+            overrideToggle.canFlip();
+        }
+
         //press dpad down to enable debug logs
         if (gamepad1.dpad_down) {
             debugToggle.canFlip();
@@ -310,7 +323,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     }
 
     private void updateBlinkin() {
-        if (((gripperToggle.isEnabled() && slides.atBottom()))){
+        if (gripperToggle.isEnabled() && slides.atBottom()){
             blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
             return;
         } else if (gripperTrigger.isTriggered() || intakeTrigger.isTriggered()){
@@ -318,6 +331,9 @@ public class ArdennesTeleOp extends IterativeOpMode16896
             return;
         } else if ((intakeMode == IntakeMode.INFAST || intakeMode == IntakeMode.INSLOW)){
             blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+            return;
+        } else if (overrideToggle.isEnabled()){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
             return;
         } else if (collectionModeToggle.isEnabled()){
             blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);

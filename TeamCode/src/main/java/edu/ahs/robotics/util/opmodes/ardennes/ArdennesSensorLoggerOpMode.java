@@ -44,7 +44,7 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
  * An opmode for logging various sensors. Adjust to your will.
  */
 @TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
-//@Disabled
+@Disabled
 public class ArdennesSensorLoggerOpMode extends OpMode
 {
     BNO055IMU bnoIMU;

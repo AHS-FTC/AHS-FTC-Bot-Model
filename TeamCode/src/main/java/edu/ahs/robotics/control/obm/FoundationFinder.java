@@ -41,7 +41,7 @@ public class FoundationFinder implements OBMCommand {
             case FINISHED:
                 return true;
             case INITIAL:
-                if (robotState.position.y > startLookingY){
+                if (robotState.position.y >= startLookingY){
                     state = State.LOOKING;
                 }
                 break;
