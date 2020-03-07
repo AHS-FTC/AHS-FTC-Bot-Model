@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
+import edu.ahs.robotics.util.AutoTransitioner;
 
 
 @Autonomous(name = "-- AutoBlue --", group = "Linear Opmode")
@@ -82,6 +83,8 @@ public class BlueAuto extends LinearOpMode {
         Path foundation2;
         Path quarry3;
         Path foundation3;
+
+        AutoTransitioner.transitionOnStop(this, "Ardennes TeleOp");
 
         waitForStart(); //-----------------------------
         ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look();
