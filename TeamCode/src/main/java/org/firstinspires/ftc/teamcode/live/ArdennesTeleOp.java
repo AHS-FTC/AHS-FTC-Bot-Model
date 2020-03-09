@@ -41,6 +41,7 @@ import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.hardware.Intake;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.ftc.Switch;
 import edu.ahs.robotics.util.ftc.Toggle;
 import edu.ahs.robotics.util.opmodes.bfr.IterativeOpMode16896;
@@ -79,7 +80,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
 
-    private static final double INTAKE_POWER = .5;
+    private static final double INTAKE_POWER = 1;
     private IntakeMode intakeMode = IntakeMode.OFF;
     private TapeMeasureMode tapeMeasureMode = TapeMeasureMode.OFF;
 
@@ -100,6 +101,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private double lastTime;
 
     private Toggle overrideToggle;
+
+    private double xServoPosition;
 
     @Override
     public void initialize() {
@@ -159,15 +162,19 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     public void iterate() {
         buttonActions();
         driveActions();
-        updateBlinkin();
+        //updateBlinkin();
         xSlideActions();
 
         if (!overrideToggle.isEnabled()) {
-            triggers();
+            //triggers();
             slideActions();
         } else {
             overrideSlides();
         }
+
+        telemetry.addData("delta time", FTCUtilities.getCurrentTimeMillis() - lastTime);
+        telemetry.update();
+        lastTime = FTCUtilities.getCurrentTimeMillis();
     }
 
     private void overrideSlides(){
@@ -181,17 +188,21 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     }
 
     private void xSlideActions() {
-        if(xSlideSwitch.canFlip()){
-            if(gamepad2.right_stick_y > .3) {
-                xSlide.setPosition(1);
-                //xSlide.setTimeControlTarget(0);
-                //xSlide.restartTimeControl();
-            } else if (gamepad2.right_stick_y <  -.3){
-                xSlide.setPosition(0);
-                //xSlide.setTimeControlTarget(1);
-               // xSlide.restartTimeControl();
-            }
-        }
+//        if(xSlideSwitch.canFlip()){
+//            if(gamepad2.right_stick_y > .3) {
+//                xSlide.setPosition(1);
+//                //xSlide.setTimeControlTarget(0);
+//                //xSlide.restartTimeControl();
+//            } else if (gamepad2.right_stick_y <  -.3){
+//                xSlide.setPosition(0);
+//                //xSlide.setTimeControlTarget(1);
+//               // xSlide.restartTimeControl();
+//            }
+//        }
+
+        //Old code
+        xServoPosition = Range.clip(Math.pow((xServoPosition + gamepad2.right_stick_y), 2), 0, 1);
+        xSlide.setPosition(xServoPosition);
     }
 
     private void triggers() {
