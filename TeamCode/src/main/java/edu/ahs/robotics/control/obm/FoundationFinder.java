@@ -1,6 +1,7 @@
 package edu.ahs.robotics.control.obm;
 
 import edu.ahs.robotics.control.MotionConfig;
+import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
@@ -15,6 +16,7 @@ public class FoundationFinder implements OBMCommand {
 
     private Ardennes ardennes;
     private TriggerDistanceSensor foundationTrigger;
+    private Path path;
 
     private State state = State.INITIAL;
 
@@ -24,9 +26,10 @@ public class FoundationFinder implements OBMCommand {
         FINISHED
     }
 
-    public FoundationFinder(Ardennes ardennes, double startLookingY, boolean redSide) {
+    public FoundationFinder(Ardennes ardennes, double startLookingY, boolean redSide, Path path) {
         this.startLookingY = startLookingY;
         this.ardennes = ardennes;
+        this.path = path;
 
         if (redSide) {
             this.foundationTrigger = ardennes.getFoundationTriggerRight();

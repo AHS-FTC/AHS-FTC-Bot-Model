@@ -19,7 +19,7 @@ import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.loggers.Logger;
 
 @Autonomous(name = "Foundation Look Auto", group = "Linear Opmode")
-@Disabled
+//@Disabled
 public class FoundationLookTest extends LinearOpMode {
 
     Ardennes ardennes;
@@ -40,7 +40,7 @@ public class FoundationLookTest extends LinearOpMode {
         points.add(new Point(0,0));
         points.add(new Point(0,72));
 
-        Path toFoundation = new Path(points, false, .3, .3, new double[][]{{30,.3}, {50,.3}});//was 36
+        Path toFoundation = new Path(points, false, .3, .3, new double[][]{{10,.7}, {50,.7}, {60,.5 }});//was 36
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.addOBMCommand(foundationFinder);
         toFoundationConfig.idealHeading = Math.PI/2;
