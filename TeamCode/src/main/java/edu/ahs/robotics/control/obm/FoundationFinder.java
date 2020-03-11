@@ -26,7 +26,7 @@ public class FoundationFinder implements OBMCommand {
         FINISHED
     }
 
-    public FoundationFinder(Ardennes ardennes, double startLookingY, boolean redSide, Path path) {
+    public FoundationFinder(Ardennes ardennes, double startLookingY, boolean redSide) {
         this.startLookingY = startLookingY;
         this.ardennes = ardennes;
         this.path = path;

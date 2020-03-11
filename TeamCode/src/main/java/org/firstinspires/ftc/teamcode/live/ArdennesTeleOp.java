@@ -55,7 +55,6 @@ import edu.ahs.robotics.util.opmodes.bfr.IterativeOpMode16896;
 //@Disabled
 public class ArdennesTeleOp extends IterativeOpMode16896
 {
-
     private enum IntakeMode{
         OFF,
         INSLOW,
@@ -141,7 +140,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         blinkin = ardennes.getBlinkin();
 
         gripper.setPosition(0);
-        capstone.setPosition(0.22);
+        capstone.setPosition(0);
         xSlide.mapPosition(.3,.75);
         xSlide.setTimeControlDuration(500);
         xSlide.setPosition(0);
@@ -162,16 +161,17 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     public void iterate() {
         buttonActions();
         driveActions();
-        //updateBlinkin();
+        updateBlinkin();
         xSlideActions();
 
         if (!overrideToggle.isEnabled()) {
-            //triggers();
+            triggers();
             slideActions();
         } else {
             overrideSlides();
         }
 
+        telemetry.addData("at bottom", slides.atBottom());
         telemetry.addData("delta time", FTCUtilities.getCurrentTimeMillis() - lastTime);
         telemetry.update();
         lastTime = FTCUtilities.getCurrentTimeMillis();
@@ -201,7 +201,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 //        }
 
         //Old code
-        xServoPosition = Range.clip(Math.pow((xServoPosition + gamepad2.right_stick_y), 2), 0, 1);
+        xServoPosition = Range.clip((xServoPosition + gamepad2.right_stick_y) * 10, 0, 1);
         xSlide.setPosition(xServoPosition);
     }
 
@@ -336,9 +336,9 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
     private void activateCapstone() {
         if (capstoneToggle.isEnabled()) {
-            capstone.setPosition(1);
+            capstone.setPosition(.54);
         } else {
-            capstone.setPosition(0.22);
+            capstone.setPosition(0);
         }
     }
 
