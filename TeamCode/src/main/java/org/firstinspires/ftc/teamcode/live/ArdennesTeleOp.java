@@ -219,6 +219,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
                 //telemetry.addData("deltaTime",lastTime-time.milliseconds());
                 //lastTime = time.milliseconds();
                 telemetry.addData("limit switch triggered?", slides.atBottom());
+                telemetry.addData("average deltaTime", loopTracker.getAverageDeltaTime());
+                telemetry.addData("max deltaTime", loopTracker.getMaxDeltaTime());
                 //telemetry.addData("intake trigger", intakeTrigger.isTriggered());
                 //telemetry.addData("intake trigger distance", intakeTrigger.getDist());
                 telemetry.update();
