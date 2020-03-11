@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class FoundationLookTest extends LinearOpMode {
         points.add(new Point(0,0));
         points.add(new Point(0,72));
 
-        Path toFoundation = new Path(points, false, .3, .3, new double[][]{{30,.3}, {50,.3}});//was 36
+        Path toFoundation = new Path(points, false, .3, .3, new double[][]{{10,.7}, {50,.7}, {60,.5 }});//was 36
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.addOBMCommand(foundationFinder);
         toFoundationConfig.idealHeading = Math.PI/2;

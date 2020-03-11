@@ -1,10 +1,13 @@
 package edu.ahs.robotics.seasonrobots;
 
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.ahs.robotics.control.obm.OBMCommand;
+import edu.ahs.robotics.hardware.Blinkin;
 import edu.ahs.robotics.hardware.ChassisMotors;
 import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.DriveUnit;
@@ -33,6 +36,7 @@ public class Ardennes extends Robot {
     private SerialServo leftFoundation, rightFoundation;
     private SerialServo xSlide;
     private SerialServo capstone;
+    private Blinkin blinkin;
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
@@ -48,6 +52,7 @@ public class Ardennes extends Robot {
         slides = new Slides();
         xSlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
+        blinkin = new Blinkin("blinkin");
     }
 
     public Intake getIntake(){
@@ -83,6 +88,8 @@ public class Ardennes extends Robot {
 
     public SerialServo getCapstone() {return capstone;}
 
+    public Blinkin getBlinkin() {return blinkin;}
+
     public void finishOBMCommand(OBMCommand obmCommand){
         while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){
             obmCommand.check(mecanumChassis.getState());
@@ -104,9 +111,9 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.86882911,false,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.86882911, false,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 1.86882911, false,1440.0);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.49606,false,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.49606, false,1440.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 1.48637949393, true,1440.0);
 
         OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.1025, 14.4218256);
         return odometrySystem;

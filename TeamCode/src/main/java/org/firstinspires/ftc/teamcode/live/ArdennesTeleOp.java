@@ -34,12 +34,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import edu.ahs.robotics.hardware.Blinkin;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.hardware.Intake;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.ftc.Switch;
 import edu.ahs.robotics.util.ftc.Toggle;
 import edu.ahs.robotics.util.opmodes.bfr.IterativeOpMode16896;
@@ -74,9 +76,11 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private SerialServo gripper, capstone, xSlide, leftFoundation, rightFoundation;
     //todo add Servo capstoneServo;
 
+    private Blinkin blinkin;
+
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
 
-    private static final double INTAKE_POWER = .5;
+    private static final double INTAKE_POWER = 1;
     private IntakeMode intakeMode = IntakeMode.OFF;
     private TapeMeasureMode tapeMeasureMode = TapeMeasureMode.OFF;
 
@@ -95,6 +99,10 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private ElapsedTime time;
 
     private double lastTime;
+
+    private Toggle overrideToggle;
+
+    private double xServoPosition;
 
     @Override
     public void initialize() {
@@ -119,6 +127,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         capstoneToggle = new Toggle();
         collectionModeToggle = new Toggle();
         debugToggle = new Toggle();
+        overrideToggle = new Toggle();
+        overrideToggle.setEnabled(false);
 
         intakeOutSwitch = new Switch();
         intakeInSwitch = new Switch();
@@ -128,10 +138,13 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         gripperTrigger = ardennes.getGripperTrigger();
         intakeTrigger = ardennes.getIntakeTrigger();
 
+        blinkin = ardennes.getBlinkin();
+
         gripper.setPosition(0);
         capstone.setPosition(0.22);
         xSlide.mapPosition(.3,.75);
         xSlide.setTimeControlDuration(500);
+        xSlide.setPosition(0);
     }
 
     @Override
@@ -149,26 +162,47 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     public void iterate() {
         buttonActions();
         driveActions();
-        slideActions();
-        triggers();
+        //updateBlinkin();
+        xSlideActions();
+
+        if (!overrideToggle.isEnabled()) {
+            //triggers();
+            slideActions();
+        } else {
+            overrideSlides();
+        }
+
+        telemetry.addData("delta time", FTCUtilities.getCurrentTimeMillis() - lastTime);
+        telemetry.update();
+        lastTime = FTCUtilities.getCurrentTimeMillis();
+    }
+
+    private void overrideSlides(){
+        slides.runSlidesOverrided(gamepad2.right_trigger - gamepad2.left_trigger);
     }
 
     private void slideActions() {
         slides.gamepadControl(); //big boi slides
 
-        if(xSlideSwitch.canFlip()){
-            if(gamepad2.right_stick_y > .9) {
-                xSlide.setPosition(0);
-                //xSlide.setTimeControlTarget(0);
-                //xSlide.restartTimeControl();
-            } else if (gamepad2.right_stick_y <  -.9){
-                xSlide.setPosition(1);
-                //xSlide.setTimeControlTarget(1);
-               // xSlide.restartTimeControl();
-            }
-        }
+        // xSlide.runWithTimeControl();
+    }
 
-       // xSlide.runWithTimeControl();
+    private void xSlideActions() {
+//        if(xSlideSwitch.canFlip()){
+//            if(gamepad2.right_stick_y > .3) {
+//                xSlide.setPosition(1);
+//                //xSlide.setTimeControlTarget(0);
+//                //xSlide.restartTimeControl();
+//            } else if (gamepad2.right_stick_y <  -.3){
+//                xSlide.setPosition(0);
+//                //xSlide.setTimeControlTarget(1);
+//               // xSlide.restartTimeControl();
+//            }
+//        }
+
+        //Old code
+        xServoPosition = Range.clip(Math.pow((xServoPosition + gamepad2.right_stick_y), 2), 0, 1);
+        xSlide.setPosition(xServoPosition);
     }
 
     private void triggers() {
@@ -181,7 +215,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
             }
             //Is the gripper distance sensor triggered? We have a block in position, stop the intake.
             if (gripperTrigger.isTriggered()) {
-                if (intakeMode == IntakeMode.INSLOW) {
+                if (intakeMode == IntakeMode.INSLOW || intakeMode == IntakeMode.INFAST) {
                     intakeMode = IntakeMode.OFF;
                     updateIntake();
                 }
@@ -191,7 +225,6 @@ public class ArdennesTeleOp extends IterativeOpMode16896
                     updateGripper();
                 }
             }
-
         }
 
         // If in collection mode and a block is seen by the intake. Stop the motors but allow them to run outwards.
@@ -212,6 +245,11 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     }
 
     private void buttonActions() {
+
+        if (gamepad2.dpad_right) {
+            overrideToggle.canFlip();
+        }
+
         //press dpad down to enable debug logs
         if (gamepad1.dpad_down) {
             debugToggle.canFlip();
@@ -306,6 +344,29 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         }
     }
 
+    private void updateBlinkin() {
+        if (gripperToggle.isEnabled() && slides.atBottom()){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            return;
+        } else if (gripperTrigger.isTriggered() || intakeTrigger.isTriggered()){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+            return;
+        } else if ((intakeMode == IntakeMode.INFAST || intakeMode == IntakeMode.INSLOW)){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+            return;
+        } else if (overrideToggle.isEnabled()){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
+            return;
+        } else if (collectionModeToggle.isEnabled()){
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            return;
+        } else{
+            blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+            return;
+        }
+
+    }
+
     private void updateIntake() {
         if(intakeMode == IntakeMode.INSLOW){
             intake.runMotors(INTAKE_POWER);
@@ -322,6 +383,7 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private void updateGripper() {
         if(gripperToggle.isEnabled()){
             gripper.setPosition(1);
+            updateBlinkin();
         } else {
             gripper.setPosition(0);
         }

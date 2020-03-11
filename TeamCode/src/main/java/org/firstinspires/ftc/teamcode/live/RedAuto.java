@@ -37,6 +37,7 @@ import java.util.List;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
+import edu.ahs.robotics.util.AutoTransitioner;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 
@@ -93,6 +94,8 @@ public class RedAuto extends LinearOpMode {
         Path foundation2;
         Path quarry3;
         Path foundation3;
+
+        AutoTransitioner.transitionOnStop(this, "Ardennes TeleOp");
 
         waitForStart(); //-----------------------------
         ArdennesSkyStoneDetector.SkyStoneConfigurations stoneConfiguration = detector.look();
