@@ -35,6 +35,9 @@ public class LoopTracker {
         timeCategorizations.put(Categories.MS_31_50,0);
         timeCategorizations.put(Categories.MS_51_70,0);
         timeCategorizations.put(Categories.MS_71_90,0);
+        timeCategorizations.put(Categories.MS_91_120,0);
+        timeCategorizations.put(Categories.MS_120PLUS,0);
+
     }
 
     public void update(){
@@ -71,6 +74,8 @@ public class LoopTracker {
         } else {
             incrementHashMap(Categories.MS_120PLUS);
         }
+
+        lastTime = FTCUtilities.getCurrentTimeMillis();
     }
 
     private void incrementHashMap(Categories cat){

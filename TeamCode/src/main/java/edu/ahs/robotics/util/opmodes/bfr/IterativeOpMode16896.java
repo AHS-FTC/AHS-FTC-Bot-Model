@@ -27,6 +27,8 @@ public abstract class IterativeOpMode16896 extends OpMode {
         ErrorStealer.setErrorLogger(mainLogger);
         FTCUtilities.setOpMode(this);
 
+        loopTracker = new LoopTracker();
+
         try {
             initialize();
         } catch (Throwable t) {
@@ -89,13 +91,13 @@ public abstract class IterativeOpMode16896 extends OpMode {
         HashMap<LoopTracker.Categories, Double> timePercentages = loopTracker.getTimePercentages();
 
         return (
-                "0-10ms:" + timePercentages.get(LoopTracker.Categories.MS_0_10) * 100 + "% \n" +
-                        "11-30ms:" + timePercentages.get(LoopTracker.Categories.MS_11_30) * 100 + "% \n" +
-                        "31-50ms:" + timePercentages.get(LoopTracker.Categories.MS_31_50) * 100 + "% \n" +
-                        "51-70ms:" + timePercentages.get(LoopTracker.Categories.MS_51_70) * 100 + "% \n" +
-                        "71-90ms:" + timePercentages.get(LoopTracker.Categories.MS_71_90) * 100 + "% \n" +
-                        "91-120ms:" + timePercentages.get(LoopTracker.Categories.MS_91_120) * 100 + "% \n" +
-                        "120+ms:" + timePercentages.get(LoopTracker.Categories.MS_120PLUS) * 100 + "% \n"
+                "--- 0-10ms: " + timePercentages.get(LoopTracker.Categories.MS_0_10) * 100 + "% \n" +
+                        "--- 11-30ms: " + timePercentages.get(LoopTracker.Categories.MS_11_30) * 100 + "% \n" +
+                        "--- 31-50ms: " + timePercentages.get(LoopTracker.Categories.MS_31_50) * 100 + "% \n" +
+                        "--- 51-70ms: " + timePercentages.get(LoopTracker.Categories.MS_51_70) * 100 + "% \n" +
+                        "--- 71-90ms: " + timePercentages.get(LoopTracker.Categories.MS_71_90) * 100 + "% \n" +
+                        "--- 91-120ms: " + timePercentages.get(LoopTracker.Categories.MS_91_120) * 100 + "% \n" +
+                        "--- 120+ms: " + timePercentages.get(LoopTracker.Categories.MS_120PLUS) * 100 + "% \n"
         );
     }
 
