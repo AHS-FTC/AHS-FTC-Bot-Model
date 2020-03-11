@@ -142,8 +142,7 @@ public class Slides {
      * @return true if slides are at bottom
      */
     public boolean atBottom(){
-        return (limitSwitch.isTriggered() || limitSwitch2.isTriggered());
-    }
+        return (limitSwitch.isTriggered());} //FIXME put 2nd limit switch back in || limitSwitch2.isTriggered())
 
     public void resetEncoders(){
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -205,7 +204,9 @@ public class Slides {
 //        FTCUtilities.addData("encoder reading L", leftMotor.getCurrentPosition());
 //        FTCUtilities.addData("encoder reading R", rightMotor.getCurrentPosition());
 //        FTCUtilities.addData("target level", targetLevel);
-//
+
+//        FTCUtilities.addData("limit switch", limitSwitch.isTriggered());
+//        FTCUtilities.addData("limit switch 2", limitSwitch2.isTriggered());
 //        FTCUtilities.updateOpLogger();
 
         checkInputs();
