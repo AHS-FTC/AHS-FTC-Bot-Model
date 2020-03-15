@@ -18,12 +18,12 @@
  * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED. INSLOW NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER INSLOW CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING INSLOW ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -36,9 +36,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 
-
+/**
+ * An opmode for logging various sensors. Adjust to your will.
+ */
 @TeleOp(name="Ardennes Sensor Logger", group="Iterative Opmode")
 @Disabled
 public class ArdennesSensorLoggerOpMode extends OpMode
@@ -46,13 +50,17 @@ public class ArdennesSensorLoggerOpMode extends OpMode
     BNO055IMU bnoIMU;
     IMU imu;
     TouchSensor limitSwitch;
+    Ardennes ardennes;
+    TriggerDistanceSensor foundationLeft;
+    TriggerDistanceSensor foundationRight;
 
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
-        bnoIMU = FTCUtilities.getIMU("imu");
-        imu = new IMU(bnoIMU);
-        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
+        ardennes = new Ardennes();
+        foundationLeft = ardennes.getFoundationTriggerLeft();
+        foundationRight = ardennes.getFoundationTriggerRight();
+        ardennes.getFoundationTriggerRight();
     }
 
     @Override
@@ -65,10 +73,13 @@ public class ArdennesSensorLoggerOpMode extends OpMode
 
     @Override
     public void loop() {
-        FTCUtilities.addData("IMU",imu.getHeading());
-        FTCUtilities.addData("pressed?", limitSwitch.isPressed());
+        FTCUtilities.addData("left pressed?", foundationLeft.isTriggered());
+        FTCUtilities.addData("left dist", foundationLeft.getDist());
+        FTCUtilities.addData("right pressed?", foundationRight.isTriggered());
+        FTCUtilities.addData("right dist", foundationRight.getDist());
         FTCUtilities.updateOpLogger();
     }
+
     @Override
     public void stop() {
     }

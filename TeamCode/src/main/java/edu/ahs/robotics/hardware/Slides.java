@@ -1,51 +1,102 @@
 package edu.ahs.robotics.hardware;
 
+import android.os.Debug;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
-import edu.ahs.robotics.control.pid.PID;
 import edu.ahs.robotics.hardware.sensors.LimitSwitch;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
-import edu.ahs.robotics.util.ParameterLookup;
+import edu.ahs.robotics.util.ftc.Switch;
 
 /**
  * Vertical slides system for robot. Encapsulates motors and limit switches
  */
 public class Slides {
 
-    private DcMotor leftMotor;
-    private DcMotor rightMotor;
+    private DcMotorEx leftMotor;
+    private DcMotorEx rightMotor;
     private LimitSwitch limitSwitch;
     private LimitSwitch limitSwitch2;
 
-    private double motorPower = 0;
     private int targetLevel = 0;
 
-    private static final int ENCODER_TICKS_PER_LEVEL = 420;
-    private static final int PID_ERROR_THRESHOLD = 4000;
     private static final int SLIDES_MAX = 4000; // maximum encoder val of slides
     private static final int MAX_LEVEL = 10;
-    private static final double UP_POWER = 1;
-    private static final double DOWN_POWER = -.1;
 
-    private static final double P = 0.000008;// = 0.0005;
-    private static final double I = 0.0;
-    private static final double D = 0.0;
+    /**
+     * Power that slides return with using auto retraction
+     */
+    private static final double DOWN_POWER = -.3;
 
-    private boolean frozen = false;
-    private int freezeHeight = 0;
+    private Gamepad gamepad;
+    private State state;
 
-    private PID pid = new PID(P,I,D,3);
+    private Switch returnSwitch, autoControlSwitch, levelSwitch;
 
-    private SlidesThread thread = new SlidesThread();
+    private int freezePosition = 0;
+
+    /**
+     * Target encoder height for each level
+     */
+    private static int[] levelHeights = { //tuned
+            0,    //0
+            300,  //1
+            580,  //2
+            895,  //3
+            1170, //4
+            1495, //5
+            1775, //6
+            2065, //7
+            2365, //8
+            2665, //9
+            2935, //10
+            3255, //11
+            3540, //12
+            3860  //13
+    };
+
+    private enum State {
+
+        /**
+         * Controlled by the inputs of a GamePad.
+         */
+        USER_CONTROLLED,
+
+        /**
+         * Controlled by auto levelling software.
+         */
+        AUTO_CONTROLLED,
+
+        /**
+         * Auto levelled to position driven to when user controlled.
+         */
+        FROZEN,
+
+        /**
+         * Holding negative power until interrupted or triggering limit switches.
+         */
+        RUNNING_TO_BOTTOM,
+
+        /**
+         * Sitting at bottom waiting for inputs
+         */
+        AT_BOTTOM
+    }
+
+    /**
+     * For small state machine that controls drive to height
+     */
 
     public Slides (){
-        leftMotor = FTCUtilities.getMotor("slideL");
-        rightMotor = FTCUtilities.getMotor("slideR");
+        leftMotor = FTCUtilities.getMotorEx("slideL");
+        rightMotor = FTCUtilities.getMotorEx("slideR");
 
-        leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -53,12 +104,14 @@ public class Slides {
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        thread.start();
-
-        ParameterLookup lookup = FTCUtilities.getParameterLookup();
-
         limitSwitch = new LimitSwitch("limitSwitch", true);
         limitSwitch2 = new LimitSwitch("limitSwitch2", true);
+
+        returnSwitch = new Switch();
+        autoControlSwitch = new Switch();
+        levelSwitch = new Switch();
+
+        state = State.AT_BOTTOM;
     }
 
 
@@ -68,23 +121,28 @@ public class Slides {
      * @param slidesPower Value between -1 and 1 to move slides
      */
     public void runAtPower(double slidesPower) {
+        resetSlidesMode();
+
         if (getCurrentPosition() >= SLIDES_MAX) {
             slidesPower = Range.clip(slidesPower, -1, 0);
         } else if (atBottom()) {
             slidesPower = Range.clip(slidesPower, 0, 1);
-            resetEncoders();
-            targetLevel = 0;
         }
-
         setPower(slidesPower);
+    }
+
+    private void resetSlidesMode() {
+        if(leftMotor.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER){
+            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 
     /**
      * @return true if slides are at bottom
      */
     public boolean atBottom(){
-        return (limitSwitch.isTriggered() || limitSwitch2.isTriggered());
-    }
+        return (limitSwitch.isTriggered());} //FIXME put 2nd limit switch back in || limitSwitch2.isTriggered())
 
     public void resetEncoders(){
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -92,36 +150,6 @@ public class Slides {
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-
-//    public void startAutoControl(){
-//        synchronized (thread){
-//            thread.running = true;
-//            thread.notifyAll();
-//        }
-//    }
-//
-//    public void stopAutoControl(){
-//        synchronized (thread) {
-//            frozen = false;
-//            thread.running = false;
-//        }
-//    }
-
-//    public void kill(){
-//        thread.kill();
-//    }
-//
-//    public boolean isAutoControlled(){
-//        return thread.running;
-//    }
-
-//    private int getTargetHeight(){
-//        if(frozen){
-//           return freezeHeight;
-//        } else {
-//            return targetLevel * ENCODER_TICKS_PER_LEVEL;
-//        }
-//    }
 
     /**
      * Sets the target level that you want the slides to achieve.
@@ -137,76 +165,22 @@ public class Slides {
         }
     }
 
-    public void runToLevel (){
-        double targetLevelTicks = targetLevel * ENCODER_TICKS_PER_LEVEL;
-        while (getCurrentPosition() < targetLevelTicks) {
-            runAtPower(.5);
-        }
-        runAtPower(0);
-    }
-
-    /**
-     * Blocking method
-     */
-    public void goToBottom(){
-        runAtPower(-0.3);
-
-        while (!atBottom()){
-            //do nothing
-        }
-
-        stopMotors();
-    }
-
-    /**
-     * Enables auto control where target slide height is where we are now, freezing slides in position.
-     * The more elegant alternative to setPower(0);
-     */
-//    public void freeze(){
-//        freezeHeight = getCurrentPosition();
-//        frozen = true;
-//        startAutoControl();
-//    }
 
     /**
      * Runs slide PID when auto control is enabled.
      * Package protected for unit testing.
      */
-//    void autoControl(){
-//        int target = getTargetHeight();
-//        int current = getCurrentPosition();
-//        int error = target - current; // in ticks
-//
-//        FTCUtilities.addData("target", target);
-//        FTCUtilities.addData("current", current);
-//        FTCUtilities.addData("error", current);
-//
-//        double correction = pid.getCorrection(error).totalCorrection;
-//        motorPower += correction;
-//        runAtPower(motorPower);
-
-        /*if(Math.abs(error) > PID_ERROR_THRESHOLD) {
-            if(Math.signum(error) == 1){ // go up
-                runAtPower(UP_POWER/3);
-            } else { // go down
-                runAtPower(DOWN_POWER/3);
-            }
-            pid.trashIntegral(); // integral should stay at zero per 'pid sesh'
-        } else { //do the pid thing
-
-        }*/
-
-
-//        FTCUtilities.addData("motor power", motorPower);
-//        //FTCUtilities.addData("bottom", atBottom());
-//        //FTCUtilities.addData("target level", targetLevel);
-//        FTCUtilities.updateOpLogger();
-//    }
 
     //USUALLY USE runAtPower(), it checks the slide limits.
     private void setPower(double power) {
         leftMotor.setPower(power);
         rightMotor.setPower(power);
+    }
+
+    //THIS A PUBLIC METHOD FOR OVERRIDE IN TELEOP
+    public void runSlidesOverrided(double power){
+        resetSlidesMode();
+        setPower(power);
     }
 
     public void stopMotors() {
@@ -220,35 +194,111 @@ public class Slides {
         return (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition())/2; //note integer division
     }
 
-    private class SlidesThread extends Thread {
-        private volatile boolean running;
-        private volatile  boolean finished;
+    /**
+     * Controls the slides with the gamepad.
+     * Nonblocking, use in an iterative context.
+     */
+    public void gamepadControl(){
+//        FTCUtilities.addData("mode", state);
+//        FTCUtilities.addData("encoder reading", getCurrentPosition());
+//        FTCUtilities.addData("encoder reading L", leftMotor.getCurrentPosition());
+//        FTCUtilities.addData("encoder reading R", rightMotor.getCurrentPosition());
+//        FTCUtilities.addData("target level", targetLevel);
 
-        public SlidesThread() {
-            running = false;
-            finished = false;
+//        FTCUtilities.addData("limit switch", limitSwitch.isTriggered());
+//        FTCUtilities.addData("limit switch 2", limitSwitch2.isTriggered());
+//        FTCUtilities.updateOpLogger();
+
+        checkInputs();
+        switch (state){
+            case AT_BOTTOM: //todo change this state
+                break;
+            case AUTO_CONTROLLED:
+                autoControl(levelHeights[targetLevel]);
+                break;
+            case RUNNING_TO_BOTTOM:
+                if(atBottom()){
+                    stopMotors();
+                    state = State.AT_BOTTOM;
+                }
+                break;
+            case FROZEN:
+                autoControl(freezePosition);
+                break;
+            case USER_CONTROLLED:
+                runAtPower(gamepad.right_trigger - gamepad.left_trigger);
+                break;
+        }
+    }
+
+    /**
+     * Sets the gamepad that controls the slides in gamepadControl();
+     */
+    public void setGamepad(Gamepad gamepad){
+        this.gamepad = gamepad;
+    }
+
+    private void raiseTargetLevel(){
+        if(targetLevel < levelHeights.length){
+            targetLevel++;
+        }
+    }
+
+    private void autoControl(int targetPosition){
+        if(leftMotor.getTargetPosition() != targetPosition){
+            setTargetPositions(targetPosition);
         }
 
-        private synchronized void kill(){
-                finished = true;
-                running = false;
-                notifyAll();
+        if(leftMotor.getMode() != DcMotor.RunMode.RUN_TO_POSITION){
+            leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-//        @Override
-//        public void run() {
-//            while(!finished){
-//                while (running){
-//                    autoControl();
-//                }
-//                if(!finished){
-//                    try {
-//                        synchronized (this) {
-//                            wait();
-//                        }
-//                    } catch (Exception e){}
-//                }
-//            }
-//        }
+        leftMotor.setPower(.7);
+        rightMotor.setPower(.7);
+    }
+
+    private void lowerTargetLevel(){
+        if(targetLevel > 0){
+            targetLevel--;
+        }
+    }
+
+    private void setTargetPositions(int position){
+        leftMotor.setTargetPosition(position);
+        rightMotor.setTargetPosition(position);
+    }
+
+    /**
+     * Check controller inputs to determine slide state
+     */
+    private void checkInputs(){
+        if(gamepad.left_trigger != 0.0 || gamepad.right_trigger != 0.0){
+
+            //if there's any trigger control, escape any automation and go into user control
+            state = State.USER_CONTROLLED;
+
+        } else if (gamepad.b && returnSwitch.canFlip()){
+
+            state = State.RUNNING_TO_BOTTOM;
+            runAtPower(DOWN_POWER);
+
+        } else if (gamepad.y && autoControlSwitch.canFlip()){
+
+            state = State.AUTO_CONTROLLED;
+            raiseTargetLevel();
+
+        } else if (state == State.USER_CONTROLLED){ //if there are no inputs and the state is user controlled, freeze slides
+
+            freezePosition = getCurrentPosition();
+            state = State.FROZEN;
+
+        } //if none of these things are true, maintain state.
+
+        if (gamepad.dpad_up && levelSwitch.canFlip()){ //check up / down level controls
+            raiseTargetLevel();
+        } else if (gamepad.dpad_down && levelSwitch.canFlip()){
+            lowerTargetLevel();
+        }
     }
 }

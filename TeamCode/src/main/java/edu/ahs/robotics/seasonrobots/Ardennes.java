@@ -1,10 +1,13 @@
 package edu.ahs.robotics.seasonrobots;
 
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.ahs.robotics.control.obm.OBMCommand;
+import edu.ahs.robotics.hardware.Blinkin;
 import edu.ahs.robotics.hardware.ChassisMotors;
 import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.DriveUnit;
@@ -26,28 +29,30 @@ public class Ardennes extends Robot {
     private MecanumChassis mecanumChassis;
     private OdometrySystemImpl odometrySystem;
     private Intake intake;
-    private SerialServo gripper;//todo add other serbos
-    private TriggerDistanceSensor intakeTrigger, gripperTrigger;
+    private SerialServo gripper;
+    private TriggerDistanceSensor intakeTrigger, gripperTrigger, foundationTriggerRight, foundationTriggerLeft;
     private ArdennesSkyStoneDetector detector;
     private Slides slides;
     private SerialServo leftFoundation, rightFoundation;
-    private SerialServo ySlide;
+    private SerialServo xSlide;
     private SerialServo capstone;
-    private ContinuosServo tapeMeasure;
+    private Blinkin blinkin;
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
         gripperTrigger = new TriggerDistanceSensor("gripperTrigger", 35);
+        foundationTriggerRight = new TriggerDistanceSensor("foundationTriggerR", 100);
+        foundationTriggerLeft = new TriggerDistanceSensor("foundationTriggerL", 100);
         leftFoundation = new SerialServo("FSL", false);
         rightFoundation = new SerialServo("FSR", true);
-        intake = new Intake(1);
+        intake = new Intake(.5);
         gripper = new SerialServo("gripper", false);
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
         slides = new Slides();
-        ySlide = new SerialServo("slideServo", false);
+        xSlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
-        tapeMeasure = new ContinuosServo("vexServo");
+        blinkin = new Blinkin("blinkin");
     }
 
     public Intake getIntake(){
@@ -66,6 +71,10 @@ public class Ardennes extends Robot {
         return gripperTrigger;
     }
 
+    public TriggerDistanceSensor getFoundationTriggerRight(){return foundationTriggerRight;}
+
+    public TriggerDistanceSensor getFoundationTriggerLeft(){return foundationTriggerLeft;}
+
     public SerialServo getGripper(){
         return gripper;
     }
@@ -73,13 +82,13 @@ public class Ardennes extends Robot {
     public SerialServo getLeftFoundation() {return leftFoundation;}
     public SerialServo getRightFoundation() {return rightFoundation;}
 
-    public SerialServo getySlide() {return ySlide;}
+    public SerialServo getxSlide() {return xSlide;}
 
     public Slides getSlides() {return slides;}
 
     public SerialServo getCapstone() {return capstone;}
 
-    public ContinuosServo getTapeMeasure() {return tapeMeasure;}
+    public Blinkin getBlinkin() {return blinkin;}
 
     public void finishOBMCommand(OBMCommand obmCommand){
         while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){
@@ -93,7 +102,7 @@ public class Ardennes extends Robot {
         //Set Wheel Diameter in inches and Motor Type. These traits are shared by all chassis drive units
         DriveUnit.Config config = new DriveUnit.Config(driveGearRatio, 3.94, MotorHashService.MotorTypes.AM_20);
 
-        //Make a HashMap that maps motors to their flip status. True indicates the motor runs reverse.
+        //Make a HashMap that maps motors to their canFlip status. True indicates the motor runs reverse.
         Map<ChassisMotors.Mecanum, Boolean> driveFlips  = new HashMap<>();
 
         //OdometrySystemImpl odometrySystem = makeOdometrySystem(imu);
@@ -102,11 +111,11 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 2.3590,true,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 2.3569, true,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 2.3675, false,4000);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.50664565, false,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.51543176978, false,1440.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 1.50446717, true,1440.0);
 
-        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -.103, 14.085);
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.1025, 14.4218256);
         return odometrySystem;
     }
 

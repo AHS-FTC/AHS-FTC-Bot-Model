@@ -27,43 +27,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.ahs.robotics.util.opmodes;
+package edu.ahs.robotics.util.opmodes.ardennes;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import edu.ahs.robotics.hardware.sensors.Odometer;
-import edu.ahs.robotics.hardware.sensors.OdometerImpl;
+import edu.ahs.robotics.hardware.Blinkin;
+import edu.ahs.robotics.hardware.sensors.IMU;
+import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
+import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 
-
 /**
- * OpMode that returns displacement values to check if wheels are correctly tuned. Also works to check ticks per rotation and rotation direction
- * <b>Independent of BotModel, needs to be tuned before use</b>
- * Remember that motor flips in botmodel may also affect your encoder directions.
- * @author Alex Appleby
+ * An opmode for testing the Blinkin
  */
-@TeleOp(name="Odometer tuning check OpMode", group="Iterative OpMode")
+@TeleOp(name="Ardennes Blinkin", group="Iterative Opmode")
 @Disabled
-public class WheelTuningCheckOpMode extends OpMode
+public class ArdennesBlinkinTest extends OpMode
 {
-    private Odometer leftOdom,rightOdom,backOdom;
-    private DcMotor br;
+    Ardennes ardennes;
+    Blinkin blinkinLedDriver;
+    RevBlinkinLedDriver.BlinkinPattern pattern;
 
     @Override
     public void init() {
         FTCUtilities.setOpMode(this);
-
-        br = hardwareMap.get(DcMotor.class, "BR");
-        br.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        leftOdom = new OdometerImpl("intakeL",2.3596, true, 1440); // remember to update these
-        rightOdom = new OdometerImpl("intakeR",2.3617, true, 1440); // tune all before use
-        backOdom = new OdometerImpl("BR",2.387, true, 4000);
-
+        ardennes = new Ardennes();
+        blinkinLedDriver = ardennes.getBlinkin();
     }
 
     @Override
@@ -76,25 +70,21 @@ public class WheelTuningCheckOpMode extends OpMode
 
     @Override
     public void loop() {
-
-        if(gamepad1.a){
-            if(br.getDirection() == DcMotorSimple.Direction.REVERSE) {
-                br.setDirection(DcMotorSimple.Direction.FORWARD);
-            } else {
-                br.setDirection(DcMotorSimple.Direction.REVERSE);
-            }
+        if (gamepad1.x) {
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         }
 
-        telemetry.addData("back right direction", br.getDirection().toString());
+        if (gamepad1.y) {
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        }
 
-        telemetry.addData("left reading", leftOdom.getDistance());
-        telemetry.addData("right reading", rightOdom.getDistance());
-        telemetry.addData("back reading", backOdom.getDistance());
-        telemetry.update();
+        if (gamepad1.a) {
+            blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+        }
     }
+
     @Override
     public void stop() {
-
     }
 
 }

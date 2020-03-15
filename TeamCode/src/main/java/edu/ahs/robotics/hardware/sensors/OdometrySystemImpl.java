@@ -135,8 +135,6 @@ public class OdometrySystemImpl implements OdometrySystem {
         xLReading = xL.getDistance();
         yReading = y.getDistance();
 
-        FTCUtilities.OpLogger("y reading", yReading);
-
         //find deltas
         dxR = xRReading - xRLast;
         dxL = xLReading - xLLast;
@@ -155,7 +153,7 @@ public class OdometrySystemImpl implements OdometrySystem {
         dyExpected = Math.toDegrees(dHeading) * yInchesPerDegree;
 
         //find real dy
-        dySum += dyBeforeFactorOut - dyExpected;
+        dySum += (dyBeforeFactorOut - dyExpected);
         dy = dyBeforeFactorOut - dyExpected;
 
 
@@ -180,6 +178,16 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         position.x += dxGlobal;
         position.y += dyGlobal;
+
+        FTCUtilities.addData("dySum", dySum);
+        FTCUtilities.addData("heading", position.heading);
+        FTCUtilities.addData("YWheelRaw", yReading);
+        FTCUtilities.addData("XWheelLRaw", xLReading);
+        FTCUtilities.addData("XWheelRRaw", xRReading);
+
+
+        FTCUtilities.updateOpLogger();
+
 
         logger.append("xR", String.valueOf(xRReading));
         logger.append("xL", String.valueOf(xLReading));

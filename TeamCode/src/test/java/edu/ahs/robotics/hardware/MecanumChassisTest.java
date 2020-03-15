@@ -183,7 +183,7 @@ public class MecanumChassisTest {
     }
 
     @Test
-    @Ignore
+    //@Ignore
     public void testPointPID(){
         Point targetPoint = new Point(0,0);
         long timeout =  100000000; // don't timeout

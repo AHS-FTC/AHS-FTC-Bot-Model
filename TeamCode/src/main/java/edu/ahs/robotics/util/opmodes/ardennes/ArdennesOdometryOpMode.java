@@ -18,18 +18,19 @@
  * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED. INSLOW NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER INSLOW CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING INSLOW ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package edu.ahs.robotics.util.opmodes.ardennes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -50,20 +51,12 @@ import edu.ahs.robotics.util.loggers.Logger;
  */
 @TeleOp(name="Ardennes Odometry OpMode", group="Iterative OpMode")
 //@Disabled
-public class ArdennesOdomOpMode extends OpMode
+public class ArdennesOdometryOpMode extends OpMode
 {
-    //private Ardennes ardennes;
     private Position position;
-    private Velocity velocity;
     private Logger logger;
     private Ardennes ardennes;
     private MecanumChassis chassis;
-    private IMU imu;
-
-
-    private double lastTime;
-
-    //private OpMode teleOp;
 
     @Override
     public void init() {
@@ -71,34 +64,24 @@ public class ArdennesOdomOpMode extends OpMode
         ardennes = new Ardennes();
         logger = new DataLogger("ardennesOdomOpMode","ardennesOdomOpMode");
 
-        //teleOp = new SimpleTeleOp();
-        //teleOp.hardwareMap = hardwareMap;
-        //teleOp.gamepad1 = gamepad1;
-        //teleOp.init();
         chassis = ardennes.getChassis();
         chassis.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        imu = new IMU(hardwareMap.get(BNO055IMU.class, "imu"));
     }
 
     @Override
     public void init_loop() {
+
     }
 
     @Override
     public void start() {
-        lastTime = FTCUtilities.getCurrentTimeMillis();
-        logger.startWriting();
-        chassis.startOdometrySystem();
         chassis.setPosition(0,0,0);
+        chassis.startOdometrySystem();
     }
 
     @Override
     public void loop() {
-        //teleOp.loop();
         chassis.drive3Axis(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-
-        double currentTime = FTCUtilities.getCurrentTimeMillis();
-        double imuHeading = imu.getHeading();
 
         OdometrySystem.State state = chassis.getState();
 
@@ -106,31 +89,10 @@ public class ArdennesOdomOpMode extends OpMode
 
         telemetry.addData("x -ins", position.x);
         telemetry.addData("y -ins", position.y);
-        //telemetry.addData("x^2 + y^2 sqrt", Math.sqrt(position.x * position.x + position.y * position.y));
-
-//        telemetry.addData("heading -deg", Math.toDegrees(position.heading));
-//        telemetry.addData("imu heading -deg", imuHeading);
-//        telemetry.addData("power -in/s", velocity.power());
-//        telemetry.addData("dir of travel -deg", Math.toDegrees(velocity.direction()));
-//        telemetry.addData("delta time -millis", currentTime - lastTime);
-        telemetry.update();
-//
-//        logger.append("x", String.valueOf(position.x));
-//        logger.append("y", String.valueOf(position.y));
-//        logger.append("heading", String.valueOf(position.getHeadingInDegrees()));
-//        logger.append("power", String.valueOf(velocity.power()));
-//        logger.append("acceleration", String.valueOf(state.acceleration));
-//        logger.append("radius", String.valueOf(state.travelRadius));
-//
-//        logger.append("imu heading", String.valueOf(imuHeading));
-//        logger.writeLine();
-
-        lastTime = currentTime;
+        telemetry.addData("heading", Math.toDegrees(position.heading));
     }
     @Override
     public void stop() {
-        //teleOp.stop();
-        Logger.stopLoggers();
         chassis.stopOdometrySystem();
     }
 

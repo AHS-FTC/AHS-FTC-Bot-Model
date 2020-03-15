@@ -38,7 +38,7 @@ public class ErrorStealer {
             errorLogger = new TextLogger("ERROR_LOG", "error");
         }
 
-        errorLogger.logLine("\n \n ----------------------------------- THROWABLE STOPPED EXECUTION: " + t.getClass().getSimpleName()); // add formatting
+        errorLogger.logLine("\n \n ----------------------------------- THROWABLE STARTED EXECUTION: " + t.getClass().getSimpleName()); // add formatting
 
         errorLogger.logLine("Error Identifier: " + composeErrorIdentifier());
 

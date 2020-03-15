@@ -13,7 +13,7 @@ public class OdometerImpl implements Odometer {
     private DcMotor motor; //we use the crappy DcMotor class from FTC to access encoder values. Kind of a hack, but that's how it be.
     private double wheelCircumference;// in inches, used to be in mm
     private double ticksPerRotation; //specific to our S4T encoders. May be in need of change for other S4T models or different encoders.
-    private int direction = 1; //enables flip. only 1 or -1. //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+    private int direction = 1; //enables canFlip. only 1 or -1. //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
 
     /**
      * @param deviceName A string that ties the encoder sensor to the motor port of a DcMotor. Should be the same as whatever motor it's attached to.

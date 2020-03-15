@@ -5,10 +5,12 @@ import android.os.Environment;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -111,6 +113,13 @@ public class FTCUtilities { //handles inaccessable objects in FTCApp. hardwareMa
         return hardwareMap.get(DcMotor.class, deviceName);
     }
 
+    public static DcMotorEx getMotorEx(String deviceName){
+        if(testMode){
+            return (DcMotorEx)testMotors.get(deviceName);
+        }
+        return hardwareMap.get(DcMotorEx.class, deviceName);
+    }
+
     public static BNO055IMU getIMU (String imuName){
         if(testMode){
             return null;//literally die in a hole // todo mock imu
@@ -123,6 +132,14 @@ public class FTCUtilities { //handles inaccessable objects in FTCApp. hardwareMa
             throw new UnsupportedOperationException("TestMode doesn't support touch sensors yet. mock it");
         } else {
             return hardwareMap.get(TouchSensor.class, sensorName);
+        }
+    }
+
+    public static RevBlinkinLedDriver getBlinkin (String deviceName){
+        if(testMode){
+            throw new UnsupportedOperationException("TestMode doesn't support Blinkin yet. mock it");
+        } else {
+            return hardwareMap.get(RevBlinkinLedDriver.class, deviceName);
         }
     }
 

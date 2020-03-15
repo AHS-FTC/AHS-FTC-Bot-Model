@@ -18,11 +18,11 @@ public class BaseTestAuto {
     private MecanumChassis chassis;
     private OBMCommand nullCommand = new NullCommand();
 
-    public BaseTestAuto(List<Point> points){
+    public BaseTestAuto(List<Point> points, double initialPower, double finalPower, double[][] powers){
         MotorHashService.init();
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
-        path = new Path(points, false, .5, 0, new double[][]{});//was 36
+        path = new Path(points, false, initialPower, finalPower, powers);//was 36
         chassis.startOdometrySystem();
     }
 

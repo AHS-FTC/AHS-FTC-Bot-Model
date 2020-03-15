@@ -46,7 +46,7 @@ public class FullAuto {
         foundationServoLeft = ardennes.getLeftFoundation();
         foundationServoRight = ardennes.getRightFoundation();
         gripper = ardennes.getGripper();
-        yslide = ardennes.getySlide();
+        yslide = ardennes.getxSlide();
         capstone = ardennes.getCapstone();
         gripperTrigger = ardennes.getGripperTrigger();
         //intakeTrigger = ardennes.getIntakeTrigger();
@@ -113,8 +113,8 @@ public class FullAuto {
         FTCUtilities.sleep(500);
         gripper.setPosition(1);
         FTCUtilities.sleep(1000);
-        slides.setTargetLevel(2);
-        slides.runToLevel();
+        //slides.setTargetLevel(2); //reimplement slides control for auto too
+        //slides.runToLevel();
         FTCUtilities.sleep(300);
         yslide.setPosition(1);
         FTCUtilities.sleep(1500);
