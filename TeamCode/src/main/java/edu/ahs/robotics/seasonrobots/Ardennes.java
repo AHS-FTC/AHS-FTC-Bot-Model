@@ -37,6 +37,7 @@ public class Ardennes extends Robot {
     private SerialServo xSlide;
     private SerialServo capstone;
     private Blinkin blinkin;
+    private ContinuosServo tapeMeasure;
 
     public Ardennes() {
         intakeTrigger = new TriggerDistanceSensor("intakeTrigger",70);
@@ -45,7 +46,7 @@ public class Ardennes extends Robot {
         foundationTriggerLeft = new TriggerDistanceSensor("foundationTriggerL", 100);
         leftFoundation = new SerialServo("FSL", false);
         rightFoundation = new SerialServo("FSR", true);
-        intake = new Intake(.5);
+        intake = new Intake(1);
         gripper = new SerialServo("gripper", false);
         odometrySystem = makeOdometrySystem();
         mecanumChassis = makeChassis(odometrySystem);
@@ -53,6 +54,7 @@ public class Ardennes extends Robot {
         xSlide = new SerialServo("slideServo", false);
         capstone = new SerialServo("capstone", true);
         blinkin = new Blinkin("blinkin");
+        tapeMeasure = new ContinuosServo("tapeMeasure");
     }
 
     public Intake getIntake(){
@@ -90,6 +92,8 @@ public class Ardennes extends Robot {
 
     public Blinkin getBlinkin() {return blinkin;}
 
+    public ContinuosServo getTapeMeasure() {return tapeMeasure;}
+
     public void finishOBMCommand(OBMCommand obmCommand){
         while (!obmCommand.isFinished() && FTCUtilities.opModeIsActive()){
             obmCommand.check(mecanumChassis.getState());
@@ -111,11 +115,11 @@ public class Ardennes extends Robot {
     }
 
     private OdometrySystemImpl makeOdometrySystem(){
-        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.50664565, false,1440.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
-        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.51543176978, false,1440.0); //2.3617
-        Odometer y = FTCUtilities.getOdometer("BR", 1.50446717, true,1440.0);
+        Odometer x1 = FTCUtilities.getOdometer("intakeR", 1.512, false,4000.0); //2.3596 //*** IMPORTANT *** setDirection() method on DcMotor changes encoder direction
+        Odometer x2 = FTCUtilities.getOdometer("intakeL", 1.50501864, false,4000.0); //2.3617
+        Odometer y = FTCUtilities.getOdometer("BR", 1.50446717, false,1440.0);
 
-        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.1025, 14.4218256);
+        OdometrySystemImpl odometrySystem = new OdometrySystemImpl(x1, x2, y, -0.106308038, 14.239);
         return odometrySystem;
     }
 

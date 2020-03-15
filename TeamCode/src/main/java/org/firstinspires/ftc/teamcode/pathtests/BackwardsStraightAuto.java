@@ -30,43 +30,47 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import edu.ahs.robotics.control.Path;
-import edu.ahs.robotics.hardware.MecanumChassis;
-import edu.ahs.robotics.seasonrobots.Ardennes;
+import java.util.ArrayList;
+
+import edu.ahs.robotics.control.MotionConfig;
+import edu.ahs.robotics.control.Point;
+import edu.ahs.robotics.util.ftc.ErrorStealer;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
+import edu.ahs.robotics.util.loggers.DataLogger;
+import edu.ahs.robotics.util.loggers.Logger;
 
 
-@Autonomous(name = "Left Curve Auto Reverse", group = "Linear Opmode")
-@Disabled
-public class LeftCurveReverseAuto extends LinearOpMode {
-
-    private Ardennes ardennes;
-    private Path path;
-    private MecanumChassis chassis;
+@Autonomous(name = "Backwards Straight Auto", group = "Linear Opmode")
+//@Disabled
+public class BackwardsStraightAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        /*
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new DataLogger("pathDataCurveLReverse", "partialPursuit");
+        Logger logger = new DataLogger("pathDataStraightBackwards", "partialPursuit");
 
-        List<List<Point>> points = GCodeReader.openFile("1001.csv");
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(new Point(0,0));
+        points.add(new Point(100,0));
 
-        MotorHashService.init();
-        ardennes = new Ardennes();
-        chassis = ardennes.getChassis();
-        chassis.setPosition(0,0, Math.PI);
-        path = new Path(points.get(0), 12, 4, 36, false);
-        chassis.startOdometrySystem();
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.idealHeading = Math.PI;
+
+        BaseTestAuto base = new BaseTestAuto(points,.3, 0, new double[][]{{24, .4}, {48, .4}}, motionConfig);
 
         waitForStart();
 
-        //chassis.followPath(path, 12, Math.PI, null,0, 0);
+
+        try {
+            logger.startWriting();
+            base.afterStart();
+        } catch (Throwable t){
+            ErrorStealer.stealError(t);
+        }
 
         logger.stopWriting();
-        */
     }
 }

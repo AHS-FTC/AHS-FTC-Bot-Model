@@ -66,11 +66,6 @@ public class OdometrySystemImpl implements OdometrySystem {
 
         odometerThread = new OdometerThread();
 
-        logger = (DataLogger) Logger.getLogger("odometrySystem");
-        if(logger == null){ //create a mock/empty logger if one hasn't been created higher up, so as to not have null pointers. this way we don't log unless specified.
-            logger = new MockDataLogger("odometrySystem");
-        }
-
 //        distanceBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0.0);
 //        velocityTimeBuffer = new RingBuffer<>(DISTANCE_TIME_BUFFER_SIZE, 0L);//type is long
 //
@@ -82,6 +77,11 @@ public class OdometrySystemImpl implements OdometrySystem {
      * starts thread continuously monitoring position
      */
     public void start() {
+        logger = (DataLogger) Logger.getLogger("odometrySystem");
+        if(logger == null){ //create a mock/empty logger if one hasn't been created higher up, so as to not have null pointers. this way we don't log unless specified.
+            logger = new MockDataLogger("odometrySystem");
+        }
+
         logger.startWriting();
         resetEncoders();
         odometerThread.start();
@@ -180,7 +180,7 @@ public class OdometrySystemImpl implements OdometrySystem {
         position.y += dyGlobal;
 
         FTCUtilities.addData("dySum", dySum);
-        FTCUtilities.addData("heading", position.heading);
+        FTCUtilities.addData("heading", Math.toDegrees(position.heading));
         FTCUtilities.addData("YWheelRaw", yReading);
         FTCUtilities.addData("XWheelLRaw", xLReading);
         FTCUtilities.addData("XWheelRRaw", xRReading);

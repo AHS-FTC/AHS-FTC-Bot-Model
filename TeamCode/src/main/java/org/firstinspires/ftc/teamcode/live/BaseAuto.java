@@ -19,7 +19,7 @@ import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.loggers.Logger;
 
 public class BaseAuto {
-    public static final double MOTOR_POWER = .5;
+    public static final double MOTOR_POWER = 1;
     private Ardennes ardennes;
     private MecanumChassis chassis;
     private Intake intake;
@@ -39,6 +39,8 @@ public class BaseAuto {
 
 
     public BaseAuto(boolean flipToBlue) {
+
+
         ardennes = new Ardennes();
         chassis = ardennes.getChassis();
         intake = ardennes.getIntake();
@@ -139,15 +141,15 @@ public class BaseAuto {
         toFoundationConfig.idealHeading = Math.PI;
         toFoundationConfig.turnAggression = .8;
         toFoundationConfig.timeOut = 5000;
-        changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
-        toFoundationConfig.addOBMCommand (changeTargetHeading);
+        //changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
+        //toFoundationConfig.addOBMCommand(changeTargetHeading);
         toFoundationConfig.turnCutoff = 4;
 
         chassis.followPath(toFoundation, toFoundationConfig);
 
         chassis.stopMotors();
 
-        MotionConfig gripFoundationConfig = new MotionConfig();
+/*        MotionConfig gripFoundationConfig = new MotionConfig();
         gripFoundationConfig.idealHeading = Math.PI;
         gripFoundationConfig.timeOut = 3000;
         gripFoundationConfig.turnCutoff = 20.0;
@@ -170,7 +172,7 @@ public class BaseAuto {
         leftFoundation.setPosition(0);
         rightFoundation.setPosition(0);
 
-/*        blockGripper.reset();
+        blockGripper.reset();
 
         intake.runMotors(MOTOR_POWER);
 
