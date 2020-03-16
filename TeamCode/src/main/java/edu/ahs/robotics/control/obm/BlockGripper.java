@@ -1,5 +1,6 @@
 package edu.ahs.robotics.control.obm;
 
+import edu.ahs.robotics.hardware.sensors.DistanceSensor;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
 import edu.ahs.robotics.hardware.sensors.Trigger;
 import edu.ahs.robotics.seasonrobots.Ardennes;
@@ -40,13 +41,12 @@ public class BlockGripper implements OBMCommand {
 
     @Override
     public boolean check(OdometrySystem.State robotState) {
+        FTCUtilities.addData("isTriggered", gripperTrigger.isTriggered());
+        FTCUtilities.addData("distance", ((DistanceSensor)gripperTrigger).getDistOptimized());
+        FTCUtilities.updateOpLogger();
         switch(state){
             case FINISHED:
                 return true;
-            case INITIAL:
-                startTime = FTCUtilities.getCurrentTimeMillis();
-                state = State.WAITING;
-                break;
             case WAITING:
                 if(gripperTrigger.isTriggered()) {// || FTCUtilities.getCurrentTimeMillis() - startTime > waitTime){ gripperTrigger.isTriggered()
                     ardennes.getGripper().setPosition(1);
@@ -60,7 +60,7 @@ public class BlockGripper implements OBMCommand {
     }
 
     public void reset(){
-        state = State.INITIAL;
+        state = State.WAITING;
     }
 
     @Override

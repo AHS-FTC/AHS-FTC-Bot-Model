@@ -54,6 +54,8 @@ public class BaseAuto {
 
         capstone = ardennes.getCapstone();
 
+        xSlide.mapPosition(.3,.75);
+
         xSlide.setPosition(0);
         gripper.setPosition(0);
 
@@ -139,21 +141,23 @@ public class BaseAuto {
 
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.idealHeading = Math.PI;
-        toFoundationConfig.turnAggression = .8;
+        toFoundationConfig.turnAggression = .9;
+        toFoundationConfig.turnPower = 1;
         toFoundationConfig.timeOut = 5000;
-        //changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
-        //toFoundationConfig.addOBMCommand(changeTargetHeading);
-        toFoundationConfig.turnCutoff = 4;
+        changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
+        toFoundationConfig.addOBMCommand(changeTargetHeading);
+        toFoundationConfig.turnCutoff = 2;
 
         chassis.followPath(toFoundation, toFoundationConfig);
 
         chassis.stopMotors();
 
-/*        MotionConfig gripFoundationConfig = new MotionConfig();
+        MotionConfig gripFoundationConfig = new MotionConfig();
         gripFoundationConfig.idealHeading = Math.PI;
         gripFoundationConfig.timeOut = 3000;
         gripFoundationConfig.turnCutoff = 20.0;
-        //gripFoundationConfig.addOBMCommand(slideCycle);
+        slideCycle.setCycleHeight(220);
+        gripFoundationConfig.addOBMCommand(slideCycle);
         chassis.followPath(gripFoundation, gripFoundationConfig);
         chassis.stopMotors();
 
@@ -163,7 +167,7 @@ public class BaseAuto {
         FTCUtilities.sleep(400);
 
         MotionConfig pullFoundationConfig = new MotionConfig();
-        //pullFoundationConfig.addOBMCommand(slideCycle);
+        pullFoundationConfig.addOBMCommand(slideCycle);
         pullFoundationConfig.timeOut = 3000;
         pullFoundationConfig.turnCutoff = 4.0;
 
@@ -172,34 +176,34 @@ public class BaseAuto {
         leftFoundation.setPosition(0);
         rightFoundation.setPosition(0);
 
+        intake.runMotors(.5);
+
         blockGripper.reset();
 
-        intake.runMotors(MOTOR_POWER);
-
         MotionConfig quarry2Config = new MotionConfig();
-        //quarry2Config.addOBMCommand(slideCycle);
+        quarry2Config.addOBMCommand(slideCycle);
         quarry2Config.addOBMCommand(blockGripper);
         quarry2Config.timeOut = 3500;
         quarry2Config.turnPower = .7;
         quarry2Config.turnAggression = .4;
 
         chassis.followPath(quarry2, quarry2Config);
-        //slideCycle.reset();
-        //slideCycle.setCycleHeight(280);
+        slideCycle.reset();
+        slideCycle.setCycleHeight(350);
 
         MotionConfig foundation2Config = new MotionConfig();
         foundation2Config.idealHeading = Math.PI;
-        //foundation2Config.addOBMCommand(slideCycle);
+        foundation2Config.addOBMCommand(slideCycle);
         foundation2Config.timeOut = 3000;
 
         chassis.followPath(foundation2, foundation2Config);
         chassis.stopMotors();
 
-        //ardennes.finishOBMCommand(slideCycle);
+        ardennes.finishOBMCommand(slideCycle);
 
         blockGripper.reset();
 
-        intake.runMotors(MOTOR_POWER);
+        intake.runMotors(.5);
 
         MotionConfig quarry3Config = new MotionConfig();
         quarry3Config.addOBMCommand(blockGripper);
@@ -207,18 +211,18 @@ public class BaseAuto {
 
         chassis.followPath(quarry3, quarry3Config);
 
-        //slideCycle.reset();
-        //slideCycle.setCycleHeight(280);
+        slideCycle.reset();
+        slideCycle.setCycleHeight(360);
 
         MotionConfig foundation3Config = new MotionConfig();
         foundation3Config.idealHeading = Math.PI;
-        //foundation3Config.addOBMCommand(slideCycle);
+        foundation3Config.addOBMCommand(slideCycle);
         foundation3Config.timeOut = 4000;
 
         chassis.followPath(foundation3, foundation3Config);
         chassis.stopMotors();
 
-        //ardennes.finishOBMCommand(slideCycle);
+        ardennes.finishOBMCommand(slideCycle);
 
         //MotionConfig parkConfig = new MotionConfig();
         //parkConfig.addOBMCommand(tapeMeasure);
