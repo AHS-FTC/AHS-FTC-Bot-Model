@@ -8,15 +8,15 @@ import edu.ahs.robotics.hardware.sensors.OdometrySystem;
  * Can be used at times where the heading of the robot should be changed mid movement.
  * @author Alex Appleby
  */
-public class TargetHeadingChanger implements OBMCommand {
+public class GlobalHeadingChanger implements OBMCommand {
     private MotionConfig motionConfig;
     private double turnY;
-    private double idealHeading;
+    private double globalHeading;
     private boolean finished = false;
 
-    public TargetHeadingChanger(MotionConfig motionConfig, double idealHeading, double turnY) {
+    public GlobalHeadingChanger(MotionConfig motionConfig, double globalHeading, double turnY) {
         this.motionConfig = motionConfig;
-        this.idealHeading = idealHeading;
+        this.globalHeading = globalHeading;
         this.turnY = turnY;
     }
 
@@ -24,7 +24,8 @@ public class TargetHeadingChanger implements OBMCommand {
     public boolean check(OdometrySystem.State robotState) {
         if(!finished){
             if(robotState.position.y > turnY){ //kind of static logic, can be changed if need be
-                motionConfig.idealHeading = idealHeading;
+                motionConfig.usingGlobalHeading = true;
+                motionConfig.globalHeading = globalHeading;
                 finished = true;
             }
         }

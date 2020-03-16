@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.control.obm.TargetHeadingChanger;
+import edu.ahs.robotics.control.obm.GlobalHeadingChanger;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.loggers.DataLogger;
@@ -69,7 +69,7 @@ public class TurnMidPathAuto extends LinearOpMode {
         waitForStart(); // ------------------
 
         MotionConfig motionConfig = new MotionConfig();
-        motionConfig.addOBMCommand(new TargetHeadingChanger(motionConfig, Math.PI, 40));
+        motionConfig.addOBMCommand(new GlobalHeadingChanger(motionConfig, Math.PI, 40));
         motionConfig.turnCutoff = 4;
         motionConfig.turnPower = 0.5;
 
