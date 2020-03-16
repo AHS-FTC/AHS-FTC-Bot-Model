@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.control.obm.BlockGripper;
+import edu.ahs.robotics.control.obm.FoundationGrip;
 import edu.ahs.robotics.control.obm.NullCommand;
 import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.obm.SlideCycle;
@@ -20,6 +21,7 @@ import edu.ahs.robotics.util.loggers.Logger;
 
 public class BaseAuto {
     public static final double MOTOR_POWER = 1;
+    public static final double MOTOR_POWER_SLOW = .7;
     private Ardennes ardennes;
     private MecanumChassis chassis;
     private Intake intake;
@@ -31,9 +33,11 @@ public class BaseAuto {
 
     private Logger logger;
     private OBMCommand nullCommand = new NullCommand();
-    private SlideCycle slideCycle;
+    private SlideCycleUp slideCycleUp;
+    private SlideCycleDown slideCycleDown;
     private BlockGripper blockGripper;
     private OBMCommand changeTargetHeading;
+    private FoundationGrip foundationGrip;
 
     private int turnSign;
 
@@ -64,8 +68,10 @@ public class BaseAuto {
 
         capstone.setPosition(0.22);
 
-        slideCycle = new SlideCycle(ardennes);
-        blockGripper = new BlockGripper(ardennes,500L);
+        slideCycleUp = new SlideCycleUp(ardennes);
+        slideCycleDown = new SlideCycleDown(ardennes);
+        blockGripper = new BlockGripper(ardennes);
+        foundationGrip = new FoundationGrip(ardennes, 1000);
 
         if(flipToBlue){
             turnSign = -1;
@@ -141,33 +147,36 @@ public class BaseAuto {
 
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.idealHeading = Math.PI;
-        toFoundationConfig.turnAggression = .9;
+        toFoundationConfig.turnAggression = .01;
         toFoundationConfig.turnPower = 1;
         toFoundationConfig.timeOut = 5000;
         changeTargetHeading = new GlobalHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
         toFoundationConfig.addOBMCommand(changeTargetHeading);
-        toFoundationConfig.turnCutoff = 2;
+        toFoundationConfig.usingGlobalHeading = true;
+        toFoundationConfig.turnCutoff = 0;
 
         chassis.followPath(toFoundation, toFoundationConfig);
 
         chassis.stopMotors();
 
+        gripper.setPosition(1);
+
         MotionConfig gripFoundationConfig = new MotionConfig();
         gripFoundationConfig.idealHeading = Math.PI;
-        gripFoundationConfig.timeOut = 3000;
-        gripFoundationConfig.turnCutoff = 20.0;
-        slideCycle.setCycleHeight(220);
-        gripFoundationConfig.addOBMCommand(slideCycle);
+        gripFoundationConfig.timeOut = 2700;
+        gripFoundationConfig.turnCutoff = 6.0; //20
+        slideCycleUp.setCycleHeight(220);
+        gripFoundationConfig.addOBMCommand(slideCycleUp);
+        gripFoundationConfig.addOBMCommand(foundationGrip);
         chassis.followPath(gripFoundation, gripFoundationConfig);
         chassis.stopMotors();
 
-        leftFoundation.setPosition(1);
-        rightFoundation.setPosition(1);
+        gripper.setPosition(0);
 
-        FTCUtilities.sleep(400);
+        ardennes.finishOBMCommand(foundationGrip);
 
         MotionConfig pullFoundationConfig = new MotionConfig();
-        pullFoundationConfig.addOBMCommand(slideCycle);
+        pullFoundationConfig.addOBMCommand(slideCycleUp);
         pullFoundationConfig.timeOut = 3000;
         pullFoundationConfig.turnCutoff = 4.0;
 
@@ -176,53 +185,56 @@ public class BaseAuto {
         leftFoundation.setPosition(0);
         rightFoundation.setPosition(0);
 
-        intake.runMotors(.5);
+        intake.runMotors(MOTOR_POWER_SLOW);
 
         blockGripper.reset();
 
         MotionConfig quarry2Config = new MotionConfig();
-        quarry2Config.addOBMCommand(slideCycle);
+        quarry2Config.addOBMCommand(slideCycleDown);
         quarry2Config.addOBMCommand(blockGripper);
         quarry2Config.timeOut = 3500;
         quarry2Config.turnPower = .7;
         quarry2Config.turnAggression = .4;
 
         chassis.followPath(quarry2, quarry2Config);
-        slideCycle.reset();
-        slideCycle.setCycleHeight(350);
+        slideCycleUp.reset();
+        slideCycleUp.setCycleHeight(400);
+        slideCycleDown.reset();
+
+        gripper.setPosition(1);
 
         MotionConfig foundation2Config = new MotionConfig();
         foundation2Config.idealHeading = Math.PI;
-        foundation2Config.addOBMCommand(slideCycle);
+        foundation2Config.addOBMCommand(slideCycleUp);
         foundation2Config.timeOut = 3000;
 
         chassis.followPath(foundation2, foundation2Config);
         chassis.stopMotors();
 
-        ardennes.finishOBMCommand(slideCycle);
+        gripper.setPosition(0);
 
+        intake.runMotors(MOTOR_POWER_SLOW);
         blockGripper.reset();
 
-        intake.runMotors(.5);
-
         MotionConfig quarry3Config = new MotionConfig();
+        quarry3Config.addOBMCommand(slideCycleDown);
         quarry3Config.addOBMCommand(blockGripper);
         quarry3Config.timeOut = 3500;
 
         chassis.followPath(quarry3, quarry3Config);
 
-        slideCycle.reset();
-        slideCycle.setCycleHeight(360);
+        slideCycleUp.reset();
+        slideCycleUp.setCycleHeight(400);
+        slideCycleDown.reset();
 
         MotionConfig foundation3Config = new MotionConfig();
         foundation3Config.idealHeading = Math.PI;
-        foundation3Config.addOBMCommand(slideCycle);
+        foundation3Config.addOBMCommand(slideCycleUp);
         foundation3Config.timeOut = 4000;
 
         chassis.followPath(foundation3, foundation3Config);
         chassis.stopMotors();
 
-        ardennes.finishOBMCommand(slideCycle);
 
         //MotionConfig parkConfig = new MotionConfig();
         //parkConfig.addOBMCommand(tapeMeasure);

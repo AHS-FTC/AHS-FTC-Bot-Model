@@ -16,27 +16,17 @@ public class BlockGripper implements OBMCommand {
 
     private Trigger gripperTrigger;
 
-    private long startTime;
-    private long waitTime;
-
     private State state;
 
     private enum State{
-        INITIAL,
         WAITING,
         FINISHED
     }
 
-    public BlockGripper(Ardennes ardennes, long waitTime){
+    public BlockGripper(Ardennes ardennes){
         this.ardennes = ardennes;
-        this.waitTime = waitTime;
         this.gripperTrigger = ardennes.getGripperTrigger();
         reset();
-    }
-
-    public void resetWaitTime(long waitTime){
-        this.waitTime = waitTime;
-        startTime = FTCUtilities.getCurrentTimeMillis();
     }
 
     @Override
