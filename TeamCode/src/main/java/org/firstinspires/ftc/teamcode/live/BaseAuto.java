@@ -148,11 +148,12 @@ public class BaseAuto {
 
         MotionConfig toFoundationConfig = new MotionConfig();
         toFoundationConfig.idealHeading = Math.PI;
-        toFoundationConfig.turnAggression = .9;
+        toFoundationConfig.turnAggression = .01;
         toFoundationConfig.turnPower = 1;
         toFoundationConfig.timeOut = 5000;
         changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
         toFoundationConfig.addOBMCommand(changeTargetHeading);
+        toFoundationConfig.usingGlobalHeading = true;
         toFoundationConfig.turnCutoff = 0;
 
         chassis.followPath(toFoundation, toFoundationConfig);
