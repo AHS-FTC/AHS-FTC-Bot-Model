@@ -19,7 +19,7 @@ import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.loggers.Logger;
 
 @Autonomous(name = "Foundation Look Auto", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class FoundationLookTest extends LinearOpMode {
 
     Ardennes ardennes;

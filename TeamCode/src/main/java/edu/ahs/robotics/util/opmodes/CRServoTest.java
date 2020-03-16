@@ -38,13 +38,13 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import edu.ahs.robotics.hardware.ContinuosServo;
 
 @TeleOp(name="CR Servo Test", group="Iterative OpMode")
-@Disabled
+//@Disabled
 public class CRServoTest extends OpMode {
     CRServo crServo;
 
     @Override
     public void init() {
-        crServo = hardwareMap.get(CRServo.class, "vexServo");
+        crServo = hardwareMap.get(CRServo.class, "tapeMeasure");
     }
 
     @Override

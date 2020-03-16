@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
 import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
@@ -44,32 +45,34 @@ import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
 import edu.ahs.robotics.util.loggers.Logger;
+import edu.ahs.robotics.util.opmodes.bfr.LinearOpMode16896;
 
 
 @Autonomous(name = "Left Curve Auto", group = "Linear Opmode")
-@Disabled
-public class LeftCurveAuto extends LinearOpMode {
+//@Disabled
+public class LeftCurveAuto extends LinearOpMode16896 {
 
     private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+    Logger logger;
+    BaseTestAuto base;
+
 
     @Override
-    public void runOpMode() {
+    protected void initialize() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new DataLogger("pathDataCurveL", "partialPursuit");
+        logger = new DataLogger("pathDataCurveL", "partialPursuit");
 
         List<List<Point>> points = GCodeReader.openFile("1001.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points.get(0), .5, 0, new double[][]{{6,.4}, {12, .3}});
+        MotionConfig motionConfig = new MotionConfig();
 
-        waitForStart();
+        base = new BaseTestAuto(points.get(0), .3, .3, new double[][]{{6, .4}, {12, .5}, {18, .4}}, motionConfig);
+    }
 
+    @Override
+    protected void runProgram() {
         base.afterStart();
-
         logger.stopWriting();
     }
 }

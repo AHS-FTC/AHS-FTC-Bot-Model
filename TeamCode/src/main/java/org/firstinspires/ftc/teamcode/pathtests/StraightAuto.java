@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Point;
 import edu.ahs.robotics.util.ftc.ErrorStealer;
 import edu.ahs.robotics.util.loggers.DataLogger;
@@ -43,7 +44,7 @@ import edu.ahs.robotics.util.loggers.Logger;
 
 
 @Autonomous(name = "Straight Auto", group = "Linear Opmode")
-@Disabled
+//@Disabled
 public class StraightAuto extends LinearOpMode {
 
     @Override
@@ -54,9 +55,11 @@ public class StraightAuto extends LinearOpMode {
 
         ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(0,0));
-        points.add(new Point(72,0));
+        points.add(new Point(100,0));
 
-        BaseTestAuto base = new BaseTestAuto(points,.3, 0, new double[][]{{24, .4}, {48, .4}});
+        MotionConfig motionConfig = new MotionConfig();
+
+        BaseTestAuto base = new BaseTestAuto(points,.3, 0, new double[][]{{24, .4}, {48, .4}}, motionConfig);
 
         waitForStart();
 

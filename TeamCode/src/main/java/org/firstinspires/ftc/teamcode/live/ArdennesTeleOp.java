@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import edu.ahs.robotics.hardware.Blinkin;
+import edu.ahs.robotics.hardware.ContinuosServo;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.Slides;
@@ -73,13 +74,14 @@ public class ArdennesTeleOp extends IterativeOpMode16896
     private MecanumChassis chassis;
 
     private SerialServo gripper, capstone, xSlide, leftFoundation, rightFoundation;
-    //todo add Servo capstoneServo;
+
+    private ContinuosServo tapeMeasure;
 
     private Blinkin blinkin;
 
     private TriggerDistanceSensor gripperTrigger, intakeTrigger;
 
-    private static final double INTAKE_POWER = 1;
+    private static final double INTAKE_POWER = .5;
     private IntakeMode intakeMode = IntakeMode.OFF;
     private TapeMeasureMode tapeMeasureMode = TapeMeasureMode.OFF;
 
@@ -92,6 +94,9 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
     private Switch intakeOutSwitch;
     private Switch intakeInSwitch;
+
+    private Switch tapeMeasureSwitchOut;
+    private Switch tapeMeasureSwitchIn;
 
     private Switch xSlideSwitch;
 
@@ -121,6 +126,8 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         leftFoundation = ardennes.getLeftFoundation();
         rightFoundation = ardennes.getRightFoundation();
 
+        tapeMeasure = ardennes.getTapeMeasure();
+
         foundationToggle = new Toggle();
         gripperToggle = new Toggle();
         capstoneToggle = new Toggle();
@@ -131,6 +138,9 @@ public class ArdennesTeleOp extends IterativeOpMode16896
 
         intakeOutSwitch = new Switch();
         intakeInSwitch = new Switch();
+
+        tapeMeasureSwitchOut = new Switch();
+        tapeMeasureSwitchIn = new Switch();
 
         xSlideSwitch = new Switch();
 
@@ -302,6 +312,27 @@ public class ArdennesTeleOp extends IterativeOpMode16896
             }
         }
 
+        if (gamepad1.x) {
+            if (tapeMeasureSwitchOut.canFlip()) {
+                if (tapeMeasureMode == TapeMeasureMode.OUT) {
+                    tapeMeasureMode = TapeMeasureMode.OFF;
+                } else {
+                    tapeMeasureMode = TapeMeasureMode.OUT;
+                }
+                updateTapeMeasure();
+            }
+        }
+
+        if (gamepad1.y) {
+            if (tapeMeasureSwitchIn.canFlip()) {
+                if (tapeMeasureMode == TapeMeasureMode.IN) {
+                    tapeMeasureMode = TapeMeasureMode.OFF;
+                } else {
+                    tapeMeasureMode = TapeMeasureMode.IN;
+                }
+                updateTapeMeasure();
+            }
+        }
 
         //press x to drop capstone
         if (gamepad2.x) {
@@ -377,6 +408,16 @@ public class ArdennesTeleOp extends IterativeOpMode16896
         } else if (intakeMode == IntakeMode.INFAST) {
             double fastPower = Range.clip((gamepad1.right_trigger + .5), .5, 1);
             intake.runMotors(fastPower);
+        }
+    }
+
+    private void updateTapeMeasure() {
+        if(tapeMeasureMode == TapeMeasureMode.IN){
+            tapeMeasure.setPower(.85);
+        } else if (tapeMeasureMode == TapeMeasureMode.OFF) {
+            tapeMeasure.setPower(0);
+        } else if (tapeMeasureMode == TapeMeasureMode.OUT) {
+            tapeMeasure.setPower(-.85);
         }
     }
 

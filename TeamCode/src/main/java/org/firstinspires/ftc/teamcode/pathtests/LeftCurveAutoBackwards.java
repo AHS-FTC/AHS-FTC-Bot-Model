@@ -30,46 +30,44 @@
 package org.firstinspires.ftc.teamcode.pathtests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
+import edu.ahs.robotics.control.MotionConfig;
 import edu.ahs.robotics.control.Point;
-import edu.ahs.robotics.hardware.sensors.ArdennesSkyStoneDetector;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
-import edu.ahs.robotics.seasonrobots.Ardennes;
-import edu.ahs.robotics.util.loggers.DataLogger;
-import edu.ahs.robotics.util.ftc.FTCUtilities;
 import edu.ahs.robotics.util.GCodeReader;
+import edu.ahs.robotics.util.ftc.FTCUtilities;
+import edu.ahs.robotics.util.loggers.DataLogger;
 import edu.ahs.robotics.util.loggers.Logger;
+import edu.ahs.robotics.util.opmodes.bfr.LinearOpMode16896;
 
 
-@Autonomous(name = "Right Curve Auto", group = "Linear Opmode")
-@Disabled
-public class RightCurveAuto extends LinearOpMode {
+@Autonomous(name = "Left Curve Auto Backwards", group = "Linear Opmode")
+//@Disabled
+public class LeftCurveAutoBackwards extends LinearOpMode16896 {
 
     private ElapsedTime runtime = new ElapsedTime();
-    private Ardennes ardennes;
-    //private Tuner tuner;
-    private ArdennesSkyStoneDetector detector;
-    private TriggerDistanceSensor intakeTrigger;
+    Logger logger;
+    BaseTestAuto base;
 
     @Override
-    public void runOpMode() {
+    protected void initialize() {
         FTCUtilities.setOpMode(this);
 
-        Logger logger = new DataLogger("pathDataCurveR", "pathFollower");
+        logger = new DataLogger("pathDataCurveLBackwards", "partialPursuit");
 
-        List<List<Point>> points = GCodeReader.openFile("rightCurve.csv");
+        List<List<Point>> points = GCodeReader.openFile("1001.csv");
 
-        BaseTestAuto base = new BaseTestAuto(points.get(0), .3, 0, new double[][]{{}});
+        MotionConfig motionConfig = new MotionConfig();
+        motionConfig.idealHeading = Math.PI;
 
-        waitForStart();
+        base = new BaseTestAuto(points.get(0), .3, .3, new double[][]{{6, .4}, {12, .5}, {18, .4}}, motionConfig);
+    }
 
+    @Override
+    protected void runProgram() {
         base.afterStart();
-
-        stop();
+        logger.stopWriting();
     }
 }
