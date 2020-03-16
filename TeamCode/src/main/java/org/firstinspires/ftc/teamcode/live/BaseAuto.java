@@ -8,7 +8,7 @@ import edu.ahs.robotics.control.obm.BlockGripper;
 import edu.ahs.robotics.control.obm.NullCommand;
 import edu.ahs.robotics.control.obm.OBMCommand;
 import edu.ahs.robotics.control.obm.SlideCycle;
-import edu.ahs.robotics.control.obm.TargetHeadingChanger;
+import edu.ahs.robotics.control.obm.GlobalHeadingChanger;
 import edu.ahs.robotics.hardware.Intake;
 import edu.ahs.robotics.hardware.MecanumChassis;
 import edu.ahs.robotics.hardware.SerialServo;
@@ -144,7 +144,7 @@ public class BaseAuto {
         toFoundationConfig.turnAggression = .9;
         toFoundationConfig.turnPower = 1;
         toFoundationConfig.timeOut = 5000;
-        changeTargetHeading = new TargetHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
+        changeTargetHeading = new GlobalHeadingChanger(toFoundationConfig, (turnSign) * Math.PI/2, 12);
         toFoundationConfig.addOBMCommand(changeTargetHeading);
         toFoundationConfig.turnCutoff = 2;
 
