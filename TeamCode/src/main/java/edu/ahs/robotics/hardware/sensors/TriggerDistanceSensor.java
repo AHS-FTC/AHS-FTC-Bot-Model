@@ -9,7 +9,7 @@ public class TriggerDistanceSensor extends DistanceSensor implements Trigger {
     }
 
     public boolean isTriggered(){
-        if (getDistOptimized() <= threshold){
+        if (getDistOptimized() <= threshold){ //todo optimize
             return true;
         } else {
             return false;
