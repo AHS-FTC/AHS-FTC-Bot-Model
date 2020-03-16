@@ -193,10 +193,18 @@ public class MecanumChassis extends Chassis {
         double turnOutput;
 
         double distanceToTarget = target.distanceTo(robotPosition);
-        if(distanceToTarget < motionConfig.turnCutoff){
+        double angleError;
+
+        if(motionConfig.usingGlobalHeading){
+            angleError = FTCMath.ensureIdealAngle(robotPosition.heading - motionConfig.globalHeading);
+
+        } else {
+            angleError = FTCMath.ensureIdealAngle(localAngleToPoint - motionConfig.idealHeading);
+        }
+
+        if(distanceToTarget < motionConfig.turnCutoff && !motionConfig.usingGlobalHeading){
             turnOutput = 0.0;
         } else {
-            double angleError = FTCMath.ensureIdealAngle(localAngleToPoint - motionConfig.idealHeading);
             turnOutput = Range.clip(angleError * motionConfig.turnAggression,-1,1) * motionConfig.turnPower; // local angle to point can be interpreted as error
         }
 
@@ -211,7 +219,6 @@ public class MecanumChassis extends Chassis {
         logger.append("local angle to point", String.valueOf(localAngleToPoint));
 
         logger.writeLine();
-
 
         return new DriveCommand(v,turnOutput);
     }
@@ -229,8 +236,6 @@ public class MecanumChassis extends Chassis {
             this.turnOutput = turnOutput;
         }
     }
-
-
 
     public void arc(double angle, double radius, double maxPower, boolean rightTurn) {
         double minRampUp = .2;

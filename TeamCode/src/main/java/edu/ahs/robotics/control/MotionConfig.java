@@ -17,6 +17,9 @@ public class MotionConfig {
     public double turnAggression = .8;
     public double turnCutoff = 8;
 
+    public boolean usingGlobalHeading = false;
+    public double globalHeading = 0;
+
     public long timeOut =  10000L;//in milliseconds
 
     private ArrayList<OBMCommand> obmCommands = new ArrayList<>();
