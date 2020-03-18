@@ -1,9 +1,7 @@
 package edu.ahs.robotics.control.obm;
 
-import edu.ahs.robotics.control.Path;
 import edu.ahs.robotics.hardware.SerialServo;
 import edu.ahs.robotics.hardware.sensors.OdometrySystem;
-import edu.ahs.robotics.hardware.sensors.TriggerDistanceSensor;
 import edu.ahs.robotics.seasonrobots.Ardennes;
 import edu.ahs.robotics.util.ftc.FTCUtilities;
 
@@ -12,15 +10,13 @@ import edu.ahs.robotics.util.ftc.FTCUtilities;
  * Can be used at times where the heading of the robot should be changed mid movement.
  * @author Alex Appleby
  */
-public class FoundationGrip implements OBMCommand {
-    private double startLookingY;
+public class TimedGripper implements OBMCommand {
 
     private Ardennes ardennes;
 
     private State state = State.INITIAL;
 
-    private SerialServo foundationLeft;
-    private SerialServo foundationRight;
+    private SerialServo gripper;
 
     long startTime;
     long waitTime;
@@ -28,16 +24,14 @@ public class FoundationGrip implements OBMCommand {
     private enum State{
         INITIAL,
         RUNNING,
-        GRABBING,
         FINISHED
     }
 
-    public FoundationGrip(Ardennes ardennes, long waitTime) {
+    public TimedGripper(Ardennes ardennes, long waitTime) {
         this.ardennes = ardennes;
         this.waitTime = waitTime;
 
-        foundationLeft = ardennes.getLeftFoundation();
-        foundationRight = ardennes.getRightFoundation();
+        gripper = ardennes.getGripper();
 
     }
 
@@ -54,17 +48,10 @@ public class FoundationGrip implements OBMCommand {
 
             case RUNNING:
                 if ((FTCUtilities.getCurrentTimeMillis() - startTime) > waitTime){
-                    state = State.GRABBING;
-                    foundationRight.setPosition(1);
-                    foundationLeft.setPosition(1);
-                    break;
-                }
-
-            case GRABBING:
-                if ((FTCUtilities.getCurrentTimeMillis() - startTime) > 400 + waitTime){
                     state = State.FINISHED;
-                    break;
+                    gripper.setPosition(1);
                 }
+                break;
 
         }
         return false;
@@ -74,6 +61,8 @@ public class FoundationGrip implements OBMCommand {
     public void reset() {
         state = State.INITIAL;
     }
+
+    public void resetWaitTime(long waitTime) {this.waitTime = waitTime;}
 
     @Override
     public boolean isFinished() {
