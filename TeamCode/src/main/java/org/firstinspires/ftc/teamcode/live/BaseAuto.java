@@ -76,7 +76,7 @@ public class BaseAuto {
         slideCycleUp = new SlideCycleUp(ardennes);
         slideCycleDown = new SlideCycleDown(ardennes);
         blockGripper = new BlockGripper(ardennes);
-        foundationGrip = new FoundationGrip(ardennes, 1300);
+        foundationGrip = new FoundationGrip(ardennes, 900);
         timedGripper = new TimedGripper(ardennes, 500);
 
         if(flipToBlue){
@@ -172,14 +172,24 @@ public class BaseAuto {
 
         //FOUNDATION
 
+        leftFoundation.setPosition(.4);
+        rightFoundation.setPosition(.4);
+
         MotionConfig gripFoundationConfig = new MotionConfig();
         gripFoundationConfig.timeOut = 5000;
         gripFoundationConfig.globalHeading = Math.PI;
         gripFoundationConfig.usingGlobalHeading = true;
-        gripFoundationConfig.turnAggression = .1;
+        gripFoundationConfig.turnAggression = .2;
+        gripFoundationConfig.turnPower = .7;
         gripFoundationConfig.addOBMCommand(slideCycleUp);
         gripFoundationConfig.addOBMCommand(foundationGrip);
         chassis.followPath(gripFoundation, gripFoundationConfig);
+
+        chassis.setPowerAll(-.2);
+        long startTime = FTCUtilities.getCurrentTimeMillis();
+        while((FTCUtilities.getCurrentTimeMillis() - startTime) < 300){
+            foundationGrip.check(null);
+        }
         chassis.stopMotors();
 
         //leftFoundation.setPosition(1);

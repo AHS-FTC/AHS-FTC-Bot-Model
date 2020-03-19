@@ -71,12 +71,12 @@ public class RedAuto extends LinearOpMode16896 {
         pullFoundation36 = new Path(route36.get(3), false, .7, 1, new double[][]{{10, .8}, {14, 1}});
         quarry236 = new Path(route36.get(4), false, 1, .3, new double[][]{{8, 1}, {12, .8}, {16,.6}});
         foundation236 = new Path(route36.get(5), false, .8, .3, new double[][]{{12, .7}, {16, .6}});
-        quarry336 = new Path(route36.get(6), false, 1, 0.3, new double[][]{{12, 1}, {20, 1}, {26, .8}, {35, .7}});
+        quarry336 = new Path(route36.get(6), false, 1, 0.3, new double[][]{{12, 1}, {20, 1}, {26, .8}, {33, .6}});
         foundation336 = new Path(route36.get(7), false, 1, .3, new double[][]{{12, 1}, {16, 1}, {26, .7}, {35, .6}});
         quarry436 = new Path(route36.get(8), false, 1, .3, new double[][]{{12, 1}, {16, 1}, {26, 1}, {39, .6}});
         foundation436 = new Path(route36.get(9), false, 1, .3, new double[][]{{12, 1}, {16, 1}, {26, 1}, {35, .6}});
         quarry536 = new Path(route36.get(10), false, 1, .3, new double[][]{{12, 1}, {16, .7}, {20, .6}});
-        foundation536 = new Path(route36.get(11), false, 1, .3, new double[][]{{12, 1}, {16, .8}, {20, .8}, {24, .6}});
+        foundation536 = new Path(route36.get(11), false, 1, .3, new double[][]{{12, 1}, {16, .8}, {20, .8}, {24, .6}, {28, .8}});
 
         quarry25 = new Path(route25.get(0), false, 0.6, 0.2, new double[][]{{10, .5}, {22, .4}});
         toFoundation25 = new Path(route25.get(1), false, .3, 0, new double[][]{{18, .5}, {26, 1}, {40, .8}});

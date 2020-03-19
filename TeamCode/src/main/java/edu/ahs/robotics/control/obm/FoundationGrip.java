@@ -61,7 +61,7 @@ public class FoundationGrip implements OBMCommand {
                 }
 
             case GRABBING:
-                if ((FTCUtilities.getCurrentTimeMillis() - startTime) > 400 + waitTime){
+                if ((FTCUtilities.getCurrentTimeMillis() - startTime) > 350 + waitTime){
                     state = State.FINISHED;
                     break;
                 }
