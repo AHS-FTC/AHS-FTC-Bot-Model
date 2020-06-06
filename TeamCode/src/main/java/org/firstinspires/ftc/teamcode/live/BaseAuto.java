@@ -33,7 +33,7 @@ public class BaseAuto {
 
     private SerialServo leftFoundation, rightFoundation, xSlide, gripper, capstone;
 
-    private Path quarry, toFoundation, gripFoundation, pullFoundation, quarry2, foundation2, quarry3, foundation3, quarry4, foundation4, quarry5, foundation5;
+    private Path quarry, toFoundation, gripFoundation, pullFoundation, quarry2, foundation2, quarry3, foundation3, quarry4, foundation4, quarry5, foundation5, park;
 
     private Logger logger;
     private OBMCommand nullCommand = new NullCommand();
@@ -73,7 +73,7 @@ public class BaseAuto {
 
         capstone.setPosition(0.22);
 
-        slideCycleUp = new SlideCycleUp(ardennes);
+        slideCycleUp = new SlideCycleUp(ardennes, 220, true);
         slideCycleDown = new SlideCycleDown(ardennes);
         blockGripper = new BlockGripper(ardennes);
         foundationGrip = new FoundationGrip(ardennes, 900);
@@ -127,7 +127,7 @@ public class BaseAuto {
         chassis.startOdometrySystem();
     }
 
-    public void setPaths(Path quarry, Path toFoundation, Path gripFoundation , Path pullFoundation, Path quarry2, Path foundation2, Path quarry3, Path foundation3, Path quarry4, Path foundation4, Path quarry5, Path foundation5) {
+    public void setPaths(Path quarry, Path toFoundation, Path gripFoundation , Path pullFoundation, Path quarry2, Path foundation2, Path quarry3, Path foundation3, Path quarry4, Path foundation4, Path quarry5, Path foundation5, Path park) {
         this.quarry = quarry;
         this.toFoundation = toFoundation;
         this.gripFoundation = gripFoundation;
@@ -140,10 +140,11 @@ public class BaseAuto {
         this.foundation4 = foundation4;
         this.quarry5 = quarry5;
         this.foundation5 = foundation5;
+        this.park = park;
     }
 
     public void start(){
-        intake.runMotors(MOTOR_POWER);
+        intake.runMotors(MOTOR_POWER_SLOW);
 
         MotionConfig quarryConfig = new MotionConfig();
         quarryConfig.idealHeading =  (turnSign)*(-Math.PI/3);
@@ -172,38 +173,46 @@ public class BaseAuto {
 
         //FOUNDATION
 
-        leftFoundation.setPosition(.4);
-        rightFoundation.setPosition(.4);
+        leftFoundation.setPosition(.5);
+        rightFoundation.setPosition(.5);
 
         MotionConfig gripFoundationConfig = new MotionConfig();
-        gripFoundationConfig.timeOut = 5000;
-        gripFoundationConfig.globalHeading = Math.PI;
+        gripFoundationConfig.timeOut = 4000;
+        gripFoundationConfig.globalHeading = 2*Math.PI;
         gripFoundationConfig.usingGlobalHeading = true;
-        gripFoundationConfig.turnAggression = .2;
-        gripFoundationConfig.turnPower = .7;
+        gripFoundationConfig.turnAggression = 1;
         gripFoundationConfig.addOBMCommand(slideCycleUp);
         gripFoundationConfig.addOBMCommand(foundationGrip);
         chassis.followPath(gripFoundation, gripFoundationConfig);
 
-        chassis.setPowerAll(-.2);
-        long startTime = FTCUtilities.getCurrentTimeMillis();
-        while((FTCUtilities.getCurrentTimeMillis() - startTime) < 300){
-            foundationGrip.check(null);
-        }
         chassis.stopMotors();
+
+//        rightFoundation.setPosition(1);
+//        leftFoundation.setPosition(1);
+
+        gripper.setPosition(0);
+
+        ardennes.finishOBMCommand(foundationGrip);
+
+//        chassis.setPowerAll(-.2);
+//        long startTime = FTCUtilities.getCurrentTimeMillis();
+//        while((FTCUtilities.getCurrentTimeMillis() - startTime) < 500){
+//            foundationGrip.check(null);
+//        }
+//        chassis.stopMotors();
 
         //leftFoundation.setPosition(1);
         //rightFoundation.setPosition(1);
 
-        gripper.setPosition(0);
         //FTCUtilities.sleep(600);
 
-        ardennes.finishOBMCommand(foundationGrip);
 
         MotionConfig pullFoundationConfig = new MotionConfig();
         pullFoundationConfig.addOBMCommand(slideCycleUp);
         pullFoundationConfig.timeOut = 3000;
-        pullFoundationConfig.turnCutoff = 4.0;
+        pullFoundationConfig.turnCutoff = 0;
+        pullFoundationConfig.turnPower = 1;
+        pullFoundationConfig.turnAggression = 1;
 
         chassis.followPath(pullFoundation, pullFoundationConfig);
 
@@ -226,10 +235,10 @@ public class BaseAuto {
 
         chassis.followPath(quarry2, quarry2Config);
         slideCycleUp.reset();
-        slideCycleUp.setCycleHeight(400);
-        slideCycleDown.reset();
+        slideCycleUp.setCycleHeight(220);
+        slideCycleUp.setDropSlides(false);
 
-        gripper.setPosition(1);
+        slideCycleDown.reset();
 
         MotionConfig foundation2Config = new MotionConfig();
         foundation2Config.idealHeading = Math.PI;
@@ -241,8 +250,9 @@ public class BaseAuto {
         chassis.stopMotors();
 
         gripper.setPosition(0);
+        FTCUtilities.sleep(200);
 
-        intake.runMotors(MOTOR_POWER);
+        intake.runMotors(MOTOR_POWER_SLOW);
         blockGripper.reset();
         timedGripper.reset();
 
@@ -271,8 +281,9 @@ public class BaseAuto {
         chassis.stopMotors();
 
         gripper.setPosition(0);
+        FTCUtilities.sleep(200);
 
-        intake.runMotors(MOTOR_POWER);
+        intake.runMotors(MOTOR_POWER_SLOW);
         blockGripper.reset();
         timedGripper.reset();
 
@@ -287,6 +298,7 @@ public class BaseAuto {
 
         slideCycleUp.reset();
         slideCycleUp.setCycleHeight(400);
+        slideCycleUp.setDropSlides(true);
         slideCycleDown.reset();
 
         MotionConfig foundation4Config = new MotionConfig();
@@ -301,6 +313,7 @@ public class BaseAuto {
         chassis.stopMotors();
 
         gripper.setPosition(0);
+        FTCUtilities.sleep(200);
 
         //BLOCK 5
 
@@ -317,6 +330,7 @@ public class BaseAuto {
 
         slideCycleUp.reset();
         slideCycleUp.setCycleHeight(400);
+        slideCycleDown.reset();
 
         MotionConfig foundation5Config = new MotionConfig();
         foundation5Config.idealHeading = Math.PI;
@@ -330,14 +344,17 @@ public class BaseAuto {
         chassis.stopMotors();
 
         gripper.setPosition(0);
+        FTCUtilities.sleep(400);
 
-        //MotionConfig parkConfig = new MotionConfig();
-        //parkConfig.addOBMCommand(tapeMeasure);
-        //parkConfig.timeOut = 3000;
+        //PARK
 
-        //chassis.followPath(park, parkConfig);
-        //chassis.stopMotors();
-        //ardennes.finishOBMCommand(tapeMeasure);*/
+        MotionConfig parkConfig = new MotionConfig();
+        parkConfig.addOBMCommand(slideCycleDown);
+
+        chassis.followPath(park, parkConfig);
+        chassis.stopMotors();
+
+        ardennes.finishOBMCommand(slideCycleDown);
 
         chassis.stopOdometrySystem();
         logger.stopWriting();

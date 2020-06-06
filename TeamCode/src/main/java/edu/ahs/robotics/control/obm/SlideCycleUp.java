@@ -10,9 +10,10 @@ public class SlideCycleUp implements OBMCommand{
 
     private int cycleHeight;
     private static final double STATIC_POWER = 0.2;
-    private static final double UP_POWER = 0.9;
+    private static final double UP_POWER = 1;
     private Ardennes ardennes;
     private State state;
+    private boolean dropSlides;
 
     private Slides slides;
     private SerialServo xSlide;
@@ -23,14 +24,16 @@ public class SlideCycleUp implements OBMCommand{
     private enum State{
         INITIAL,
         RAISINGZ,
-        FINISHED
+        EXTENDINGX,
+        DROPPING,
+        FINISHED,
     }
 
     public SlideCycleUp(Ardennes ardennes){
-        this(ardennes, 280);
+        this(ardennes, 280, false);
     }
 
-    public SlideCycleUp(Ardennes ardennes, int cycleHeight){
+    public SlideCycleUp(Ardennes ardennes, int cycleHeight, boolean dropSlides){
         this.ardennes = ardennes;
         state  = State.INITIAL;
 
@@ -39,11 +42,14 @@ public class SlideCycleUp implements OBMCommand{
         gripper = ardennes.getGripper();
 
         this.cycleHeight = cycleHeight;
+        this.dropSlides = dropSlides;
     }
 
     public void setCycleHeight(int cycleHeight) {
         this.cycleHeight = cycleHeight;
     }
+
+    public void setDropSlides(boolean dropSlides) {this.dropSlides = dropSlides;}
 
     @Override
     public boolean check(OdometrySystem.State robotState){
@@ -52,7 +58,7 @@ public class SlideCycleUp implements OBMCommand{
                 break;
 
             case INITIAL:
-                if (robotState.position.y > -12) { // if we're 12 inches above the center of the field
+                if (robotState.position.y > 4) { // if we're 4 inches above the center of the field
                     state = State.RAISINGZ;
                     slides.runAtPower(UP_POWER);
                 }
@@ -60,12 +66,29 @@ public class SlideCycleUp implements OBMCommand{
 
             case RAISINGZ:
                 if(slides.getCurrentPosition() > cycleHeight){
-                    state = State.FINISHED;
+                    state = State.EXTENDINGX;
                     slides.runAtPower(STATIC_POWER);
                     xSlide.setPosition(1);
                     startTime = FTCUtilities.getCurrentTimeMillis();
                 }
                 break;
+
+            case EXTENDINGX:
+                if (dropSlides){
+                    if (FTCUtilities.getCurrentTimeMillis() - startTime > 500){
+                        state = State.DROPPING;
+                        slides.runAtPower(-.1);
+                    }
+                } else {
+                    state = State.FINISHED;
+                }
+                break;
+
+            case DROPPING:
+                if (slides.getCurrentPosition() < (cycleHeight-10)){
+                    slides.runAtPower(STATIC_POWER);
+                    state = State.FINISHED;
+                }
         }
         return false;
     }

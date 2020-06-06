@@ -196,7 +196,7 @@ public class MecanumChassis extends Chassis {
         double angleError;
 
         if(motionConfig.usingGlobalHeading){
-            angleError = FTCMath.ensureIdealAngle(robotPosition.heading - motionConfig.globalHeading);
+            angleError = FTCMath.ensureIdealAngle(motionConfig.globalHeading - robotPosition.heading);
 
         } else {
             angleError = FTCMath.ensureIdealAngle(localAngleToPoint - motionConfig.idealHeading);

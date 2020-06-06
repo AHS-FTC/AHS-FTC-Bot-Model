@@ -51,7 +51,7 @@ public class SlideCycleDown implements OBMCommand{
             case RETRACTINGX:
                 if(FTCUtilities.getCurrentTimeMillis() - startTime > 200){
                     state = State.LOWERINGZ;
-                    slides.runAtPower(-.4);
+                    slides.runAtPower(-.8);
                 }
                 break;
 
