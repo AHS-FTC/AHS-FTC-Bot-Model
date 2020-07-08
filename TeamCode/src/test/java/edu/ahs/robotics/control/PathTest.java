@@ -400,6 +400,11 @@ public class PathTest {
 
         assertEquals(new Point(0,4), targetLocation.futurePoint);
 
+        robotPosition = new Position(0,-5,0);
+        targetLocation = path.getTargetLocation(robotPosition, 1);
+
+        assertEquals(new Point(0,-4), targetLocation.futurePoint);
+
         robotPosition = new Position(0, 0, 0);
         targetLocation = path.getTargetLocation(robotPosition, 0);
 
